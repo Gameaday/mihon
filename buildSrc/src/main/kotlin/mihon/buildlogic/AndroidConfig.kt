@@ -9,6 +9,6 @@ object AndroidConfig {
     const val MIN_SDK = 26
 
     // https://youtrack.jetbrains.com/issue/KT-66995/JvmTarget-and-JavaVersion-compatibility-for-easier-JVM-version-setup
-    val JavaVersion = GradleJavaVersion.VERSION_17
-    val JvmTarget = KotlinJvmTarget.JVM_17
+    val JavaVersion = GradleJavaVersion.VERSION_21
+    val JvmTarget = KotlinJvmTarget.JVM_21
 }

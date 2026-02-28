@@ -23,6 +23,10 @@ shortcutHelper.setFilePath("./shortcuts.xml")
 android {
     namespace = "eu.kanade.tachiyomi"
 
+    // NDK r29+ is required for ARMv9.2-A (arm64-v8a with SVE2/SME) support used by
+    // devices such as the Samsung Galaxy S24 series (Snapdragon 8 Gen 3 / Exynos 2400).
+    ndkVersion = "29.0.14206865"
+
     defaultConfig {
         applicationId = "app.mihon"
 
@@ -36,6 +40,12 @@ android {
         buildConfigField("boolean", "UPDATER_ENABLED", "${Config.enableUpdater}")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            // arm64-v8a covers ARMv8 through ARMv9.2-A (e.g. Samsung Galaxy S24 series).
+            // The universal APK and the dedicated arm64-v8a split both target this ABI.
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
+        }
     }
 
     buildTypes {

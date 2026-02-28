@@ -37,7 +37,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
 
       - name: Set up Gradle
@@ -55,7 +55,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: '35.0.1'
+          BUILD_TOOLS_VERSION: '36.0.0'
 
       - name: Rename APK
         run: |
@@ -93,7 +93,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
 
       - name: Set up Gradle
@@ -113,7 +113,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: '35.0.1'
+          BUILD_TOOLS_VERSION: '36.0.0'
 
       - name: Rename APK
         run: |
@@ -166,6 +166,8 @@ jobs:
             > [!TIP]
             >
             > ### If you are unsure which version to download then go with `mihon-${{ needs.get_tag.outputs.tag }}.apk`
+            >
+            > **Samsung Galaxy S24 series (ARMv9.2-A / Snapdragon 8 Gen 3 · Exynos 2400):** use `mihon-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk` for the best experience. The `arm64-v8a` ABI covers all 64-bit ARM devices including ARMv9.2-A.
           files: |
             mihon-${{ needs.get_tag.outputs.tag }}.apk
             mihon-${{ needs.get_tag.outputs.tag }}-foss.apk

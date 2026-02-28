@@ -23,7 +23,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
 
       - name: Set up Gradle
@@ -42,7 +42,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: '35.0.1'
+          BUILD_TOOLS_VERSION: '36.0.0'
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
 
       - name: Rename APKs
@@ -50,8 +50,12 @@ jobs:
           set -e
           cd app/build/outputs/apk/nightly
           SHORT_SHA="${GITHUB_SHA::7}"
+          # Remove unsigned APKs if signed versions exist to avoid uploading unsigned APKs
+          if ls *-signed.apk 2>/dev/null | grep -q .; then
+            rm -f *-unsigned.apk
+          fi
           for apk in *.apk; do
-            new_name=$(echo "$apk" | sed 's/-unsigned[^.]*\.apk$//')
+            new_name=$(echo "$apk" | sed 's/-nightly-unsigned[^.]*\.apk$//')
             mv "$apk" "${new_name}-nightly-${SHORT_SHA}.apk"
           done
 

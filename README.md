@@ -16,7 +16,7 @@ Discover and read manga, webtoons, comics, and more – easier than ever on your
 
 ## Download
 
-[![Mihon Nightly](https://img.shields.io/github/release/Gameaday/mihon.svg?maxAge=3600&label=Nightly&labelColor=2c2c47&color=1c1c39)](https://github.com/Gameaday/mihon/releases/latest)
+[![Mihon Nightly](https://img.shields.io/github/release/Gameaday/mihon.svg?maxAge=3600&label=Nightly&labelColor=2c2c47&color=1c1c39&include_prereleases)](https://github.com/Gameaday/mihon/releases/tag/nightly)
 
 *Requires Android 8.0 or higher.*
 
