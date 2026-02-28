@@ -60,8 +60,10 @@ class CoverCache(private val context: Context) {
      */
     @Throws(IOException::class)
     fun setCustomCoverToCache(manga: Manga, inputStream: InputStream) {
-        getCustomCoverFile(manga.id).outputStream().use {
-            inputStream.copyTo(it)
+        getCustomCoverFile(manga.id).outputStream().use { output ->
+            inputStream.use { input ->
+                input.copyTo(output)
+            }
         }
     }
 
