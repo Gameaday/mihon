@@ -83,6 +83,10 @@ fun WebView.setDefaultSettings() {
         loadWithOverviewMode = true
         cacheMode = WebSettings.LOAD_DEFAULT
 
+        // Prevent the WebView from accessing local files or content providers
+        allowFileAccess = false
+        allowContentAccess = false
+
         // Handle popups properly
         setSupportMultipleWindows(true)
 

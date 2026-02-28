@@ -30,13 +30,13 @@ jobs:
         uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
 
       - name: Build app
-        run: ./gradlew assembleRelease -Penable-updater
+        run: ./gradlew assembleNightly -Penable-updater
 
       - name: Sign APK
         if: ${{ env.SIGNING_KEY != '' }}
         uses: r0adkll/sign-android-release@f30bdd30588842ac76044ecdbd4b6d0e3e813478
         with:
-          releaseDirectory: app/build/outputs/apk/release
+          releaseDirectory: app/build/outputs/apk/nightly
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -48,7 +48,7 @@ jobs:
       - name: Rename APKs
         run: |
           set -e
-          cd app/build/outputs/apk/release
+          cd app/build/outputs/apk/nightly
           SHORT_SHA="${GITHUB_SHA::7}"
           for apk in *.apk; do
             new_name=$(echo "$apk" | sed 's/-unsigned[^.]*\.apk$//')
@@ -64,6 +64,6 @@ jobs:
             Automated nightly build from commit ${{ github.sha }}.
 
             Built from branch `${{ github.ref_name }}` at ${{ github.event.head_commit.timestamp }}.
-          files: app/build/outputs/apk/release/*.apk
+          files: app/build/outputs/apk/nightly/*.apk
           prerelease: true
           make_latest: false

@@ -141,8 +141,10 @@ object ImageUtil {
         half.applyCanvas {
             drawBitmap(imageBitmap, part, singlePage, null)
         }
+        imageBitmap.recycle()
         val output = Buffer()
         half.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        half.recycle()
 
         return output
     }
@@ -150,9 +152,11 @@ object ImageUtil {
     fun rotateImage(imageSource: BufferedSource, degrees: Float): BufferedSource {
         val imageBitmap = BitmapFactory.decodeStream(imageSource.inputStream())
         val rotated = rotateBitMap(imageBitmap, degrees)
+        imageBitmap.recycle()
 
         val output = Buffer()
         rotated.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        rotated.recycle()
 
         return output
     }
@@ -187,9 +191,11 @@ object ImageUtil {
             val bottomPart = Rect(0, height, width / 2, height * 2)
             drawBitmap(imageBitmap, leftPart, bottomPart, null)
         }
+        imageBitmap.recycle()
 
         val output = Buffer()
         result.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        result.recycle()
         return output
     }
 
@@ -227,6 +233,7 @@ object ImageUtil {
 
         val output = Buffer()
         result.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        result.recycle()
         return output
     }
 
@@ -375,6 +382,7 @@ object ImageUtil {
         val whiteColor = Color.WHITE
         if (image == null) return ColorDrawable(whiteColor)
         if (image.width < 50 || image.height < 50) {
+            image.recycle()
             return ColorDrawable(whiteColor)
         }
 
@@ -396,6 +404,8 @@ object ImageUtil {
         val botLeftPixel = image[left, bot]
         val bottomCenterPixel = image[midX, bot]
         val botRightPixel = image[right, bot]
+        val topOffsetCornersIsDark = image[leftOffsetX, top].isDark() && image[rightOffsetX, top].isDark()
+        val botOffsetCornersIsDark = image[leftOffsetX, bot].isDark() && image[rightOffsetX, bot].isDark()
 
         val topLeftIsDark = topLeftPixel.isDark()
         val topRightIsDark = topRightPixel.isDark()
@@ -416,6 +426,7 @@ object ImageUtil {
             !color.isWhite() && color.isCloseTo(other)
         }
         if (isNotWhiteAndCloseTo.all { it }) {
+            image.recycle()
             return ColorDrawable(topLeftPixel)
         }
 
@@ -528,6 +539,8 @@ object ImageUtil {
             darkBG = true
         }
 
+        image.recycle()
+
         val isLandscape = context.resources.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (isLandscape) {
             return when {
@@ -541,9 +554,6 @@ object ImageUtil {
 
         val topCornersIsDark = topLeftIsDark && topRightIsDark
         val botCornersIsDark = botLeftIsDark && botRightIsDark
-
-        val topOffsetCornersIsDark = image[leftOffsetX, top].isDark() && image[rightOffsetX, top].isDark()
-        val botOffsetCornersIsDark = image[leftOffsetX, bot].isDark() && image[rightOffsetX, bot].isDark()
 
         val gradient = when {
             darkBG && botCornersIsWhite -> {

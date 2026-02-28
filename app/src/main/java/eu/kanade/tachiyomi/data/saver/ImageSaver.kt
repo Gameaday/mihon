@@ -15,13 +15,12 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.cacheImageDir
 import eu.kanade.tachiyomi.util.storage.getUriCompat
 import logcat.LogPriority
+import okio.Buffer
 import okio.IOException
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
 import java.time.Instant
@@ -164,9 +163,9 @@ sealed class Image(
             return when (this) {
                 is Cover -> {
                     {
-                        val baos = ByteArrayOutputStream()
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-                        ByteArrayInputStream(baos.toByteArray())
+                        val buffer = Buffer()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, buffer.outputStream())
+                        buffer.inputStream()
                     }
                 }
                 is Page -> inputStream

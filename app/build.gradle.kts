@@ -55,6 +55,14 @@ android {
 
         val commonMatchingFallbacks = listOf(release.name)
 
+        create("nightly") {
+            initWith(release)
+
+            applicationIdSuffix = ".nightly"
+            versionNameSuffix = "-nightly-${getGitSha()}"
+
+            matchingFallbacks.addAll(commonMatchingFallbacks)
+        }
         create("foss") {
             initWith(release)
 

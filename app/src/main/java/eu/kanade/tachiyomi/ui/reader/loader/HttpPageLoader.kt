@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.ui.reader.loader
 
 import eu.kanade.tachiyomi.data.cache.ChapterCache
 import eu.kanade.tachiyomi.data.database.models.toDomainChapter
+import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
@@ -11,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runInterruptible
@@ -19,6 +21,7 @@ import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.core.common.util.lang.withIOContext
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
+import java.io.IOException
 import java.util.concurrent.PriorityBlockingQueue
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
@@ -163,30 +166,45 @@ internal class HttpPageLoader(
 
     /**
      * Loads the page, retrieving the image URL and downloading the image if necessary.
+     * Automatically retries on transient network errors (IO errors, HTTP 429 and 5xx) up to
+     * [MAX_PAGE_LOAD_RETRIES] times with exponential backoff before marking the page as failed.
      * Downloaded images are stored in the chapter cache.
      *
      * @param page the page whose source image has to be downloaded.
      */
     private suspend fun internalLoadPage(page: ReaderPage) {
-        try {
-            if (page.imageUrl.isNullOrEmpty()) {
-                page.status = Page.State.LoadPage
-                page.imageUrl = source.getImageUrl(page)
-            }
-            val imageUrl = page.imageUrl!!
+        var retries = 0
+        while (true) {
+            try {
+                if (page.imageUrl.isNullOrEmpty()) {
+                    page.status = Page.State.LoadPage
+                    page.imageUrl = source.getImageUrl(page)
+                }
+                val imageUrl = page.imageUrl!!
 
-            if (!chapterCache.isImageInCache(imageUrl)) {
-                page.status = Page.State.DownloadImage
-                val imageResponse = source.getImage(page)
-                chapterCache.putImageToCache(imageUrl, imageResponse)
-            }
+                if (!chapterCache.isImageInCache(imageUrl)) {
+                    page.status = Page.State.DownloadImage
+                    val imageResponse = source.getImage(page)
+                    chapterCache.putImageToCache(imageUrl, imageResponse)
+                }
 
-            page.stream = { chapterCache.getImageFile(imageUrl).inputStream() }
-            page.status = Page.State.Ready
-        } catch (e: Throwable) {
-            page.status = Page.State.Error(e)
-            if (e is CancellationException) {
-                throw e
+                page.stream = { chapterCache.getImageFile(imageUrl).inputStream() }
+                page.status = Page.State.Ready
+                return
+            } catch (e: Throwable) {
+                if (e is CancellationException) throw e
+                val isTransient = when (e) {
+                    is IOException -> true
+                    is HttpException -> e.code == 429 || e.code >= 500
+                    else -> false
+                }
+                if (isTransient && retries < MAX_PAGE_LOAD_RETRIES) {
+                    retries++
+                    delay((PAGE_LOAD_RETRY_DELAY_MS * (1L shl (retries - 1))).coerceAtMost(MAX_PAGE_LOAD_RETRY_DELAY_MS))
+                } else {
+                    page.status = Page.State.Error(e)
+                    return
+                }
             }
         }
     }
@@ -211,3 +229,12 @@ private class PriorityPage(
         return if (p != 0) p else identifier.compareTo(other.identifier)
     }
 }
+
+/** Maximum number of automatic retry attempts for transient page-load failures. */
+private const val MAX_PAGE_LOAD_RETRIES = 3
+
+/** Initial delay in milliseconds before the first retry; doubles with each subsequent attempt. */
+private const val PAGE_LOAD_RETRY_DELAY_MS = 1_000L
+
+/** Maximum delay cap in milliseconds between retry attempts. */
+private const val MAX_PAGE_LOAD_RETRY_DELAY_MS = 8_000L
