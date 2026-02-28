@@ -193,6 +193,43 @@ object ImageUtil {
         return output
     }
 
+    /**
+     * Check whether the image is a small "stub" relative to a reference image.
+     * A stub has approximately the same width as the reference but a much smaller height (< 30%).
+     */
+    fun isSmallPage(imageSource: BufferedSource, referenceSource: BufferedSource): Boolean {
+        val options = extractImageOptions(imageSource)
+        val refOptions = extractImageOptions(referenceSource)
+        if (options.outWidth <= 0 || options.outHeight <= 0 || refOptions.outWidth <= 0 || refOptions.outHeight <= 0) {
+            return false
+        }
+        val widthSimilar = abs(options.outWidth - refOptions.outWidth) <= refOptions.outWidth * 0.05f
+        if (!widthSimilar) return false
+        val heightFraction = options.outHeight.toFloat() / refOptions.outHeight.toFloat()
+        return heightFraction < 0.3f
+    }
+
+    /**
+     * Combine two images vertically, placing the second image below the first.
+     */
+    fun mergePages(topSource: BufferedSource, bottomSource: BufferedSource): BufferedSource {
+        val topBitmap = BitmapFactory.decodeStream(topSource.inputStream())
+        val bottomBitmap = BitmapFactory.decodeStream(bottomSource.inputStream())
+
+        val width = max(topBitmap.width, bottomBitmap.width)
+        val result = createBitmap(width, topBitmap.height + bottomBitmap.height)
+        result.applyCanvas {
+            drawBitmap(topBitmap, 0f, 0f, null)
+            drawBitmap(bottomBitmap, 0f, topBitmap.height.toFloat(), null)
+        }
+        topBitmap.recycle()
+        bottomBitmap.recycle()
+
+        val output = Buffer()
+        result.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        return output
+    }
+
     enum class Side {
         RIGHT,
         LEFT,

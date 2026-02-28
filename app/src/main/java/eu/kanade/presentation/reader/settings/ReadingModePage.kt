@@ -134,6 +134,11 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
             pref = screenModel.preferences.dualPageRotateToFitInvert(),
         )
     }
+
+    CheckboxItem(
+        label = stringResource(MR.strings.pref_smart_page_combine),
+        pref = screenModel.preferences.smartCombinePaged(),
+    )
 }
 
 @Composable

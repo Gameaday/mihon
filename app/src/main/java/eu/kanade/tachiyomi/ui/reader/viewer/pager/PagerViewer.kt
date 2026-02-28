@@ -449,6 +449,12 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
         }
     }
 
+    fun onPageAbsorb(page: ReaderPage) {
+        activity.runOnUiThread {
+            adapter.onPageAbsorb(page)
+        }
+    }
+
     private fun cleanupPageSplit() {
         adapter.cleanupPageSplit()
     }

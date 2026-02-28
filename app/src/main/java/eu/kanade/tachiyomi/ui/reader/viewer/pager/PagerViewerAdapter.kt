@@ -179,6 +179,14 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
         notifyDataSetChanged()
     }
 
+    fun onPageAbsorb(page: ReaderPage) {
+        val index = items.indexOf(page)
+        if (index != -1) {
+            items.removeAt(index)
+            notifyDataSetChanged()
+        }
+    }
+
     fun cleanupPageSplit() {
         val insertPages = items.filterIsInstance<InsertPage>()
         items.removeAll(insertPages)

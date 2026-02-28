@@ -191,7 +191,7 @@ class PagerPageHolder(
         }
 
         if (!viewer.config.dualPageSplit) {
-            return imageSource
+            return trySmartCombine(page, imageSource) ?: imageSource
         }
 
         if (page is InsertPage) {
@@ -200,12 +200,25 @@ class PagerPageHolder(
 
         val isDoublePage = ImageUtil.isWideImage(imageSource)
         if (!isDoublePage) {
-            return imageSource
+            return trySmartCombine(page, imageSource) ?: imageSource
         }
 
         onPageSplit(page)
 
         return splitInHalf(imageSource)
+    }
+
+    private fun trySmartCombine(page: ReaderPage, imageSource: BufferedSource): BufferedSource? {
+        if (!viewer.config.smartCombine || page is InsertPage) return null
+        val nextPage = page.chapter.pages?.getOrNull(page.index + 1) ?: return null
+        if (nextPage.status != Page.State.Ready) return null
+        val nextStreamFn = nextPage.stream ?: return null
+
+        val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
+        if (!ImageUtil.isSmallPage(nextSource, imageSource)) return null
+
+        onPageAbsorb(nextPage)
+        return ImageUtil.mergePages(imageSource, nextSource)
     }
 
     private fun rotateDualPage(imageSource: BufferedSource): BufferedSource {
@@ -240,6 +253,10 @@ class PagerPageHolder(
     private fun onPageSplit(page: ReaderPage) {
         val newPage = InsertPage(page)
         viewer.onPageSplit(page, newPage)
+    }
+
+    private fun onPageAbsorb(page: ReaderPage) {
+        viewer.onPageAbsorb(page)
     }
 
     /**

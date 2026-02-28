@@ -106,6 +106,12 @@ class PagerConfig(
                 { dualPageRotateToFitInvert = it },
                 { imagePropertyChangedListener?.invoke() },
             )
+
+        readerPreferences.smartCombinePaged()
+            .register(
+                { smartCombine = it },
+                { imagePropertyChangedListener?.invoke() },
+            )
     }
 
     private fun zoomTypeFromPreference(value: Int) {
