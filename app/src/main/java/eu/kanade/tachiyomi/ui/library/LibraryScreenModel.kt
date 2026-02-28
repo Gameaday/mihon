@@ -203,9 +203,7 @@ class LibraryScreenModel(
 
         val filterFnDownloaded: (LibraryItem) -> Boolean = {
             applyFilter(filterDownloaded) {
-                it.libraryManga.manga.isLocal() ||
-                    it.downloadCount > 0 ||
-                    downloadManager.getDownloadCount(it.libraryManga.manga) > 0
+                it.libraryManga.manga.isLocal() || it.downloadCount > 0
             }
         }
 
@@ -389,10 +387,26 @@ class LibraryScreenModel(
             getLibraryItemPreferencesFlow(),
             downloadCache.changes,
         ) { libraryManga, preferences, _ ->
+            // Build a source→language map once per emission instead of once per manga, so a library
+            // with 1 000 manga from 10 sources makes 10 getOrStub calls instead of 1 000.
+            val sourceLangMap = if (preferences.languageBadge) {
+                libraryManga.map { it.manga.source }.toSet()
+                    .associateWith { sourceManager.getOrStub(it).lang }
+            } else {
+                emptyMap()
+            }
+
+            // downloadCount is needed for the download badge and for the "downloaded" filter.
+            // Pre-computing it here (once per manga) avoids a redundant per-item lookup inside
+            // applyFilters(), which is called on every filter-pass for every item.
+            val needDownloadCount = preferences.downloadBadge ||
+                preferences.filterDownloaded != TriState.DISABLED ||
+                preferences.globalFilterDownloaded
+
             libraryManga.map { manga ->
                 LibraryItem(
                     libraryManga = manga,
-                    downloadCount = if (preferences.downloadBadge) {
+                    downloadCount = if (needDownloadCount) {
                         downloadManager.getDownloadCount(manga.manga).toLong()
                     } else {
                         0
@@ -407,11 +421,7 @@ class LibraryScreenModel(
                     } else {
                         false
                     },
-                    sourceLanguage = if (preferences.languageBadge) {
-                        sourceManager.getOrStub(manga.manga.source).lang
-                    } else {
-                        ""
-                    },
+                    sourceLanguage = sourceLangMap[manga.manga.source] ?: "",
                 )
             }
         }
