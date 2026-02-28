@@ -200,7 +200,9 @@ internal class HttpPageLoader(
                 }
                 if (isTransient && retries < MAX_PAGE_LOAD_RETRIES) {
                     retries++
-                    delay((PAGE_LOAD_RETRY_DELAY_MS * (1L shl (retries - 1))).coerceAtMost(MAX_PAGE_LOAD_RETRY_DELAY_MS))
+                    delay(
+                        (PAGE_LOAD_RETRY_DELAY_MS * (1L shl (retries - 1))).coerceAtMost(MAX_PAGE_LOAD_RETRY_DELAY_MS),
+                    )
                 } else {
                     page.status = Page.State.Error(e)
                     return
