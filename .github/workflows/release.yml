@@ -13,6 +13,7 @@ jobs:
     if: github.repository == 'Gameaday/mihon'
     name: Extract tag name
     runs-on: 'ubuntu-24.04'
+    permissions: {}
     outputs:
       tag: ${{ steps.extract.outputs.tag }}
 
@@ -25,6 +26,8 @@ jobs:
     if: github.repository == 'Gameaday/mihon'
     name: Build
     runs-on: 'ubuntu-24.04'
+    permissions:
+      contents: read
     needs: get_tag
 
     steps:
@@ -79,6 +82,8 @@ jobs:
     if: github.repository == 'Gameaday/mihon'
     name: Build (FOSS)
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     needs: get_tag
 
     steps:
@@ -126,6 +131,8 @@ jobs:
     if: github.repository == 'Gameaday/mihon'
     name: Create GitHub Release
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     needs: [get_tag, build, build_foss]
 
     steps:
