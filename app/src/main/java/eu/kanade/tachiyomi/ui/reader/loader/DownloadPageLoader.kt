@@ -70,6 +70,7 @@ internal class DownloadPageLoader(
     }
 
     override suspend fun loadPage(page: ReaderPage) {
+        check(!isRecycled)
         archivePageLoader?.loadPage(page)
     }
 }

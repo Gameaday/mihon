@@ -26,4 +26,10 @@ internal class DirectoryPageLoader(val file: UniFile) : PageLoader() {
             }
             .orEmpty()
     }
+
+    // All pages are marked Ready immediately in getPages(), so there is no loading work to do
+    // here. The guard ensures the loader has not been recycled before any stream lambda is used.
+    override suspend fun loadPage(page: ReaderPage) {
+        check(!isRecycled)
+    }
 }
