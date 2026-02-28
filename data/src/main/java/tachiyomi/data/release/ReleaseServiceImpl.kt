@@ -16,23 +16,48 @@ class ReleaseServiceImpl(
 ) : ReleaseService {
 
     override suspend fun latest(arguments: GetApplicationRelease.Arguments): Release? {
+        val url = if (arguments.isNightly) {
+            "https://api.github.com/repos/${arguments.repository}/releases/tags/nightly"
+        } else {
+            "https://api.github.com/repos/${arguments.repository}/releases/latest"
+        }
+
         val release = with(json) {
             networkService.client
-                .newCall(GET("https://api.github.com/repos/${arguments.repository}/releases/latest"))
+                .newCall(GET(url))
                 .awaitSuccess()
                 .parseAs<GithubRelease>()
         }
 
         val downloadLink = getDownloadLink(release = release, isFoss = arguments.isFoss) ?: return null
 
+        // For nightly builds the tag is always "nightly", so use the short SHA extracted from
+        // the asset filename as the version identifier for comparison.
+        val version = if (arguments.isNightly) {
+            extractNightlySha(release) ?: release.version
+        } else {
+            release.version
+        }
+
         return Release(
-            version = release.version,
+            version = version,
             info = release.info.substringBeforeLast("<!-->").replace(gitHubUsernameMentionRegex) { mention ->
                 "[${mention.value}](https://github.com/${mention.value.substring(1)})"
             },
             releaseLink = release.releaseLink,
             downloadLink = downloadLink,
         )
+    }
+
+    /**
+     * Extracts the short git SHA from a nightly release asset filename.
+     * Asset names follow the pattern: `app-<abi>-nightly-<sha>.apk`
+     */
+    private fun extractNightlySha(release: GithubRelease): String? {
+        return release.assets
+            .firstOrNull { it.name.endsWith(".apk") }
+            ?.name
+            ?.let { name -> Regex("nightly-([a-f0-9]+)\\.apk").find(name)?.groupValues?.get(1) }
     }
 
     private fun getDownloadLink(release: GithubRelease, isFoss: Boolean): String? {

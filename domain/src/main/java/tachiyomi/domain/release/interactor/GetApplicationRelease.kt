@@ -32,7 +32,9 @@ class GetApplicationRelease(
         // Check if latest version is different from current version
         val isNewVersion = isNewVersion(
             arguments.isPreview,
+            arguments.isNightly,
             arguments.commitCount,
+            arguments.commitSha,
             arguments.versionName,
             release.version,
         )
@@ -44,38 +46,50 @@ class GetApplicationRelease(
 
     private fun isNewVersion(
         isPreview: Boolean,
+        isNightly: Boolean,
         commitCount: Int,
+        commitSha: String,
         versionName: String,
         versionTag: String,
     ): Boolean {
         // Removes prefixes like "r" or "v"
         val newVersion = versionTag.replace("[^\\d.]".toRegex(), "")
-        return if (isPreview) {
-            // Preview builds: based on releases in "mihonapp/mihon-preview" repo
-            // tagged as something like "r1234"
-            newVersion.toInt() > commitCount
-        } else {
-            // Release builds: based on releases in "mihonapp/mihon" repo
-            // tagged as something like "v0.1.2"
-            val oldVersion = versionName.replace("[^\\d.]".toRegex(), "")
-
-            val newSemVer = newVersion.split(".").map { it.toInt() }
-            val oldSemVer = oldVersion.split(".").map { it.toInt() }
-
-            oldSemVer.mapIndexed { index, i ->
-                if (newSemVer[index] > i) {
-                    return true
-                }
+        return when {
+            isPreview -> {
+                // Preview builds: based on releases in "mihonapp/mihon-preview" repo
+                // tagged as something like "r1234"
+                newVersion.toInt() > commitCount
             }
+            isNightly -> {
+                // Nightly builds: version is the short git SHA extracted from the release assets.
+                // A different SHA means a newer nightly is available.
+                versionTag.isNotBlank() && versionTag != commitSha
+            }
+            else -> {
+                // Release builds: based on releases in "mihonapp/mihon" repo
+                // tagged as something like "v0.1.2"
+                val oldVersion = versionName.replace("[^\\d.]".toRegex(), "")
 
-            false
+                val newSemVer = newVersion.split(".").map { it.toInt() }
+                val oldSemVer = oldVersion.split(".").map { it.toInt() }
+
+                oldSemVer.mapIndexed { index, i ->
+                    if (newSemVer[index] > i) {
+                        return true
+                    }
+                }
+
+                false
+            }
         }
     }
 
     data class Arguments(
         val isFoss: Boolean,
         val isPreview: Boolean,
+        val isNightly: Boolean = false,
         val commitCount: Int,
+        val commitSha: String = "",
         val versionName: String,
         val repository: String,
         val forceCheck: Boolean = false,
