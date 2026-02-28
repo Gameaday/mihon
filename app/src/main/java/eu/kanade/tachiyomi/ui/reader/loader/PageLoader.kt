@@ -12,6 +12,7 @@ abstract class PageLoader {
     /**
      * Whether this loader has been already recycled.
      */
+    @Volatile
     var isRecycled = false
         private set
 
