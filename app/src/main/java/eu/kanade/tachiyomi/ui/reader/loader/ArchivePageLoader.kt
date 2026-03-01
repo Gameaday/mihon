@@ -16,11 +16,11 @@ internal class ArchivePageLoader(private val reader: ArchiveReader) : PageLoader
         check(!isRecycled)
         return reader.useEntries { entries ->
             entries
-                .filter { it.isFile && ImageUtil.isImage(it.name) { reader.getInputStream(it.name)!! } }
+                .filter { it.isFile && ImageUtil.isImage(it.name) { requireNotNull(reader.getInputStream(it.name)) { "Entry '${it.name}' not found in archive during image check" } } }
                 .sortedWith { f1, f2 -> f1.name.compareToCaseInsensitiveNaturalOrder(f2.name) }
                 .mapIndexed { i, entry ->
                     ReaderPage(i).apply {
-                        stream = { reader.getInputStream(entry.name)!! }
+                        stream = { requireNotNull(reader.getInputStream(entry.name)) { "Entry '${entry.name}' not found in archive" } }
                         status = Page.State.Ready
                     }
                 }

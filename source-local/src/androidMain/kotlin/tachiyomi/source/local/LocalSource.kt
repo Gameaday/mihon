@@ -341,17 +341,17 @@ actual class LocalSource(
                         val entry = reader.useEntries { entries ->
                             entries
                                 .sortedWith { f1, f2 -> f1.name.compareToCaseInsensitiveNaturalOrder(f2.name) }
-                                .find { it.isFile && ImageUtil.isImage(it.name) { reader.getInputStream(it.name)!! } }
+                                .find { it.isFile && ImageUtil.isImage(it.name) { requireNotNull(reader.getInputStream(it.name)) { "Entry '${it.name}' not found in archive during image check" } } }
                         }
 
-                        entry?.let { coverManager.update(manga, reader.getInputStream(it.name)!!) }
+                        entry?.let { coverManager.update(manga, requireNotNull(reader.getInputStream(it.name)) { "Entry '${it.name}' not found in archive" }) }
                     }
                 }
                 is Format.Epub -> {
                     format.file.epubReader(context).use { epub ->
                         val entry = epub.getImagesFromPages().firstOrNull()
 
-                        entry?.let { coverManager.update(manga, epub.getInputStream(it)!!) }
+                        entry?.let { coverManager.update(manga, requireNotNull(epub.getInputStream(it)) { "Entry '$it' not found in EPUB" }) }
                     }
                 }
             }

@@ -67,7 +67,7 @@ internal class HttpPageLoader(
     override suspend fun getPages(): List<ReaderPage> {
         check(!isRecycled)
         val pages = try {
-            chapterCache.getPageListFromCache(chapter.chapter.toDomainChapter()!!)
+            chapterCache.getPageListFromCache(requireNotNull(chapter.chapter.toDomainChapter()) { "Chapter has no database ID" })
         } catch (e: Throwable) {
             if (e is CancellationException) {
                 throw e
@@ -139,7 +139,7 @@ internal class HttpPageLoader(
                 try {
                     // Convert to pages without reader information
                     val pagesToSave = pages.map { Page(it.index, it.url, it.imageUrl) }
-                    chapterCache.putPageListToCache(chapter.chapter.toDomainChapter()!!, pagesToSave)
+                    chapterCache.putPageListToCache(requireNotNull(chapter.chapter.toDomainChapter()) { "Chapter has no database ID" }, pagesToSave)
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
                         throw e
@@ -186,7 +186,7 @@ internal class HttpPageLoader(
                     page.status = Page.State.LoadPage
                     page.imageUrl = source.getImageUrl(page)
                 }
-                val imageUrl = page.imageUrl!!
+                val imageUrl = requireNotNull(page.imageUrl) { "Image URL is null after being fetched from source" }
 
                 if (!chapterCache.isImageInCache(imageUrl)) {
                     page.status = Page.State.DownloadImage
