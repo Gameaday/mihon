@@ -88,27 +88,49 @@ internal class HttpPageLoader(
      * prefetch never steals bandwidth from the active chapter. The full worker count (scaled
      * by device tier) is only used once the chapter becomes the active reading chapter.
      */
-    private val workerCount = if (isPreloadOnly) {
-        1
-    } else {
-        when (performanceTier) {
-            DeviceUtil.PerformanceTier.LOW -> 1
-            DeviceUtil.PerformanceTier.MEDIUM -> 2
-            DeviceUtil.PerformanceTier.HIGH -> 3
-        }
+    private val fullWorkerCount = when (performanceTier) {
+        DeviceUtil.PerformanceTier.LOW -> 1
+        DeviceUtil.PerformanceTier.MEDIUM -> 2
+        DeviceUtil.PerformanceTier.HIGH -> 3
     }
 
+    /** Guards [promoteToActive] so the promotion is applied at most once. */
+    @Volatile
+    private var promoted = !isPreloadOnly
+
     init {
-        repeat(workerCount) {
-            scope.launchIO {
-                flow {
-                    while (true) {
-                        emit(runInterruptible { queue.take() }.page)
-                    }
+        val initialWorkers = if (isPreloadOnly) 1 else fullWorkerCount
+        repeat(initialWorkers) { launchWorker() }
+    }
+
+    /**
+     * Promotes this loader from preload-only (1 worker) to the full [fullWorkerCount] for the
+     * active reading chapter. Idempotent — subsequent calls after the first are no-ops.
+     *
+     * The formula `fullWorkerCount - 1` is correct because preload-only loaders always start
+     * with exactly 1 worker ([init] uses `initialWorkers = 1` when [isPreloadOnly] is true),
+     * and [promoted] is initialised to `!isPreloadOnly`, so this branch is only reached when
+     * [isPreloadOnly] was true and exactly 1 worker is already running.
+     */
+    override fun promoteToActive() {
+        if (isRecycled || promoted) return
+        promoted = true
+        // Preload-only loaders always start with 1 worker; launch the remaining workers up to
+        // the tier-scaled maximum.  promoted=!isPreloadOnly guarantees this branch is only
+        // reached when initialWorkers == 1.
+        val remaining = fullWorkerCount - 1
+        repeat(remaining) { launchWorker() }
+    }
+
+    private fun launchWorker() {
+        scope.launchIO {
+            flow {
+                while (true) {
+                    emit(runInterruptible { queue.take() }.page)
                 }
-                    .filter { it.status == Page.State.Queue }
-                    .collect(::internalLoadPage)
             }
+                .filter { it.status == Page.State.Queue }
+                .collect(::internalLoadPage)
         }
     }
 

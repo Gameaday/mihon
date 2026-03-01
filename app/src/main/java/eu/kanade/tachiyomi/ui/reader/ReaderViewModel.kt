@@ -452,6 +452,7 @@ class ReaderViewModel @JvmOverloads constructor(
                 currentPages
                     .asSequence()
                     .drop(chapterPageIndex + 1)
+                    .take(preloadChapterAheadPages)
                     .count {
                         it.status == Page.State.Queue || it.status == Page.State.LoadPage ||
                             it.status == Page.State.DownloadImage
@@ -511,7 +512,38 @@ class ReaderViewModel @JvmOverloads constructor(
             downloadNextChapters()
         }
 
+        // If the next chapter is already loaded (preloaded) but its image prefetch was
+        // previously deferred because the current buffer was too thin, retry it now that
+        // another page has been consumed. This makes the preload truly opportunistic: it
+        // starts the moment bandwidth is available rather than only at the instant preload()
+        // is first called.
+        tryPreloadNextChapterImages(page.index, pages)
+
         eventChannel.trySend(Event.PageChanged)
+    }
+
+    /**
+     * Starts image preloading for the next chapter if the current chapter's forward buffer is
+     * healthy enough that we can spare bandwidth. Idempotent — pages already downloading or
+     * cached are skipped by [preloadFirstPages].
+     *
+     * @param currentPageIndex zero-based index of the page the user just navigated to.
+     * @param currentPages     the full page list of the chapter being read.
+     */
+    private fun tryPreloadNextChapterImages(currentPageIndex: Int, currentPages: List<ReaderPage>) {
+        val nextChapter = state.value.viewerChapters?.nextChapter ?: return
+        if (nextChapter.state !is ReaderChapter.State.Loaded) return
+        val pendingAhead = currentPages
+            .asSequence()
+            .drop(currentPageIndex + 1)
+            .take(preloadChapterAheadPages)
+            .count {
+                it.status == Page.State.Queue || it.status == Page.State.LoadPage ||
+                    it.status == Page.State.DownloadImage
+            }
+        if (pendingAhead < preloadChapterAheadPages) {
+            nextChapter.pageLoader?.preloadFirstPages(preloadChapterAheadPages)
+        }
     }
 
     private fun downloadNextChapters() {

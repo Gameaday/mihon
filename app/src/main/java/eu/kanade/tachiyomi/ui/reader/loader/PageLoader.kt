@@ -48,6 +48,20 @@ abstract class PageLoader {
     open fun preloadFirstPages(amount: Int) {}
 
     /**
+     * Promotes this loader to full worker concurrency when it was initially created in a
+     * bandwidth-throttled preload-only mode.
+     *
+     * When a chapter transitions from speculative preload to the active reading chapter the
+     * underlying [HttpPageLoader] needs additional download workers so it can keep pace with
+     * the reader. The base implementation is a no-op; [HttpPageLoader] overrides it to spawn
+     * the remaining workers up to the device-tier maximum.
+     *
+     * Implementations must be idempotent — calling this method more than once must not spawn
+     * duplicate workers.
+     */
+    open fun promoteToActive() {}
+
+    /**
      * Recycles this loader. Implementations must override this method to clean up any active
      * resources.
      */

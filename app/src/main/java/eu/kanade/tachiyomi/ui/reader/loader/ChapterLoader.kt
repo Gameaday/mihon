@@ -44,6 +44,13 @@ class ChapterLoader(
      */
     suspend fun loadChapter(chapter: ReaderChapter, isPreloadOnly: Boolean = false) {
         if (chapterIsReady(chapter)) {
+            // The chapter's page list is already available. If it was previously loaded by a
+            // preload-only (single-worker) HttpPageLoader and is now being activated as the
+            // current reading chapter, promote it to the full worker count so downloads are no
+            // longer throttled by the background-preload bandwidth cap.
+            if (!isPreloadOnly) {
+                chapter.pageLoader?.promoteToActive()
+            }
             return
         }
 
