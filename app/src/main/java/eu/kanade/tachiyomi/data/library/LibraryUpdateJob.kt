@@ -400,7 +400,9 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
                 }
                 return file
             }
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            logcat(LogPriority.ERROR, e) { "Failed to write library update error log" }
+        }
         return File("")
     }
 
