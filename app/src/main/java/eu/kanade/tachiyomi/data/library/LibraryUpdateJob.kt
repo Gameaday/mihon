@@ -98,14 +98,6 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
 
     override suspend fun doWork(): Result {
         if (tags.contains(WORK_NAME_AUTO)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                val preferences = Injekt.get<LibraryPreferences>()
-                val restrictions = preferences.autoUpdateDeviceRestrictions().get()
-                if ((DEVICE_ONLY_ON_WIFI in restrictions) && !context.isConnectedToWifi()) {
-                    return Result.retry()
-                }
-            }
-
             // Defer automatic updates while battery saver is active to conserve energy.
             if (context.isPowerSaveMode) {
                 return Result.retry()

@@ -57,7 +57,7 @@ internal object ExtensionLoader {
     private val PACKAGE_FLAGS = PackageManager.GET_CONFIGURATIONS or
         PackageManager.GET_META_DATA or
         PackageManager.GET_SIGNATURES or
-        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) PackageManager.GET_SIGNING_CERTIFICATES else 0)
+        PackageManager.GET_SIGNING_CERTIFICATES
 
     private const val PRIVATE_EXTENSION_EXTENSION = "ext"
 
@@ -363,16 +363,11 @@ internal object ExtensionLoader {
      * @return List SHA256 digest of the signatures
      */
     private fun getSignatures(pkgInfo: PackageInfo): List<String>? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val signingInfo = pkgInfo.signingInfo!!
-            if (signingInfo.hasMultipleSigners()) {
-                signingInfo.apkContentsSigners
-            } else {
-                signingInfo.signingCertificateHistory
-            }
+        val signingInfo = pkgInfo.signingInfo!!
+        return if (signingInfo.hasMultipleSigners()) {
+            signingInfo.apkContentsSigners
         } else {
-            @Suppress("DEPRECATION")
-            pkgInfo.signatures
+            signingInfo.signingCertificateHistory
         }
             ?.map { Hash.sha256(it.toByteArray()) }
             ?.toList()

@@ -13,13 +13,17 @@ fun Window.setSecureScreen(enabled: Boolean) {
 }
 
 /**
- * Requests the highest display refresh rate available on the device for the window, and on
- * Android 15+ opts out of power-savings-balanced frame rate management so the system does
- * not cap the rate during reading sessions.
+ * Requests the highest display refresh rate available on the device for the window.
  *
  * Sets [WindowManager.LayoutParams.preferredDisplayModeId] to the display mode that has the
  * highest refresh rate, allowing the panel to run at full speed (e.g. 90/120/144 Hz) while
  * the reader is active and giving smooth page transitions and scrolling.
+ *
+ * On Android 15+ (API 35) also opts out of power-savings-balanced frame rate management
+ * ([Window.setFrameRatePowerSavingsBalanced]) and enables touch-responsive rate boosting
+ * ([Window.setFrameRateBoostOnTouchEnabled]). This lets the OS automatically reduce the
+ * display refresh rate when the screen is idle/static (saving battery), while instantly
+ * boosting back to the high rate the moment the user touches or scrolls.
  */
 @Suppress("DEPRECATION")
 fun Window.applyHighRefreshRate() {
@@ -37,9 +41,11 @@ fun Window.applyHighRefreshRate() {
         preferredDisplayModeId = highestMode.modeId
     }
 
-    // API 35+: Opt out of automatic refresh-rate reductions to keep the panel at the
-    // selected rate throughout the reading session.
+    // API 35+: Opt out of automatic refresh-rate reductions during the reading session,
+    // and enable automatic rate boost when touch input is detected so the rate is high
+    // during scrolling/swiping and can be reduced by the OS when the display is static.
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
         setFrameRatePowerSavingsBalanced(false)
+        setFrameRateBoostOnTouchEnabled(true)
     }
 }

@@ -70,7 +70,7 @@ fun Activity.hasDisplayCutout(): Boolean {
  * Only works on Android 9+.
  */
 fun View.hasDisplayCutout(): Boolean {
-    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && rootWindowInsets?.displayCutout != null
+    return rootWindowInsets?.displayCutout != null
 }
 
 /**

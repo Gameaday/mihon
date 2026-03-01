@@ -143,13 +143,8 @@ class ShellInterface : IShellInterface.Stub() {
             PendingIntent.FLAG_MUTABLE,
         )
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-            session::class.java.getMethod("commit", IntentSender::class.java, Boolean::class.java)
-                .invoke(session, statusIntent.intentSender, false)
-        } else {
-            session::class.java.getMethod("commit", IntentSender::class.java)
-                .invoke(session, statusIntent.intentSender)
-        }
+        session::class.java.getMethod("commit", IntentSender::class.java, Boolean::class.java)
+            .invoke(session, statusIntent.intentSender, false)
     }
 
     override fun destroy() {

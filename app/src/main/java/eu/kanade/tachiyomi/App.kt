@@ -90,11 +90,9 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
             Security.insertProviderAt(Conscrypt.newProvider(), 1)
         }
 
-        // Avoid potential crashes
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val process = getProcessName()
-            if (packageName != process) WebView.setDataDirectorySuffix(process)
-        }
+        // Avoid potential crashes from multiple WebView processes
+        val process = getProcessName()
+        if (packageName != process) WebView.setDataDirectorySuffix(process)
 
         Injekt.importModule(PreferenceModule(this))
         Injekt.importModule(AppModule(this))

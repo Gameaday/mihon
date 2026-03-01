@@ -75,8 +75,8 @@ object ImageUtil {
             // https://coil-kt.github.io/coil/getting_started/#supported-image-formats
             when (type.format) {
                 Format.Gif -> true
-                // Animated WebP on Android 9+
-                Format.Webp -> type.isAnimated && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+                // Animated WebP supported from Android 9 (our minimum)
+                Format.Webp -> type.isAnimated
                 // Animated Heif on Android 11+
                 Format.Heif -> type.isAnimated && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
                 else -> false
