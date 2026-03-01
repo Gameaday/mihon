@@ -136,6 +136,8 @@ class PagerPageHolder(
      * Called when the page is queued.
      */
     private fun setQueued() {
+        // Clear any previously cached merge so a page retry starts with a fresh decode.
+        page.mergedBytes = null
         initProgressIndicator()
         progressIndicator?.show()
         removeErrorLayout()
@@ -165,11 +167,23 @@ class PagerPageHolder(
     private suspend fun setImage() {
         progressIndicator?.setProgress(0)
 
-        val streamFn = page.stream ?: return
+        // Fast path: if this page was already merged with its stub, use the cached bytes
+        // directly and skip re-opening the original streams entirely. This makes scrubbing
+        // back to a merged page instant with zero extra I/O or network calls.
+        // streamFn is only needed when there is no cache; capturing it before the suspend
+        // point guards against the stream reference being cleared on another thread.
+        val cachedMerge = page.mergedBytes
+        val streamFn = if (cachedMerge == null) page.stream ?: return else null
 
         try {
             val (source, isAnimated, background) = withIOContext {
-                val source = streamFn().use { process(item, Buffer().readFrom(it)) }
+                val source = if (cachedMerge != null) {
+                    // Write the cached byte array directly into a Buffer —
+                    // no intermediate InputStream or stream copy needed.
+                    Buffer().write(cachedMerge)
+                } else {
+                    checkNotNull(streamFn)().use { process(item, Buffer().readFrom(it)) }
+                }
                 // Cache displayed image dimensions so setupSmartCombineRetry can perform
                 // a header-only stub check without re-buffering the stream.
                 val dimOpts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -221,6 +235,8 @@ class PagerPageHolder(
     private fun setupSmartCombineRetry() {
         smartCombineRetryJob?.cancel()
         if (!viewer.config.smartCombine || page is InsertPage) return
+        // Already merged while the page was loading — no retry needed.
+        if (page.mergedBytes != null) return
         val nextPage = page.chapter.pages?.getOrNull(page.index + 1) ?: return
         // If the next page was already ready, trySmartCombine already had a chance to handle it.
         if (nextPage.status == Page.State.Ready) return
@@ -230,6 +246,8 @@ class PagerPageHolder(
             // isAttachedToWindow() returns true while this view is part of the window's
             // view hierarchy, i.e. the page holder is still on screen.
             if (!isAttachedToWindow()) return@launch
+            // The merge may have been completed by another path while we were waiting.
+            if (page.mergedBytes != null) return@launch
             // Use the cached dimensions of the current page so no stream re-read is needed.
             val nextStreamFn = nextPage.stream ?: return@launch
             try {
@@ -282,11 +300,19 @@ class PagerPageHolder(
         // Confirmed stub and non-animated: load the full next-page stream for bitmap decoding.
         val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
         return try {
-            val merged = ImageUtil.mergePages(imageSource, nextSource)
+            val mergedBuffer = ImageUtil.mergePages(imageSource, nextSource)
+            // Persist merged bytes on the page so every subsequent render (scrubbing back,
+            // refreshAdapter, etc.) returns the cached result instantly — no re-merge,
+            // no extra stream opens, no extra network or disk I/O.
+            // readByteArray() reads and removes all bytes from mergedBuffer in one pass.
+            val mergedBytes = mergedBuffer.readByteArray()
+            page.mergedBytes = mergedBytes
             // Absorb the stub only after a successful merge so that a decode failure
             // does not silently remove a page from the reader.
             onPageAbsorb(nextPage)
-            merged
+            // Write the already-extracted byte array directly into a fresh Buffer —
+            // no intermediate InputStream needed.
+            Buffer().write(mergedBytes)
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Smart combine merge failed; showing pages separately" }
             null

@@ -11,4 +11,13 @@ open class ReaderPage(
 ) : Page(index, url, imageUrl, null) {
 
     open lateinit var chapter: ReaderChapter
+
+    /**
+     * Cached bytes of a smart-combine merge with a following stub page.
+     * Non-null once the merge has succeeded; subsequent renders write these bytes
+     * directly into a [okio.Buffer] without opening any intermediate stream.
+     * Cleared to null when the page is retried so a fresh load starts clean.
+     */
+    @Volatile
+    var mergedBytes: ByteArray? = null
 }
