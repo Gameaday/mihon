@@ -4,11 +4,9 @@ import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import androidx.annotation.RequiresApi
 import androidx.core.content.contentValuesOf
 import androidx.core.net.toUri
 import eu.kanade.tachiyomi.util.storage.DiskUtil
@@ -35,7 +33,7 @@ class ImageSaver(
         val type = ImageUtil.findImageType(data) ?: throw IllegalArgumentException("Not an image")
         val filename = DiskUtil.buildValidFilename("${image.name}.${type.extension}")
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || image.location !is Location.Pictures) {
+        if (image.location !is Location.Pictures) {
             return save(data(), image.location.directory(context), filename)
         }
 
@@ -58,7 +56,6 @@ class ImageSaver(
         return destFile.getUriCompat(context)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveApi29(
         image: Image,
         type: ImageUtil.ImageType,
@@ -112,7 +109,6 @@ class ImageSaver(
         return picture
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun findUriOrDefault(path: String, filename: String, default: () -> Uri): Uri {
         val projection = arrayOf(
             MediaStore.MediaColumns._ID,
