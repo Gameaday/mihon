@@ -9,8 +9,6 @@ import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.source.local.io.LocalSourceFileSystem
 import java.io.InputStream
 
-private const val DEFAULT_COVER_NAME = "cover.jpg"
-
 actual class LocalCoverManager(
     private val context: Context,
     private val fileSystem: LocalSourceFileSystem,
@@ -46,5 +44,9 @@ actual class LocalCoverManager(
 
         manga.thumbnail_url = targetFile.uri.toString()
         return targetFile
+    }
+
+    companion object {
+        private const val DEFAULT_COVER_NAME = "cover.jpg"
     }
 }

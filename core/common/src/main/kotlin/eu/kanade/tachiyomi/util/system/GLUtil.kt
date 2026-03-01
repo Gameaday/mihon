@@ -55,6 +55,6 @@ object GLUtil {
             }
         }
     }
-}
 
-private const val MULTIPLIER: Int = 1024
+    private const val MULTIPLIER: Int = 1024
+}
