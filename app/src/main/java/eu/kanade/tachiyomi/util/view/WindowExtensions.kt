@@ -25,14 +25,8 @@ fun Window.setSecureScreen(enabled: Boolean) {
  * display refresh rate when the screen is idle/static (saving battery), while instantly
  * boosting back to the high rate the moment the user touches or scrolls.
  */
-@Suppress("DEPRECATION")
 fun Window.applyHighRefreshRate() {
-    val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        context.display
-    } else {
-        windowManager.defaultDisplay
-    } ?: return
-
+    val display = context.display ?: return
     val supportedModes = display.supportedModes
     if (supportedModes.isEmpty()) return
 

@@ -1,7 +1,6 @@
 package eu.kanade.tachiyomi.di
 
 import android.app.Application
-import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
@@ -55,7 +54,7 @@ class AppModule(val app: Application) : InjektModule {
                 schema = Database.Schema,
                 context = app,
                 name = "tachiyomi.db",
-                factory = if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                factory = if (BuildConfig.DEBUG) {
                     // Support database inspector in Android Studio
                     FrameworkSQLiteOpenHelperFactory()
                 } else {

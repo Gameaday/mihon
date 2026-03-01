@@ -77,8 +77,8 @@ object ImageUtil {
                 Format.Gif -> true
                 // Animated WebP supported from Android 9 (our minimum)
                 Format.Webp -> type.isAnimated
-                // Animated Heif on Android 11+
-                Format.Heif -> type.isAnimated && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                // Animated HEIF supported from Android 11 (our minimum)
+                Format.Heif -> type.isAnimated
                 else -> false
             }
         } catch (e: Exception) {
