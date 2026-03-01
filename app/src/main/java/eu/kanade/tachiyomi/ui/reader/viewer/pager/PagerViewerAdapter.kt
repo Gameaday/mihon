@@ -51,8 +51,9 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
         val prevHasMissingChapters = calculateChapterGap(chapters.currChapter, chapters.prevChapter) > 0
         val nextHasMissingChapters = calculateChapterGap(chapters.nextChapter, chapters.currChapter) > 0
 
-        // Add previous chapter pages and transition
-        chapters.prevChapter?.pages?.let(newItems::addAll)
+        // Add previous chapter pages and transition, excluding any stubs already absorbed
+        // by smart-combine so they are not re-inserted into the ViewPager on refresh.
+        chapters.prevChapter?.pages?.filter { !it.isAbsorbed }?.let(newItems::addAll)
 
         // Skip transition page if the chapter is loaded & current page is not a transition page
         if (prevHasMissingChapters || forceTransition || chapters.prevChapter?.state !is ReaderChapter.State.Loaded) {
@@ -77,7 +78,10 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
                     preprocessed[key]?.let { pages.add(key + 1, it) }
                 }
 
-            newItems.addAll(pages)
+            // Filter absorbed stubs AFTER inserting preprocessed InsertPages so that the
+            // position calculations (which use original page indices as keys) stay correct.
+            // InsertPages always have isAbsorbed = false, so they are preserved by this filter.
+            newItems.addAll(pages.filter { !it.isAbsorbed })
         }
 
         currentChapter = chapters.currChapter
@@ -94,7 +98,8 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
                 }
             }
 
-        chapters.nextChapter?.pages?.let(newItems::addAll)
+        // Exclude absorbed stubs from the next chapter as well.
+        chapters.nextChapter?.pages?.filter { !it.isAbsorbed }?.let(newItems::addAll)
 
         // Resets double-page splits, else insert pages get misplaced
         items.filterIsInstance<InsertPage>().also { items.removeAll(it) }

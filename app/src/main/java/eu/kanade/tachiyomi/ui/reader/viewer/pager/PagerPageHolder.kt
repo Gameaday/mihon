@@ -91,6 +91,8 @@ class PagerPageHolder(
         super.onDetachedFromWindow()
         loadJob?.cancel()
         loadJob = null
+        smartCombineRetryJob?.cancel()
+        smartCombineRetryJob = null
         scope.cancel()
     }
 
@@ -136,8 +138,11 @@ class PagerPageHolder(
      * Called when the page is queued.
      */
     private fun setQueued() {
-        // Clear any previously cached merge so a page retry starts with a fresh decode.
-        page.mergedBytes = null
+        // mergedBytes is intentionally NOT cleared here. If this page was previously merged
+        // with a stub, the merge result is still valid even after a re-queue (e.g. when the
+        // chapter-cache evicts the original image). setImage() will take the instant fast path
+        // using the cached bytes, so the user never sees a loading indicator or a brief
+        // unmerged image while the original re-downloads.
         initProgressIndicator()
         progressIndicator?.show()
         removeErrorLayout()

@@ -23,6 +23,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import logcat.LogPriority
 import okio.Buffer
@@ -335,28 +336,43 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
         if (!config.smartCombine || pages == null) return
         preScanJob = scope.launch {
             withIOContext {
-                pages.forEachIndexed { index, page ->
-                    if (page is InsertPage || page.mergedBytes != null) return@forEachIndexed
-                    if (page.status != Page.State.Ready) return@forEachIndexed
-                    val nextPage = pages.getOrNull(index + 1) ?: return@forEachIndexed
-                    if (nextPage.status != Page.State.Ready) return@forEachIndexed
-                    val streamFn = page.stream ?: return@forEachIndexed
-                    val nextStreamFn = nextPage.stream ?: return@forEachIndexed
+                for (index in pages.indices) {
+                    // Cooperatively cancel between iterations so a chapter switch
+                    // stops the scan immediately without waiting for the next merge.
+                    if (!isActive) break
+
+                    val page = pages[index]
+                    if (page is InsertPage || page.mergedBytes != null || page.isAbsorbed) continue
+                    if (page.status != Page.State.Ready) continue
+                    val nextPage = pages.getOrNull(index + 1) ?: continue
+                    if (nextPage.isAbsorbed || nextPage.status != Page.State.Ready) continue
+                    val streamFn = page.stream ?: continue
+                    val nextStreamFn = nextPage.stream ?: continue
                     try {
                         val currentSource = streamFn().use { Buffer().readFrom(it) }
-                        // Buffer the full next-page stream once so the stub-dimension check
-                        // and the merge can both use the same bytes without a second I/O call.
-                        // extractImageOptions (called inside isSmallPage) uses peek() so
-                        // nextSource remains fully readable for the subsequent mergePages call.
+                        // Reject animated pages before opening the next-page stream at all,
+                        // since animated images cannot be merged.
+                        if (ImageUtil.isAnimatedAndSupported(currentSource)) continue
+                        // Lightweight header-only stub check: BitmapFactory reads only the
+                        // image header from [nextStreamFn] (via inJustDecodeBounds) without
+                        // decoding pixel data. This avoids buffering a full-resolution image
+                        // into memory for the common case where the next page is not a stub
+                        // (e.g., all 39 non-stub pages in a 40-page chapter that ends with a
+                        // single watermark strip).
+                        val isStub = nextStreamFn().use { ImageUtil.isSmallPage(it, currentSource) }
+                        if (!isStub) continue
+                        // Stub confirmed. Buffer the full next-page stream now for decoding.
+                        // Opening the stream a second time is the deliberate trade-off: it
+                        // avoids a full buffer in the ~99 % non-stub case.
                         val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
-                        val isStub = ImageUtil.isSmallPage(nextSource.peek().inputStream(), currentSource)
-                        if (!isStub) return@forEachIndexed
-                        if (ImageUtil.isAnimatedAndSupported(currentSource)) return@forEachIndexed
-                        val mergedBuffer = ImageUtil.mergePages(currentSource, nextSource)
-                        val mergedBytes = mergedBuffer.readByteArray()
-                        page.mergedBytes = mergedBytes
-                        withUIContext {
-                            onPageAbsorb(nextPage)
+                        val mergedBytes = ImageUtil.mergePages(currentSource, nextSource).readByteArray()
+                        // Guard against a concurrent merge (per-holder retry path) that may
+                        // have completed while this iteration was running.
+                        if (page.mergedBytes == null) {
+                            page.mergedBytes = mergedBytes
+                            withUIContext {
+                                onPageAbsorb(nextPage)
+                            }
                         }
                     } catch (e: Exception) {
                         logcat(LogPriority.WARN, e) { "Smart combine pre-scan failed for page ${page.index}" }

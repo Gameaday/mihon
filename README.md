@@ -39,6 +39,8 @@ The following changes have been made on top of the base Mihon project:
 - **Per-page preload re-trigger.** If a cross-chapter prefetch was deferred due to a thin buffer, it is retried on every page advance rather than waiting for the next full preload cycle, so downloads start the moment bandwidth is available.
 - **Backward page preloading.** Pages behind the current reading position are also queued for download at low priority, reducing stutter when navigating backward through a chapter.
 - **Automatic retry with exponential backoff.** Transient page-load failures (network I/O errors, HTTP 429 and server errors) are retried up to three times with increasing delays before the page is marked as failed.
+- **Smart page combine.** When a page is followed by a short watermark or credit stub, the two are automatically merged vertically into a single view. A background pre-scan merges already-loaded pages the moment a chapter is opened, and a per-page retry job fires automatically when the stub finishes loading after the main page is already on screen — so the merge is invisible to the reader in the common case.
+- **Memory-safe page handling.** Each merged result is cached as a byte array on the page object and written directly into an Okio Buffer on subsequent renders, eliminating redundant stream copies, disk reads, and network calls for pages that have already been merged. Background merge and decode jobs are tied to the page holder's coroutine scope, which is cancelled and cleared the moment the view detaches from the window.
 
 ## Features
 
