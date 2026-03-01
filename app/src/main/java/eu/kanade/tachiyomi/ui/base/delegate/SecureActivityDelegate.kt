@@ -2,7 +2,6 @@ package eu.kanade.tachiyomi.ui.base.delegate
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -12,6 +11,7 @@ import eu.kanade.tachiyomi.core.security.SecurityPreferences
 import eu.kanade.tachiyomi.ui.security.UnlockActivity
 import eu.kanade.tachiyomi.util.system.AuthenticatorUtil
 import eu.kanade.tachiyomi.util.system.AuthenticatorUtil.isAuthenticationSupported
+import eu.kanade.tachiyomi.util.view.overrideTransitionCompat
 import eu.kanade.tachiyomi.util.view.setSecureScreen
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -108,12 +108,7 @@ class SecureActivityDelegateImpl : SecureActivityDelegate, DefaultLifecycleObser
         if (activity.isAuthenticationSupported()) {
             if (!SecureActivityDelegate.requireUnlock) return
             activity.startActivity(Intent(activity, UnlockActivity::class.java))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)
-            } else {
-                @Suppress("DEPRECATION")
-                activity.overridePendingTransition(0, 0)
-            }
+            activity.overrideTransitionCompat(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)
         } else {
             securityPreferences.useAuthenticator().set(false)
         }

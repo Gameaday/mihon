@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.util.view
 
+import android.app.Activity
 import android.os.Build
 import android.view.Window
 import android.view.WindowManager
@@ -9,6 +10,25 @@ fun Window.setSecureScreen(enabled: Boolean) {
         setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
     } else {
         clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+    }
+}
+
+/**
+ * Compat wrapper for setting an activity transition animation.
+ *
+ * Uses [Activity.overrideActivityTransition] on API 34+ (UPSIDE_DOWN_CAKE),
+ * and falls back to the deprecated [Activity.overridePendingTransition] on older versions.
+ *
+ * @param overrideTransitionType [Activity.OVERRIDE_TRANSITION_OPEN] or [Activity.OVERRIDE_TRANSITION_CLOSE]
+ * @param enterAnim resource ID of the enter animation, or 0 for none
+ * @param exitAnim resource ID of the exit animation, or 0 for none
+ */
+@Suppress("DEPRECATION")
+fun Activity.overrideTransitionCompat(overrideTransitionType: Int, enterAnim: Int, exitAnim: Int) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        overrideActivityTransition(overrideTransitionType, enterAnim, exitAnim)
+    } else {
+        overridePendingTransition(enterAnim, exitAnim)
     }
 }
 
