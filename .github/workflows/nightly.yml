@@ -90,13 +90,19 @@ jobs:
           set -e
           cd app/build/outputs/apk/nightly
           SHORT_SHA="${GITHUB_SHA::7}"
-          # Remove unsigned APKs if signed versions exist to avoid uploading unsigned APKs
+          # Remove all non-signed APKs if signed versions exist to avoid uploading unsigned APKs.
+          # r0adkll/sign-android-release produces *-unsigned-aligned-signed.apk; the fallback
+          # produces *-unsigned-signed.apk. Both end with -signed.apk.
           if ls *-signed.apk 2>/dev/null | grep -q .; then
-            rm -f *-unsigned.apk
+            for apk in *.apk; do
+              [[ "$apk" == *-signed.apk ]] || rm -f "$apk"
+            done
           fi
           for apk in *.apk; do
-            new_name=$(echo "$apk" | sed -E 's/-nightly(-unsigned(-signed)?)?\.apk$//')
-            mv "$apk" "${new_name}-nightly-${SHORT_SHA}.apk"
+            [[ -f "$apk" ]] || continue
+            # Strip everything from -nightly onward, then add -nightly-<SHA>.apk
+            base=$(echo "$apk" | sed -E 's/-nightly.*\.apk$//')
+            mv "$apk" "${base}-nightly-${SHORT_SHA}.apk"
           done
 
       - name: Delete existing nightly release
