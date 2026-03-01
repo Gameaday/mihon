@@ -29,6 +29,7 @@ import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import eu.kanade.tachiyomi.util.storage.getUriCompat
 import eu.kanade.tachiyomi.util.system.createFileInCacheDir
 import eu.kanade.tachiyomi.util.system.isConnectedToWifi
+import eu.kanade.tachiyomi.util.system.isPowerSaveMode
 import eu.kanade.tachiyomi.util.system.isRunning
 import eu.kanade.tachiyomi.util.system.setForegroundSafely
 import eu.kanade.tachiyomi.util.system.workManager
@@ -103,6 +104,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
                 if ((DEVICE_ONLY_ON_WIFI in restrictions) && !context.isConnectedToWifi()) {
                     return Result.retry()
                 }
+            }
+
+            // Defer automatic updates while battery saver is active to conserve energy.
+            if (context.isPowerSaveMode) {
+                return Result.retry()
             }
 
             // Find a running manual worker. If exists, try again later
