@@ -15,11 +15,10 @@ data class NetworkState(
     val isOnline = isConnected && isValidated
 }
 
-@Suppress("DEPRECATION")
 fun Context.activeNetworkState(): NetworkState {
     val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     return NetworkState(
-        isConnected = connectivityManager.activeNetworkInfo?.isConnected ?: false,
+        isConnected = connectivityManager.activeNetwork != null,
         isValidated = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ?: false,
         isWifi = wifiManager.isWifiEnabled && capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ?: false,
     )

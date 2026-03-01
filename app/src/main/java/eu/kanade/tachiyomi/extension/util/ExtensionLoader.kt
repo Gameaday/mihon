@@ -53,10 +53,8 @@ internal object ExtensionLoader {
     const val LIB_VERSION_MIN = 1.4
     const val LIB_VERSION_MAX = 1.5
 
-    @Suppress("DEPRECATION")
     private val PACKAGE_FLAGS = PackageManager.GET_CONFIGURATIONS or
         PackageManager.GET_META_DATA or
-        PackageManager.GET_SIGNATURES or
         PackageManager.GET_SIGNING_CERTIFICATES
 
     private const val PRIVATE_EXTENSION_EXTENSION = "ext"
