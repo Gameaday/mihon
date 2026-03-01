@@ -41,6 +41,8 @@ import logcat.LogPriority
 import mihon.core.archive.ZipWriter
 import nl.adaptivity.xmlutil.serialization.XML
 import okhttp3.Response
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import okio.Buffer
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.storage.extension
 import tachiyomi.core.common.util.lang.launchIO
@@ -75,6 +77,7 @@ class Downloader(
     private val sourceManager: SourceManager = Injekt.get(),
     private val chapterCache: ChapterCache = Injekt.get(),
     private val downloadPreferences: DownloadPreferences = Injekt.get(),
+    private val readerPreferences: ReaderPreferences = Injekt.get(),
     private val xml: XML = Injekt.get(),
     private val getCategories: GetCategories = Injekt.get(),
     private val getTracks: GetTracks = Injekt.get(),
@@ -400,6 +403,11 @@ class Downloader(
                 return
             }
 
+            // Merge consecutive stub pages (narrow watermark strips) into the preceding page
+            // using the same smart-combine logic as the reader.  Runs after the success check
+            // so the file count verification is done on the original (unmerged) page set.
+            mergeStubPagesInDownload(tmpDir)
+
             createComicInfoFile(
                 tmpDir,
                 download.manga,
@@ -532,7 +540,10 @@ class Downloader(
         }
         val extension = cacheFile.inputStream().use { ImageUtil.findImageType(it) } ?: return tmpFile
         tmpFile.renameTo("$filename.${extension.extension}")
-        cacheFile.delete()
+        // Do NOT delete the cache file here: deleting the raw file from the DiskLruCache directory
+        // bypasses journal tracking (leaving a stale entry) and can break active reader streams if
+        // the same chapter is open in the reader at the same time.  The DiskLruCache manages its
+        // own LRU eviction automatically when new content is added.
         return tmpFile
     }
 
@@ -562,6 +573,94 @@ class Downloader(
             ImageUtil.splitTallImage(tmpDir, imageFile, filenamePrefix)
         } catch (e: Exception) {
             logcat(LogPriority.ERROR, e) { "Failed to split downloaded image" }
+        }
+    }
+
+    /**
+     * After all pages are downloaded and verified, merges consecutive stub pages (narrow
+     * watermark strips) into the preceding page using the same smart-combine logic as the
+     * reader. The merged result is written as a JPEG back to the preceding page's file; the
+     * stub file is deleted so the saved chapter has the correct final page count immediately.
+     *
+     * Only runs when [ReaderPreferences.smartCombinePaged] is enabled. Stub detection uses
+     * [ImageUtil.isSmallPage] with header-only decoding (cheap — reads only image dimensions)
+     * so the non-stub case (the vast majority of consecutive page pairs) is inexpensive.
+     *
+     * @param tmpDir the temporary directory where the downloaded chapter pages are stored.
+     */
+    private fun mergeStubPagesInDownload(tmpDir: UniFile) {
+        if (!readerPreferences.smartCombinePaged().get()) return
+
+        // Build a sorted mutable list of primary page image files, excluding:
+        //  • temporary files (.tmp)
+        //  • metadata files (ComicInfo.xml, .nomedia)
+        //  • secondary split pages (e.g. "001__002.jpg") — first split ("001__001.jpg") is kept
+        val pageFiles = tmpDir.listFiles()
+            ?.filter { file ->
+                val name = file.name.orEmpty()
+                !name.endsWith(".tmp") &&
+                    name !in listOf(COMIC_INFO_FILE, NOMEDIA_FILE) &&
+                    ImageUtil.isImage(name) &&
+                    !(name.contains("__") && !name.contains("__001."))
+            }
+            ?.sortedBy { it.name }
+            ?.toMutableList()
+            ?: return
+
+        var i = 0
+        while (i < pageFiles.size - 1) {
+            val current = pageFiles[i]
+            val next = pageFiles[i + 1]
+            try {
+                // Buffer the current page once; isAnimatedAndSupported and isSmallPage both use
+                // peek() internally so the buffer is not consumed by the dimension checks.
+                val currentSource = current.openInputStream().use { Buffer().readFrom(it) }
+
+                // Animated pages cannot be merged
+                if (ImageUtil.isAnimatedAndSupported(currentSource)) {
+                    i++
+                    continue
+                }
+
+                // Header-only stub check for the next page (cheap: reads only image dimensions)
+                val isStub = next.openInputStream().use { ImageUtil.isSmallPage(it, currentSource) }
+                if (!isStub) {
+                    i++
+                    continue
+                }
+
+                // Stub confirmed: open the next page again for full bitmap decode and merge.
+                // currentSource still holds all its data (peek() was used above).
+                val nextSource = next.openInputStream().use { Buffer().readFrom(it) }
+                val mergedBytes = ImageUtil.mergePages(currentSource, nextSource).readByteArray()
+
+                // Write the merged JPEG to a temp file, swap it in for the current file,
+                // and delete the stub.  Using a temp file prevents data loss if the write fails.
+                val baseName = current.name!!.substringBeforeLast(".")
+                val mergedTmp = tmpDir.createFile("$baseName.jpg.tmp")
+                    ?: throw IOException("Could not create temp file for merged stub page")
+                mergedTmp.openOutputStream().use { it.write(mergedBytes) }
+                current.delete()
+                next.delete()
+                pageFiles.removeAt(i + 1)
+                mergedTmp.renameTo("$baseName.jpg")
+                // Update our list to point to the freshly renamed file so the next
+                // iteration can check the merged page against the new next page.
+                val mergedFile = tmpDir.findFile("$baseName.jpg")
+                if (mergedFile != null) {
+                    pageFiles[i] = mergedFile
+                    // Do NOT increment i — check the merged page against the new next page
+                } else {
+                    // Rename succeeded but we cannot locate the file — unusual; skip forward
+                    logcat(LogPriority.WARN) { "Could not locate merged file $baseName.jpg after rename; skipping" }
+                    i++
+                }
+            } catch (e: Exception) {
+                logcat(LogPriority.ERROR, e) {
+                    "Failed to merge stub page ${next.name} into ${current.name} during download"
+                }
+                i++
+            }
         }
     }
 

@@ -78,6 +78,7 @@ import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.time.Instant
 import java.util.Date
+import java.io.InputStream
 
 /**
  * Presenter used by the activity to perform background operations.
@@ -928,9 +929,14 @@ class ReaderViewModel @JvmOverloads constructor(
         // Copy file in background.
         viewModelScope.launchNonCancellable {
             try {
+                // If the page was smart-combined with a stub, save the merged image so the saved
+                // file reflects exactly what the reader showed rather than just the first page.
+                val inputStream: () -> InputStream = page.mergedBytes?.let { bytes ->
+                    { bytes.inputStream() }
+                } ?: page.stream!!
                 val uri = imageSaver.save(
                     image = Image.Page(
-                        inputStream = page.stream!!,
+                        inputStream = inputStream,
                         name = filename,
                         location = Location.Pictures.create(relativePath),
                     ),
@@ -966,9 +972,14 @@ class ReaderViewModel @JvmOverloads constructor(
         try {
             viewModelScope.launchNonCancellable {
                 destDir.deleteRecursively()
+                // If the page was smart-combined with a stub, share the merged image so the
+                // recipient sees the same combined view that the reader displayed.
+                val inputStream: () -> InputStream = page.mergedBytes?.let { bytes ->
+                    { bytes.inputStream() }
+                } ?: page.stream!!
                 val uri = imageSaver.save(
                     image = Image.Page(
-                        inputStream = page.stream!!,
+                        inputStream = inputStream,
                         name = filename,
                         location = Location.Cache,
                     ),
