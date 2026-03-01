@@ -67,7 +67,11 @@ internal class HttpPageLoader(
     override suspend fun getPages(): List<ReaderPage> {
         check(!isRecycled)
         val pages = try {
-            chapterCache.getPageListFromCache(requireNotNull(chapter.chapter.toDomainChapter()) { "Chapter has no database ID" })
+            chapterCache.getPageListFromCache(
+                requireNotNull(chapter.chapter.toDomainChapter()) {
+                    "Chapter has no database ID"
+                },
+            )
         } catch (e: Throwable) {
             if (e is CancellationException) {
                 throw e
@@ -139,7 +143,12 @@ internal class HttpPageLoader(
                 try {
                     // Convert to pages without reader information
                     val pagesToSave = pages.map { Page(it.index, it.url, it.imageUrl) }
-                    chapterCache.putPageListToCache(requireNotNull(chapter.chapter.toDomainChapter()) { "Chapter has no database ID" }, pagesToSave)
+                    chapterCache.putPageListToCache(
+                        requireNotNull(chapter.chapter.toDomainChapter()) {
+                            "Chapter has no database ID"
+                        },
+                        pagesToSave,
+                    )
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
                         throw e
