@@ -312,7 +312,10 @@ class MangaCoverFetcher(
                 options = options,
                 coverFileLazy = lazy { coverCache.getCoverFile(data.thumbnailUrl) },
                 customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.id) },
-                diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
+                diskCacheKeyLazy = lazy {
+                    imageLoader.components.key(data, options)
+                        ?: error("No disk cache key for $data")
+                },
                 sourceLazy = lazy { sourceManager.get(data.source) as? HttpSource },
                 callFactoryLazy = callFactoryLazy,
                 imageLoader = imageLoader,
@@ -334,7 +337,10 @@ class MangaCoverFetcher(
                 options = options,
                 coverFileLazy = lazy { coverCache.getCoverFile(data.url) },
                 customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.mangaId) },
-                diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
+                diskCacheKeyLazy = lazy {
+                    imageLoader.components.key(data, options)
+                        ?: error("No disk cache key for $data")
+                },
                 sourceLazy = lazy { sourceManager.get(data.sourceId) as? HttpSource },
                 callFactoryLazy = callFactoryLazy,
                 imageLoader = imageLoader,

@@ -523,7 +523,8 @@ class Downloader(
      * @param filename the filename of the image.
      */
     private fun copyImageFromCache(cacheFile: File, tmpDir: UniFile, filename: String): UniFile {
-        val tmpFile = tmpDir.createFile("$filename.tmp")!!
+        val tmpFile = tmpDir.createFile("$filename.tmp")
+            ?: throw IOException("Could not create temporary file in download directory")
         cacheFile.inputStream().use { input ->
             tmpFile.openOutputStream().use { output ->
                 input.copyTo(output)
@@ -604,7 +605,8 @@ class Downloader(
         dirname: String,
         tmpDir: UniFile,
     ) {
-        val zip = mangaDir.createFile("$dirname.cbz$TMP_DIR_SUFFIX")!!
+        val zip = mangaDir.createFile("$dirname.cbz$TMP_DIR_SUFFIX")
+            ?: throw IOException("Could not create CBZ archive file")
         ZipWriter(context, zip).use { writer ->
             tmpDir.listFiles()?.forEach { file ->
                 writer.write(file)
