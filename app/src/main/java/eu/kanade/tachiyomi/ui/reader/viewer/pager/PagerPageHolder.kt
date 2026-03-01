@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.ui.reader.viewer.pager
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
 import eu.kanade.presentation.util.formattedMessage
@@ -169,6 +170,12 @@ class PagerPageHolder(
         try {
             val (source, isAnimated, background) = withIOContext {
                 val source = streamFn().use { process(item, Buffer().readFrom(it)) }
+                // Cache displayed image dimensions so setupSmartCombineRetry can perform
+                // a header-only stub check without re-buffering the stream.
+                val dimOpts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeStream(source.peek().inputStream(), null, dimOpts)
+                cachedPageWidth = dimOpts.outWidth
+                cachedPageHeight = dimOpts.outHeight
                 val isAnimated = ImageUtil.isAnimatedAndSupported(source)
                 val background = if (!isAnimated && viewer.config.automaticBackground) {
                     ImageUtil.chooseBackground(context, source.peek().inputStream())
@@ -213,7 +220,6 @@ class PagerPageHolder(
      */
     private fun setupSmartCombineRetry() {
         smartCombineRetryJob?.cancel()
-        smartCombineRetryJob = null
         if (!viewer.config.smartCombine || page is InsertPage) return
         val nextPage = page.chapter.pages?.getOrNull(page.index + 1) ?: return
         // If the next page was already ready, trySmartCombine already had a chance to handle it.
@@ -221,20 +227,24 @@ class PagerPageHolder(
         smartCombineRetryJob = scope.launch {
             // Wait for the stub candidate to finish loading.
             nextPage.statusFlow.filter { it == Page.State.Ready }.first()
-            // Don't disturb the UI if this holder is no longer on screen.
+            // isAttachedToWindow() returns true while this view is part of the window's
+            // view hierarchy, i.e. the page holder is still on screen.
             if (!isAttachedToWindow()) return@launch
-            // Cheaply verify the now-ready page is actually a stub before re-rendering.
-            val currentStreamFn = page.stream ?: return@launch
+            // Use the cached dimensions of the current page so no stream re-read is needed.
             val nextStreamFn = nextPage.stream ?: return@launch
-            val currentSource = currentStreamFn().use { Buffer().readFrom(it) }
-            val isStub = nextStreamFn().use { ImageUtil.isSmallPage(it, currentSource) }
-            if (isStub) setImage()
+            try {
+                val isStub = nextStreamFn().use { ImageUtil.isSmallPage(it, cachedPageWidth, cachedPageHeight) }
+                if (isStub) setImage()
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Smart combine retry stub check failed" }
+            }
         }
     }
 
     private fun process(page: ReaderPage, imageSource: BufferedSource): BufferedSource {
         if (viewer.config.dualPageRotateToFit) {
-            return rotateDualPage(imageSource)
+            val degrees = if (viewer.config.dualPageRotateToFitInvert) -90f else 90f
+            return ImageUtil.rotateDualPageIfWide(imageSource, degrees)
         }
 
         if (!viewer.config.dualPageSplit) {
@@ -257,8 +267,6 @@ class PagerPageHolder(
 
     private fun trySmartCombine(page: ReaderPage, imageSource: BufferedSource): BufferedSource? {
         if (!viewer.config.smartCombine || page is InsertPage) return null
-        // Animated images (GIF, animated WebP/HEIF) must not be merged.
-        if (ImageUtil.isAnimatedAndSupported(imageSource)) return null
         val nextPage = page.chapter.pages?.getOrNull(page.index + 1) ?: return null
         if (nextPage.status != Page.State.Ready) return null
         val nextStreamFn = nextPage.stream ?: return null
@@ -267,7 +275,11 @@ class PagerPageHolder(
         // This avoids buffering the entire stream into memory for pages that are not stubs.
         if (!nextStreamFn().use { ImageUtil.isSmallPage(it, imageSource) }) return null
 
-        // Confirmed stub: now load the full stream for bitmap decoding.
+        // Stub confirmed. Reject animated current pages here (after the cheap dimension check)
+        // so the animated-image decode only happens when a merge would actually proceed.
+        if (ImageUtil.isAnimatedAndSupported(imageSource)) return null
+
+        // Confirmed stub and non-animated: load the full next-page stream for bitmap decoding.
         val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
         return try {
             val merged = ImageUtil.mergePages(imageSource, nextSource)
@@ -278,16 +290,6 @@ class PagerPageHolder(
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Smart combine merge failed; showing pages separately" }
             null
-        }
-    }
-
-    private fun rotateDualPage(imageSource: BufferedSource): BufferedSource {
-        val isDoublePage = ImageUtil.isWideImage(imageSource)
-        return if (isDoublePage) {
-            val rotation = if (viewer.config.dualPageRotateToFitInvert) -90f else 90f
-            ImageUtil.rotateImage(imageSource, rotation)
-        } else {
-            imageSource
         }
     }
 
