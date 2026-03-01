@@ -18,8 +18,6 @@ import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.injectLazy
 
-private const val READLIST_API = "/api/v1/readlists"
-
 class KomgaApi(
     private val trackId: Long,
     private val client: OkHttpClient,
@@ -106,5 +104,9 @@ class KomgaApi(
 
     private fun ReadListDto.toTrack(): TrackSearch = TrackSearch.create(trackId).also {
         it.title = name
+    }
+
+    companion object {
+        private const val READLIST_API = "/api/v1/readlists"
     }
 }

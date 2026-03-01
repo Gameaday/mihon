@@ -7,6 +7,7 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import eu.kanade.tachiyomi.util.system.DeviceUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,12 +18,15 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.suspendCancellableCoroutine
+import logcat.LogPriority
 import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.core.common.util.lang.withIOContext
+import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.IOException
 import java.util.concurrent.PriorityBlockingQueue
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
@@ -35,6 +39,22 @@ internal class HttpPageLoader(
     private val chapter: ReaderChapter,
     private val source: HttpSource,
     private val chapterCache: ChapterCache = Injekt.get(),
+    /**
+     * Device performance tier used to scale preload window sizes and worker concurrency.
+     * Defaults to [DeviceUtil.PerformanceTier.MEDIUM] so that the loader is safe to instantiate
+     * in tests or other contexts where a [Context] is unavailable. Production callers (i.e.
+     * [eu.kanade.tachiyomi.ui.reader.loader.ChapterLoader]) always supply the real tier.
+     */
+    performanceTier: DeviceUtil.PerformanceTier = DeviceUtil.PerformanceTier.MEDIUM,
+    /**
+     * When `true` the loader is being used to preload a chapter that is not yet the active
+     * reading chapter. In this mode only a single background worker is spawned, regardless of
+     * the device performance tier, so the preload never competes with the active chapter's
+     * downloads for network bandwidth. The worker count is raised to the full tier value the
+     * moment the chapter becomes active (i.e. a new [HttpPageLoader] is created for it via the
+     * active-chapter path in [ChapterLoader]).
+     */
+    isPreloadOnly: Boolean = false,
 ) : PageLoader() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -44,9 +64,66 @@ internal class HttpPageLoader(
      */
     private val queue = PriorityBlockingQueue<PriorityPage>()
 
-    private val preloadSize = 4
+    /**
+     * Number of pages ahead of the current page to preload — scaled by device capability.
+     */
+    private val preloadSize = when (performanceTier) {
+        DeviceUtil.PerformanceTier.LOW -> 2
+        DeviceUtil.PerformanceTier.MEDIUM -> 4
+        DeviceUtil.PerformanceTier.HIGH -> 6
+    }
+
+    /**
+     * Number of pages behind the current page to preload — scaled by device capability.
+     */
+    private val preloadBackwardSize = when (performanceTier) {
+        DeviceUtil.PerformanceTier.LOW -> 1
+        DeviceUtil.PerformanceTier.MEDIUM -> 2
+        DeviceUtil.PerformanceTier.HIGH -> 3
+    }
+
+    /**
+     * Number of concurrent page-download workers.
+     *
+     * For preload-only loaders a single worker is always used so that background chapter
+     * prefetch never steals bandwidth from the active chapter. The full worker count (scaled
+     * by device tier) is only used once the chapter becomes the active reading chapter.
+     */
+    private val fullWorkerCount = when (performanceTier) {
+        DeviceUtil.PerformanceTier.LOW -> 1
+        DeviceUtil.PerformanceTier.MEDIUM -> 2
+        DeviceUtil.PerformanceTier.HIGH -> 3
+    }
+
+    /** Guards [promoteToActive] so the promotion is applied at most once. */
+    @OptIn(ExperimentalAtomicApi::class)
+    private val promoted = AtomicBoolean(!isPreloadOnly)
 
     init {
+        val initialWorkers = if (isPreloadOnly) 1 else fullWorkerCount
+        repeat(initialWorkers) { launchWorker() }
+    }
+
+    /**
+     * Promotes this loader from preload-only (1 worker) to the full [fullWorkerCount] for the
+     * active reading chapter. Idempotent — subsequent calls after the first are no-ops.
+     *
+     * The formula `fullWorkerCount - 1` is correct because preload-only loaders always start
+     * with exactly 1 worker ([init] uses `initialWorkers = 1` when [isPreloadOnly] is true),
+     * and [promoted] starts as `!isPreloadOnly`, so this branch is only reached when
+     * [isPreloadOnly] was true and exactly 1 worker is already running.
+     */
+    @OptIn(ExperimentalAtomicApi::class)
+    override fun promoteToActive() {
+        if (isRecycled) return
+        if (!promoted.compareAndSet(expectedValue = false, newValue = true)) return
+        // Preload-only loaders always start with 1 worker; launch the remaining workers up to
+        // the tier-scaled maximum.
+        val remaining = fullWorkerCount - 1
+        repeat(remaining) { launchWorker() }
+    }
+
+    private fun launchWorker() {
         scope.launchIO {
             flow {
                 while (true) {
@@ -67,7 +144,11 @@ internal class HttpPageLoader(
     override suspend fun getPages(): List<ReaderPage> {
         check(!isRecycled)
         val pages = try {
-            chapterCache.getPageListFromCache(requireNotNull(chapter.chapter.toDomainChapter()) { "Chapter has no database ID" })
+            chapterCache.getPageListFromCache(
+                requireNotNull(chapter.chapter.toDomainChapter()) {
+                    "Chapter has no database ID"
+                },
+            )
         } catch (e: Throwable) {
             if (e is CancellationException) {
                 throw e
@@ -102,6 +183,7 @@ internal class HttpPageLoader(
             queuedPages += PriorityPage(page, 1).also { queue.offer(it) }
         }
         queuedPages += preloadNextPages(page, preloadSize)
+        queuedPages += preloadPrevPages(page, preloadBackwardSize)
 
         suspendCancellableCoroutine<Nothing> { continuation ->
             continuation.invokeOnCancellation {
@@ -127,19 +209,48 @@ internal class HttpPageLoader(
 
     override fun recycle() {
         super.recycle()
+        // Cancel all in-flight download coroutines. Any page whose download is interrupted here
+        // will have its disk-cache editor aborted (see ChapterCache.fetchAndCacheImage), so no
+        // partial data is committed. The page status may be left in a transient state
+        // (LoadPage/DownloadImage); we reset it below so external observers never see a ghost
+        // "downloading" indicator for a cancelled operation.
         scope.cancel()
         queue.clear()
 
-        // Release stream lambdas so the captured imageUrl strings and file references can be GC'd
-        chapter.pages?.forEach { it.stream = null }
+        // Reset pages stuck in transient states so that:
+        //  • any viewer holding a reference to the old ReaderPage sees a retryable state, and
+        //  • if this chapter is re-entered later, new ReaderPage objects start with Queue status
+        //    (they are always created fresh in getPages(), but defensive reset costs nothing).
+        val pages = chapter.pages
+        if (pages != null) {
+            var cancelledCount = 0
+            for (page in pages) {
+                val status = page.status
+                if (status == Page.State.LoadPage || status == Page.State.DownloadImage) {
+                    page.status = Page.State.Queue
+                    cancelledCount++
+                }
+            }
+            if (cancelledCount > 0) {
+                logcat(LogPriority.DEBUG) {
+                    "Recycled ${chapter.chapter.name}: cancelled $cancelledCount in-flight download(s)"
+                }
+            }
 
-        // Cache current page list progress for online chapters to allow a faster reopen
-        chapter.pages?.let { pages ->
+            // Release stream lambdas so the captured imageUrl strings and file references can be GC'd
+            pages.forEach { it.stream = null }
+
+            // Cache current page list progress for online chapters to allow a faster reopen
             launchIO {
                 try {
                     // Convert to pages without reader information
                     val pagesToSave = pages.map { Page(it.index, it.url, it.imageUrl) }
-                    chapterCache.putPageListToCache(requireNotNull(chapter.chapter.toDomainChapter()) { "Chapter has no database ID" }, pagesToSave)
+                    chapterCache.putPageListToCache(
+                        requireNotNull(chapter.chapter.toDomainChapter()) {
+                            "Chapter has no database ID"
+                        },
+                        pagesToSave,
+                    )
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
                         throw e
@@ -168,6 +279,45 @@ internal class HttpPageLoader(
                     null
                 }
             }
+    }
+
+    /**
+     * Preloads the given [amount] of pages before the [currentPage] with a lower priority.
+     * This avoids stutter when the user navigates backward through a chapter.
+     *
+     * @param currentPage the page the user is currently viewing.
+     * @param amount the number of pages before [currentPage] to preload.
+     * @return a list of [PriorityPage] that were added to the [queue]
+     */
+    private fun preloadPrevPages(currentPage: ReaderPage, amount: Int): List<PriorityPage> {
+        val pageIndex = currentPage.index
+        if (pageIndex == 0) return emptyList()
+        val pages = currentPage.chapter.pages ?: return emptyList()
+
+        return pages
+            .subList(maxOf(0, pageIndex - amount), pageIndex)
+            .mapNotNull {
+                if (it.status == Page.State.Queue) {
+                    PriorityPage(it, 0).apply { queue.offer(this) }
+                } else {
+                    null
+                }
+            }
+    }
+
+    /**
+     * Proactively starts loading the first [amount] pages of this chapter at background priority.
+     * Called after the page list has been fetched so that images begin downloading before the user
+     * actually scrolls to this chapter, reducing wait time at chapter boundaries.
+     */
+    override fun preloadFirstPages(amount: Int) {
+        if (isRecycled) return
+        val pages = chapter.pages?.take(amount) ?: return
+        pages.forEach { page ->
+            if (page.status == Page.State.Queue) {
+                queue.offer(PriorityPage(page, 0))
+            }
+        }
     }
 
     /**
@@ -215,6 +365,17 @@ internal class HttpPageLoader(
             }
         }
     }
+
+    companion object {
+        /** Maximum number of automatic retry attempts for transient page-load failures. */
+        private const val MAX_PAGE_LOAD_RETRIES = 3
+
+        /** Initial delay in milliseconds before the first retry; doubles with each subsequent attempt. */
+        private const val PAGE_LOAD_RETRY_DELAY_MS = 1_000L
+
+        /** Maximum delay cap in milliseconds between retry attempts. */
+        private const val MAX_PAGE_LOAD_RETRY_DELAY_MS = 8_000L
+    }
 }
 
 /**
@@ -236,12 +397,3 @@ private class PriorityPage(
         return if (p != 0) p else identifier.compareTo(other.identifier)
     }
 }
-
-/** Maximum number of automatic retry attempts for transient page-load failures. */
-private const val MAX_PAGE_LOAD_RETRIES = 3
-
-/** Initial delay in milliseconds before the first retry; doubles with each subsequent attempt. */
-private const val PAGE_LOAD_RETRY_DELAY_MS = 1_000L
-
-/** Maximum delay cap in milliseconds between retry attempts. */
-private const val MAX_PAGE_LOAD_RETRY_DELAY_MS = 8_000L

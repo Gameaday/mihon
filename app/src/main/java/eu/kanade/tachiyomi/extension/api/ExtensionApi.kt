@@ -138,6 +138,15 @@ internal class ExtensionApi {
     private fun ExtensionJsonObject.extractLibVersion(): Double {
         return version.substringBeforeLast('.').toDouble()
     }
+
+    private val extensionSourceMapper: (ExtensionSourceJsonObject) -> Extension.Available.Source = {
+        Extension.Available.Source(
+            id = it.id,
+            lang = it.lang,
+            name = it.name,
+            baseUrl = it.baseUrl,
+        )
+    }
 }
 
 @Serializable
@@ -159,12 +168,3 @@ private data class ExtensionSourceJsonObject(
     val name: String,
     val baseUrl: String,
 )
-
-private val extensionSourceMapper: (ExtensionSourceJsonObject) -> Extension.Available.Source = {
-    Extension.Available.Source(
-        id = it.id,
-        lang = it.lang,
-        name = it.name,
-        baseUrl = it.baseUrl,
-    )
-}

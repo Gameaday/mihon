@@ -150,7 +150,9 @@ class ShizukuInstaller(private val service: Service) : Installer(service) {
 
         initShizuku()
     }
-}
 
-private const val SHIZUKU_PERMISSION_REQUEST_CODE = 14045
-const val ACTION_INSTALL_RESULT = "${BuildConfig.APPLICATION_ID}.ACTION_INSTALL_RESULT"
+    companion object {
+        private const val SHIZUKU_PERMISSION_REQUEST_CODE = 14045
+        const val ACTION_INSTALL_RESULT = "${BuildConfig.APPLICATION_ID}.ACTION_INSTALL_RESULT"
+    }
+}

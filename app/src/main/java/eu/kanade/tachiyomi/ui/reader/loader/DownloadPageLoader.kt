@@ -60,10 +60,18 @@ internal class DownloadPageLoader(
     }
 
     private fun getPagesFromDirectory(): List<ReaderPage> {
-        val pages = downloadManager.buildPageList(source, manga, requireNotNull(chapter.chapter.toDomainChapter()) { "Chapter has no database ID" })
+        val pages = downloadManager.buildPageList(
+            source,
+            manga,
+            requireNotNull(chapter.chapter.toDomainChapter()) {
+                "Chapter has no database ID"
+            },
+        )
         return pages.map { page ->
             ReaderPage(page.index, page.url, page.imageUrl) {
-                requireNotNull(context.contentResolver.openInputStream(page.uri ?: Uri.EMPTY)) { "Could not open input stream for page URI: ${page.uri}" }
+                requireNotNull(context.contentResolver.openInputStream(page.uri ?: Uri.EMPTY)) {
+                    "Could not open input stream for page URI: ${page.uri}"
+                }
             }.apply {
                 status = Page.State.Ready
             }

@@ -40,6 +40,7 @@ import eu.kanade.tachiyomi.util.editCover
 import eu.kanade.tachiyomi.util.lang.byteSize
 import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.cacheImageDir
+import eu.kanade.tachiyomi.util.system.DeviceUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -53,7 +54,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import tachiyomi.core.common.preference.toggle
 import tachiyomi.core.common.util.lang.launchIO
@@ -108,6 +108,18 @@ class ReaderViewModel @JvmOverloads constructor(
 
     private val eventChannel = Channel<Event>()
     val eventFlow = eventChannel.receiveAsFlow()
+
+    /**
+     * Number of pages to proactively start loading when an adjacent chapter is preloaded,
+     * scaled to the device's performance tier so high-end devices prefetch more aggressively.
+     */
+    private val preloadChapterAheadPages: Int by lazy {
+        when (DeviceUtil.performanceTier(Injekt.get<Application>())) {
+            DeviceUtil.PerformanceTier.LOW -> 2
+            DeviceUtil.PerformanceTier.MEDIUM -> 4
+            DeviceUtil.PerformanceTier.HIGH -> 6
+        }
+    }
 
     /**
      * The manga loaded in the reader. It can be null when instantiated for a short time.
@@ -425,7 +437,37 @@ class ReaderViewModel @JvmOverloads constructor(
         val loader = loader ?: return
         try {
             logcat { "Preloading ${chapter.chapter.url}" }
-            loader.loadChapter(chapter)
+            // Load with isPreloadOnly=true so the underlying HttpPageLoader spawns only a single
+            // background worker. This prevents the speculative preload from competing with the
+            // active chapter's downloads for network bandwidth.
+            loader.loadChapter(chapter, isPreloadOnly = true)
+
+            // Only proactively start downloading the first few images of the preloaded chapter
+            // if the current chapter's buffer is healthy. If the user is outpacing the current
+            // buffer (i.e. there are still many unloaded pages ahead of the reading position),
+            // skip image preloading so all available bandwidth stays with the active chapter.
+            // This makes cross-chapter image prefetch purely opportunistic.
+            val currentPages = getCurrentChapter()?.pages
+            val pendingAhead = if (currentPages != null) {
+                currentPages
+                    .asSequence()
+                    .drop(chapterPageIndex + 1)
+                    .take(preloadChapterAheadPages)
+                    .count {
+                        it.status == Page.State.Queue || it.status == Page.State.LoadPage ||
+                            it.status == Page.State.DownloadImage
+                    }
+            } else {
+                0
+            }
+            if (pendingAhead < preloadChapterAheadPages) {
+                logcat { "Current buffer healthy ($pendingAhead pending ahead); starting next-chapter image preload" }
+                chapter.pageLoader?.preloadFirstPages(preloadChapterAheadPages)
+            } else {
+                logcat {
+                    "Buffer thin ($pendingAhead pending ahead >= $preloadChapterAheadPages threshold); deferring next-chapter image preload"
+                }
+            }
         } catch (e: Throwable) {
             if (e is CancellationException) {
                 throw e
@@ -470,7 +512,38 @@ class ReaderViewModel @JvmOverloads constructor(
             downloadNextChapters()
         }
 
+        // If the next chapter is already loaded (preloaded) but its image prefetch was
+        // previously deferred because the current buffer was too thin, retry it now that
+        // another page has been consumed. This makes the preload truly opportunistic: it
+        // starts the moment bandwidth is available rather than only at the instant preload()
+        // is first called.
+        tryPreloadNextChapterImages(page.index, pages)
+
         eventChannel.trySend(Event.PageChanged)
+    }
+
+    /**
+     * Starts image preloading for the next chapter if the current chapter's forward buffer is
+     * healthy enough that we can spare bandwidth. Idempotent — pages already downloading or
+     * cached are skipped by [preloadFirstPages].
+     *
+     * @param currentPageIndex zero-based index of the page the user just navigated to.
+     * @param currentPages     the full page list of the chapter being read.
+     */
+    private fun tryPreloadNextChapterImages(currentPageIndex: Int, currentPages: List<ReaderPage>) {
+        val nextChapter = state.value.viewerChapters?.nextChapter ?: return
+        if (nextChapter.state !is ReaderChapter.State.Loaded) return
+        val pendingAhead = currentPages
+            .asSequence()
+            .drop(currentPageIndex + 1)
+            .take(preloadChapterAheadPages)
+            .count {
+                it.status == Page.State.Queue || it.status == Page.State.LoadPage ||
+                    it.status == Page.State.DownloadImage
+            }
+        if (pendingAhead < preloadChapterAheadPages) {
+            nextChapter.pageLoader?.preloadFirstPages(preloadChapterAheadPages)
+        }
     }
 
     private fun downloadNextChapters() {
@@ -554,7 +627,18 @@ class ReaderViewModel @JvmOverloads constructor(
         if (!incognitoMode && page.status !is Page.State.Error) {
             readerChapter.chapter.last_page_read = pageIndex
 
-            if (readerChapter.pages?.lastIndex == pageIndex) {
+            // A page is the effective last page either when it literally is the last page
+            // in the chapter's page list, or when it is a merged page (mergedBytes != null)
+            // and all subsequent pages in the list were absorbed as stubs. This ensures the
+            // chapter is marked as read even when the final page(s) are watermark stubs that
+            // get merged invisibly into the previous page.
+            val chapterPages = readerChapter.pages
+            val isEffectivelyLastPage = pageIndex == chapterPages?.lastIndex ||
+                (
+                    (page as? ReaderPage)?.mergedBytes != null &&
+                        chapterPages?.drop(pageIndex + 1)?.all { it.isAbsorbed } == true
+                    )
+            if (isEffectivelyLastPage) {
                 updateChapterProgressOnComplete(readerChapter)
             }
 

@@ -93,8 +93,9 @@ class MangaCoverFetcher(
     }
 
     private fun fileUriLoader(uri: String): FetchResult {
-        val source = UniFile.fromUri(options.context, uri.toUri())!!
-            .openInputStream()
+        val uniFile = UniFile.fromUri(options.context, uri.toUri())
+            ?: throw IOException("Could not open file at the specified URI")
+        val source = uniFile.openInputStream()
             .source()
             .buffer()
         return SourceFetchResult(
@@ -311,7 +312,10 @@ class MangaCoverFetcher(
                 options = options,
                 coverFileLazy = lazy { coverCache.getCoverFile(data.thumbnailUrl) },
                 customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.id) },
-                diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
+                diskCacheKeyLazy = lazy {
+                    imageLoader.components.key(data, options)
+                        ?: error("No disk cache key for $data")
+                },
                 sourceLazy = lazy { sourceManager.get(data.source) as? HttpSource },
                 callFactoryLazy = callFactoryLazy,
                 imageLoader = imageLoader,
@@ -333,7 +337,10 @@ class MangaCoverFetcher(
                 options = options,
                 coverFileLazy = lazy { coverCache.getCoverFile(data.url) },
                 customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.mangaId) },
-                diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
+                diskCacheKeyLazy = lazy {
+                    imageLoader.components.key(data, options)
+                        ?: error("No disk cache key for $data")
+                },
                 sourceLazy = lazy { sourceManager.get(data.sourceId) as? HttpSource },
                 callFactoryLazy = callFactoryLazy,
                 imageLoader = imageLoader,

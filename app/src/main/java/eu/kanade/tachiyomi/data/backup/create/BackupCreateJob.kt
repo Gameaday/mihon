@@ -83,6 +83,13 @@ class BackupCreateJob(private val context: Context, workerParams: WorkerParamete
     }
 
     companion object {
+        private const val TAG_AUTO = "BackupCreator"
+        private const val TAG_MANUAL = "$TAG_AUTO:manual"
+
+        private const val IS_AUTO_BACKUP_KEY = "is_auto_backup" // Boolean
+        private const val LOCATION_URI_KEY = "location_uri" // String
+        private const val OPTIONS_KEY = "options" // BooleanArray
+
         fun isManualJobRunning(context: Context): Boolean {
             return context.workManager.isRunning(TAG_MANUAL)
         }
@@ -127,10 +134,3 @@ class BackupCreateJob(private val context: Context, workerParams: WorkerParamete
         }
     }
 }
-
-private const val TAG_AUTO = "BackupCreator"
-private const val TAG_MANUAL = "$TAG_AUTO:manual"
-
-private const val IS_AUTO_BACKUP_KEY = "is_auto_backup" // Boolean
-private const val LOCATION_URI_KEY = "location_uri" // String
-private const val OPTIONS_KEY = "options" // BooleanArray

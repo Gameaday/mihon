@@ -60,6 +60,7 @@ import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
+import java.io.IOException
 import java.util.Locale
 
 /**
@@ -344,7 +345,8 @@ class Downloader(
             download.chapter.scanlator,
             download.chapter.url,
         )
-        val tmpDir = mangaDir.createDirectory(chapterDirname + TMP_DIR_SUFFIX)!!
+        val tmpDir = mangaDir.createDirectory(chapterDirname + TMP_DIR_SUFFIX)
+            ?: error("Failed to create temporary download directory for chapter ${download.chapter.name}")
 
         try {
             // If the page list already exists, start from the file
@@ -488,7 +490,8 @@ class Downloader(
         page.progress = 0
         return flow {
             val response = source.getImage(page)
-            val file = tmpDir.createFile("$filename.tmp")!!
+            val file = tmpDir.createFile("$filename.tmp")
+                ?: error("Failed to create temporary file for page $filename")
             try {
                 response.body.source().saveTo(file.openOutputStream())
                 val extension = getImageExtension(response, file)
@@ -520,7 +523,8 @@ class Downloader(
      * @param filename the filename of the image.
      */
     private fun copyImageFromCache(cacheFile: File, tmpDir: UniFile, filename: String): UniFile {
-        val tmpFile = tmpDir.createFile("$filename.tmp")!!
+        val tmpFile = tmpDir.createFile("$filename.tmp")
+            ?: throw IOException("Could not create temporary file in download directory")
         cacheFile.inputStream().use { input ->
             tmpFile.openOutputStream().use { output ->
                 input.copyTo(output)
@@ -601,7 +605,8 @@ class Downloader(
         dirname: String,
         tmpDir: UniFile,
     ) {
-        val zip = mangaDir.createFile("$dirname.cbz$TMP_DIR_SUFFIX")!!
+        val zip = mangaDir.createFile("$dirname.cbz$TMP_DIR_SUFFIX")
+            ?: throw IOException("Could not create CBZ archive file")
         ZipWriter(context, zip).use { writer ->
             tmpDir.listFiles()?.forEach { file ->
                 writer.write(file)
@@ -638,7 +643,9 @@ class Downloader(
 
         // Remove the old file
         dir.findFile(COMIC_INFO_FILE)?.delete()
-        dir.createFile(COMIC_INFO_FILE)!!.openOutputStream().use {
+        val comicInfoFile = dir.createFile(COMIC_INFO_FILE)
+            ?: throw IOException("Could not create $COMIC_INFO_FILE")
+        comicInfoFile.openOutputStream().use {
             val comicInfoString = xml.encodeToString(ComicInfo.serializer(), comicInfo)
             it.write(comicInfoString.toByteArray())
         }
@@ -728,8 +735,8 @@ class Downloader(
         const val WARNING_NOTIF_TIMEOUT_MS = 30_000L
         const val CHAPTERS_PER_SOURCE_QUEUE_WARNING_THRESHOLD = 15
         private const val DOWNLOADS_QUEUED_WARNING_THRESHOLD = 30
+
+        // Arbitrary minimum required space to start a download: 200 MB
+        const val MIN_DISK_SPACE = 200L * 1024 * 1024
     }
 }
-
-// Arbitrary minimum required space to start a download: 200 MB
-private const val MIN_DISK_SPACE = 200L * 1024 * 1024

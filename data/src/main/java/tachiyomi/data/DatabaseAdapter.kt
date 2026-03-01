@@ -9,7 +9,6 @@ object DateColumnAdapter : ColumnAdapter<Date, Long> {
     override fun encode(value: Date): Long = value.time
 }
 
-private const val LIST_OF_STRINGS_SEPARATOR = ", "
 object StringListColumnAdapter : ColumnAdapter<List<String>, String> {
     override fun decode(databaseValue: String) = if (databaseValue.isEmpty()) {
         emptyList()
@@ -19,6 +18,8 @@ object StringListColumnAdapter : ColumnAdapter<List<String>, String> {
     override fun encode(value: List<String>) = value.joinToString(
         separator = LIST_OF_STRINGS_SEPARATOR,
     )
+
+    private const val LIST_OF_STRINGS_SEPARATOR = ", "
 }
 
 object UpdateStrategyColumnAdapter : ColumnAdapter<UpdateStrategy, Long> {

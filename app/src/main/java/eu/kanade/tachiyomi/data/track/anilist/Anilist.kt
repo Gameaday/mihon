@@ -146,7 +146,7 @@ class Anilist(id: Long) : BaseTracker(id, "AniList"), DeletableTracker {
 
     override suspend fun update(track: Track, didReadChapter: Boolean): Track {
         // If user was using API v1 fetch library_id
-        if (track.library_id == null || track.library_id!! == 0L) {
+        if (track.library_id == null || track.library_id == 0L) {
             val libManga = api.findLibManga(track, getUsername().toInt())
                 ?: throw Exception("$track not found on user library")
             track.library_id = libManga.library_id
@@ -172,7 +172,8 @@ class Anilist(id: Long) : BaseTracker(id, "AniList"), DeletableTracker {
     override suspend fun delete(track: DomainTrack) {
         if (track.libraryId == null || track.libraryId == 0L) {
             val libManga = api.findLibManga(track.toDbTrack(), getUsername().toInt()) ?: return
-            return api.deleteLibManga(track.copy(id = libManga.library_id!!))
+            val libraryId = libManga.library_id ?: return
+            return api.deleteLibManga(track.copy(id = libraryId))
         }
 
         api.deleteLibManga(track)

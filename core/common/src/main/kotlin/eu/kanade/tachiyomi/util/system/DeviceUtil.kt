@@ -99,6 +99,38 @@ object DeviceUtil {
         return totalMemBytes < 3L * 1024 * 1024 * 1024
     }
 
+    /**
+     * Broad device performance tiers used to scale reader preload windows,
+     * concurrent download workers, and RecyclerView caches without user configuration.
+     *
+     * - [LOW]: Less than 2 GB of total RAM — conservative settings to avoid OOM.
+     * - [MEDIUM]: 2–3.9 GB of total RAM — balanced defaults.
+     * - [HIGH]: 4 GB or more total RAM — aggressive preloading and concurrency.
+     */
+    enum class PerformanceTier { LOW, MEDIUM, HIGH }
+
+    // Cached so the ActivityManager query is only performed once per process.
+    @Volatile private var cachedPerformanceTier: PerformanceTier? = null
+
+    /**
+     * Returns the [PerformanceTier] for the device by reading total physical RAM.
+     * The result is cached after the first call. Thread-safe via the [DeviceUtil] object lock.
+     */
+    @Synchronized
+    fun performanceTier(context: Context): PerformanceTier =
+        cachedPerformanceTier ?: run {
+            val memInfo = ActivityManager.MemoryInfo()
+            context.getSystemService<ActivityManager>()!!.getMemoryInfo(memInfo)
+            val totalGb = memInfo.totalMem.toDouble() / (1024.0 * 1024.0 * 1024.0)
+            val tier = when {
+                totalGb < 2.0 -> PerformanceTier.LOW
+                totalGb < 4.0 -> PerformanceTier.MEDIUM
+                else -> PerformanceTier.HIGH
+            }
+            cachedPerformanceTier = tier
+            tier
+        }
+
     @SuppressLint("PrivateApi")
     private fun getSystemProperty(key: String?): String? {
         return try {

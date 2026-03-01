@@ -180,6 +180,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
     }
 
     fun onPageAbsorb(page: ReaderPage) {
+        page.isAbsorbed = true
         val index = items.indexOf(page)
         if (index != -1) {
             items.removeAt(index)

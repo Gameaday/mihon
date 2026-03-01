@@ -10,12 +10,15 @@ data class ALFuzzyDate(
     val month: Int?,
     val day: Int?,
 ) {
-    fun toEpochMilli(): Long = try {
-        LocalDate.of(year!!, month!!, day!!)
-            .atStartOfDay(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli()
-    } catch (_: Exception) {
-        0L
+    fun toEpochMilli(): Long {
+        if (year == null || month == null || day == null) return 0L
+        return try {
+            LocalDate.of(year, month, day)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+        } catch (_: Exception) {
+            0L
+        }
     }
 }

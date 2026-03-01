@@ -29,6 +29,17 @@ Mihon Nightly is a hardened, up-to-date build of [Mihon](https://github.com/miho
 - Does not include upstream donation links.
 - Routes its in-app updater to [Gameaday/mihon](https://github.com/Gameaday/mihon) releases.
 
+## Improvements over upstream
+
+The following changes have been made on top of the base Mihon project:
+
+- **Device-adaptive reader performance.** Preload window sizes and download worker counts are scaled automatically based on available device RAM, so low-end devices stay conservative while high-end devices prefetch more aggressively.
+- **Bandwidth-isolated chapter preloading.** Adjacent chapters are fetched in the background using a single throttled worker, preventing speculative preloads from competing with the active chapter's downloads. Worker concurrency scales up only when that chapter becomes the one being read.
+- **Opportunistic cross-chapter image prefetch.** When the current chapter's download buffer has headroom, the first pages of the next chapter begin downloading before the user reaches the chapter boundary, reducing wait time at transitions.
+- **Per-page preload re-trigger.** If a cross-chapter prefetch was deferred due to a thin buffer, it is retried on every page advance rather than waiting for the next full preload cycle, so downloads start the moment bandwidth is available.
+- **Backward page preloading.** Pages behind the current reading position are also queued for download at low priority, reducing stutter when navigating backward through a chapter.
+- **Automatic retry with exponential backoff.** Transient page-load failures (network I/O errors, HTTP 429 and server errors) are retried up to three times with increasing delays before the page is marked as failed.
+
 ## Features
 
 <div align="left">

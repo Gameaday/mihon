@@ -37,6 +37,31 @@ abstract class PageLoader {
     open fun retryPage(page: ReaderPage) {}
 
     /**
+     * Proactively starts loading the first [amount] pages of this chapter so that their images
+     * are cached before the user scrolls to them. Called after the chapter's page list has been
+     * fetched but before the user reaches the chapter boundary. Implementations should enqueue
+     * pages at background (lowest) priority; the default no-op is appropriate for local loaders
+     * whose pages are already ready on disk.
+     *
+     * @param amount the number of pages from the beginning of the chapter to preload.
+     */
+    open fun preloadFirstPages(amount: Int) {}
+
+    /**
+     * Promotes this loader to full worker concurrency when it was initially created in a
+     * bandwidth-throttled preload-only mode.
+     *
+     * When a chapter transitions from speculative preload to the active reading chapter the
+     * underlying [HttpPageLoader] needs additional download workers so it can keep pace with
+     * the reader. The base implementation is a no-op; [HttpPageLoader] overrides it to spawn
+     * the remaining workers up to the device-tier maximum.
+     *
+     * Implementations must be idempotent — calling this method more than once must not spawn
+     * duplicate workers.
+     */
+    open fun promoteToActive() {}
+
+    /**
      * Recycles this loader. Implementations must override this method to clean up any active
      * resources.
      */

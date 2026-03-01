@@ -6,6 +6,7 @@ import eu.kanade.tachiyomi.data.download.DownloadProvider
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
+import eu.kanade.tachiyomi.util.system.DeviceUtil
 import mihon.core.archive.archiveReader
 import mihon.core.archive.epubReader
 import tachiyomi.core.common.i18n.stringResource
@@ -28,12 +29,28 @@ class ChapterLoader(
     private val source: Source,
 ) {
 
+    // Computed once and reused for every chapter loaded in this session.
+    private val performanceTier by lazy { DeviceUtil.performanceTier(context) }
+
     /**
      * Assigns the chapter's page loader and loads the its pages. Returns immediately if the chapter
      * is already loaded.
+     *
+     * @param chapter the chapter to load.
+     * @param isPreloadOnly when `true` the chapter is being preloaded speculatively before the
+     *   reader actually navigates to it. The underlying [HttpPageLoader] will be created with a
+     *   single background worker so it cannot compete with the active chapter's downloads for
+     *   network bandwidth.
      */
-    suspend fun loadChapter(chapter: ReaderChapter) {
+    suspend fun loadChapter(chapter: ReaderChapter, isPreloadOnly: Boolean = false) {
         if (chapterIsReady(chapter)) {
+            // The chapter's page list is already available. If it was previously loaded by a
+            // preload-only (single-worker) HttpPageLoader and is now being activated as the
+            // current reading chapter, promote it to the full worker count so downloads are no
+            // longer throttled by the background-preload bandwidth cap.
+            if (!isPreloadOnly) {
+                chapter.pageLoader?.promoteToActive()
+            }
             return
         }
 
@@ -41,7 +58,7 @@ class ChapterLoader(
         withIOContext {
             logcat { "Loading pages for ${chapter.chapter.name}" }
             try {
-                val loader = getPageLoader(chapter)
+                val loader = getPageLoader(chapter, isPreloadOnly)
                 chapter.pageLoader = loader
 
                 val pages = loader.getPages()
@@ -75,7 +92,7 @@ class ChapterLoader(
     /**
      * Returns the page loader to use for this [chapter].
      */
-    private fun getPageLoader(chapter: ReaderChapter): PageLoader {
+    private fun getPageLoader(chapter: ReaderChapter, isPreloadOnly: Boolean = false): PageLoader {
         val dbChapter = chapter.chapter
         val isDownloaded = downloadManager.isChapterDownloaded(
             dbChapter.name,
@@ -100,7 +117,12 @@ class ChapterLoader(
                     is Format.Epub -> EpubPageLoader(format.file.epubReader(context))
                 }
             }
-            source is HttpSource -> HttpPageLoader(chapter, source)
+            source is HttpSource -> HttpPageLoader(
+                chapter,
+                source,
+                performanceTier = performanceTier,
+                isPreloadOnly = isPreloadOnly,
+            )
             source is StubSource -> error(context.stringResource(MR.strings.source_not_installed, source.toString()))
             else -> error(context.stringResource(MR.strings.loader_not_implemented_error))
         }

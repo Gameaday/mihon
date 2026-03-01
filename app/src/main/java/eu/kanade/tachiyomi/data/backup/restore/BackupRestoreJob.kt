@@ -70,6 +70,12 @@ class BackupRestoreJob(private val context: Context, workerParams: WorkerParamet
     }
 
     companion object {
+        private const val TAG = "BackupRestore"
+
+        private const val LOCATION_URI_KEY = "location_uri" // String
+        private const val SYNC_KEY = "sync" // Boolean
+        private const val OPTIONS_KEY = "options" // BooleanArray
+
         fun isRunning(context: Context): Boolean {
             return context.workManager.isRunning(TAG)
         }
@@ -97,9 +103,3 @@ class BackupRestoreJob(private val context: Context, workerParams: WorkerParamet
         }
     }
 }
-
-private const val TAG = "BackupRestore"
-
-private const val LOCATION_URI_KEY = "location_uri" // String
-private const val SYNC_KEY = "sync" // Boolean
-private const val OPTIONS_KEY = "options" // BooleanArray

@@ -96,8 +96,10 @@ class ImageSaver(
 
         try {
             data().use { input ->
-                context.contentResolver.openOutputStream(picture, "w").use { output ->
-                    input.copyTo(output!!)
+                val outputStream = context.contentResolver.openOutputStream(picture, "w")
+                    ?: throw IOException(context.stringResource(MR.strings.error_saving_picture))
+                outputStream.use { output ->
+                    input.copyTo(output)
                 }
             }
         } catch (e: Exception) {

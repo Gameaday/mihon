@@ -20,6 +20,12 @@ class StorageManager(
     storagePreferences: StoragePreferences,
 ) {
 
+    companion object {
+        const val AUTOMATIC_BACKUPS_PATH = "autobackup"
+        const val DOWNLOADS_PATH = "downloads"
+        const val LOCAL_SOURCE_PATH = "local"
+    }
+
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private var baseDir: UniFile? = getBaseDir(storagePreferences.baseStorageDirectory().get())
@@ -29,18 +35,15 @@ class StorageManager(
         .shareIn(scope, SharingStarted.Lazily, 1)
 
     init {
+        // Ensure directories exist for the current storage location when StorageManager is created.
+        baseDir?.let(::initializeDirectories)
+
         storagePreferences.baseStorageDirectory().changes()
             .drop(1)
             .distinctUntilChanged()
             .onEach { uri ->
                 baseDir = getBaseDir(uri)
-                baseDir?.let { parent ->
-                    parent.createDirectory(AUTOMATIC_BACKUPS_PATH)
-                    parent.createDirectory(LOCAL_SOURCE_PATH)
-                    parent.createDirectory(DOWNLOADS_PATH).also {
-                        DiskUtil.createNoMediaFile(it, context)
-                    }
-                }
+                baseDir?.let(::initializeDirectories)
                 _changes.send(Unit)
             }
             .launchIn(scope)
@@ -49,6 +52,14 @@ class StorageManager(
     private fun getBaseDir(uri: String): UniFile? {
         return UniFile.fromUri(context, uri.toUri())
             .takeIf { it?.exists() == true }
+    }
+
+    private fun initializeDirectories(parent: UniFile) {
+        parent.createDirectory(AUTOMATIC_BACKUPS_PATH)
+        parent.createDirectory(LOCAL_SOURCE_PATH)
+        parent.createDirectory(DOWNLOADS_PATH).also {
+            DiskUtil.createNoMediaFile(it, context)
+        }
     }
 
     fun getAutomaticBackupsDirectory(): UniFile? {
@@ -63,7 +74,3 @@ class StorageManager(
         return baseDir?.createDirectory(LOCAL_SOURCE_PATH)
     }
 }
-
-private const val AUTOMATIC_BACKUPS_PATH = "autobackup"
-private const val DOWNLOADS_PATH = "downloads"
-private const val LOCAL_SOURCE_PATH = "local"

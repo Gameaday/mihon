@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.viewpager.widget.ViewPager
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.download.DownloadManager
+import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.model.ChapterTransition
 import eu.kanade.tachiyomi.ui.reader.model.InsertPage
@@ -19,8 +20,15 @@ import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.ViewerChapters
 import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import logcat.LogPriority
+import okio.Buffer
+import tachiyomi.core.common.util.lang.withIOContext
+import tachiyomi.core.common.util.lang.withUIContext
+import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.injectLazy
 import kotlin.math.min
@@ -34,6 +42,13 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
     val downloadManager: DownloadManager by injectLazy()
 
     private val scope = MainScope()
+
+    /**
+     * Background job that proactively scans all pages in the current chapter for stub patterns
+     * and merges them before they are ever displayed. Cancelled and replaced each time
+     * [setChaptersInternal] is called so that stale work from a previous chapter is abandoned.
+     */
+    private var preScanJob: Job? = null
 
     /**
      * View pager used by this viewer. It's abstract to implement L2R, R2L and vertical pagers on
@@ -293,6 +308,62 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
         pager.addOnPageChangeListener(pagerListener)
         // Manually call onPageChange to update the UI
         onPageChange(pager.currentItem)
+
+        // Proactively merge any pages that are already loaded so that stubs are absorbed
+        // before the user scrolls to them. This makes the merge invisible in the common case
+        // (e.g., downloaded chapters where all pages are ready immediately).
+        launchSmartCombinePreScan(chapters.currChapter.pages)
+    }
+
+    /**
+     * Launches a background job that scans [pages] for already-ready stub patterns and
+     * pre-merges them so they are never seen as separate pages.  The job is cancelled and
+     * replaced each time [setChaptersInternal] is called.
+     *
+     * Each pair (page N, page N+1) is processed independently: if page N+1 is already in
+     * [Page.State.Ready] and passes the stub dimension check, the two are merged and the stub
+     * is absorbed from the adapter before the user ever scrolls to either page.
+     *
+     * Processing is intentionally sequential (one merge at a time) to avoid simultaneous
+     * bitmap decodes that would spike memory usage on low-RAM devices.
+     *
+     * If a page is not yet ready when this scan runs, the per-holder [setupSmartCombineRetry]
+     * logic will handle it once it becomes ready.
+     */
+    private fun launchSmartCombinePreScan(pages: List<ReaderPage>?) {
+        preScanJob?.cancel()
+        if (!config.smartCombine || pages == null) return
+        preScanJob = scope.launch {
+            withIOContext {
+                pages.forEachIndexed { index, page ->
+                    if (page is InsertPage || page.mergedBytes != null) return@forEachIndexed
+                    if (page.status != Page.State.Ready) return@forEachIndexed
+                    val nextPage = pages.getOrNull(index + 1) ?: return@forEachIndexed
+                    if (nextPage.status != Page.State.Ready) return@forEachIndexed
+                    val streamFn = page.stream ?: return@forEachIndexed
+                    val nextStreamFn = nextPage.stream ?: return@forEachIndexed
+                    try {
+                        val currentSource = streamFn().use { Buffer().readFrom(it) }
+                        // Buffer the full next-page stream once so the stub-dimension check
+                        // and the merge can both use the same bytes without a second I/O call.
+                        // extractImageOptions (called inside isSmallPage) uses peek() so
+                        // nextSource remains fully readable for the subsequent mergePages call.
+                        val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
+                        val isStub = ImageUtil.isSmallPage(nextSource.peek().inputStream(), currentSource)
+                        if (!isStub) return@forEachIndexed
+                        if (ImageUtil.isAnimatedAndSupported(currentSource)) return@forEachIndexed
+                        val mergedBuffer = ImageUtil.mergePages(currentSource, nextSource)
+                        val mergedBytes = mergedBuffer.readByteArray()
+                        page.mergedBytes = mergedBytes
+                        withUIContext {
+                            onPageAbsorb(nextPage)
+                        }
+                    } catch (e: Exception) {
+                        logcat(LogPriority.WARN, e) { "Smart combine pre-scan failed for page ${page.index}" }
+                    }
+                }
+            }
+        }
     }
 
     /**

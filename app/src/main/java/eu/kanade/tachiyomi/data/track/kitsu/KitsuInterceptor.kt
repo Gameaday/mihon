@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.Response
 import uy.kohesive.injekt.injectLazy
+import java.io.IOException
 
 class KitsuInterceptor(private val kitsu: Kitsu) : Interceptor {
 
@@ -22,10 +23,10 @@ class KitsuInterceptor(private val kitsu: Kitsu) : Interceptor {
 
         val currAuth = oauth ?: throw Exception("Not authenticated with Kitsu")
 
-        val refreshToken = currAuth.refreshToken!!
-
         // Refresh access token if expired.
         if (currAuth.isExpired()) {
+            val refreshToken = currAuth.refreshToken
+                ?: throw IOException("No refresh token available")
             val response = chain.proceed(KitsuApi.refreshTokenRequest(refreshToken))
             if (response.isSuccessful) {
                 newAuth(json.decodeFromString(response.body.string()))
@@ -36,7 +37,7 @@ class KitsuInterceptor(private val kitsu: Kitsu) : Interceptor {
 
         // Add the authorization header to the original request.
         val authRequest = originalRequest.newBuilder()
-            .addHeader("Authorization", "Bearer ${oauth!!.accessToken}")
+            .addHeader("Authorization", "Bearer ${(oauth ?: currAuth).accessToken}")
             .header("User-Agent", "Mihon v${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})")
             .header("Accept", "application/vnd.api+json")
             .header("Content-Type", "application/vnd.api+json")

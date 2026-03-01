@@ -51,7 +51,7 @@ import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.UserHandle
 import eu.kanade.tachiyomi.BuildConfig
-import eu.kanade.tachiyomi.extension.installer.ACTION_INSTALL_RESULT
+import eu.kanade.tachiyomi.extension.installer.ShizukuInstaller
 import rikka.shizuku.SystemServiceHelper
 import java.io.OutputStream
 import kotlin.system.exitProcess
@@ -139,7 +139,7 @@ class ShellInterface : IShellInterface.Stub() {
         val statusIntent = PendingIntent.getBroadcast(
             context,
             0,
-            Intent(ACTION_INSTALL_RESULT).setPackage(packageName),
+            Intent(ShizukuInstaller.ACTION_INSTALL_RESULT).setPackage(packageName),
             PendingIntent.FLAG_MUTABLE,
         )
 
@@ -180,8 +180,10 @@ class ShellInterface : IShellInterface.Stub() {
 
         return shellContext.createPackageContext("com.android.shell", 0)
     }
-}
 
-// Constant hidden from the SDK
-// https://cs.android.com/android/platform/superproject/main/+/512046e84bcc51cc241bc6599f83ab345e93ab12:frameworks/base/core/java/android/content/pm/PackageManager.java;l=1682-1689
-private const val REPLACE_EXISTING_INSTALL_FLAG = 0x00000002
+    companion object {
+        // Constant hidden from the SDK
+        // https://cs.android.com/android/platform/superproject/main/+/512046e84bcc51cc241bc6599f83ab345e93ab12:frameworks/base/core/java/android/content/pm/PackageManager.java;l=1682-1689
+        private const val REPLACE_EXISTING_INSTALL_FLAG = 0x00000002
+    }
+}
