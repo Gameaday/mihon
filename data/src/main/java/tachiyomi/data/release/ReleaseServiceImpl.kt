@@ -61,7 +61,10 @@ class ReleaseServiceImpl(
     }
 
     private fun getDownloadLink(release: GithubRelease, isFoss: Boolean): String? {
-        val map = release.assets.associate { asset ->
+        // Sort so that unsigned APKs are processed first; since associate keeps the last
+        // value for duplicate keys, signed APKs will take priority over unsigned ones.
+        val sortedAssets = release.assets.sortedBy { if ("unsigned" in it.name) 0 else 1 }
+        val map = sortedAssets.associate { asset ->
             BUILD_TYPES.find { "-$it" in asset.name } to asset.downloadLink
         }
 
