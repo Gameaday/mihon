@@ -140,6 +140,11 @@ internal class HttpPageLoader(
     /**
      * Returns the page list for a chapter. It tries to return the page list from the local cache,
      * otherwise fallbacks to network.
+     *
+     * When the page list is fetched from the network, it is immediately persisted to
+     * [ChapterCache] in the background. This means a process death or force-close before the
+     * normal [recycle] call does not lose the page URLs — the next chapter open will be served
+     * from cache rather than making another [source.getPageList] network call.
      */
     override suspend fun getPages(): List<ReaderPage> {
         check(!isRecycled)
@@ -153,7 +158,19 @@ internal class HttpPageLoader(
             if (e is CancellationException) {
                 throw e
             }
-            source.getPageList(chapter.chapter)
+            val networkPages = source.getPageList(chapter.chapter)
+            // Persist immediately so a crash before recycle() doesn't lose the page list.
+            chapter.chapter.toDomainChapter()?.let { domainChapter ->
+                scope.launchIO {
+                    try {
+                        chapterCache.putPageListToCache(domainChapter, networkPages)
+                    } catch (ex: Throwable) {
+                        if (ex is CancellationException) throw ex
+                        logcat(LogPriority.WARN, ex) { "Failed to persist page list to cache after network fetch" }
+                    }
+                }
+            }
+            networkPages
         }
         return pages.mapIndexed { index, page ->
             // Don't trust sources and use our own indexing

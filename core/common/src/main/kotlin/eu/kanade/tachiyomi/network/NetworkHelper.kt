@@ -5,6 +5,7 @@ import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor
 import eu.kanade.tachiyomi.network.interceptor.IgnoreGzipInterceptor
 import eu.kanade.tachiyomi.network.interceptor.UncaughtExceptionInterceptor
 import eu.kanade.tachiyomi.network.interceptor.UserAgentInterceptor
+import eu.kanade.tachiyomi.util.system.DeviceUtil
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.brotli.BrotliInterceptor
@@ -28,7 +29,15 @@ class NetworkHelper(
             .cache(
                 Cache(
                     directory = File(context.cacheDir, "network_cache"),
-                    maxSize = 5L * 1024 * 1024, // 5 MiB
+                    // Scale the HTTP-level response cache with device capability so that
+                    // source API responses carrying Cache-Control headers (page lists, image
+                    // URL resolvers, etc.) survive longer in memory and avoid repeat network
+                    // round-trips within a reading session.
+                    maxSize = when (DeviceUtil.performanceTier(context)) {
+                        DeviceUtil.PerformanceTier.LOW -> 5L * 1024 * 1024   // 5 MiB
+                        DeviceUtil.PerformanceTier.MEDIUM -> 20L * 1024 * 1024 // 20 MiB
+                        DeviceUtil.PerformanceTier.HIGH -> 50L * 1024 * 1024  // 50 MiB
+                    },
                 ),
             )
             .addInterceptor(UncaughtExceptionInterceptor())
