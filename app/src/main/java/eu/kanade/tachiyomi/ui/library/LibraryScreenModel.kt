@@ -491,6 +491,9 @@ class LibraryScreenModel(
     private fun downloadNextChapters(amount: Int?) {
         val mangas = state.value.selectedManga
         screenModelScope.launchNonCancellable {
+            // Wait for the DownloadCache disk-snapshot to be ready before querying it so
+            // that a chapter already on disk is never mistakenly re-downloaded on a cold start.
+            downloadManager.awaitCacheReady()
             mangas.forEach { manga ->
                 val chapters = getNextChapters.await(manga.id)
                     .fastFilterNot { chapter ->
@@ -513,6 +516,9 @@ class LibraryScreenModel(
     private fun downloadBookmarkedChapters() {
         val mangas = state.value.selectedManga
         screenModelScope.launchNonCancellable {
+            // Wait for the DownloadCache disk-snapshot to be ready before querying it so
+            // that a chapter already on disk is never mistakenly re-downloaded on a cold start.
+            downloadManager.awaitCacheReady()
             mangas.forEach { manga ->
                 val chapters = getBookmarkedChaptersByMangaId.await(manga.id)
                     .fastFilterNot { chapter ->

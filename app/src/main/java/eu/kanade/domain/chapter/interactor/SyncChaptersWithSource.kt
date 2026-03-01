@@ -110,6 +110,11 @@ class SyncChaptersWithSource(
                 newChapters.add(toAddChapter)
             } else {
                 if (shouldUpdateDbChapter.await(dbChapter, chapter)) {
+                    // Ensure the DownloadCache has read its on-disk snapshot before we
+                    // query it. On the warm path this is a non-suspending check; on a
+                    // cold start (e.g. via LibraryUpdateJob at launch) it waits briefly
+                    // so we don't miss a rename needed because the cache looks empty.
+                    downloadManager.awaitCacheReady()
                     val shouldRenameChapter = downloadProvider.isChapterDirNameChanged(dbChapter, chapter) &&
                         downloadManager.isChapterDownloaded(
                             dbChapter.name,
