@@ -617,9 +617,19 @@ class ReaderViewModel @JvmOverloads constructor(
      */
     private suspend fun updateChapterProgress(readerChapter: ReaderChapter, page: Page) {
         val pageIndex = page.index
+        val chapterPages = readerChapter.pages
 
+        // Compute the 1-based display position by counting only non-absorbed pages up to
+        // and including the current page. This keeps the bottom indicator and slider in sync
+        // with what is actually visible — absorbed stub pages (smart-combined watermarks) are
+        // invisible to the user and should not inflate the page count or current position.
+        val displayIndex = if (chapterPages != null) {
+            chapterPages.take(pageIndex + 1).count { !it.isAbsorbed }
+        } else {
+            pageIndex + 1
+        }
         mutableState.update {
-            it.copy(currentPage = pageIndex + 1)
+            it.copy(currentPage = displayIndex)
         }
         readerChapter.requestedPage = pageIndex
         chapterPageIndex = pageIndex
@@ -632,7 +642,6 @@ class ReaderViewModel @JvmOverloads constructor(
             // and all subsequent pages in the list were absorbed as stubs. This ensures the
             // chapter is marked as read even when the final page(s) are watermark stubs that
             // get merged invisibly into the previous page.
-            val chapterPages = readerChapter.pages
             val isEffectivelyLastPage = pageIndex == chapterPages?.lastIndex ||
                 (
                     (page as? ReaderPage)?.mergedBytes != null &&
@@ -1059,7 +1068,10 @@ class ReaderViewModel @JvmOverloads constructor(
             get() = viewerChapters?.currChapter
 
         val totalPages: Int
-            get() = currentChapter?.pages?.size ?: -1
+            // Count only non-absorbed pages so the indicator reflects the number of pages
+            // the user actually navigates through. Absorbed stubs are invisible (merged into
+            // the previous page by smart combine) and should not inflate the total.
+            get() = currentChapter?.pages?.count { !it.isAbsorbed } ?: -1
     }
 
     sealed interface Dialog {
