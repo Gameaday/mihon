@@ -108,6 +108,8 @@ class ReaderNavigationOverlayView(context: Context, attributeSet: AttributeSet) 
         performClick()
         return super.onTouchEvent(event)
     }
-}
 
-private const val FADE_DURATION = 1000L
+    companion object {
+        private const val FADE_DURATION = 1000L
+    }
+}

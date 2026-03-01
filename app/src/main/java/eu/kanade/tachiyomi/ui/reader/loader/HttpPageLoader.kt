@@ -224,6 +224,17 @@ internal class HttpPageLoader(
             }
         }
     }
+
+    companion object {
+        /** Maximum number of automatic retry attempts for transient page-load failures. */
+        private const val MAX_PAGE_LOAD_RETRIES = 3
+
+        /** Initial delay in milliseconds before the first retry; doubles with each subsequent attempt. */
+        private const val PAGE_LOAD_RETRY_DELAY_MS = 1_000L
+
+        /** Maximum delay cap in milliseconds between retry attempts. */
+        private const val MAX_PAGE_LOAD_RETRY_DELAY_MS = 8_000L
+    }
 }
 
 /**
@@ -245,12 +256,3 @@ private class PriorityPage(
         return if (p != 0) p else identifier.compareTo(other.identifier)
     }
 }
-
-/** Maximum number of automatic retry attempts for transient page-load failures. */
-private const val MAX_PAGE_LOAD_RETRIES = 3
-
-/** Initial delay in milliseconds before the first retry; doubles with each subsequent attempt. */
-private const val PAGE_LOAD_RETRY_DELAY_MS = 1_000L
-
-/** Maximum delay cap in milliseconds between retry attempts. */
-private const val MAX_PAGE_LOAD_RETRY_DELAY_MS = 8_000L

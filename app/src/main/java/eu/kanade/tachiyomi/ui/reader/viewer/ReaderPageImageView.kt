@@ -435,6 +435,8 @@ open class ReaderPageImageView @JvmOverloads constructor(
         CENTER,
         RIGHT,
     }
-}
 
-private const val MAX_ZOOM_SCALE = 5F
+    companion object {
+        private const val MAX_ZOOM_SCALE = 5F
+    }
+}

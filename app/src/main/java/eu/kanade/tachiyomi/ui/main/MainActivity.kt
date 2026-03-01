@@ -466,10 +466,10 @@ class MainActivity : BaseActivity() {
         const val INTENT_SEARCH = "eu.kanade.tachiyomi.SEARCH"
         const val INTENT_SEARCH_QUERY = "query"
         const val INTENT_SEARCH_FILTER = "filter"
+
+        // Splash screen
+        private const val SPLASH_MIN_DURATION = 500 // ms
+        private const val SPLASH_MAX_DURATION = 5000 // ms
+        private const val SPLASH_EXIT_ANIM_DURATION = 400L // ms
     }
 }
-
-// Splash screen
-private const val SPLASH_MIN_DURATION = 500 // ms
-private const val SPLASH_MAX_DURATION = 5000 // ms
-private const val SPLASH_EXIT_ANIM_DURATION = 400L // ms

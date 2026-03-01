@@ -359,7 +359,9 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
             min(position + 3, adapter.itemCount - 1),
         )
     }
-}
 
-// Double the cache size to reduce rebinds/recycles incurred by the extra layout space on scroll direction changes
-private const val RECYCLER_VIEW_CACHE_SIZE = 4
+    companion object {
+        // Double the cache size to reduce rebinds/recycles incurred by the extra layout space on scroll direction changes
+        private const val RECYCLER_VIEW_CACHE_SIZE = 4
+    }
+}
