@@ -26,6 +26,7 @@ import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.IOException
 import java.util.concurrent.PriorityBlockingQueue
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
@@ -95,8 +96,8 @@ internal class HttpPageLoader(
     }
 
     /** Guards [promoteToActive] so the promotion is applied at most once. */
-    @Volatile
-    private var promoted = !isPreloadOnly
+    @OptIn(ExperimentalAtomicApi::class)
+    private val promoted = AtomicBoolean(!isPreloadOnly)
 
     init {
         val initialWorkers = if (isPreloadOnly) 1 else fullWorkerCount
@@ -109,15 +110,15 @@ internal class HttpPageLoader(
      *
      * The formula `fullWorkerCount - 1` is correct because preload-only loaders always start
      * with exactly 1 worker ([init] uses `initialWorkers = 1` when [isPreloadOnly] is true),
-     * and [promoted] is initialised to `!isPreloadOnly`, so this branch is only reached when
+     * and [promoted] starts as `!isPreloadOnly`, so this branch is only reached when
      * [isPreloadOnly] was true and exactly 1 worker is already running.
      */
+    @OptIn(ExperimentalAtomicApi::class)
     override fun promoteToActive() {
-        if (isRecycled || promoted) return
-        promoted = true
+        if (isRecycled) return
+        if (!promoted.compareAndSet(expectedValue = false, newValue = true)) return
         // Preload-only loaders always start with 1 worker; launch the remaining workers up to
-        // the tier-scaled maximum.  promoted=!isPreloadOnly guarantees this branch is only
-        // reached when initialWorkers == 1.
+        // the tier-scaled maximum.
         val remaining = fullWorkerCount - 1
         repeat(remaining) { launchWorker() }
     }
