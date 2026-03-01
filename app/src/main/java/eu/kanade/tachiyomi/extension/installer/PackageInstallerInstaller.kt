@@ -126,6 +126,8 @@ class PackageInstallerInstaller(private val service: Service) : Installer(servic
             ContextCompat.RECEIVER_NOT_EXPORTED,
         )
     }
-}
 
-private const val INSTALL_ACTION = "PackageInstallerInstaller.INSTALL_ACTION"
+    companion object {
+        private const val INSTALL_ACTION = "PackageInstallerInstaller.INSTALL_ACTION"
+    }
+}

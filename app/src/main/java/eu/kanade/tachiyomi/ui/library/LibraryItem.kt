@@ -7,8 +7,6 @@ import tachiyomi.source.local.LocalSource
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
-private const val LOCAL_SOURCE_ID_ALIAS = "local"
-
 data class LibraryItem(
     val libraryManga: LibraryManga,
     val downloadCount: Long = -1,
@@ -67,5 +65,9 @@ data class LibraryItem(
         } else {
             predicate(constraint)
         }
+    }
+
+    companion object {
+        private const val LOCAL_SOURCE_ID_ALIAS = "local"
     }
 }

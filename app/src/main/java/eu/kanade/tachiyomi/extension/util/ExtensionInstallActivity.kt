@@ -79,6 +79,8 @@ class ExtensionInstallActivity : Activity() {
         }
         extensionManager.updateInstallStep(downloadId, newStep)
     }
-}
 
-private const val INSTALL_REQUEST_CODE = 500
+    companion object {
+        private const val INSTALL_REQUEST_CODE = 500
+    }
+}
