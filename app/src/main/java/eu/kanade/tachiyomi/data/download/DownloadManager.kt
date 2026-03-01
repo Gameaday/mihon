@@ -173,6 +173,15 @@ class DownloadManager(
     }
 
     /**
+     * Suspends until the [DownloadCache] has finished reading its on-disk snapshot. Returns
+     * immediately on every call after the initial disk-cache load has completed (i.e. the
+     * overhead is a single deferred check on the fast path). Callers that must make a reliable
+     * [isChapterDownloaded] query before the cache has been populated by a background renewal
+     * should await this first.
+     */
+    suspend fun awaitCacheReady() = cache.awaitCacheReady()
+
+    /**
      * Returns true if the chapter is downloaded.
      *
      * @param chapterName the name of the chapter to query.

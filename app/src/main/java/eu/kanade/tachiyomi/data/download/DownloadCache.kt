@@ -7,6 +7,7 @@ import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.extension.ExtensionManager
 import eu.kanade.tachiyomi.source.Source
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -102,6 +103,16 @@ class DownloadCache(
     private val rootDownloadsDirMutex = Mutex()
     private var rootDownloadsDir = RootDirectory(storageManager.getDownloadsDirectory())
 
+    /**
+     * Signals that the initial cache state is ready for queries. Completed once immediately
+     * after the disk-cache load attempt in [init] — before the first filesystem-renewal job
+     * runs. Callers that need a reliable answer should call [awaitCacheReady] (via
+     * [eu.kanade.tachiyomi.data.download.DownloadManager.awaitCacheReady]) before calling
+     * [isChapterDownloaded], so they see the disk-cached state rather than the transient empty
+     * map that exists in the narrow window between process start and disk-cache read.
+     */
+    private val cacheReady = CompletableDeferred<Unit>()
+
     init {
         // Attempt to read cache file
         scope.launch {
@@ -118,6 +129,11 @@ class DownloadCache(
                     diskCacheFile.delete()
                 }
             }
+
+            // Signal that the initial state (disk-cache data or confirmed-empty) is ready.
+            // Any caller blocked in awaitCacheReady() is released here, before the first
+            // full filesystem renewal overwrites rootDownloadsDir.
+            cacheReady.complete(Unit)
 
             sourceManager.catalogueSources
                 .map { sources -> sources.map { it.id }.toSet() }
@@ -329,6 +345,14 @@ class DownloadCache(
 
         notifyChanges()
     }
+
+    /**
+     * Suspends until the initial cache state is ready for queries. Returns immediately on all
+     * calls after the first disk-cache load attempt has completed. Use this before the first
+     * [isChapterDownloaded] call to avoid querying the transient empty map that exists between
+     * process start and disk-cache read.
+     */
+    suspend fun awaitCacheReady() = cacheReady.await()
 
     suspend fun invalidateCache() {
         renewalJob?.cancelAndJoin()

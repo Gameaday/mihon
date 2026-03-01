@@ -92,7 +92,13 @@ class ChapterLoader(
     /**
      * Returns the page loader to use for this [chapter].
      */
-    private fun getPageLoader(chapter: ReaderChapter, isPreloadOnly: Boolean = false): PageLoader {
+    private suspend fun getPageLoader(chapter: ReaderChapter, isPreloadOnly: Boolean = false): PageLoader {
+        // Ensure the DownloadCache has finished reading its on-disk snapshot before we query
+        // it. On the fast path (every call after the first disk-cache load) this is a single
+        // deferred check with no suspension. On a cold start where the reader is opened before
+        // the disk-cache read completes, we suspend here briefly rather than querying an empty
+        // map and incorrectly routing to HttpPageLoader for a downloaded chapter.
+        downloadManager.awaitCacheReady()
         val dbChapter = chapter.chapter
         val isDownloaded = downloadManager.isChapterDownloaded(
             dbChapter.name,
