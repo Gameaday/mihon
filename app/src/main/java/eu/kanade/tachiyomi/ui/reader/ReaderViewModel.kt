@@ -571,6 +571,11 @@ class ReaderViewModel @JvmOverloads constructor(
         val nextChapter = state.value.viewerChapters?.nextChapter?.chapter ?: return
 
         viewModelScope.launchIO {
+            // Ensure the DownloadCache has finished reading its on-disk snapshot before
+            // querying it. On the warm path this is a non-suspending check; on a cold
+            // start it waits for the brief disk-cache read to avoid a false negative that
+            // would suppress the download-ahead even though the next chapter is on disk.
+            downloadManager.awaitCacheReady()
             val isNextChapterDownloaded = downloadManager.isChapterDownloaded(
                 nextChapter.name,
                 nextChapter.scanlator,
