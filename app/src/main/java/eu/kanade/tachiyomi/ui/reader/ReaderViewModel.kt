@@ -334,6 +334,12 @@ class ReaderViewModel @JvmOverloads constructor(
     ): ViewerChapters {
         loader.loadChapter(chapter)
 
+        // Queue every page at the lowest background priority so the smart-combine pre-scan
+        // can process the entire chapter without waiting for the user to scroll to each page.
+        // Priority is kept below the nearby-page preload (0) and current-page load (1) so
+        // this never competes for bandwidth with what the user is actively reading.
+        chapter.pageLoader?.preloadAllPages()
+
         val chapterList = getChapterList()
         val chapterPos = chapterList.indexOf(chapter)
         val newChapters = ViewerChapters(

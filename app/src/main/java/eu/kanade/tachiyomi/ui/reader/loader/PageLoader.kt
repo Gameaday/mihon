@@ -48,6 +48,15 @@ abstract class PageLoader {
     open fun preloadFirstPages(amount: Int) {}
 
     /**
+     * Proactively queues every page in this chapter for download at the lowest background
+     * priority so that the smart-combine pre-scan can process the entire chapter without
+     * waiting for the user to scroll to each page. Pages already downloading or cached are
+     * skipped. The default no-op is appropriate for local loaders whose pages are already
+     * ready on disk.
+     */
+    open fun preloadAllPages() {}
+
+    /**
      * Promotes this loader to full worker concurrency when it was initially created in a
      * bandwidth-throttled preload-only mode.
      *

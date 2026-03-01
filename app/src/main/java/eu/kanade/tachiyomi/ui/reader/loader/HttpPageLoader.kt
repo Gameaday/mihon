@@ -321,6 +321,28 @@ internal class HttpPageLoader(
     }
 
     /**
+     * Queues every page in this chapter at the lowest background priority so that the
+     * smart-combine pre-scan can process the entire chapter without waiting for the user to
+     * navigate to each page. Pages are enqueued at priority [BACKGROUND_PRELOAD_PRIORITY]
+     * (below the nearby-page preload priority of 0), so they never compete for bandwidth with
+     * the page the user is actively reading or about to read.
+     *
+     * Only pages in [Page.State.Queue] are enqueued. Pages already downloading, ready, or in
+     * an error state are intentionally skipped: pages in progress or already cached need no
+     * action, and errored pages are retried through the user-facing [retryPage] path rather
+     * than being silently re-queued here.
+     */
+    override fun preloadAllPages() {
+        if (isRecycled) return
+        val pages = chapter.pages ?: return
+        pages.forEach { page ->
+            if (page.status == Page.State.Queue) {
+                queue.offer(PriorityPage(page, BACKGROUND_PRELOAD_PRIORITY))
+            }
+        }
+    }
+
+    /**
      * Loads the page, retrieving the image URL and downloading the image if necessary.
      * Automatically retries on transient network errors (IO errors, HTTP 429 and 5xx) up to
      * [MAX_PAGE_LOAD_RETRIES] times with exponential backoff before marking the page as failed.
@@ -375,6 +397,13 @@ internal class HttpPageLoader(
 
         /** Maximum delay cap in milliseconds between retry attempts. */
         private const val MAX_PAGE_LOAD_RETRY_DELAY_MS = 8_000L
+
+        /**
+         * Priority assigned to pages queued by [preloadAllPages]. Set below the nearby-page
+         * preload priority (0) so that background full-chapter downloads never steal bandwidth
+         * from pages the user is actively reading or about to reach.
+         */
+        private const val BACKGROUND_PRELOAD_PRIORITY = -1
     }
 }
 

@@ -23,6 +23,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -317,19 +318,19 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
     }
 
     /**
-     * Launches a background job that scans [pages] for already-ready stub patterns and
-     * pre-merges them so they are never seen as separate pages.  The job is cancelled and
-     * replaced each time [setChaptersInternal] is called.
+     * Launches a background job that scans [pages] for stub patterns and pre-merges them so
+     * they are never seen as separate pages.  The job is cancelled and replaced each time
+     * [setChaptersInternal] is called so that stale work from a previous chapter is abandoned.
      *
-     * Each pair (page N, page N+1) is processed independently: if page N+1 is already in
-     * [Page.State.Ready] and passes the stub dimension check, the two are merged and the stub
-     * is absorbed from the adapter before the user ever scrolls to either page.
+     * Each pair (page N, page N+1) is processed independently.  If a page is not yet
+     * downloaded when the scan reaches it, the job suspends until the page finishes (or
+     * errors out), ensuring that every page is eventually evaluated — even for online chapters
+     * where images arrive incrementally.  [preloadAllPages] in [ReaderViewModel.loadChapter]
+     * queues every page at the lowest background priority so the scan is never stuck waiting
+     * for a page that has not been scheduled for download.
      *
      * Processing is intentionally sequential (one merge at a time) to avoid simultaneous
      * bitmap decodes that would spike memory usage on low-RAM devices.
-     *
-     * If a page is not yet ready when this scan runs, the per-holder [setupSmartCombineRetry]
-     * logic will handle it once it becomes ready.
      */
     private fun launchSmartCombinePreScan(pages: List<ReaderPage>?) {
         preScanJob?.cancel()
@@ -343,9 +344,22 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
 
                     val page = pages[index]
                     if (page is InsertPage || page.mergedBytes != null || page.isAbsorbed) continue
-                    if (page.status != Page.State.Ready) continue
+
+                    // Suspend until this page finishes downloading; skip on error.
+                    if (page.status != Page.State.Ready) {
+                        val arrived = page.statusFlow.firstOrNull { it == Page.State.Ready || it is Page.State.Error }
+                        if (arrived != Page.State.Ready) continue
+                    }
+
                     val nextPage = pages.getOrNull(index + 1) ?: continue
-                    if (nextPage.isAbsorbed || nextPage.status != Page.State.Ready) continue
+                    if (nextPage.isAbsorbed) continue
+
+                    // Suspend until the next page finishes downloading; skip on error.
+                    if (nextPage.status != Page.State.Ready) {
+                        val arrived = nextPage.statusFlow.firstOrNull { it == Page.State.Ready || it is Page.State.Error }
+                        if (arrived != Page.State.Ready) continue
+                    }
+
                     val streamFn = page.stream ?: continue
                     val nextStreamFn = nextPage.stream ?: continue
                     try {
