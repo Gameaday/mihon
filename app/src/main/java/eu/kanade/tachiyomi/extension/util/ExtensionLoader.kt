@@ -200,7 +200,10 @@ internal object ExtensionLoader {
 
         val sharedPkg = try {
             val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(pkgName, PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong()))
+                context.packageManager.getPackageInfo(
+                    pkgName,
+                    PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong()),
+                )
             } else {
                 context.packageManager.getPackageInfo(pkgName, PACKAGE_FLAGS)
             }

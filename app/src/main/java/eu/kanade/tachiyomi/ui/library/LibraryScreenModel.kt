@@ -197,8 +197,12 @@ class LibraryScreenModel(
 
         val isNotLoggedInAnyTrack = trackingFilter.isEmpty()
 
-        val excludedTracks = trackingFilter.mapNotNullTo(HashSet()) { if (it.value == TriState.ENABLED_NOT) it.key else null }
-        val includedTracks = trackingFilter.mapNotNullTo(HashSet()) { if (it.value == TriState.ENABLED_IS) it.key else null }
+        val excludedTracks = trackingFilter.mapNotNullTo(HashSet()) {
+            if (it.value == TriState.ENABLED_NOT) it.key else null
+        }
+        val includedTracks = trackingFilter.mapNotNullTo(HashSet()) {
+            if (it.value == TriState.ENABLED_IS) it.key else null
+        }
         val trackFiltersIsIgnored = includedTracks.isEmpty() && excludedTracks.isEmpty()
 
         val filterFnDownloaded: (LibraryItem) -> Boolean = {
