@@ -87,14 +87,16 @@ abstract class SearchScreenModel(
     }
 
     open fun getEnabledSources(): List<CatalogueSource> {
-        return sourceManager.getCatalogueSources()
+        val filtered = sourceManager.getCatalogueSources()
             .filter { it.lang in enabledLanguages && it.id !in disabledSourceIds }
-            .sortedWith(
-                compareBy(
-                    { it.id !in pinnedSourceIds },
-                    { "${it.name.lowercase()} (${it.lang})" },
-                ),
-            )
+        val sortKeys = HashMap<Long, String>((filtered.size / 0.75f + 1).toInt())
+        filtered.forEach { sortKeys[it.id] = "${it.name.lowercase()} (${it.lang})" }
+        return filtered.sortedWith(
+            compareBy(
+                { it.id !in pinnedSourceIds },
+                { sortKeys.getValue(it.id) },
+            ),
+        )
     }
 
     private fun getSelectedSources(): List<CatalogueSource> {
@@ -169,10 +171,11 @@ abstract class SearchScreenModel(
                             source.getSearchManga(1, query, source.getFilterList())
                         }
 
-                        val titles = page.mangas
-                            .map { it.toDomainManga(source.id) }
-                            .distinctBy { it.url }
-                            .let { networkToLocalManga(it) }
+                        val seenUrls = HashSet<String>(page.mangas.size)
+                        val domainMangas = page.mangas.mapNotNullTo(ArrayList(page.mangas.size)) { smanga ->
+                            if (seenUrls.add(smanga.url)) smanga.toDomainManga(source.id) else null
+                        }
+                        val titles = networkToLocalManga(domainMangas)
 
                         if (isActive) {
                             updateItem(source, SearchItemResult.Success(titles))

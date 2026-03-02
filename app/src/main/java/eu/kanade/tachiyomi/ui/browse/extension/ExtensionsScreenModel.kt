@@ -32,6 +32,7 @@ import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
+import java.util.TreeMap
 import kotlin.time.Duration.Companion.seconds
 
 class ExtensionsScreenModel(
@@ -72,16 +73,13 @@ class ExtensionsScreenModel(
                         put(ExtensionUiModel.Header.Resource(MR.strings.ext_installed), installed + untrusted)
                     }
 
-                    val languagesWithExtensions = _available
-                        .filter(predicate)
-                        .groupBy { it.lang }
-                        .toSortedMap(LocaleHelper.comparator)
-                        .map { (lang, exts) ->
-                            ExtensionUiModel.Header.Text(LocaleHelper.getSourceDisplayName(lang, context)) to
-                                exts.map(extensionMapper(downloads))
-                        }
-                    if (languagesWithExtensions.isNotEmpty()) {
-                        putAll(languagesWithExtensions)
+                    val langGroups = TreeMap<String, MutableList<Extension.Available>>(LocaleHelper.comparator)
+                    _available.forEach { if (predicate(it)) langGroups.getOrPut(it.lang) { mutableListOf() }.add(it) }
+                    langGroups.forEach { (lang, exts) ->
+                        put(
+                            ExtensionUiModel.Header.Text(LocaleHelper.getSourceDisplayName(lang, context)),
+                            exts.map(extensionMapper(downloads)),
+                        )
                     }
                 }
             }
