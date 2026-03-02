@@ -66,6 +66,21 @@ class ExtensionManager(
     private val installedExtensionMapFlow = MutableStateFlow(emptyMap<String, Extension.Installed>())
     val installedExtensionsFlow = installedExtensionMapFlow.mapExtensions(scope)
 
+    /**
+     * A flat map from source ID → extension package name, derived from [installedExtensionMapFlow].
+     * Rebuilt whenever the installed extension list changes; avoids O(n×m) scan in
+     * [getExtensionPackage] / [getExtensionPackageAsFlow].
+     */
+    private val sourceIdToPkgFlow: StateFlow<Map<Long, String>> = installedExtensionMapFlow
+        .map { extMap ->
+            buildMap {
+                extMap.values.forEach { ext ->
+                    ext.sources.forEach { src -> put(src.id, ext.pkgName) }
+                }
+            }
+        }
+        .stateIn(scope, SharingStarted.Eagerly, emptyMap())
+
     private val availableExtensionMapFlow = MutableStateFlow(emptyMap<String, Extension.Available>())
     val availableExtensionsFlow = availableExtensionMapFlow.mapExtensions(scope)
 
@@ -80,19 +95,11 @@ class ExtensionManager(
     private var subLanguagesEnabledOnFirstRun = preferences.enabledLanguages().isSet()
 
     fun getExtensionPackage(sourceId: Long): String? {
-        return installedExtensionsFlow.value.find { extension ->
-            extension.sources.any { it.id == sourceId }
-        }
-            ?.pkgName
+        return sourceIdToPkgFlow.value[sourceId]
     }
 
     fun getExtensionPackageAsFlow(sourceId: Long): Flow<String?> {
-        return installedExtensionsFlow.map { extensions ->
-            extensions.find { extension ->
-                extension.sources.any { it.id == sourceId }
-            }
-                ?.pkgName
-        }
+        return sourceIdToPkgFlow.map { it[sourceId] }
     }
 
     fun getAppIconForSource(sourceId: Long): Drawable? {
