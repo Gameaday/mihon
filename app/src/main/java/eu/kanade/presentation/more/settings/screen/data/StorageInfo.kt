@@ -55,8 +55,10 @@ private fun StorageInfo(
     var total by remember(file) { mutableStateOf(-1L) }
 
     LaunchedEffect(file) {
-        available = withContext(Dispatchers.IO) { DiskUtil.getAvailableStorageSpace(file) }
-        total = withContext(Dispatchers.IO) { DiskUtil.getTotalStorageSpace(file) }
+        withContext(Dispatchers.IO) {
+            available = DiskUtil.getAvailableStorageSpace(file)
+            total = DiskUtil.getTotalStorageSpace(file)
+        }
     }
 
     val availableText = if (available == -1L) {
