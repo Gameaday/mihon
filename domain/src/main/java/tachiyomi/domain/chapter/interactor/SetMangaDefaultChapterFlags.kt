@@ -15,9 +15,15 @@ class SetMangaDefaultChapterFlags(
     suspend fun await(manga: Manga) {
         withNonCancellableContext {
             with(libraryPreferences) {
+                // Don't apply "show only read" as the default unread filter for manga being
+                // added to the library (manga.favorite == false). Applying it would hide all
+                // unread chapters, making new chapters invisible in the manga screen.
+                val unreadFilter = filterChapterByRead().get().let { storedFilter ->
+                    if (!manga.favorite && storedFilter == Manga.CHAPTER_SHOW_READ) Manga.SHOW_ALL else storedFilter
+                }
                 setMangaChapterFlags.awaitSetAllFlags(
                     mangaId = manga.id,
-                    unreadFilter = filterChapterByRead().get(),
+                    unreadFilter = unreadFilter,
                     downloadedFilter = filterChapterByDownloaded().get(),
                     bookmarkedFilter = filterChapterByBookmarked().get(),
                     sortingMode = sortChapterBySourceOrNumber().get(),
