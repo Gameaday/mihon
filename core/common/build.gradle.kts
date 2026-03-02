@@ -43,9 +43,6 @@ dependencies {
 
     implementation(libs.jsoup)
 
-    // Sort
-    implementation(libs.natural.comparator)
-
     // JavaScript engine
     implementation(libs.bundles.js.engine)
 

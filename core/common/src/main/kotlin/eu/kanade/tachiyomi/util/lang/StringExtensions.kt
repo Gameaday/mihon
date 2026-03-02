@@ -1,7 +1,6 @@
 package eu.kanade.tachiyomi.util.lang
 
 import androidx.core.text.parseAsHtml
-import net.greypanther.natsort.CaseInsensitiveSimpleNaturalComparator
 import java.nio.charset.StandardCharsets
 import kotlin.math.floor
 
@@ -32,11 +31,48 @@ fun String.truncateCenter(count: Int, replacement: String = "..."): String {
 }
 
 /**
- * Case-insensitive natural comparator for strings.
+ * Case-insensitive natural order comparison for strings.
+ *
+ * Splits each string into alternating numeric and non-numeric chunks, comparing numeric chunks by
+ * their integer value and non-numeric chunks case-insensitively. This replaces the external
+ * `java-nat-sort` (CaseInsensitiveSimpleNaturalComparator) dependency with an equivalent
+ * pure-Kotlin implementation.
+ *
+ * Behavior notes (matching the original library):
+ * - Leading zeros are ignored: "001" == "1" (both parse to 1 numerically).
+ * - Numeric chunks are parsed as [Long]; sequences longer than 18 digits are unlikely in file
+ *   or chapter names and would overflow silently — the same trade-off as the original library.
  */
 fun String.compareToCaseInsensitiveNaturalOrder(other: String): Int {
-    val comparator = CaseInsensitiveSimpleNaturalComparator.getInstance<String>()
-    return comparator.compare(this, other)
+    val a = this
+    val b = other
+    var i = 0
+    var j = 0
+    while (i < a.length && j < b.length) {
+        val ca = a[i]
+        val cb = b[j]
+        if (ca.isDigit() && cb.isDigit()) {
+            // Extract and compare numeric chunks by value
+            var numA = 0L
+            while (i < a.length && a[i].isDigit()) {
+                numA = numA * 10 + a[i].digitToInt()
+                i++
+            }
+            var numB = 0L
+            while (j < b.length && b[j].isDigit()) {
+                numB = numB * 10 + b[j].digitToInt()
+                j++
+            }
+            val cmp = numA.compareTo(numB)
+            if (cmp != 0) return cmp
+        } else {
+            val cmp = ca.lowercaseChar().compareTo(cb.lowercaseChar())
+            if (cmp != 0) return cmp
+            i++
+            j++
+        }
+    }
+    return a.length.compareTo(b.length)
 }
 
 /**
