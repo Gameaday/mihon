@@ -12,6 +12,7 @@ import android.os.Looper
 import android.webkit.WebView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
+import android.graphics.Bitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,7 @@ import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.allowRgb565
+import coil3.request.bitmapConfig
 import coil3.request.crossfade
 import coil3.util.DebugLogger
 import dev.mihon.injekt.patchInjekt
@@ -201,7 +203,12 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
             )
 
             crossfade((300 * this@App.animatorDurationScale).toInt())
-            allowRgb565(DeviceUtil.isLowRamDevice(this@App))
+            val lowRam = DeviceUtil.isLowRamDevice(this@App)
+            allowRgb565(lowRam)
+            // On capable devices, request GPU-resident hardware bitmaps as the global default.
+            // This eliminates the CPU→GPU upload on every render frame for covers and browse
+            // images. getBitmapOrNull() handles the soft-copy needed for compress/notifications.
+            if (!lowRam) bitmapConfig(Bitmap.Config.HARDWARE)
             if (networkPreferences.verboseLogging().get()) logger(DebugLogger())
 
             // Coil spawns a new thread for every image load by default

@@ -143,7 +143,7 @@ object ImageUtil {
         }
         imageBitmap.recycle()
         val output = Buffer()
-        half.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        half.compress(Bitmap.CompressFormat.PNG, 100, output.outputStream())
         half.recycle()
 
         return output
@@ -155,7 +155,7 @@ object ImageUtil {
         imageBitmap.recycle()
 
         val output = Buffer()
-        rotated.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        rotated.compress(Bitmap.CompressFormat.PNG, 100, output.outputStream())
         rotated.recycle()
 
         return output
@@ -204,7 +204,7 @@ object ImageUtil {
         imageBitmap.recycle()
 
         val output = Buffer()
-        result.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        result.compress(Bitmap.CompressFormat.PNG, 100, output.outputStream())
         result.recycle()
         return output
     }
@@ -286,7 +286,7 @@ object ImageUtil {
         bottomBitmap.recycle()
 
         val output = Buffer()
-        result.compress(Bitmap.CompressFormat.JPEG, 100, output.outputStream())
+        result.compress(Bitmap.CompressFormat.PNG, 100, output.outputStream())
         result.recycle()
         return output
     }
@@ -345,7 +345,7 @@ object ImageUtil {
 
                 splitFile.openOutputStream().use { outputStream ->
                     val splitBitmap = bitmapRegionDecoder.decodeRegion(region, options)
-                    splitBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    splitBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
                     splitBitmap.recycle()
                 }
                 logcat {
@@ -370,7 +370,7 @@ object ImageUtil {
     private fun splitImageName(filenamePrefix: String, index: Int) = "${filenamePrefix}__${"%03d".format(
         Locale.ENGLISH,
         index + 1,
-    )}.jpg"
+    )}.png"
 
     private val BitmapFactory.Options.splitData
         get(): List<SplitData> {
