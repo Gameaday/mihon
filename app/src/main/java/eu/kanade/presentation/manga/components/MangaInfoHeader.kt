@@ -83,6 +83,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import coil3.size.Precision
 import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.model.markdownAnnotatorConfig
 import com.mikepenz.markdown.utils.getUnescapedTextInNode
@@ -360,6 +361,7 @@ private fun MangaAndSourceTitlesLarge(
             data = ImageRequest.Builder(LocalContext.current)
                 .data(manga)
                 .crossfade(true)
+                .precision(Precision.EXACT)
                 .build(),
             contentDescription = stringResource(MR.strings.manga_cover),
             onClick = onCoverClick,
@@ -401,6 +403,7 @@ private fun MangaAndSourceTitlesSmall(
             data = ImageRequest.Builder(LocalContext.current)
                 .data(manga)
                 .crossfade(true)
+                .precision(Precision.EXACT)
                 .build(),
             contentDescription = stringResource(MR.strings.manga_cover),
             onClick = onCoverClick,
