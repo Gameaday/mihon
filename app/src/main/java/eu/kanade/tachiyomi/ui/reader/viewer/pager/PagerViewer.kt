@@ -355,7 +355,9 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
 
                     // Suspend until the next page finishes downloading; skip on error.
                     if (nextPage.status != Page.State.Ready) {
-                        val arrived = nextPage.statusFlow.firstOrNull { it == Page.State.Ready || it is Page.State.Error }
+                        val arrived = nextPage.statusFlow.firstOrNull {
+                            it == Page.State.Ready || it is Page.State.Error
+                        }
                         if (arrived != Page.State.Ready) continue
                     }
 

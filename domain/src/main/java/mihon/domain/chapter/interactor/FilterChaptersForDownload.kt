@@ -55,8 +55,12 @@ class FilterChaptersForDownload(
         if (!favorite) return false
 
         val categories = getCategories.await(id).map { it.id }.ifEmpty { listOf(DEFAULT_CATEGORY_ID) }
-        val includedCategories = downloadPreferences.downloadNewChapterCategories().get().mapTo(HashSet()) { it.toLong() }
-        val excludedCategories = downloadPreferences.downloadNewChapterCategoriesExclude().get().mapTo(HashSet()) { it.toLong() }
+        val includedCategories = downloadPreferences.downloadNewChapterCategories().get().mapTo(HashSet()) {
+            it.toLong()
+        }
+        val excludedCategories = downloadPreferences.downloadNewChapterCategoriesExclude().get().mapTo(HashSet()) {
+            it.toLong()
+        }
 
         return when {
             // Default Download from all categories

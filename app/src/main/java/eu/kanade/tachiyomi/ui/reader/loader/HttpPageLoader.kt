@@ -298,7 +298,9 @@ internal class HttpPageLoader(
                         if (e is CancellationException) {
                             throw e
                         }
-                        logcat(LogPriority.WARN, e) { "Failed to persist page list on recycle for ${chapter.chapter.name}" }
+                        logcat(LogPriority.WARN, e) {
+                            "Failed to persist page list on recycle for ${chapter.chapter.name}"
+                        }
                     }
                 }
             }
