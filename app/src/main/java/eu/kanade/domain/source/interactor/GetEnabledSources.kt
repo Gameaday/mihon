@@ -27,19 +27,19 @@ class GetEnabledSources(
             // for every source on every filter/flatMap call.
             val disabledIds = disabledSources.mapTo(HashSet()) { it.toLong() }
             val pinnedIds = pinnedSourceIds.mapTo(HashSet()) { it.toLong() }
-            sources
-                .filter { it.lang in enabledLanguages || it.isLocal() }
-                .filterNot { it.id in disabledIds }
+            val sortedSources = sources
+                .filter { (it.lang in enabledLanguages || it.isLocal()) && it.id !in disabledIds }
                 .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
-                .flatMap {
+            buildList(sortedSources.size + 1) {
+                for (it in sortedSources) {
                     val flag = if (it.id in pinnedIds) Pins.pinned else Pins.unpinned
                     val source = it.copy(pin = flag)
-                    val toFlatten = mutableListOf(source)
+                    add(source)
                     if (source.id == lastUsedSource) {
-                        toFlatten.add(source.copy(isUsedLast = true, pin = source.pin - Pin.Actual))
+                        add(source.copy(isUsedLast = true, pin = source.pin - Pin.Actual))
                     }
-                    toFlatten
                 }
+            }
         }
             .distinctUntilChanged()
     }

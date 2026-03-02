@@ -166,12 +166,11 @@ internal class HttpPageLoader(
      */
     override suspend fun getPages(): List<ReaderPage> {
         check(!isRecycled)
+        val domainChapter = requireNotNull(chapter.chapter.toDomainChapter()) {
+            "Chapter has no database ID"
+        }
         val pages = try {
-            val cachedPages = chapterCache.getPageListFromCache(
-                requireNotNull(chapter.chapter.toDomainChapter()) {
-                    "Chapter has no database ID"
-                },
-            )
+            val cachedPages = chapterCache.getPageListFromCache(domainChapter)
             // All image URLs are already resolved: the recycle() save can be skipped.
             cacheHadMissingImageUrls = cachedPages.any { it.imageUrl.isNullOrEmpty() }
             cachedPages
@@ -181,14 +180,12 @@ internal class HttpPageLoader(
             }
             val networkPages = source.getPageList(chapter.chapter)
             // Persist immediately so a crash before recycle() doesn't lose the page list.
-            chapter.chapter.toDomainChapter()?.let { domainChapter ->
-                scope.launchIO {
-                    try {
-                        chapterCache.putPageListToCache(domainChapter, networkPages)
-                    } catch (ex: Throwable) {
-                        if (ex is CancellationException) throw ex
-                        logcat(LogPriority.WARN, ex) { "Failed to persist page list to cache after network fetch" }
-                    }
+            scope.launchIO {
+                try {
+                    chapterCache.putPageListToCache(domainChapter, networkPages)
+                } catch (ex: Throwable) {
+                    if (ex is CancellationException) throw ex
+                    logcat(LogPriority.WARN, ex) { "Failed to persist page list to cache after network fetch" }
                 }
             }
             // cacheHadMissingImageUrls stays true (network pages have no imageUrls yet)

@@ -68,7 +68,7 @@ class AppLanguageScreen : Screen() {
             LazyColumn(
                 modifier = Modifier.padding(contentPadding),
             ) {
-                items(langs) {
+                items(langs, key = { it.langTag }) {
                     ListItem(
                         modifier = Modifier.clickable {
                             currentLanguage = it.langTag

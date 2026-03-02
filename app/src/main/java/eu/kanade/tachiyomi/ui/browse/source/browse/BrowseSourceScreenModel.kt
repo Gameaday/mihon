@@ -106,7 +106,7 @@ class BrowseSourceScreenModel(
     val mangaPagerFlowFlow = state.map { it.listing }
         .distinctUntilChanged()
         .map { listing ->
-            Pager(PagingConfig(pageSize = 25)) {
+            Pager(PagingConfig(pageSize = 25, prefetchDistance = 15)) {
                 getRemoteManga(sourceId, listing.query ?: "", listing.filters)
             }.flow.map { pagingData ->
                 pagingData.map { manga ->
@@ -114,7 +114,7 @@ class BrowseSourceScreenModel(
                         .map { it ?: manga }
                         .stateIn(ioCoroutineScope)
                 }
-                    .filter { !hideInLibraryItems || !it.value.favorite }
+                    .let { pd -> if (hideInLibraryItems) pd.filter { !it.value.favorite } else pd }
             }
                 .cachedIn(ioCoroutineScope)
         }
@@ -187,8 +187,7 @@ class BrowseSourceScreenModel(
                     }
                 }
             } else if (sourceFilter is SourceModelFilter.Select<*>) {
-                val index = sourceFilter.values.filterIsInstance<String>()
-                    .indexOfFirst { it.equals(genreName, true) }
+                val index = sourceFilter.values.indexOfFirst { it is String && it.equals(genreName, true) }
 
                 if (index != -1) {
                     sourceFilter.state = index
@@ -261,7 +260,7 @@ class BrowseSourceScreenModel(
 
                 // Choose a category
                 else -> {
-                    val preselectedIds = getCategories.await(manga.id).map { it.id }
+                    val preselectedIds = getCategories.await(manga.id).mapTo(HashSet()) { it.id }
                     setDialog(
                         Dialog.ChangeMangaCategory(
                             manga,
@@ -290,14 +289,14 @@ class BrowseSourceScreenModel(
     }
 
     private fun moveMangaToCategories(manga: Manga, vararg categories: Category) {
-        moveMangaToCategories(manga, categories.filter { it.id != 0L }.map { it.id })
+        moveMangaToCategories(manga, categories.mapNotNull { if (it.id != 0L) it.id else null })
     }
 
     fun moveMangaToCategories(manga: Manga, categoryIds: List<Long>) {
         screenModelScope.launchIO {
             setMangaCategories.await(
                 mangaId = manga.id,
-                categoryIds = categoryIds.toList(),
+                categoryIds = categoryIds,
             )
         }
     }

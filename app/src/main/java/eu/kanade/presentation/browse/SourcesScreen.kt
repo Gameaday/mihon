@@ -66,7 +66,7 @@ fun SourcesScreen(
                     },
                     key = {
                         when (it) {
-                            is SourceUiModel.Header -> it.hashCode()
+                            is SourceUiModel.Header -> "source-header-${it.language}"
                             is SourceUiModel.Item -> "source-${it.source.key()}"
                         }
                     },

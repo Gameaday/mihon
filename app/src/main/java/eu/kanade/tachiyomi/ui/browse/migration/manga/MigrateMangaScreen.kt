@@ -135,7 +135,7 @@ data class MigrateMangaScreen(
             state = lazyListState,
             contentPadding = contentPadding,
         ) {
-            items(state.titles) { manga ->
+            items(state.titles, key = { it.id }) { manga ->
                 MigrateMangaItem(
                     manga = manga,
                     isSelected = manga.id in state.selection,

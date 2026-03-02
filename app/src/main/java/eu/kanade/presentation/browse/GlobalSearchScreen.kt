@@ -74,7 +74,7 @@ internal fun GlobalSearchContent(
         contentPadding = contentPadding,
     ) {
         items.forEach { (source, result) ->
-            item(key = source.id) {
+            item(key = source.id, contentType = "search-result") {
                 GlobalSearchResultItem(
                     title = fromSourceId?.let {
                         "▶ ${source.name}".takeIf { source.id == fromSourceId }

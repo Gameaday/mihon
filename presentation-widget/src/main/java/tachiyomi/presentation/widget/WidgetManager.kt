@@ -27,7 +27,9 @@ class WidgetManager(
         )
             .distinctUntilChanged { old, new ->
                 old.second == new.second &&
-                    old.first.map { it.chapterId }.toSet() == new.first.map { it.chapterId }.toSet()
+                    old.first.size == new.first.size &&
+                    old.first.mapTo(HashSet(old.first.size)) { it.chapterId } ==
+                    new.first.mapTo(HashSet(new.first.size)) { it.chapterId }
             }
             .onEach {
                 try {

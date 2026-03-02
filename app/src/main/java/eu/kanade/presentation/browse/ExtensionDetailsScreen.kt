@@ -198,6 +198,7 @@ private fun ExtensionDetails(
         items(
             items = sources,
             key = { it.source.id },
+            contentType = { "source" },
         ) { source ->
             SourceSwitchPreference(
                 modifier = Modifier.animateItem(),

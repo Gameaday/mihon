@@ -167,7 +167,10 @@ private fun ExtensionContent(
         state.items.forEach { (header, items) ->
             item(
                 contentType = "header",
-                key = "extensionHeader-${header.hashCode()}",
+                key = when (header) {
+                    is ExtensionUiModel.Header.Resource -> "extensionHeader-res-${header.textRes}"
+                    is ExtensionUiModel.Header.Text -> "extensionHeader-txt-${header.text}"
+                },
             ) {
                 when (header) {
                     is ExtensionUiModel.Header.Resource -> {
@@ -204,13 +207,7 @@ private fun ExtensionContent(
             items(
                 items = items,
                 contentType = { "item" },
-                key = { item ->
-                    when (item.extension) {
-                        is Extension.Untrusted -> "extension-untrusted-${item.hashCode()}"
-                        is Extension.Installed -> "extension-installed-${item.hashCode()}"
-                        is Extension.Available -> "extension-available-${item.hashCode()}"
-                    }
-                },
+                key = { item -> "extension-${item.extension.pkgName}" },
             ) { item ->
                 ExtensionItem(
                     modifier = Modifier.animateItemFastScroll(),

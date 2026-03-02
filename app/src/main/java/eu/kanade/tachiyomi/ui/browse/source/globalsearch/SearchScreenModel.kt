@@ -13,8 +13,8 @@ import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.collectLatest
@@ -32,19 +32,17 @@ import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.source.service.SourceManager
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
-import java.util.concurrent.Executors
 
 abstract class SearchScreenModel(
     initialState: State = State(),
-    sourcePreferences: SourcePreferences = Injekt.get(),
+    private val sourcePreferences: SourcePreferences = Injekt.get(),
     private val sourceManager: SourceManager = Injekt.get(),
     private val extensionManager: ExtensionManager = Injekt.get(),
     private val networkToLocalManga: NetworkToLocalManga = Injekt.get(),
     private val getManga: GetManga = Injekt.get(),
-    private val preferences: SourcePreferences = Injekt.get(),
 ) : StateScreenModel<SearchScreenModel.State>(initialState) {
 
-    private val coroutineDispatcher = Executors.newFixedThreadPool(5).asCoroutineDispatcher()
+    private val coroutineDispatcher = Dispatchers.IO.limitedParallelism(5)
     private var searchJob: Job? = null
 
     private val enabledLanguages = sourcePreferences.enabledLanguages().get()
@@ -60,16 +58,18 @@ abstract class SearchScreenModel(
     protected var extensionFilter: String? = null
 
     open val sortComparator = { map: Map<CatalogueSource, SearchItemResult> ->
+        val sortKeys = HashMap<Long, String>((map.size / 0.75f + 1).toInt())
+        map.keys.forEach { sortKeys[it.id] = "${it.name.lowercase()} (${it.lang})" }
         compareBy<CatalogueSource>(
             { (map[it] as? SearchItemResult.Success)?.isEmpty ?: true },
             { it.id !in pinnedSourceIds },
-            { "${it.name.lowercase()} (${it.lang})" },
+            { sortKeys.getValue(it.id) },
         )
     }
 
     init {
         screenModelScope.launch {
-            preferences.globalSearchFilterState().changes().collectLatest { state ->
+            sourcePreferences.globalSearchFilterState().changes().collectLatest { state ->
                 mutableState.update { it.copy(onlyShowHasResults = state) }
             }
         }
@@ -87,14 +87,16 @@ abstract class SearchScreenModel(
     }
 
     open fun getEnabledSources(): List<CatalogueSource> {
-        return sourceManager.getCatalogueSources()
+        val filtered = sourceManager.getCatalogueSources()
             .filter { it.lang in enabledLanguages && it.id !in disabledSourceIds }
-            .sortedWith(
-                compareBy(
-                    { it.id !in pinnedSourceIds },
-                    { "${it.name.lowercase()} (${it.lang})" },
-                ),
-            )
+        val sortKeys = HashMap<Long, String>((filtered.size / 0.75f + 1).toInt())
+        filtered.forEach { sortKeys[it.id] = "${it.name.lowercase()} (${it.lang})" }
+        return filtered.sortedWith(
+            compareBy(
+                { it.id !in pinnedSourceIds },
+                { sortKeys.getValue(it.id) },
+            ),
+        )
     }
 
     private fun getSelectedSources(): List<CatalogueSource> {
@@ -105,11 +107,19 @@ abstract class SearchScreenModel(
             return enabledSources
         }
 
-        return extensionManager.installedExtensionsFlow.value
-            .filter { it.pkgName == filter }
-            .flatMap { it.sources }
-            .filterIsInstance<CatalogueSource>()
-            .filter { it in enabledSources }
+        // Build O(1) lookup set for enabled source IDs to replace O(N) List.contains
+        val enabledIds = enabledSources.mapTo(HashSet(enabledSources.size)) { it.id }
+        // Single-pass: find matching extension and collect enabled CatalogueSources in one loop
+        val result = mutableListOf<CatalogueSource>()
+        for (ext in extensionManager.installedExtensionsFlow.value) {
+            if (ext.pkgName != filter) continue
+            for (source in ext.sources) {
+                if (source is CatalogueSource && source.id in enabledIds) {
+                    result.add(source)
+                }
+            }
+        }
+        return result
     }
 
     fun updateSearchQuery(query: String?) {
@@ -122,7 +132,7 @@ abstract class SearchScreenModel(
     }
 
     fun toggleFilterResults() {
-        preferences.globalSearchFilterState().toggle()
+        sourcePreferences.globalSearchFilterState().toggle()
     }
 
     fun search() {
@@ -169,10 +179,11 @@ abstract class SearchScreenModel(
                             source.getSearchManga(1, query, source.getFilterList())
                         }
 
-                        val titles = page.mangas
-                            .map { it.toDomainManga(source.id) }
-                            .distinctBy { it.url }
-                            .let { networkToLocalManga(it) }
+                        val seenUrls = HashSet<String>(page.mangas.size)
+                        val domainMangas = page.mangas.mapNotNullTo(ArrayList(page.mangas.size)) { smanga ->
+                            if (seenUrls.add(smanga.url)) smanga.toDomainManga(source.id) else null
+                        }
+                        val titles = networkToLocalManga(domainMangas)
 
                         if (isActive) {
                             updateItem(source, SearchItemResult.Success(titles))
@@ -227,7 +238,13 @@ abstract class SearchScreenModel(
     ) {
         val progress: Int = items.count { it.value !is SearchItemResult.Loading }
         val total: Int = items.size
-        val filteredItems = items.filter { (_, result) -> result.isVisible(onlyShowHasResults) }
+        val filteredItems = if (!onlyShowHasResults) {
+            items
+        } else {
+            items.filter { (_, result) ->
+                result.isVisible(onlyShowHasResults)
+            }
+        }
     }
 
     sealed interface Dialog {

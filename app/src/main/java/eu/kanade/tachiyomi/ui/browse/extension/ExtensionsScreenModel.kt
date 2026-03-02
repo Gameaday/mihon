@@ -32,6 +32,7 @@ import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
+import java.util.TreeMap
 import kotlin.time.Duration.Companion.seconds
 
 class ExtensionsScreenModel(
@@ -60,28 +61,26 @@ class ExtensionsScreenModel(
                 currentDownloads,
                 getExtensions.subscribe(),
             ) { predicate, downloads, (_updates, _installed, _available, _untrusted) ->
+                val mapper = extensionMapper(downloads)
                 buildMap {
-                    val updates = _updates.filter(predicate).map(extensionMapper(downloads))
+                    val updates = _updates.mapNotNull { if (predicate(it)) mapper(it) else null }
                     if (updates.isNotEmpty()) {
                         put(ExtensionUiModel.Header.Resource(MR.strings.ext_updates_pending), updates)
                     }
 
-                    val installed = _installed.filter(predicate).map(extensionMapper(downloads))
-                    val untrusted = _untrusted.filter(predicate).map(extensionMapper(downloads))
+                    val installed = _installed.mapNotNull { if (predicate(it)) mapper(it) else null }
+                    val untrusted = _untrusted.mapNotNull { if (predicate(it)) mapper(it) else null }
                     if (installed.isNotEmpty() || untrusted.isNotEmpty()) {
                         put(ExtensionUiModel.Header.Resource(MR.strings.ext_installed), installed + untrusted)
                     }
 
-                    val languagesWithExtensions = _available
-                        .filter(predicate)
-                        .groupBy { it.lang }
-                        .toSortedMap(LocaleHelper.comparator)
-                        .map { (lang, exts) ->
-                            ExtensionUiModel.Header.Text(LocaleHelper.getSourceDisplayName(lang, context)) to
-                                exts.map(extensionMapper(downloads))
-                        }
-                    if (languagesWithExtensions.isNotEmpty()) {
-                        putAll(languagesWithExtensions)
+                    val langGroups = TreeMap<String, MutableList<Extension.Available>>(LocaleHelper.comparator)
+                    _available.forEach { if (predicate(it)) langGroups.getOrPut(it.lang) { mutableListOf() }.add(it) }
+                    langGroups.forEach { (lang, exts) ->
+                        put(
+                            ExtensionUiModel.Header.Text(LocaleHelper.getSourceDisplayName(lang, context)),
+                            exts.map(mapper),
+                        )
                     }
                 }
             }
@@ -113,10 +112,12 @@ class ExtensionsScreenModel(
 
         if (subqueries.isEmpty()) return { true }
 
+        // Pre-compute Long ID parsing once per subquery, instead of once per extension
+        val parsedSubqueries = subqueries.map { it to it.toLongOrNull() }
+
         return { extension ->
-            subqueries.any { subquery ->
+            parsedSubqueries.any { (subquery, subqueryAsId) ->
                 if (extension.name.contains(subquery, ignoreCase = true)) return@any true
-                val subqueryAsId = subquery.toLongOrNull()
                 when (extension) {
                     is Extension.Installed -> extension.sources.any { source ->
                         source.name.contains(subquery, ignoreCase = true) ||
@@ -144,11 +145,14 @@ class ExtensionsScreenModel(
 
     fun updateAllExtensions() {
         screenModelScope.launchIO {
-            state.value.items.values.flatten()
-                .map { it.extension }
-                .filterIsInstance<Extension.Installed>()
-                .filter { it.hasUpdate }
-                .forEach(::updateExtension)
+            state.value.items.values.forEach { items ->
+                items.forEach { item ->
+                    val ext = item.extension
+                    if (ext is Extension.Installed && ext.hasUpdate) {
+                        updateExtension(ext)
+                    }
+                }
+            }
         }
     }
 

@@ -230,7 +230,7 @@ private fun SearchResult(
                 ) {
                     items(
                         items = it,
-                        key = { i -> i.hashCode() },
+                        key = { i -> i.highlightKey },
                     ) { item ->
                         Column(
                             modifier = Modifier

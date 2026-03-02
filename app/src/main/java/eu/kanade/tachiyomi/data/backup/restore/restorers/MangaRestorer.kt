@@ -34,13 +34,8 @@ class MangaRestorer(
     fetchInterval: FetchInterval = Injekt.get(),
 ) {
 
-    private var now = ZonedDateTime.now()
-    private var currentFetchWindow = fetchInterval.getWindow(now)
-
-    init {
-        now = ZonedDateTime.now()
-        currentFetchWindow = fetchInterval.getWindow(now)
-    }
+    private val now = ZonedDateTime.now()
+    private val currentFetchWindow = fetchInterval.getWindow(now)
 
     suspend fun sortByNew(backupMangas: List<BackupManga>): List<BackupManga> {
         val urlsBySource = handler.awaitList { mangasQueries.getAllMangaSourceAndUrl() }

@@ -215,7 +215,7 @@ fun TrackerSearch(
                     ) {
                         items(
                             items = availableTracks,
-                            key = { it.hashCode() },
+                            key = { "tracker-${it.tracker_id}-${it.remote_id}" },
                         ) {
                             SearchResultItem(
                                 trackSearch = it,
