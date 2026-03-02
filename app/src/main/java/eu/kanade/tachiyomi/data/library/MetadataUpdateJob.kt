@@ -105,6 +105,8 @@ class MetadataUpdateJob(private val context: Context, workerParams: WorkerParame
                     async {
                         semaphore.withPermit {
                             // Resolve the source once per group instead of once per manga.
+                            // All manga in mangaInSource share the same source ID (grouped
+                            // on line 102), so a null result applies to the entire batch.
                             val source = sourceManager.get(mangaInSource.first().manga.source)
                                 ?: return@withPermit
                             mangaInSource.forEach { libraryManga ->
