@@ -17,36 +17,26 @@ import eu.kanade.tachiyomi.R
 val Context.notificationManager: NotificationManager
     get() = getSystemService()!!
 
+private fun Context.hasNotificationPermission(): Boolean {
+    return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        PermissionChecker.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PermissionChecker.PERMISSION_GRANTED
+}
+
 fun Context.notify(id: Int, channelId: String, block: (NotificationCompat.Builder.() -> Unit)? = null) {
     val notification = notificationBuilder(channelId, block).build()
     this.notify(id, notification)
 }
 
 fun Context.notify(id: Int, notification: Notification) {
-    if (
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-        PermissionChecker.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS,
-        ) != PermissionChecker.PERMISSION_GRANTED
-    ) {
-        return
-    }
-
+    if (!hasNotificationPermission()) return
     NotificationManagerCompat.from(this).notify(id, notification)
 }
 
 fun Context.notify(notificationWithIdAndTags: List<NotificationWithIdAndTag>) {
-    if (
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-        PermissionChecker.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS,
-        ) != PermissionChecker.PERMISSION_GRANTED
-    ) {
-        return
-    }
-
+    if (!hasNotificationPermission()) return
     NotificationManagerCompat.from(this).notify(notificationWithIdAndTags)
 }
 
