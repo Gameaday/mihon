@@ -282,7 +282,7 @@ class DownloadManager(
         if (wasRunning) {
             if (queueState.value.isEmpty()) {
                 downloader.stop()
-            } else if (queueState.value.isNotEmpty()) {
+            } else {
                 downloader.start()
             }
         }

@@ -279,13 +279,14 @@ class Downloader(
 
         val source = sourceManager.get(manga.source) as? HttpSource ?: return
         val wasEmpty = queueState.value.isEmpty()
+        val enqueuedChapterIds = queueState.value.mapTo(HashSet()) { it.chapter.id }
         val chaptersToQueue = chapters.asSequence()
             // Filter out those already downloaded.
             .filter { provider.findChapterDir(it.name, it.scanlator, it.url, manga.title, source) == null }
             // Add chapters to queue from the start.
             .sortedByDescending { it.sourceOrder }
             // Filter out those already enqueued.
-            .filter { chapter -> queueState.value.none { it.chapter.id == chapter.id } }
+            .filter { chapter -> chapter.id !in enqueuedChapterIds }
             // Create a download for each one.
             .map { Download(source, manga, it) }
             .toList()

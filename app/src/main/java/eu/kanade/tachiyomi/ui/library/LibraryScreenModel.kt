@@ -273,9 +273,7 @@ class LibraryScreenModel(
         loggedInTrackerIds: Set<Long>,
     ): Map<Category, List</* LibraryItem */ Long>> {
         val sortAlphabetically: (LibraryItem, LibraryItem) -> Int = { manga1, manga2 ->
-            val title1 = manga1.libraryManga.manga.title.lowercase()
-            val title2 = manga2.libraryManga.manga.title.lowercase()
-            title1.compareToWithCollator(title2)
+            manga1.libraryManga.manga.title.compareToWithCollator(manga2.libraryManga.manga.title)
         }
 
         val defaultTrackerScoreSortValue = -1.0
@@ -470,9 +468,9 @@ class LibraryScreenModel(
         if (mangas.isEmpty()) return emptyList()
         val mangaCategories = mangas.map { getCategories.await(it.id).toSet() }
         val common = mangaCategories.reduce { set1, set2 -> set1.intersect(set2) }
-        val all = mangaCategories.flatMapTo(HashSet()) { it }
-        all.removeAll(common)
-        return all
+        val uniqueCategories = mangaCategories.flatMapTo(HashSet()) { it }
+        uniqueCategories.removeAll(common)
+        return uniqueCategories
     }
 
     /**

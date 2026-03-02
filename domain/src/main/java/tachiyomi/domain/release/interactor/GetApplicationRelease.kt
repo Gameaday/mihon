@@ -102,7 +102,11 @@ class GetApplicationRelease(
     }
 
     companion object {
-        /** Pre-compiled regex used to strip non-digit, non-dot characters from version strings. */
+        /**
+         * Pre-compiled regex that strips non-digit, non-dot characters from version tag strings
+         * (e.g. turns "v0.1.2" or "r1234" into "0.1.2" / "1234"). Compiled once at class-load
+         * time to avoid the cost of repeated [toRegex] calls inside [isNewVersion].
+         */
         private val NON_DIGIT_REGEX = "[^\\d.]".toRegex()
     }
 }
