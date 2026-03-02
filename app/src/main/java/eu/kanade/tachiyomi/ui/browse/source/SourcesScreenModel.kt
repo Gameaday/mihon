@@ -68,14 +68,12 @@ class SourcesScreenModel(
 
             state.copy(
                 isLoading = false,
-                items = byLang
-                    .flatMap { (key, sources) ->
-                        buildList(sources.size + 1) {
-                            add(SourceUiModel.Header(key))
-                            sources.mapTo(this) { SourceUiModel.Item(it) }
-                        }
+                items = buildList(sources.size + byLang.size) {
+                    byLang.forEach { (key, sources) ->
+                        add(SourceUiModel.Header(key))
+                        sources.mapTo(this) { SourceUiModel.Item(it) }
                     }
-                    .toImmutableList(),
+                }.toImmutableList(),
             )
         }
     }

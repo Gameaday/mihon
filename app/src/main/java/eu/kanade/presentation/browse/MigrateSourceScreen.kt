@@ -131,6 +131,7 @@ private fun MigrateSourceList(
         items(
             items = list,
             key = { (source, _) -> "migrate-${source.id}" },
+            contentType = { "source" },
         ) { (source, count) ->
             MigrateSourceItem(
                 modifier = Modifier.animateItem(),

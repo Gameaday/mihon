@@ -112,10 +112,12 @@ class ExtensionsScreenModel(
 
         if (subqueries.isEmpty()) return { true }
 
+        // Pre-compute Long ID parsing once per subquery, instead of once per extension
+        val parsedSubqueries = subqueries.map { it to it.toLongOrNull() }
+
         return { extension ->
-            subqueries.any { subquery ->
+            parsedSubqueries.any { (subquery, subqueryAsId) ->
                 if (extension.name.contains(subquery, ignoreCase = true)) return@any true
-                val subqueryAsId = subquery.toLongOrNull()
                 when (extension) {
                     is Extension.Installed -> extension.sources.any { source ->
                         source.name.contains(subquery, ignoreCase = true) ||

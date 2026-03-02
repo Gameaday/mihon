@@ -107,11 +107,19 @@ abstract class SearchScreenModel(
             return enabledSources
         }
 
-        return extensionManager.installedExtensionsFlow.value
-            .filter { it.pkgName == filter }
-            .flatMap { it.sources }
-            .filterIsInstance<CatalogueSource>()
-            .filter { it in enabledSources }
+        // Build O(1) lookup set for enabled source IDs to replace O(N) List.contains
+        val enabledIds = enabledSources.mapTo(HashSet(enabledSources.size)) { it.id }
+        // Single-pass: find matching extension and collect enabled CatalogueSources in one loop
+        val result = mutableListOf<CatalogueSource>()
+        for (ext in extensionManager.installedExtensionsFlow.value) {
+            if (ext.pkgName != filter) continue
+            for (source in ext.sources) {
+                if (source is CatalogueSource && source.id in enabledIds) {
+                    result.add(source)
+                }
+            }
+        }
+        return result
     }
 
     fun updateSearchQuery(query: String?) {

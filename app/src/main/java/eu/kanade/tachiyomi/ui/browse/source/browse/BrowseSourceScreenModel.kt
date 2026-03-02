@@ -187,8 +187,7 @@ class BrowseSourceScreenModel(
                     }
                 }
             } else if (sourceFilter is SourceModelFilter.Select<*>) {
-                val index = sourceFilter.values.filterIsInstance<String>()
-                    .indexOfFirst { it.equals(genreName, true) }
+                val index = sourceFilter.values.indexOfFirst { it is String && it.equals(genreName, true) }
 
                 if (index != -1) {
                     sourceFilter.state = index
