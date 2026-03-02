@@ -20,6 +20,7 @@ import tachiyomi.domain.chapter.model.toChapterUpdate
 import tachiyomi.domain.chapter.repository.ChapterRepository
 import tachiyomi.domain.chapter.service.ChapterRecognition
 import tachiyomi.domain.library.service.LibraryPreferences
+import tachiyomi.domain.manga.interactor.SetMangaChapterFlags
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.source.local.isLocal
 import java.lang.Long.max
@@ -36,6 +37,7 @@ class SyncChaptersWithSource(
     private val getChaptersByMangaId: GetChaptersByMangaId,
     private val getExcludedScanlators: GetExcludedScanlators,
     private val libraryPreferences: LibraryPreferences,
+    private val setMangaChapterFlags: SetMangaChapterFlags,
 ) {
 
     /**
@@ -211,6 +213,12 @@ class SyncChaptersWithSource(
 
         if (updatedToAdd.isNotEmpty()) {
             updatedToAdd = chapterRepository.addAll(updatedToAdd)
+
+            // If the manga has "show only read" filter active and new unread chapters were
+            // inserted, reset the filter so the new chapters are visible in the manga screen.
+            if (manga.unreadFilterRaw == Manga.CHAPTER_SHOW_READ && updatedToAdd.any { !it.read }) {
+                setMangaChapterFlags.awaitSetUnreadFilter(manga, Manga.SHOW_ALL)
+            }
         }
 
         if (updatedChapters.isNotEmpty()) {
