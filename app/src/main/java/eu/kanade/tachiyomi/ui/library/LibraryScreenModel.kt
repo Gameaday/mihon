@@ -483,7 +483,9 @@ class LibraryScreenModel(
      * Returns common and mix category sets for [mangas] in a single DB pass.
      * Avoids fetching per-manga categories twice when both are needed together.
      */
-    private suspend fun getCommonAndMixCategories(mangas: List<Manga>): Pair<Collection<Category>, Collection<Category>> {
+    private suspend fun getCommonAndMixCategories(
+        mangas: List<Manga>,
+    ): Pair<Collection<Category>, Collection<Category>> {
         if (mangas.isEmpty()) return Pair(emptyList(), emptyList())
         val mangaCategories = mangas.map { getCategories.await(it.id).toSet() }
         val common = mangaCategories.reduce { set1, set2 -> set1.intersect(set2) }

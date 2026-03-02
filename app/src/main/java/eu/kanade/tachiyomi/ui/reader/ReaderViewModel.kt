@@ -76,9 +76,9 @@ import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.source.local.isLocal
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
+import java.io.InputStream
 import java.time.Instant
 import java.util.Date
-import java.io.InputStream
 
 /**
  * Presenter used by the activity to perform background operations.

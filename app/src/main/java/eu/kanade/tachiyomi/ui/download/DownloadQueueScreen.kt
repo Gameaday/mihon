@@ -248,8 +248,12 @@ object DownloadQueueScreen : Screen() {
             // Only item rows are reorderable (not headers); track by chapter id
             val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
                 // Only allow reordering item rows (not headers)
-                val fromItem = flatItems.getOrNull(from.index) as? DownloadListDisplayItem.Item ?: return@rememberReorderableLazyListState
-                val toItem = flatItems.getOrNull(to.index) as? DownloadListDisplayItem.Item ?: return@rememberReorderableLazyListState
+                val fromItem =
+                    flatItems.getOrNull(from.index) as? DownloadListDisplayItem.Item
+                        ?: return@rememberReorderableLazyListState
+                val toItem =
+                    flatItems.getOrNull(to.index) as? DownloadListDisplayItem.Item
+                        ?: return@rememberReorderableLazyListState
 
                 // Compute new queue order from current flat item list, with from/to swapped
                 val downloads = flatItems
@@ -427,27 +431,45 @@ private fun DownloadQueueItem(
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(MR.strings.action_move_to_top)) },
-                    onClick = { onMoveToTop(); menuExpanded = false },
+                    onClick = {
+                        onMoveToTop()
+                        menuExpanded = false
+                    },
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(MR.strings.action_move_to_top_all_for_series)) },
-                    onClick = { onMoveSeriesTop(); menuExpanded = false },
+                    onClick = {
+                        onMoveSeriesTop()
+                        menuExpanded = false
+                    },
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(MR.strings.action_move_to_bottom)) },
-                    onClick = { onMoveToBottom(); menuExpanded = false },
+                    onClick = {
+                        onMoveToBottom()
+                        menuExpanded = false
+                    },
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(MR.strings.action_move_to_bottom_all_for_series)) },
-                    onClick = { onMoveSeriesBottom(); menuExpanded = false },
+                    onClick = {
+                        onMoveSeriesBottom()
+                        menuExpanded = false
+                    },
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(MR.strings.action_cancel)) },
-                    onClick = { onCancel(); menuExpanded = false },
+                    onClick = {
+                        onCancel()
+                        menuExpanded = false
+                    },
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(MR.strings.cancel_all_for_series)) },
-                    onClick = { onCancelSeries(); menuExpanded = false },
+                    onClick = {
+                        onCancelSeries()
+                        menuExpanded = false
+                    },
                 )
             }
         }

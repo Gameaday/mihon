@@ -147,10 +147,10 @@ class ReaderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         registerSecureActivity(this)
         overrideTransitionCompat(
-                OVERRIDE_TRANSITION_OPEN,
-                R.anim.shared_axis_x_push_enter,
-                R.anim.shared_axis_x_push_exit,
-            )
+            OVERRIDE_TRANSITION_OPEN,
+            R.anim.shared_axis_x_push_enter,
+            R.anim.shared_axis_x_push_exit,
+        )
 
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false

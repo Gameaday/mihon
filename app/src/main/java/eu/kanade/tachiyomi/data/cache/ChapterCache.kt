@@ -117,7 +117,9 @@ class ChapterCache(
                 }
                 editor.commitAndOpenSnapshot()?.close()
             } catch (e: Exception) {
-                try { editor.abort() } catch (_: Exception) {}
+                try {
+                    editor.abort()
+                } catch (_: Exception) {}
                 throw e
             }
         } catch (e: Exception) {
@@ -176,7 +178,9 @@ class ChapterCache(
                 }
                 editor.commitAndOpenSnapshot()?.close()
             } catch (e: Exception) {
-                try { editor.abort() } catch (_: Exception) {}
+                try {
+                    editor.abort()
+                } catch (_: Exception) {}
                 throw e
             }
         } finally {
@@ -211,7 +215,9 @@ class ChapterCache(
             }
             editor.commitAndOpenSnapshot()?.close()
         } catch (e: Exception) {
-            try { editor.abort() } catch (_: Exception) {}
+            try {
+                editor.abort()
+            } catch (_: Exception) {}
             throw e
         }
     }

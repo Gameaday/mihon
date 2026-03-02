@@ -169,10 +169,34 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
 
         // Pre-resolve skip-reason strings once; each is identical for every manga that fails the same check.
         val skipReasonNotAlwaysUpdate = context.stringResource(MR.strings.skipped_reason_not_always_update)
-        val skipReasonCompleted = if (MANGA_NON_COMPLETED in restrictions) context.stringResource(MR.strings.skipped_reason_completed) else null
-        val skipReasonNotCaughtUp = if (MANGA_HAS_UNREAD in restrictions) context.stringResource(MR.strings.skipped_reason_not_caught_up) else null
-        val skipReasonNotStarted = if (MANGA_NON_READ in restrictions) context.stringResource(MR.strings.skipped_reason_not_started) else null
-        val skipReasonOutsideReleasePeriod = if (MANGA_OUTSIDE_RELEASE_PERIOD in restrictions) context.stringResource(MR.strings.skipped_reason_not_in_release_period) else null
+        val skipReasonCompleted = if (MANGA_NON_COMPLETED in
+            restrictions
+        ) {
+            context.stringResource(MR.strings.skipped_reason_completed)
+        } else {
+            null
+        }
+        val skipReasonNotCaughtUp = if (MANGA_HAS_UNREAD in
+            restrictions
+        ) {
+            context.stringResource(MR.strings.skipped_reason_not_caught_up)
+        } else {
+            null
+        }
+        val skipReasonNotStarted = if (MANGA_NON_READ in
+            restrictions
+        ) {
+            context.stringResource(MR.strings.skipped_reason_not_started)
+        } else {
+            null
+        }
+        val skipReasonOutsideReleasePeriod = if (MANGA_OUTSIDE_RELEASE_PERIOD in
+            restrictions
+        ) {
+            context.stringResource(MR.strings.skipped_reason_not_in_release_period)
+        } else {
+            null
+        }
 
         mangaToUpdate = listToUpdate
             .filter {
@@ -333,7 +357,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
      * @param manga the manga to update.
      * @return a pair of the inserted and removed chapters.
      */
-    private suspend fun updateManga(manga: Manga, fetchWindow: Pair<Long, Long>, autoUpdateMetadata: Boolean): List<Chapter> {
+    private suspend fun updateManga(
+        manga: Manga,
+        fetchWindow: Pair<Long, Long>,
+        autoUpdateMetadata: Boolean,
+    ): List<Chapter> {
         val source = sourceManager.getOrStub(manga.source)
 
         // Update manga metadata if needed
