@@ -238,7 +238,13 @@ abstract class SearchScreenModel(
     ) {
         val progress: Int = items.count { it.value !is SearchItemResult.Loading }
         val total: Int = items.size
-        val filteredItems = if (!onlyShowHasResults) items else items.filter { (_, result) -> result.isVisible(onlyShowHasResults) }
+        val filteredItems = if (!onlyShowHasResults) {
+            items
+        } else {
+            items.filter { (_, result) ->
+                result.isVisible(onlyShowHasResults)
+            }
+        }
     }
 
     sealed interface Dialog {
