@@ -128,12 +128,13 @@ object SettingsLibraryScreen : SearchableSettings {
         val excluded by autoUpdateCategoriesExcludePref.collectAsState()
         var showCategoriesDialog by rememberSaveable { mutableStateOf(false) }
         if (showCategoriesDialog) {
+            val categoryById = remember(allCategories) { allCategories.associateBy { it.id.toString() } }
             TriStateListDialog(
                 title = stringResource(MR.strings.categories),
                 message = stringResource(MR.strings.pref_library_update_categories_details),
                 items = allCategories,
-                initialChecked = included.mapNotNull { id -> allCategories.find { it.id.toString() == id } },
-                initialInversed = excluded.mapNotNull { id -> allCategories.find { it.id.toString() == id } },
+                initialChecked = included.mapNotNull { categoryById[it] },
+                initialInversed = excluded.mapNotNull { categoryById[it] },
                 itemLabel = { it.visualName },
                 onDismissRequest = { showCategoriesDialog = false },
                 onValueChanged = { newIncluded, newExcluded ->

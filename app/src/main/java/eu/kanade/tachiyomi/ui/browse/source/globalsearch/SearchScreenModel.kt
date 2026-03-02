@@ -48,8 +48,10 @@ abstract class SearchScreenModel(
     private var searchJob: Job? = null
 
     private val enabledLanguages = sourcePreferences.enabledLanguages().get()
-    private val disabledSources = sourcePreferences.disabledSources().get()
-    protected val pinnedSources = sourcePreferences.pinnedSources().get()
+    // Parse Set<String> source IDs to Set<Long> once at construction time to avoid creating a
+    // new String per source on every getEnabledSources()/sortComparator call.
+    private val disabledSourceIds = sourcePreferences.disabledSources().get().mapTo(HashSet()) { it.toLong() }
+    protected val pinnedSourceIds = sourcePreferences.pinnedSources().get().mapTo(HashSet()) { it.toLong() }
 
     private var lastQuery: String? = null
     private var lastSourceFilter: SourceFilter? = null
@@ -59,7 +61,7 @@ abstract class SearchScreenModel(
     open val sortComparator = { map: Map<CatalogueSource, SearchItemResult> ->
         compareBy<CatalogueSource>(
             { (map[it] as? SearchItemResult.Success)?.isEmpty ?: true },
-            { "${it.id}" !in pinnedSources },
+            { it.id !in pinnedSourceIds },
             { "${it.name.lowercase()} (${it.lang})" },
         )
     }
@@ -85,10 +87,10 @@ abstract class SearchScreenModel(
 
     open fun getEnabledSources(): List<CatalogueSource> {
         return sourceManager.getCatalogueSources()
-            .filter { it.lang in enabledLanguages && "${it.id}" !in disabledSources }
+            .filter { it.lang in enabledLanguages && it.id !in disabledSourceIds }
             .sortedWith(
                 compareBy(
-                    { "${it.id}" !in pinnedSources },
+                    { it.id !in pinnedSourceIds },
                     { "${it.name.lowercase()} (${it.lang})" },
                 ),
             )

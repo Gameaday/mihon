@@ -23,12 +23,16 @@ class GetEnabledSources(
             preferences.lastUsedSource().changes(),
             repository.getSources(),
         ) { pinnedSourceIds, enabledLanguages, disabledSources, lastUsedSource, sources ->
+            // Parse Set<String> IDs to Set<Long> once per emission to avoid creating a String
+            // for every source on every filter/flatMap call.
+            val disabledIds = disabledSources.mapTo(HashSet()) { it.toLong() }
+            val pinnedIds = pinnedSourceIds.mapTo(HashSet()) { it.toLong() }
             sources
                 .filter { it.lang in enabledLanguages || it.isLocal() }
-                .filterNot { it.id.toString() in disabledSources }
+                .filterNot { it.id in disabledIds }
                 .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
                 .flatMap {
-                    val flag = if ("${it.id}" in pinnedSourceIds) Pins.pinned else Pins.unpinned
+                    val flag = if (it.id in pinnedIds) Pins.pinned else Pins.unpinned
                     val source = it.copy(pin = flag)
                     val toFlatten = mutableListOf(source)
                     if (source.id == lastUsedSource) {

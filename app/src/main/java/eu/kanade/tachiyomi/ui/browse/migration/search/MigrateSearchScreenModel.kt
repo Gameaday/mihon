@@ -20,11 +20,12 @@ class MigrateSearchScreenModel(
 ) : SearchScreenModel() {
 
     private val migrationSources by lazy { sourcePreferences.migrationSources().get() }
+    private val migrationSourceRank by lazy { migrationSources.withIndex().associate { (i, id) -> id to i } }
 
     override val sortComparator = { map: Map<CatalogueSource, SearchItemResult> ->
         compareBy<CatalogueSource>(
             { (map[it] as? SearchItemResult.Success)?.isEmpty ?: true },
-            { migrationSources.indexOf(it.id) },
+            { migrationSourceRank.getOrDefault(it.id, Int.MAX_VALUE) },
         )
     }
 
