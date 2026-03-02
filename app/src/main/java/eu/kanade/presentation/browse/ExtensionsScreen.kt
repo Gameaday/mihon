@@ -204,13 +204,7 @@ private fun ExtensionContent(
             items(
                 items = items,
                 contentType = { "item" },
-                key = { item ->
-                    when (item.extension) {
-                        is Extension.Untrusted -> "extension-untrusted-${item.hashCode()}"
-                        is Extension.Installed -> "extension-installed-${item.hashCode()}"
-                        is Extension.Available -> "extension-available-${item.hashCode()}"
-                    }
-                },
+                key = { item -> "extension-${item.extension.pkgName}" },
             ) { item ->
                 ExtensionItem(
                     modifier = Modifier.animateItemFastScroll(),

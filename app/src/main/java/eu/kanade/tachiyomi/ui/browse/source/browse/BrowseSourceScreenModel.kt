@@ -261,7 +261,7 @@ class BrowseSourceScreenModel(
 
                 // Choose a category
                 else -> {
-                    val preselectedIds = getCategories.await(manga.id).map { it.id }
+                    val preselectedIds = getCategories.await(manga.id).mapTo(HashSet()) { it.id }
                     setDialog(
                         Dialog.ChangeMangaCategory(
                             manga,
@@ -290,14 +290,14 @@ class BrowseSourceScreenModel(
     }
 
     private fun moveMangaToCategories(manga: Manga, vararg categories: Category) {
-        moveMangaToCategories(manga, categories.filter { it.id != 0L }.map { it.id })
+        moveMangaToCategories(manga, categories.mapNotNull { if (it.id != 0L) it.id else null })
     }
 
     fun moveMangaToCategories(manga: Manga, categoryIds: List<Long>) {
         screenModelScope.launchIO {
             setMangaCategories.await(
                 mangaId = manga.id,
-                categoryIds = categoryIds.toList(),
+                categoryIds = categoryIds,
             )
         }
     }

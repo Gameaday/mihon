@@ -106,7 +106,12 @@ private fun HistoryScreenContent(
     ) {
         items(
             items = history,
-            key = { "history-${it.hashCode()}" },
+            key = {
+                when (it) {
+                    is HistoryUiModel.Header -> "history-header-${it.date}"
+                    is HistoryUiModel.Item -> "history-${it.item.id}"
+                }
+            },
             contentType = {
                 when (it) {
                     is HistoryUiModel.Header -> "header"

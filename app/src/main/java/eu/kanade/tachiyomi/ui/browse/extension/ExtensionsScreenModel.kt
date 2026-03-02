@@ -61,14 +61,15 @@ class ExtensionsScreenModel(
                 currentDownloads,
                 getExtensions.subscribe(),
             ) { predicate, downloads, (_updates, _installed, _available, _untrusted) ->
+                val mapper = extensionMapper(downloads)
                 buildMap {
-                    val updates = _updates.filter(predicate).map(extensionMapper(downloads))
+                    val updates = _updates.mapNotNull { if (predicate(it)) mapper(it) else null }
                     if (updates.isNotEmpty()) {
                         put(ExtensionUiModel.Header.Resource(MR.strings.ext_updates_pending), updates)
                     }
 
-                    val installed = _installed.filter(predicate).map(extensionMapper(downloads))
-                    val untrusted = _untrusted.filter(predicate).map(extensionMapper(downloads))
+                    val installed = _installed.mapNotNull { if (predicate(it)) mapper(it) else null }
+                    val untrusted = _untrusted.mapNotNull { if (predicate(it)) mapper(it) else null }
                     if (installed.isNotEmpty() || untrusted.isNotEmpty()) {
                         put(ExtensionUiModel.Header.Resource(MR.strings.ext_installed), installed + untrusted)
                     }
@@ -78,7 +79,7 @@ class ExtensionsScreenModel(
                     langGroups.forEach { (lang, exts) ->
                         put(
                             ExtensionUiModel.Header.Text(LocaleHelper.getSourceDisplayName(lang, context)),
-                            exts.map(extensionMapper(downloads)),
+                            exts.map(mapper),
                         )
                     }
                 }
@@ -142,11 +143,14 @@ class ExtensionsScreenModel(
 
     fun updateAllExtensions() {
         screenModelScope.launchIO {
-            state.value.items.values.flatten()
-                .map { it.extension }
-                .filterIsInstance<Extension.Installed>()
-                .filter { it.hasUpdate }
-                .forEach(::updateExtension)
+            state.value.items.values.forEach { items ->
+                items.forEach { item ->
+                    val ext = item.extension
+                    if (ext is Extension.Installed && ext.hasUpdate) {
+                        updateExtension(ext)
+                    }
+                }
+            }
         }
     }
 

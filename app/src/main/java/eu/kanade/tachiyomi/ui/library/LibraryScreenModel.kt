@@ -161,16 +161,13 @@ class LibraryScreenModel(
             getLibraryItemPreferencesFlow(),
             getTrackingFiltersFlow(),
         ) { prefs, trackFilters ->
-            listOf(
-                prefs.filterDownloaded,
-                prefs.filterUnread,
-                prefs.filterStarted,
-                prefs.filterBookmarked,
-                prefs.filterCompleted,
-                prefs.filterIntervalCustom,
-                *trackFilters.values.toTypedArray(),
-            )
-                .any { it != TriState.DISABLED }
+            prefs.filterDownloaded != TriState.DISABLED ||
+                prefs.filterUnread != TriState.DISABLED ||
+                prefs.filterStarted != TriState.DISABLED ||
+                prefs.filterBookmarked != TriState.DISABLED ||
+                prefs.filterCompleted != TriState.DISABLED ||
+                prefs.filterIntervalCustom != TriState.DISABLED ||
+                trackFilters.values.any { it != TriState.DISABLED }
         }
             .distinctUntilChanged()
             .onEach {
@@ -268,7 +265,7 @@ class LibraryScreenModel(
             }
         }
         return categories.filter { showSystemCategory || !it.isSystemCategory }
-            .associateWith { groupCache[it.id]?.toList().orEmpty() }
+            .associateWith { groupCache[it.id] ?: emptyList() }
     }
 
     private fun Map<Category, List</* LibraryItem */ Long>>.applySort(
@@ -456,9 +453,12 @@ class LibraryScreenModel(
      */
     private suspend fun getCommonCategories(mangas: List<Manga>): Collection<Category> {
         if (mangas.isEmpty()) return emptyList()
-        return mangas
-            .map { getCategories.await(it.id).toSet() }
-            .reduce { set1, set2 -> set1.intersect(set2) }
+        val mangaCategories = mangas.map { getCategories.await(it.id) }
+        val result = mangaCategories.first().toMutableSet()
+        for (i in 1 until mangaCategories.size) {
+            result.retainAll(mangaCategories[i].toSet())
+        }
+        return result
     }
 
     suspend fun getNextUnreadChapter(manga: Manga): Chapter? {
@@ -473,7 +473,10 @@ class LibraryScreenModel(
     private suspend fun getMixCategories(mangas: List<Manga>): Collection<Category> {
         if (mangas.isEmpty()) return emptyList()
         val mangaCategories = mangas.map { getCategories.await(it.id).toSet() }
-        val common = mangaCategories.reduce { set1, set2 -> set1.intersect(set2) }
+        val common = mangaCategories.first().toMutableSet()
+        for (i in 1 until mangaCategories.size) {
+            common.retainAll(mangaCategories[i])
+        }
         val uniqueCategories = mangaCategories.flatMapTo(HashSet()) { it }
         uniqueCategories.removeAll(common)
         return uniqueCategories
@@ -488,7 +491,10 @@ class LibraryScreenModel(
     ): Pair<Collection<Category>, Collection<Category>> {
         if (mangas.isEmpty()) return Pair(emptyList(), emptyList())
         val mangaCategories = mangas.map { getCategories.await(it.id).toSet() }
-        val common = mangaCategories.reduce { set1, set2 -> set1.intersect(set2) }
+        val common = mangaCategories.first().toMutableSet()
+        for (i in 1 until mangaCategories.size) {
+            common.retainAll(mangaCategories[i])
+        }
         val uniqueCategories = mangaCategories.flatMapTo(HashSet()) { it }
         uniqueCategories.removeAll(common)
         return Pair(common, uniqueCategories)
@@ -616,10 +622,8 @@ class LibraryScreenModel(
             val removeCategorySet = removeCategories.toHashSet()
             mangaList.forEach { manga ->
                 val categoryIds = getCategories.await(manga.id)
-                    .map { it.id }
-                    .subtract(removeCategorySet)
-                    .plus(addCategories)
-                    .toList()
+                    .mapNotNullTo(mutableListOf()) { if (it.id !in removeCategorySet) it.id else null }
+                    .apply { addAll(addCategories) }
 
                 setMangaCategories.await(manga.id, categoryIds)
             }
