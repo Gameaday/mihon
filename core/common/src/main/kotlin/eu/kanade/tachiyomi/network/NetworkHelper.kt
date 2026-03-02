@@ -34,9 +34,9 @@ class NetworkHelper(
                     // URL resolvers, etc.) survive longer in memory and avoid repeat network
                     // round-trips within a reading session.
                     maxSize = when (DeviceUtil.performanceTier(context)) {
-                        DeviceUtil.PerformanceTier.LOW -> 5L * 1024 * 1024   // 5 MiB
+                        DeviceUtil.PerformanceTier.LOW -> 5L * 1024 * 1024 // 5 MiB
                         DeviceUtil.PerformanceTier.MEDIUM -> 20L * 1024 * 1024 // 20 MiB
-                        DeviceUtil.PerformanceTier.HIGH -> 50L * 1024 * 1024  // 50 MiB
+                        DeviceUtil.PerformanceTier.HIGH -> 50L * 1024 * 1024 // 50 MiB
                     },
                 ),
             )

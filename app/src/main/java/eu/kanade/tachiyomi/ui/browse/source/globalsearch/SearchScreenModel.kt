@@ -48,6 +48,7 @@ abstract class SearchScreenModel(
     private var searchJob: Job? = null
 
     private val enabledLanguages = sourcePreferences.enabledLanguages().get()
+
     // Parse Set<String> source IDs to Set<Long> once at construction time to avoid creating a
     // new String per source on every getEnabledSources()/sortComparator call.
     private val disabledSourceIds = sourcePreferences.disabledSources().get().mapTo(HashSet()) { it.toLong() }
