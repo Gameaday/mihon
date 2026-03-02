@@ -27,7 +27,6 @@ quickjs-android = { group = "com.github.zhanghai.quickjs-java", name = "quickjs-
 
 jsoup = "org.jsoup:jsoup:1.22.1"
 
-disklrucache = "com.jakewharton:disklrucache:2.0.2"
 unifile = "com.github.tachiyomiorg:unifile:e0def6b3dc"
 libarchive = "me.zhanghai.android.libarchive:library:1.1.6"
 

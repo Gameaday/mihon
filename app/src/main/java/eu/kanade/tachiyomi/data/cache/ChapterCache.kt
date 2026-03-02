@@ -2,18 +2,17 @@ package eu.kanade.tachiyomi.data.cache
 
 import android.content.Context
 import android.text.format.Formatter
-import com.jakewharton.disklrucache.DiskLruCache
+import coil3.disk.DiskCache
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.util.storage.DiskUtil
-import eu.kanade.tachiyomi.util.storage.saveTo
 import eu.kanade.tachiyomi.util.system.DeviceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import logcat.LogPriority
 import okhttp3.Response
+import okio.Path.Companion.toOkioPath
 import okio.buffer
-import okio.sink
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.model.Chapter
 import java.io.File
@@ -22,8 +21,9 @@ import java.io.IOException
 /**
  * Class used to create chapter cache
  * For each image in a chapter a file is created
- * For each chapter a Json list is created and converted to a file.
- * The files are in format *md5key*.0
+ * For each chapter a JSON list is created and persisted.
+ * Backed by [DiskCache] from Coil, which provides LRU eviction, transactional writes,
+ * and concurrent-edit deduplication without any additional dependencies.
  *
  * @param context the application context.
  */
@@ -33,12 +33,6 @@ class ChapterCache(
 ) {
 
     companion object {
-        /** Application cache version. */
-        private const val PARAMETER_APP_VERSION = 1
-
-        /** The number of values per cache entry. Must be positive. */
-        private const val PARAMETER_VALUE_COUNT = 1
-
         /** Cache size for low-RAM devices (< 2 GB total RAM): 100 MB. */
         const val CACHE_SIZE_LOW = 100L * 1024 * 1024
 
@@ -68,17 +62,15 @@ class ChapterCache(
     }
 
     /** Cache class used for cache management. */
-    private val diskCache = DiskLruCache.open(
-        File(context.cacheDir, "chapter_disk_cache"),
-        PARAMETER_APP_VERSION,
-        PARAMETER_VALUE_COUNT,
-        cacheSize,
-    )
+    private val diskCache = DiskCache.Builder()
+        .directory(File(context.cacheDir, "chapter_disk_cache").toOkioPath())
+        .maxSizeBytes(cacheSize)
+        .build()
 
     /**
      * Returns directory of cache.
      */
-    private val cacheDir: File = diskCache.directory
+    private val cacheDir: File = File(diskCache.directory.toString())
 
     /**
      * Returns real size of directory in human readable format.
@@ -99,8 +91,11 @@ class ChapterCache(
         val key = DiskUtil.hashKeyForDisk(getKey(chapter))
 
         // Convert JSON string to list of objects. Throws an exception if snapshot is null
-        return diskCache.get(key).use {
-            json.decodeFromString(it.getString(0))
+        val snapshot = diskCache.openSnapshot(key) ?: throw IOException("Not in cache")
+        return snapshot.use {
+            diskCache.fileSystem.source(it.data).buffer().use { source ->
+                json.decodeFromString(source.readUtf8())
+            }
         }
     }
 
@@ -115,12 +110,15 @@ class ChapterCache(
         val cachedValue = json.encodeToString(pages)
         val key = DiskUtil.hashKeyForDisk(getKey(chapter))
         try {
-            editEntry(key) { editor ->
-                // Write chapter urls to cache.
-                editor.newOutputStream(0).sink().buffer().use {
-                    it.write(cachedValue.toByteArray())
-                    it.flush()
+            val editor = diskCache.openEditor(key) ?: return
+            try {
+                diskCache.fileSystem.write(editor.data) {
+                    writeUtf8(cachedValue)
                 }
+                editor.commitAndOpenSnapshot()?.close()
+            } catch (e: Exception) {
+                try { editor.abort() } catch (_: Exception) {}
+                throw e
             }
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Failed to put page list to cache" }
@@ -136,7 +134,7 @@ class ChapterCache(
      */
     fun isImageInCache(imageUrl: String): Boolean {
         return try {
-            diskCache.get(DiskUtil.hashKeyForDisk(imageUrl)).use { it != null }
+            diskCache.openSnapshot(DiskUtil.hashKeyForDisk(imageUrl))?.use { true } ?: false
         } catch (_: IOException) {
             false
         }
@@ -145,13 +143,19 @@ class ChapterCache(
     /**
      * Get image file from url.
      *
+     * The snapshot is closed before the [File] is returned. The underlying file stays on disk
+     * because Coil's [DiskCache] only evicts entries lazily — during a background trim cycle
+     * and only when the cache is over capacity. Callers should use the returned file immediately
+     * and must not hold long-lived references to it across operations that could trigger eviction
+     * (e.g. a manual [clear]).
+     *
      * @param imageUrl url of image.
      * @return path of image.
      */
     fun getImageFile(imageUrl: String): File {
-        // Get file from md5 key.
-        val imageName = DiskUtil.hashKeyForDisk(imageUrl) + ".0"
-        return File(diskCache.directory, imageName)
+        val key = DiskUtil.hashKeyForDisk(imageUrl)
+        return diskCache.openSnapshot(key)?.use { File(it.data.toString()) }
+            ?: error("Image not in cache: $imageUrl")
     }
 
     /**
@@ -165,9 +169,15 @@ class ChapterCache(
     fun putImageToCache(imageUrl: String, response: Response) {
         val key = DiskUtil.hashKeyForDisk(imageUrl)
         try {
-            // Get OutputStream and write image with Okio.
-            editEntry(key) { editor ->
-                response.body.source().saveTo(editor.newOutputStream(0))
+            val editor = diskCache.openEditor(key) ?: return
+            try {
+                diskCache.fileSystem.write(editor.data) {
+                    response.body.source().readAll(this)
+                }
+                editor.commitAndOpenSnapshot()?.close()
+            } catch (e: Exception) {
+                try { editor.abort() } catch (_: Exception) {}
+                throw e
             }
         } finally {
             response.body.close()
@@ -187,77 +197,35 @@ class ChapterCache(
     @Throws(IOException::class)
     suspend fun fetchAndCacheImage(imageUrl: String, fetchImage: suspend () -> Response) {
         val key = DiskUtil.hashKeyForDisk(imageUrl)
-        // edit() returns null if another edit is already in progress for this key, which
+        // openEditor() returns null if another edit is already in progress for this key, which
         // prevents duplicate network requests for the same image.
-        var editor: DiskLruCache.Editor? = null
+        val editor = diskCache.openEditor(key) ?: return
         try {
-            editor = diskCache.edit(key) ?: return
             val response = fetchImage()
             try {
-                response.body.source().saveTo(editor.newOutputStream(0))
+                diskCache.fileSystem.write(editor.data) {
+                    response.body.source().readAll(this)
+                }
             } finally {
                 response.body.close()
             }
-            editor.commit()
-            diskCache.flush()
-        } finally {
-            editor?.abortUnlessCommitted()
+            editor.commitAndOpenSnapshot()?.close()
+        } catch (e: Exception) {
+            try { editor.abort() } catch (_: Exception) {}
+            throw e
         }
     }
 
     fun clear(): Int {
-        var deletedFiles = 0
-        cacheDir.listFiles()?.forEach {
-            if (removeFileFromCache(it.name)) {
-                deletedFiles++
-            }
-        }
-        return deletedFiles
-    }
-
-    /**
-     * Remove file from cache.
-     *
-     * @param file name of file "md5.0".
-     * @return status of deletion for the file.
-     */
-    private fun removeFileFromCache(file: String): Boolean {
-        // Make sure we don't delete the journal file (keeps track of cache)
-        if (file == "journal" || file.startsWith("journal.")) {
-            return false
-        }
-
-        return try {
-            // Remove the extension from the file to get the key of the cache
-            val key = file.substringBeforeLast(".")
-            // Remove file from cache
-            diskCache.remove(key)
-        } catch (e: Exception) {
-            logcat(LogPriority.WARN, e) { "Failed to remove file from cache" }
-            false
-        }
+        // Count data files before clearing so we can report how many entries were removed.
+        val count = cacheDir.listFiles()
+            ?.count { it.isFile && !it.name.startsWith("journal") }
+            ?: 0
+        diskCache.clear()
+        return count
     }
 
     private fun getKey(chapter: Chapter): String {
         return "${chapter.mangaId}${chapter.url}"
-    }
-
-    /**
-     * Opens a [DiskLruCache.Editor] for [key], executes [block] with the editor, then commits
-     * and flushes the journal on success. If no editor can be obtained (another edit is already
-     * in progress for this key), returns `null` without calling [block]. On any exception the
-     * editor is aborted via [DiskLruCache.Editor.abortUnlessCommitted].
-     */
-    private fun <T> editEntry(key: String, block: (DiskLruCache.Editor) -> T): T? {
-        var editor: DiskLruCache.Editor? = null
-        try {
-            editor = diskCache.edit(key) ?: return null
-            val result = block(editor)
-            editor.commit()
-            diskCache.flush()
-            return result
-        } finally {
-            editor?.abortUnlessCommitted()
-        }
     }
 }
