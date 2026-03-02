@@ -6,7 +6,6 @@ import mihon.buildlogic.getGitSha
 plugins {
     id("mihon.android.application")
     id("mihon.android.application.compose")
-    id("com.github.zellius.shortcut-helper")
     kotlin("plugin.serialization")
     alias(libs.plugins.aboutLibraries)
 }
@@ -17,8 +16,6 @@ if (Config.includeTelemetry) {
         apply(libs.plugins.firebase.crashlytics.get().pluginId)
     }
 }
-
-shortcutHelper.setFilePath("./shortcuts.xml")
 
 android {
     namespace = "eu.kanade.tachiyomi"
@@ -125,7 +122,6 @@ android {
             keepDebugSymbols += listOf(
                 "libandroidx.graphics.path",
                 "libarchive-jni",
-                "libconscrypt_jni",
                 "libimagedecoder",
                 "libquickjs",
                 "libsqlite3x",
@@ -180,6 +176,7 @@ kotlin {
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
             "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
             "-opt-in=coil3.annotation.ExperimentalCoilApi",
+            "-opt-in=kotlinx.coroutines.DelicateCoroutinesApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlinx.coroutines.InternalCoroutinesApi",
@@ -213,8 +210,6 @@ dependencies {
     implementation(compose.ui.tooling.preview)
     implementation(compose.ui.util)
 
-    implementation(androidx.interpolator)
-
     implementation(androidx.paging.runtime)
     implementation(androidx.paging.compose)
 
@@ -230,7 +225,6 @@ dependencies {
     implementation(androidx.annotation)
     implementation(androidx.appcompat)
     implementation(androidx.biometricktx)
-    implementation(androidx.constraintlayout)
     implementation(androidx.corektx)
     implementation(androidx.splashscreen)
     implementation(androidx.recyclerview)
@@ -242,13 +236,9 @@ dependencies {
     // Job scheduling
     implementation(androidx.workmanager)
 
-    // RxJava
-    implementation(libs.rxjava)
-
     // Networking
     implementation(libs.bundles.okhttp)
     implementation(libs.okio)
-    implementation(libs.conscrypt.android) // TLS 1.3 support for Android < 10
 
     // Data serialization (JSON, protobuf, xml)
     implementation(kotlinx.bundles.serialization)
@@ -257,7 +247,6 @@ dependencies {
     implementation(libs.jsoup)
 
     // Disk
-    implementation(libs.disklrucache)
     implementation(libs.unifile)
 
     // Preferences
@@ -276,8 +265,6 @@ dependencies {
 
     // UI libraries
     implementation(libs.material)
-    implementation(libs.flexible.adapter.core)
-    implementation(libs.photoview)
     implementation(libs.directionalviewpager) {
         exclude(group = "androidx.viewpager", module = "viewpager")
     }
@@ -304,10 +291,6 @@ dependencies {
     // Tests
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.platform.launcher)
-
-    // For detecting memory leaks; see https://square.github.io/leakcanary/
-    // debugImplementation(libs.leakcanary.android)
-    implementation(libs.leakcanary.plumber)
 
     testImplementation(kotlinx.coroutines.test)
 }

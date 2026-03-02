@@ -197,8 +197,8 @@ class LibraryScreenModel(
 
         val isNotLoggedInAnyTrack = trackingFilter.isEmpty()
 
-        val excludedTracks = trackingFilter.mapNotNull { if (it.value == TriState.ENABLED_NOT) it.key else null }
-        val includedTracks = trackingFilter.mapNotNull { if (it.value == TriState.ENABLED_IS) it.key else null }
+        val excludedTracks = trackingFilter.mapNotNullTo(HashSet()) { if (it.value == TriState.ENABLED_NOT) it.key else null }
+        val includedTracks = trackingFilter.mapNotNullTo(HashSet()) { if (it.value == TriState.ENABLED_IS) it.key else null }
         val trackFiltersIsIgnored = includedTracks.isEmpty() && excludedTracks.isEmpty()
 
         val filterFnDownloaded: (LibraryItem) -> Boolean = {
@@ -234,10 +234,10 @@ class LibraryScreenModel(
         val filterFnTracking: (LibraryItem) -> Boolean = tracking@{ item ->
             if (isNotLoggedInAnyTrack || trackFiltersIsIgnored) return@tracking true
 
-            val mangaTracks = trackMap[item.id].orEmpty().map { it.trackerId }
+            val mangaTracks = trackMap[item.id].orEmpty()
 
-            val isExcluded = excludedTracks.isNotEmpty() && mangaTracks.fastAny { it in excludedTracks }
-            val isIncluded = includedTracks.isEmpty() || mangaTracks.fastAny { it in includedTracks }
+            val isExcluded = excludedTracks.isNotEmpty() && mangaTracks.fastAny { it.trackerId in excludedTracks }
+            val isIncluded = includedTracks.isEmpty() || mangaTracks.fastAny { it.trackerId in includedTracks }
 
             !isExcluded && isIncluded
         }
@@ -273,9 +273,9 @@ class LibraryScreenModel(
         loggedInTrackerIds: Set<Long>,
     ): Map<Category, List</* LibraryItem */ Long>> {
         val sortAlphabetically: (LibraryItem, LibraryItem) -> Int = { manga1, manga2 ->
-            val title1 = manga1.libraryManga.manga.title.lowercase()
-            val title2 = manga2.libraryManga.manga.title.lowercase()
-            title1.compareToWithCollator(title2)
+            // No .lowercase() needed: collator is configured with Collator.PRIMARY strength,
+            // which ignores case (case is tertiary strength per Java Collator spec).
+            manga1.libraryManga.manga.title.compareToWithCollator(manga2.libraryManga.manga.title)
         }
 
         val defaultTrackerScoreSortValue = -1.0
@@ -390,7 +390,7 @@ class LibraryScreenModel(
             // Build a source→language map once per emission instead of once per manga, so a library
             // with 1 000 manga from 10 sources makes 10 getOrStub calls instead of 1 000.
             val sourceLangMap = if (preferences.languageBadge) {
-                libraryManga.map { it.manga.source }.toSet()
+                libraryManga.mapTo(HashSet()) { it.manga.source }
                     .associateWith { sourceManager.getOrStub(it).lang }
             } else {
                 emptyMap()
@@ -470,7 +470,22 @@ class LibraryScreenModel(
         if (mangas.isEmpty()) return emptyList()
         val mangaCategories = mangas.map { getCategories.await(it.id).toSet() }
         val common = mangaCategories.reduce { set1, set2 -> set1.intersect(set2) }
-        return mangaCategories.flatten().distinct().subtract(common)
+        val uniqueCategories = mangaCategories.flatMapTo(HashSet()) { it }
+        uniqueCategories.removeAll(common)
+        return uniqueCategories
+    }
+
+    /**
+     * Returns common and mix category sets for [mangas] in a single DB pass.
+     * Avoids fetching per-manga categories twice when both are needed together.
+     */
+    private suspend fun getCommonAndMixCategories(mangas: List<Manga>): Pair<Collection<Category>, Collection<Category>> {
+        if (mangas.isEmpty()) return Pair(emptyList(), emptyList())
+        val mangaCategories = mangas.map { getCategories.await(it.id).toSet() }
+        val common = mangaCategories.reduce { set1, set2 -> set1.intersect(set2) }
+        val uniqueCategories = mangaCategories.flatMapTo(HashSet()) { it }
+        uniqueCategories.removeAll(common)
+        return Pair(common, uniqueCategories)
     }
 
     /**
@@ -592,10 +607,11 @@ class LibraryScreenModel(
      */
     fun setMangaCategories(mangaList: List<Manga>, addCategories: List<Long>, removeCategories: List<Long>) {
         screenModelScope.launchNonCancellable {
+            val removeCategorySet = removeCategories.toHashSet()
             mangaList.forEach { manga ->
                 val categoryIds = getCategories.await(manga.id)
                     .map { it.id }
-                    .subtract(removeCategories.toSet())
+                    .subtract(removeCategorySet)
                     .plus(addCategories)
                     .toList()
 
@@ -713,10 +729,8 @@ class LibraryScreenModel(
             // Hide the default category because it has a different behavior than the ones from db.
             val categories = state.value.displayedCategories.filter { it.id != 0L }
 
-            // Get indexes of the common categories to preselect.
-            val common = getCommonCategories(mangaList)
-            // Get indexes of the mix categories to preselect.
-            val mix = getMixCategories(mangaList)
+            // Get common and mix categories in a single DB pass (avoids querying per-manga categories twice).
+            val (common, mix) = getCommonAndMixCategories(mangaList)
             val preselected = categories
                 .map {
                     when (it) {

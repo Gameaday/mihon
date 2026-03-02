@@ -71,7 +71,7 @@ object DeviceUtil {
      *
      * Some of them may only be present on certain manufacturer's devices.
      */
-    val invalidDefaultBrowsers = listOf(
+    val invalidDefaultBrowsers = setOf(
         "android",
         // Honor
         "com.hihonor.android.internal.app",

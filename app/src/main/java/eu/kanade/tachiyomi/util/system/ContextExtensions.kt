@@ -56,6 +56,9 @@ fun Context.copyToClipboard(label: String, content: String) {
 val Context.powerManager: PowerManager
     get() = getSystemService()!!
 
+val Context.isPowerSaveMode: Boolean
+    get() = powerManager.isPowerSaveMode
+
 fun Context.openInBrowser(url: String, forceDefaultBrowser: Boolean = false) {
     this.openInBrowser(url.toUri(), forceDefaultBrowser)
 }

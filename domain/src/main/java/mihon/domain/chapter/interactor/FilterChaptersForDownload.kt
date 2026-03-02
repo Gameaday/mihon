@@ -38,10 +38,9 @@ class FilterChaptersForDownload(
         if (!downloadPreferences.downloadNewUnreadChaptersOnly().get()) return newChapters
 
         val readChapterNumbers = getChaptersByMangaId.await(manga.id)
-            .asSequence()
-            .filter { it.read && it.isRecognizedNumber }
-            .map { it.chapterNumber }
-            .toSet()
+            .mapNotNullTo(HashSet()) { chapter ->
+                chapter.chapterNumber.takeIf { chapter.read && chapter.isRecognizedNumber }
+            }
 
         return newChapters.filterNot { it.chapterNumber in readChapterNumbers }
     }
@@ -56,8 +55,8 @@ class FilterChaptersForDownload(
         if (!favorite) return false
 
         val categories = getCategories.await(id).map { it.id }.ifEmpty { listOf(DEFAULT_CATEGORY_ID) }
-        val includedCategories = downloadPreferences.downloadNewChapterCategories().get().map { it.toLong() }
-        val excludedCategories = downloadPreferences.downloadNewChapterCategoriesExclude().get().map { it.toLong() }
+        val includedCategories = downloadPreferences.downloadNewChapterCategories().get().mapTo(HashSet()) { it.toLong() }
+        val excludedCategories = downloadPreferences.downloadNewChapterCategoriesExclude().get().mapTo(HashSet()) { it.toLong() }
 
         return when {
             // Default Download from all categories

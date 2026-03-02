@@ -89,10 +89,10 @@ internal class ExtensionApi {
             .filterIsInstance<LoadResult.Success>()
             .map { it.extension }
 
+        val extensionsByPkg = extensions.associateBy { it.pkgName }
         val extensionsWithUpdate = mutableListOf<Extension.Installed>()
         for (installedExt in installedExtensions) {
-            val pkgName = installedExt.pkgName
-            val availableExt = extensions.find { it.pkgName == pkgName } ?: continue
+            val availableExt = extensionsByPkg[installedExt.pkgName] ?: continue
             val hasUpdatedVer = availableExt.versionCode > installedExt.versionCode
             val hasUpdatedLib = availableExt.libVersion > installedExt.libVersion
             val hasUpdate = hasUpdatedVer || hasUpdatedLib

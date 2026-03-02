@@ -2,7 +2,6 @@ package eu.kanade.tachiyomi.source.online
 
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.NetworkHelper
-import eu.kanade.tachiyomi.network.asObservableSuccess
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.newCachelessCallWithProgress
 import eu.kanade.tachiyomi.source.CatalogueSource
@@ -15,8 +14,6 @@ import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import rx.Observable
-import tachiyomi.core.common.util.lang.awaitSingle
 import uy.kohesive.injekt.injectLazy
 import java.net.URI
 import java.net.URISyntaxException
@@ -103,18 +100,14 @@ abstract class HttpSource : CatalogueSource {
     override fun toString() = "$name (${lang.uppercase()})"
 
     /**
-     * Returns an observable containing a page with a list of manga. Normally it's not needed to
-     * override this method.
+     * Returns a page with a list of manga. Normally it's not needed to override this method.
      *
      * @param page the page number to retrieve.
      */
-    @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getPopularManga"))
-    override fun fetchPopularManga(page: Int): Observable<MangasPage> {
-        return client.newCall(popularMangaRequest(page))
-            .asObservableSuccess()
-            .map { response ->
-                popularMangaParse(response)
-            }
+    override suspend fun getPopularManga(page: Int): MangasPage {
+        return client.newCall(popularMangaRequest(page)).awaitSuccess().let { response ->
+            popularMangaParse(response)
+        }
     }
 
     /**
@@ -132,31 +125,16 @@ abstract class HttpSource : CatalogueSource {
     protected abstract fun popularMangaParse(response: Response): MangasPage
 
     /**
-     * Returns an observable containing a page with a list of manga. Normally it's not needed to
-     * override this method.
+     * Returns a page with a list of manga. Normally it's not needed to override this method.
      *
      * @param page the page number to retrieve.
      * @param query the search query.
      * @param filters the list of filters to apply.
      */
-    @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getSearchManga"))
-    override fun fetchSearchManga(
-        page: Int,
-        query: String,
-        filters: FilterList,
-    ): Observable<MangasPage> {
-        return Observable.defer {
-            try {
-                client.newCall(searchMangaRequest(page, query, filters)).asObservableSuccess()
-            } catch (e: NoClassDefFoundError) {
-                // RxJava doesn't handle Errors, which tends to happen during global searches
-                // if an old extension using non-existent classes is still around
-                throw RuntimeException(e)
-            }
+    override suspend fun getSearchManga(page: Int, query: String, filters: FilterList): MangasPage {
+        return client.newCall(searchMangaRequest(page, query, filters)).awaitSuccess().let { response ->
+            searchMangaParse(response)
         }
-            .map { response ->
-                searchMangaParse(response)
-            }
     }
 
     /**
@@ -180,17 +158,15 @@ abstract class HttpSource : CatalogueSource {
     protected abstract fun searchMangaParse(response: Response): MangasPage
 
     /**
-     * Returns an observable containing a page with a list of latest manga updates.
+     * Returns a page with a list of latest manga updates. Normally it's not needed to override
+     * this method.
      *
      * @param page the page number to retrieve.
      */
-    @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getLatestUpdates"))
-    override fun fetchLatestUpdates(page: Int): Observable<MangasPage> {
-        return client.newCall(latestUpdatesRequest(page))
-            .asObservableSuccess()
-            .map { response ->
-                latestUpdatesParse(response)
-            }
+    override suspend fun getLatestUpdates(page: Int): MangasPage {
+        return client.newCall(latestUpdatesRequest(page)).awaitSuccess().let { response ->
+            latestUpdatesParse(response)
+        }
     }
 
     /**
@@ -214,18 +190,10 @@ abstract class HttpSource : CatalogueSource {
      * @param manga the manga to update.
      * @return the updated manga.
      */
-    @Suppress("DEPRECATION")
     override suspend fun getMangaDetails(manga: SManga): SManga {
-        return fetchMangaDetails(manga).awaitSingle()
-    }
-
-    @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getMangaDetails"))
-    override fun fetchMangaDetails(manga: SManga): Observable<SManga> {
-        return client.newCall(mangaDetailsRequest(manga))
-            .asObservableSuccess()
-            .map { response ->
-                mangaDetailsParse(response).apply { initialized = true }
-            }
+        return client.newCall(mangaDetailsRequest(manga)).awaitSuccess().let { response ->
+            mangaDetailsParse(response).apply { initialized = true }
+        }
     }
 
     /**
@@ -252,18 +220,10 @@ abstract class HttpSource : CatalogueSource {
      * @param manga the manga to update.
      * @return the chapters for the manga.
      */
-    @Suppress("DEPRECATION")
     override suspend fun getChapterList(manga: SManga): List<SChapter> {
-        return fetchChapterList(manga).awaitSingle()
-    }
-
-    @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getChapterList"))
-    override fun fetchChapterList(manga: SManga): Observable<List<SChapter>> {
-        return client.newCall(chapterListRequest(manga))
-            .asObservableSuccess()
-            .map { response ->
-                chapterListParse(response)
-            }
+        return client.newCall(chapterListRequest(manga)).awaitSuccess().let { response ->
+            chapterListParse(response)
+        }
     }
 
     /**
@@ -297,18 +257,10 @@ abstract class HttpSource : CatalogueSource {
      * @param chapter the chapter.
      * @return the pages for the chapter.
      */
-    @Suppress("DEPRECATION")
     override suspend fun getPageList(chapter: SChapter): List<Page> {
-        return fetchPageList(chapter).awaitSingle()
-    }
-
-    @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getPageList"))
-    override fun fetchPageList(chapter: SChapter): Observable<List<Page>> {
-        return client.newCall(pageListRequest(chapter))
-            .asObservableSuccess()
-            .map { response ->
-                pageListParse(response)
-            }
+        return client.newCall(pageListRequest(chapter)).awaitSuccess().let { response ->
+            pageListParse(response)
+        }
     }
 
     /**
@@ -329,22 +281,15 @@ abstract class HttpSource : CatalogueSource {
     protected abstract fun pageListParse(response: Response): List<Page>
 
     /**
-     * Returns an observable with the page containing the source url of the image. If there's any
-     * error, it will return null instead of throwing an exception.
+     * Returns the url of the source image for a page.
      *
      * @since extensions-lib 1.5
      * @param page the page whose source image has to be fetched.
      */
-    @Suppress("DEPRECATION")
     open suspend fun getImageUrl(page: Page): String {
-        return fetchImageUrl(page).awaitSingle()
-    }
-
-    @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getImageUrl"))
-    open fun fetchImageUrl(page: Page): Observable<String> {
-        return client.newCall(imageUrlRequest(page))
-            .asObservableSuccess()
-            .map { imageUrlParse(it) }
+        return client.newCall(imageUrlRequest(page)).awaitSuccess().let { response ->
+            imageUrlParse(response)
+        }
     }
 
     /**

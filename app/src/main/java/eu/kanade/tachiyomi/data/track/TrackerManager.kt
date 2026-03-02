@@ -31,6 +31,8 @@ class TrackerManager {
 
     val trackers = listOf(myAnimeList, aniList, kitsu, shikimori, bangumi, komga, mangaUpdates, kavita, suwayomi)
 
+    private val trackerById: Map<Long, Tracker> = trackers.associateBy { it.id }
+
     fun loggedInTrackers() = trackers.filter { it.isLoggedIn }
 
     fun loggedInTrackersFlow() = combine(trackers.map { it.isLoggedInFlow }) {
@@ -39,7 +41,7 @@ class TrackerManager {
         }
     }
 
-    fun get(id: Long) = trackers.find { it.id == id }
+    fun get(id: Long) = trackerById[id]
 
-    fun getAll(ids: Set<Long>) = trackers.filter { it.id in ids }
+    fun getAll(ids: Set<Long>) = ids.mapNotNull { trackerById[it] }
 }

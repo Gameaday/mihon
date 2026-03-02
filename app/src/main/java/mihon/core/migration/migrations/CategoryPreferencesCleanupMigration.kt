@@ -15,7 +15,7 @@ class CategoryPreferencesCleanupMigration : Migration {
         val downloadPreferences = migrationContext.get<DownloadPreferences>() ?: return@withIOContext false
 
         val getCategories = migrationContext.get<GetCategories>() ?: return@withIOContext false
-        val allCategories = getCategories.await().map { it.id.toString() }.toSet()
+        val allCategories = getCategories.await().mapTo(HashSet()) { it.id.toString() }
 
         val defaultCategory = libraryPreferences.defaultCategory().get()
         if (defaultCategory.toString() !in allCategories) {

@@ -11,6 +11,7 @@ android {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
+            "-opt-in=kotlinx.coroutines.DelicateCoroutinesApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
         )
@@ -21,8 +22,6 @@ dependencies {
     implementation(projects.i18n)
 
     api(libs.logcat)
-
-    api(libs.rxjava)
 
     api(libs.okhttp.core)
     api(libs.okhttp.logging)
@@ -42,9 +41,6 @@ dependencies {
     api(libs.preferencektx)
 
     implementation(libs.jsoup)
-
-    // Sort
-    implementation(libs.natural.comparator)
 
     // JavaScript engine
     implementation(libs.bundles.js.engine)

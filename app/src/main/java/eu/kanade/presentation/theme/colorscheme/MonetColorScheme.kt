@@ -17,7 +17,7 @@ internal class MonetColorScheme(context: Context) : BaseColorScheme() {
 
     private val monet = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         MonetSystemColorScheme(context)
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+    } else {
         val seed = WallpaperManager.getInstance(context)
             .getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
             ?.primaryColor
@@ -27,8 +27,6 @@ internal class MonetColorScheme(context: Context) : BaseColorScheme() {
         } else {
             TachiyomiColorScheme
         }
-    } else {
-        TachiyomiColorScheme
     }
 
     override val darkScheme

@@ -316,9 +316,10 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
     ) : StateScreenModel<ScreenModel.State>(State()) {
 
         private val sourcesComparator = { includedSources: List<Long> ->
+            val rankMap = includedSources.withIndex().associate { (i, id) -> id to i }
             compareBy<MigrationSource>(
                 { !it.isSelected },
-                { includedSources.indexOf(it.id) },
+                { rankMap.getOrDefault(it.id, Int.MAX_VALUE) },
                 { with(it) { "$name ($shortLanguage)" } },
             )
         }
@@ -333,7 +334,7 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
         private fun updateSources(action: (List<MigrationSource>) -> List<MigrationSource>) {
             mutableState.update { state ->
                 val updatedSources = action(state.sources)
-                val includedSources = updatedSources.mapNotNull { if (!it.isSelected) null else it.id }
+                val includedSources = updatedSources.mapNotNull { it.id.takeIf { _ -> it.isSelected } }
                 state.copy(sources = updatedSources.sortedWith(sourcesComparator(includedSources)))
             }
             saveSources()

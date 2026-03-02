@@ -3,32 +3,21 @@ package mihon.telemetry
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
-import android.os.Build
 import java.security.MessageDigest
 
 internal fun PackageInfo.getCertificateFingerprints(): List<String> {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        val signingInfo = signingInfo!!
-        if (signingInfo.hasMultipleSigners()) {
-            signingInfo.apkContentsSigners
-        } else {
-            signingInfo.signingCertificateHistory
-        }
+    val signingInfo = signingInfo!!
+    return if (signingInfo.hasMultipleSigners()) {
+        signingInfo.apkContentsSigners
     } else {
-        @Suppress("DEPRECATION")
-        signatures
+        signingInfo.signingCertificateHistory
     }
         ?.map(Signature::getCertificateFingerprint)
         ?.toList()
         ?: emptyList()
 }
 
-internal val SignatureFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-    PackageManager.GET_SIGNING_CERTIFICATES
-} else {
-    @Suppress("DEPRECATION")
-    PackageManager.GET_SIGNATURES
-}
+internal val SignatureFlags = PackageManager.GET_SIGNING_CERTIFICATES
 
 @OptIn(ExperimentalStdlibApi::class)
 private val CertificateFingerprintHexFormat = HexFormat {

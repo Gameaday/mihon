@@ -53,11 +53,9 @@ internal object ExtensionLoader {
     const val LIB_VERSION_MIN = 1.4
     const val LIB_VERSION_MAX = 1.5
 
-    @Suppress("DEPRECATION")
     private val PACKAGE_FLAGS = PackageManager.GET_CONFIGURATIONS or
         PackageManager.GET_META_DATA or
-        PackageManager.GET_SIGNATURES or
-        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) PackageManager.GET_SIGNING_CERTIFICATES else 0)
+        PackageManager.GET_SIGNING_CERTIFICATES
 
     private const val PRIVATE_EXTENSION_EXTENSION = "ext"
 
@@ -201,8 +199,12 @@ internal object ExtensionLoader {
         }
 
         val sharedPkg = try {
-            context.packageManager.getPackageInfo(pkgName, PACKAGE_FLAGS)
-                .takeIf { isPackageAnExtension(it) }
+            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(pkgName, PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong()))
+            } else {
+                context.packageManager.getPackageInfo(pkgName, PACKAGE_FLAGS)
+            }
+            packageInfo.takeIf { isPackageAnExtension(it) }
                 ?.let {
                     ExtensionInfo(
                         packageInfo = it,
@@ -363,16 +365,11 @@ internal object ExtensionLoader {
      * @return List SHA256 digest of the signatures
      */
     private fun getSignatures(pkgInfo: PackageInfo): List<String>? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val signingInfo = pkgInfo.signingInfo!!
-            if (signingInfo.hasMultipleSigners()) {
-                signingInfo.apkContentsSigners
-            } else {
-                signingInfo.signingCertificateHistory
-            }
+        val signingInfo = pkgInfo.signingInfo!!
+        return if (signingInfo.hasMultipleSigners()) {
+            signingInfo.apkContentsSigners
         } else {
-            @Suppress("DEPRECATION")
-            pkgInfo.signatures
+            signingInfo.signingCertificateHistory
         }
             ?.map { Hash.sha256(it.toByteArray()) }
             ?.toList()

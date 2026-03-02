@@ -46,8 +46,7 @@ import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import android.view.animation.PathInterpolator
 import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -364,7 +363,7 @@ class MainActivity : BaseActivity() {
                 splashProvider.iconView.translationY = 0F
 
                 val activityAnim = ValueAnimator.ofFloat(1F, 0F).apply {
-                    interpolator = LinearOutSlowInInterpolator()
+                    interpolator = PathInterpolator(0f, 0f, 0.2f, 1f)
                     duration = SPLASH_EXIT_ANIM_DURATION
                     addUpdateListener { va ->
                         val value = va.animatedValue as Float
@@ -373,7 +372,7 @@ class MainActivity : BaseActivity() {
                 }
 
                 val splashAnim = ValueAnimator.ofFloat(1F, 0F).apply {
-                    interpolator = FastOutSlowInInterpolator()
+                    interpolator = PathInterpolator(0.4f, 0f, 0.2f, 1f)
                     duration = SPLASH_EXIT_ANIM_DURATION
                     addUpdateListener { va ->
                         val value = va.animatedValue as Float

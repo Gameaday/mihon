@@ -1059,7 +1059,7 @@ class MangaScreenModel(
             ) { mangaTracks, loggedInTrackers ->
                 // Show only if the service supports this manga's source
                 val supportedTrackers = loggedInTrackers.filter { (it as? EnhancedTracker)?.accept(source!!) ?: true }
-                val supportedTrackerIds = supportedTrackers.map { it.id }.toHashSet()
+                val supportedTrackerIds = supportedTrackers.mapTo(HashSet()) { it.id }
                 val supportedTrackerTracks = mangaTracks.filter { it.trackerId in supportedTrackerIds }
                 supportedTrackerTracks.size to supportedTrackers.isNotEmpty()
             }
@@ -1182,7 +1182,7 @@ class MangaScreenModel(
             }
 
             val scanlatorFilterActive: Boolean
-                get() = excludedScanlators.intersect(availableScanlators).isNotEmpty()
+                get() = excludedScanlators.any { it in availableScanlators }
 
             val filterActive: Boolean
                 get() = scanlatorFilterActive || manga.chaptersFiltered()

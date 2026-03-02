@@ -282,7 +282,7 @@ class DownloadManager(
         if (wasRunning) {
             if (queueState.value.isEmpty()) {
                 downloader.stop()
-            } else if (queueState.value.isNotEmpty()) {
+            } else {
                 downloader.start()
             }
         }
@@ -404,12 +404,12 @@ class DownloadManager(
 
     private suspend fun getChaptersToDelete(chapters: List<Chapter>, manga: Manga): List<Chapter> {
         // Retrieve the categories that are set to exclude from being deleted on read
-        val categoriesToExclude = downloadPreferences.removeExcludeCategories().get().map(String::toLong)
+        val categoriesToExclude = downloadPreferences.removeExcludeCategories().get().mapTo(HashSet(), String::toLong)
 
         val categoriesForManga = getCategories.await(manga.id)
             .map { it.id }
             .ifEmpty { listOf(0) }
-        val filteredCategoryManga = if (categoriesForManga.intersect(categoriesToExclude).isNotEmpty()) {
+        val filteredCategoryManga = if (categoriesForManga.any { it in categoriesToExclude }) {
             chapters.filterNot { it.read }
         } else {
             chapters

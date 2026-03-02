@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority
 import okio.Buffer
 import tachiyomi.core.common.util.lang.withIOContext
-import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.injectLazy
@@ -383,10 +382,16 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                         // Guard against a concurrent merge (per-holder retry path) that may
                         // have completed while this iteration was running.
                         if (page.mergedBytes == null) {
+                            // Mark the stub absorbed BEFORE committing mergedBytes so that any
+                            // concurrent check that sees mergedBytes != null also sees
+                            // isAbsorbed == true — preventing the stub from reappearing in the
+                            // adapter when setChapters rebuilds items (e.g. after a chapter switch).
+                            nextPage.isAbsorbed = true
                             page.mergedBytes = mergedBytes
-                            withUIContext {
-                                onPageAbsorb(nextPage)
-                            }
+                            // onPageAbsorb uses activity.runOnUiThread internally, so it is NOT
+                            // affected by coroutine cancellation and will always post the adapter
+                            // update to the main thread even if preScanJob is cancelled right here.
+                            onPageAbsorb(nextPage)
                         }
                     } catch (e: Exception) {
                         logcat(LogPriority.WARN, e) { "Smart combine pre-scan failed for page ${page.index}" }

@@ -84,7 +84,7 @@ private fun SourcesFilterContent(
                     SourcesFilterItem(
                         modifier = Modifier.animateItemFastScroll(),
                         source = source,
-                        enabled = "${source.id}" !in state.disabledSources,
+                        enabled = source.id !in state.disabledSourceIds,
                         onClickItem = onClickSource,
                     )
                 }

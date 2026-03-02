@@ -64,6 +64,8 @@ enum class ReaderOrientation(
     companion object {
         const val MASK = 0x00000038
 
-        fun fromPreference(preference: Int?): ReaderOrientation = entries.find { it.flagValue == preference } ?: DEFAULT
+        private val flagMap = entries.associateBy { it.flagValue }
+
+        fun fromPreference(preference: Int?): ReaderOrientation = flagMap[preference] ?: DEFAULT
     }
 }

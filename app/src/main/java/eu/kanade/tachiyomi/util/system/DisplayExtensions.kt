@@ -3,7 +3,6 @@ package eu.kanade.tachiyomi.util.system
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.view.View
 import eu.kanade.domain.ui.UiPreferences
 import eu.kanade.domain.ui.model.TabletUiMode
@@ -70,13 +69,12 @@ fun Activity.hasDisplayCutout(): Boolean {
  * Only works on Android 9+.
  */
 fun View.hasDisplayCutout(): Boolean {
-    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && rootWindowInsets?.displayCutout != null
+    return rootWindowInsets?.displayCutout != null
 }
 
 /**
- * Gets system's config_navBarNeedsScrim boolean flag added in Android 10, defaults to true.
+ * Gets system's config_navBarNeedsScrim boolean flag added in Android 10.
  */
 fun Context.isNavigationBarNeedsScrim(): Boolean {
-    return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
-        InternalResourceHelper.getBoolean(this, "config_navBarNeedsScrim", true)
+    return InternalResourceHelper.getBoolean(this, "config_navBarNeedsScrim", true)
 }

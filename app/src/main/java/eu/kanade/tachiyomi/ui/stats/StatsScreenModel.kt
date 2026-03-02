@@ -85,13 +85,13 @@ class StatsScreenModel(
     }
 
     private fun getGlobalUpdateItemCount(libraryManga: List<LibraryManga>): Int {
-        val includedCategories = preferences.updateCategories().get().map { it.toLong() }
-        val excludedCategories = preferences.updateCategoriesExclude().get().map { it.toLong() }
+        val includedCategories = preferences.updateCategories().get().mapTo(HashSet()) { it.toLong() }
+        val excludedCategories = preferences.updateCategoriesExclude().get().mapTo(HashSet()) { it.toLong() }
         val updateRestrictions = preferences.autoUpdateMangaRestrictions().get()
 
         return libraryManga.filter {
-            val included = includedCategories.isEmpty() || it.categories.intersect(includedCategories).isNotEmpty()
-            val excluded = it.categories.intersect(excludedCategories).isNotEmpty()
+            val included = includedCategories.isEmpty() || it.categories.any { cat -> cat in includedCategories }
+            val excluded = it.categories.any { cat -> cat in excludedCategories }
             included && !excluded
         }
             .fastCountNot {
@@ -102,7 +102,7 @@ class StatsScreenModel(
     }
 
     private suspend fun getMangaTrackMap(libraryManga: List<LibraryManga>): Map<Long, List<Track>> {
-        val loggedInTrackerIds = loggedInTrackers.map { it.id }.toHashSet()
+        val loggedInTrackerIds = loggedInTrackers.mapTo(HashSet()) { it.id }
         return libraryManga.associate { manga ->
             val tracks = getTracks.await(manga.id)
                 .fastFilter { it.trackerId in loggedInTrackerIds }
@@ -112,21 +112,17 @@ class StatsScreenModel(
     }
 
     private fun getScoredMangaTrackMap(mangaTrackMap: Map<Long, List<Track>>): Map<Long, List<Track>> {
-        return mangaTrackMap.mapNotNull { (mangaId, tracks) ->
-            val trackList = tracks.mapNotNull { track ->
-                track.takeIf { it.score > 0.0 }
+        return buildMap {
+            mangaTrackMap.forEach { (mangaId, tracks) ->
+                val trackList = tracks.filter { it.score > 0.0 }
+                if (trackList.isNotEmpty()) put(mangaId, trackList)
             }
-            if (trackList.isEmpty()) return@mapNotNull null
-            mangaId to trackList
-        }.toMap()
+        }
     }
 
     private fun getTrackMeanScore(scoredMangaTrackMap: Map<Long, List<Track>>): Double {
-        return scoredMangaTrackMap
-            .map { (_, tracks) ->
-                tracks.map(::get10PointScore).average()
-            }
-            .fastFilter { !it.isNaN() }
+        return scoredMangaTrackMap.values
+            .mapNotNull { tracks -> tracks.map(::get10PointScore).average().takeIf { !it.isNaN() } }
             .average()
     }
 

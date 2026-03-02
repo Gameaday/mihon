@@ -144,12 +144,13 @@ object SettingsDownloadScreen : SearchableSettings {
         val excluded by downloadNewChapterCategoriesExcludePref.collectAsState()
         var showDialog by rememberSaveable { mutableStateOf(false) }
         if (showDialog) {
+            val categoryById = remember(allCategories) { allCategories.associateBy { it.id.toString() } }
             TriStateListDialog(
                 title = stringResource(MR.strings.categories),
                 message = stringResource(MR.strings.pref_download_new_categories_details),
                 items = allCategories,
-                initialChecked = included.mapNotNull { id -> allCategories.find { it.id.toString() == id } },
-                initialInversed = excluded.mapNotNull { id -> allCategories.find { it.id.toString() == id } },
+                initialChecked = included.mapNotNull { categoryById[it] },
+                initialInversed = excluded.mapNotNull { categoryById[it] },
                 itemLabel = { it.visualName },
                 onDismissRequest = { showDialog = false },
                 onValueChanged = { newIncluded, newExcluded ->

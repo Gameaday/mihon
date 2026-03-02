@@ -77,6 +77,9 @@ class SourcesFilterScreenModel(
 
             val isEmpty: Boolean
                 get() = items.isEmpty()
+
+            /** Pre-parsed as `Long` IDs for O(1) membership checks without String allocation. */
+            val disabledSourceIds: Set<Long> by lazy { disabledSources.mapTo(HashSet()) { it.toLong() } }
         }
     }
 }

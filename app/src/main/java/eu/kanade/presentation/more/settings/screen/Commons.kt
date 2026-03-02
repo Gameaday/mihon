@@ -20,11 +20,12 @@ fun getCategoriesLabel(
 ): String {
     val context = LocalContext.current
 
+    val categoryById = allCategories.associateBy { it.id }
     val includedCategories = included
-        .mapNotNull { id -> allCategories.find { it.id == id.toLong() } }
+        .mapNotNull { id -> categoryById[id.toLong()] }
         .sortedBy { it.order }
     val excludedCategories = excluded
-        .mapNotNull { id -> allCategories.find { it.id == id.toLong() } }
+        .mapNotNull { id -> categoryById[id.toLong()] }
         .sortedBy { it.order }
     val allExcluded = excludedCategories.size == allCategories.size
 

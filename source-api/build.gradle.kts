@@ -13,7 +13,6 @@ kotlin {
             dependencies {
                 api(kotlinx.serialization.json)
                 api(libs.injekt)
-                api(libs.rxjava)
                 api(libs.jsoup)
 
                 implementation(project.dependencies.platform(compose.bom))

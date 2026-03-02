@@ -11,7 +11,6 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -81,6 +80,8 @@ import eu.kanade.tachiyomi.util.system.isNightMode
 import eu.kanade.tachiyomi.util.system.openInBrowser
 import eu.kanade.tachiyomi.util.system.toShareIntent
 import eu.kanade.tachiyomi.util.system.toast
+import eu.kanade.tachiyomi.util.view.applyHighRefreshRate
+import eu.kanade.tachiyomi.util.view.overrideTransitionCompat
 import eu.kanade.tachiyomi.util.view.setComposeContent
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -145,21 +146,14 @@ class ReaderActivity : BaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         registerSecureActivity(this)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            overrideActivityTransition(
+        overrideTransitionCompat(
                 OVERRIDE_TRANSITION_OPEN,
                 R.anim.shared_axis_x_push_enter,
                 R.anim.shared_axis_x_push_exit,
             )
-        } else {
-            @Suppress("DEPRECATION")
-            overridePendingTransition(R.anim.shared_axis_x_push_enter, R.anim.shared_axis_x_push_exit)
-        }
 
         enableEdgeToEdge()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            window.isNavigationBarContrastEnforced = false
-        }
+        window.isNavigationBarContrastEnforced = false
         windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         super.onCreate(savedInstanceState)
@@ -383,16 +377,11 @@ class ReaderActivity : BaseActivity() {
     override fun finish() {
         viewModel.onActivityFinish()
         super.finish()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            overrideActivityTransition(
-                OVERRIDE_TRANSITION_CLOSE,
-                R.anim.shared_axis_x_pop_enter,
-                R.anim.shared_axis_x_pop_exit,
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            overridePendingTransition(R.anim.shared_axis_x_pop_enter, R.anim.shared_axis_x_pop_exit)
-        }
+        overrideTransitionCompat(
+            OVERRIDE_TRANSITION_CLOSE,
+            R.anim.shared_axis_x_pop_enter,
+            R.anim.shared_axis_x_pop_exit,
+        )
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
@@ -842,6 +831,9 @@ class ReaderActivity : BaseActivity() {
          * Initializes the reader subscriptions.
          */
         init {
+            // Request the highest available display refresh rate for smooth page transitions.
+            window.applyHighRefreshRate()
+
             readerPreferences.readerTheme().changes()
                 .onEach { theme ->
                     binding.readerContainer.setBackgroundColor(

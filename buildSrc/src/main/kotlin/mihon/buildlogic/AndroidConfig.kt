@@ -6,9 +6,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget as KotlinJvmTarget
 object AndroidConfig {
     const val COMPILE_SDK = 36
     const val TARGET_SDK = 36
-    const val MIN_SDK = 26
+    const val MIN_SDK = 30
 
     // https://youtrack.jetbrains.com/issue/KT-66995/JvmTarget-and-JavaVersion-compatibility-for-easier-JVM-version-setup
-    val JavaVersion = GradleJavaVersion.VERSION_21
-    val JvmTarget = KotlinJvmTarget.JVM_21
+    val JavaVersion = GradleJavaVersion.VERSION_17
+    val JvmTarget = KotlinJvmTarget.JVM_17
 }

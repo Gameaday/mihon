@@ -7,8 +7,6 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
@@ -33,7 +31,6 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.EASE_IN_OUT_QUAD
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.EASE_OUT_QUAD
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE
-import com.github.chrisbanes.photoview.PhotoView
 import eu.kanade.domain.base.BasePreferences
 import eu.kanade.tachiyomi.data.coil.cropBorders
 import eu.kanade.tachiyomi.data.coil.customDecoder
@@ -48,10 +45,9 @@ import uy.kohesive.injekt.api.get
 /**
  * A wrapper view for showing page image.
  *
- * Animated image will be drawn by [PhotoView] while [SubsamplingScaleImageView] will take non-animated image.
- *
- * @param isWebtoon if true, [WebtoonSubsamplingImageView] will be used instead of [SubsamplingScaleImageView]
- * and [AppCompatImageView] will be used instead of [PhotoView]
+ * Animated images are displayed by [AppCompatImageView] while [SubsamplingScaleImageView] will
+ * take non-animated images. In webtoon mode, [WebtoonSubsamplingImageView] is used instead of
+ * [SubsamplingScaleImageView].
  */
 open class ReaderPageImageView @JvmOverloads constructor(
     context: Context,
@@ -348,37 +344,9 @@ open class ReaderPageImageView @JvmOverloads constructor(
         if (pageView is AppCompatImageView) return
         removeView(pageView)
 
-        pageView = if (isWebtoon) {
-            AppCompatImageView(context)
-        } else {
-            PhotoView(context)
-        }.apply {
+        pageView = AppCompatImageView(context).apply {
             adjustViewBounds = true
-
-            if (this is PhotoView) {
-                setScaleLevels(1F, 2F, MAX_ZOOM_SCALE)
-                // Force 2 scale levels on double tap
-                setOnDoubleTapListener(
-                    object : GestureDetector.SimpleOnGestureListener() {
-                        override fun onDoubleTap(e: MotionEvent): Boolean {
-                            if (scale > 1F) {
-                                setScale(1F, e.x, e.y, true)
-                            } else {
-                                setScale(2F, e.x, e.y, true)
-                            }
-                            return true
-                        }
-
-                        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                            this@ReaderPageImageView.onViewClicked()
-                            return super.onSingleTapConfirmed(e)
-                        }
-                    },
-                )
-                setOnScaleChangeListener { _, _, _ ->
-                    this@ReaderPageImageView.onScaleChanged(scale)
-                }
-            }
+            setOnClickListener { this@ReaderPageImageView.onViewClicked() }
         }
         addView(pageView, MATCH_PARENT, MATCH_PARENT)
     }
@@ -387,10 +355,6 @@ open class ReaderPageImageView @JvmOverloads constructor(
         data: Any,
         config: Config,
     ) = (pageView as? AppCompatImageView)?.apply {
-        if (this is PhotoView) {
-            setZoomTransitionDuration(config.zoomDuration.getSystemScaledDuration())
-        }
-
         val request = ImageRequest.Builder(context)
             .data(data)
             .memoryCachePolicy(CachePolicy.DISABLED)
