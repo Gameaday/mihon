@@ -65,6 +65,30 @@ class CoverSearchScreenModel(
         fetchFromSources(query)
     }
 
+    /**
+     * Deduplicate cover results by thumbnail URL.
+     * When multiple sources return the same URL, keeps the first occurrence
+     * and merges the source names from subsequent duplicates.
+     */
+    private fun deduplicateResults(results: List<CoverResult>): List<CoverResult> {
+        val seen = linkedMapOf<String, CoverResult>()
+        for (result in results) {
+            val existing = seen[result.thumbnailUrl]
+            if (existing != null) {
+                if (result.sourceName !in existing.additionalSourceNames &&
+                    result.sourceName != existing.sourceName
+                ) {
+                    seen[result.thumbnailUrl] = existing.copy(
+                        additionalSourceNames = existing.additionalSourceNames + result.sourceName,
+                    )
+                }
+            } else {
+                seen[result.thumbnailUrl] = result
+            }
+        }
+        return seen.values.toList()
+    }
+
     private fun fetchFromSources(query: String) {
         searchJob?.cancel()
 
@@ -104,7 +128,7 @@ class CoverSearchScreenModel(
                         if (isActive && covers.isNotEmpty()) {
                             mutableState.update { state ->
                                 state.copy(
-                                    results = state.results + covers,
+                                    results = deduplicateResults(state.results + covers),
                                     progress = state.progress + 1,
                                 )
                             }
@@ -174,4 +198,7 @@ data class CoverResult(
     val sourceName: String,
     val sourceId: Long,
     val mangaTitle: String,
-)
+    val additionalSourceNames: List<String> = emptyList(),
+) {
+    val sourceCount: Int get() = 1 + additionalSourceNames.size
+}

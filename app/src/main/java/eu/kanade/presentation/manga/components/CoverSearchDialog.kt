@@ -110,7 +110,7 @@ fun CoverSearchDialog(
             ) {
                 items(
                     items = state.results,
-                    key = { "${it.sourceId}_${it.thumbnailUrl}" },
+                    key = { it.thumbnailUrl },
                 ) { cover ->
                     CoverSearchItem(
                         cover = cover,
@@ -144,7 +144,11 @@ private fun CoverSearchItem(
                 .clip(MaterialTheme.shapes.extraSmall),
         )
         Text(
-            text = cover.sourceName,
+            text = if (cover.sourceCount > 1) {
+                stringResource(MR.strings.cover_search_source_count, cover.sourceName, cover.sourceCount - 1)
+            } else {
+                cover.sourceName
+            },
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
