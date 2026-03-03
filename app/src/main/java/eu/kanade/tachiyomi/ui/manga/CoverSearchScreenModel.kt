@@ -148,12 +148,23 @@ class CoverSearchScreenModel(
     )
 
     companion object {
+        private const val MAX_CACHE_ENTRIES = 20
+
         /**
-         * In-memory cache of cover search results keyed by manga title.
+         * In-memory LRU cache of cover search results keyed by manga title.
          * Persists across screen model instances within the same app session,
          * so reopening the cover search for the same manga is instant and free.
+         * Bounded to [MAX_CACHE_ENTRIES] to prevent unbounded memory growth.
          */
-        private val coverResultsCache = mutableMapOf<String, List<CoverResult>>()
+        private val coverResultsCache = object : LinkedHashMap<String, List<CoverResult>>(
+            MAX_CACHE_ENTRIES + 1,
+            0.75f,
+            true,
+        ) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<CoverResult>>): Boolean {
+                return size > MAX_CACHE_ENTRIES
+            }
+        }
     }
 }
 

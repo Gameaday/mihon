@@ -164,14 +164,13 @@ class MangaCoverScreenModel(
                 val networkHelper: NetworkHelper = Injekt.get()
                 val request = Request.Builder().url(coverUrl).build()
                 val response = networkHelper.client.newCall(request).await()
-                if (!response.isSuccessful) {
-                    response.close()
-                    throw IllegalStateException("Failed to download cover: ${response.code}")
-                }
-                val body = response.body
-
-                body.byteStream().use { input ->
-                    manga.editCover(Injekt.get(), input, updateManga, coverCache)
+                response.use {
+                    if (!it.isSuccessful) {
+                        throw IllegalStateException("Failed to download cover: ${it.code}")
+                    }
+                    it.body.byteStream().use { input ->
+                        manga.editCover(Injekt.get(), input, updateManga, coverCache)
+                    }
                 }
                 notifyCoverUpdated(context)
             } catch (e: Exception) {
