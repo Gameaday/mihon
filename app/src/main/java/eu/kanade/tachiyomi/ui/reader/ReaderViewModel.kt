@@ -661,13 +661,13 @@ class ReaderViewModel @JvmOverloads constructor(
             readerChapter.chapter.last_page_read = pageIndex
 
             // A page is the effective last page either when it literally is the last page
-            // in the chapter's page list, or when it is a merged page (mergedBytes != null)
+            // in the chapter's page list, or when it is a merged page (mergedBitmap != null)
             // and all subsequent pages in the list were absorbed as stubs. This ensures the
             // chapter is marked as read even when the final page(s) are watermark stubs that
             // get merged invisibly into the previous page.
             val isEffectivelyLastPage = pageIndex == chapterPages?.lastIndex ||
                 (
-                    (page as? ReaderPage)?.mergedBytes != null &&
+                    (page as? ReaderPage)?.mergedBitmap != null &&
                         chapterPages?.drop(pageIndex + 1)?.all { it.isAbsorbed } == true
                     )
             if (isEffectivelyLastPage) {
@@ -947,8 +947,14 @@ class ReaderViewModel @JvmOverloads constructor(
             try {
                 // If the page was smart-combined with a stub, save the merged image so the saved
                 // file reflects exactly what the reader showed rather than just the first page.
-                val inputStream: () -> InputStream = page.mergedBytes?.let { bytes ->
-                    { bytes.inputStream() }
+                // The bitmap is encoded to PNG on-the-fly — this is a rare, user-triggered
+                // action so the one-time encode cost is negligible.
+                val inputStream: () -> InputStream = page.mergedBitmap?.let { bitmap ->
+                    {
+                        val buffer = okio.Buffer()
+                        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, buffer.outputStream())
+                        buffer.inputStream()
+                    }
                 } ?: page.stream!!
                 val uri = imageSaver.save(
                     image = Image.Page(
@@ -990,8 +996,12 @@ class ReaderViewModel @JvmOverloads constructor(
                 destDir.deleteRecursively()
                 // If the page was smart-combined with a stub, share the merged image so the
                 // recipient sees the same combined view that the reader displayed.
-                val inputStream: () -> InputStream = page.mergedBytes?.let { bytes ->
-                    { bytes.inputStream() }
+                val inputStream: () -> InputStream = page.mergedBitmap?.let { bitmap ->
+                    {
+                        val buffer = okio.Buffer()
+                        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, buffer.outputStream())
+                        buffer.inputStream()
+                    }
                 } ?: page.stream!!
                 val uri = imageSaver.save(
                     image = Image.Page(

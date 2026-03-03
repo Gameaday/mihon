@@ -30,6 +30,7 @@ import tachiyomi.decoder.Format
 import tachiyomi.decoder.ImageDecoder
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
@@ -125,11 +126,10 @@ object ImageUtil {
     }
 
     /**
-     * Default lossless encoder for transient reader buffers (splits, merges, rotations).
+     * Lossless encoder used only for **persistent** disk operations (download tall-image splits).
      *
-     * PNG is used because SubsamplingScaleImageView decodes via [BitmapRegionDecoder] /
-     * [BitmapFactory], which do not support JXL on API < 34. PNG is universally
-     * decodable and fast enough for temporary images that are never written to disk.
+     * Reader transforms (split, rotate, merge) return [Bitmap] directly — no encoding is
+     * needed since [SubsamplingScaleImageView] accepts bitmaps via [ImageSource.bitmap].
      *
      * Callers that persist to disk should supply their own encoder via
      * [ImageFormat.encoder()][tachiyomi.domain.library.service.LibraryPreferences.ImageFormat].
@@ -139,52 +139,44 @@ object ImageUtil {
     }
 
     /**
-     * Extract the 'side' part from [BufferedSource] and return it as [BufferedSource].
+     * Extract the [side] half from [imageSource] and return it as a [Bitmap].
+     *
+     * Uses [android.graphics.ImageDecoder] with [setCrop][android.graphics.ImageDecoder.setCrop]
+     * so only the requested half is decoded — halving peak memory compared to decoding the
+     * full image and copying pixels with [Canvas].
      */
-    fun splitInHalf(imageSource: BufferedSource, side: Side, encoder: (Bitmap, OutputStream) -> Unit = defaultEncoder): BufferedSource {
-        val imageBitmap = BitmapFactory.decodeStream(imageSource.inputStream())
-        val height = imageBitmap.height
-        val width = imageBitmap.width
-
-        val singlePage = Rect(0, 0, width / 2, height)
-
-        val half = createBitmap(width / 2, height)
-        val part = when (side) {
-            Side.RIGHT -> Rect(width - width / 2, 0, width, height)
-            Side.LEFT -> Rect(0, 0, width / 2, height)
+    fun splitInHalf(imageSource: BufferedSource, side: Side): Bitmap {
+        val bytes = imageSource.readByteArray()
+        val source = android.graphics.ImageDecoder.createSource(ByteBuffer.wrap(bytes))
+        return android.graphics.ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
+            val width = info.size.width
+            val height = info.size.height
+            decoder.allocator = android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
+            decoder.setCrop(
+                when (side) {
+                    Side.RIGHT -> Rect(width - width / 2, 0, width, height)
+                    Side.LEFT -> Rect(0, 0, width / 2, height)
+                },
+            )
         }
-        half.applyCanvas {
-            drawBitmap(imageBitmap, part, singlePage, null)
-        }
-        imageBitmap.recycle()
-        val output = Buffer()
-        encoder(half, output.outputStream())
-        half.recycle()
-
-        return output
-    }
-
-    fun rotateImage(imageSource: BufferedSource, degrees: Float, encoder: (Bitmap, OutputStream) -> Unit = defaultEncoder): BufferedSource {
-        val imageBitmap = BitmapFactory.decodeStream(imageSource.inputStream())
-        val rotated = rotateBitMap(imageBitmap, degrees)
-        imageBitmap.recycle()
-
-        val output = Buffer()
-        encoder(rotated, output.outputStream())
-        rotated.recycle()
-
-        return output
     }
 
     /**
-     * If [imageSource] is a wide (double-page spread) image, rotate it by [degrees];
-     * otherwise return [imageSource] unchanged.
-     *
-     * @param degrees rotation angle in degrees; positive values rotate clockwise,
-     * negative values rotate counter-clockwise.
+     * Decode [imageSource] and rotate the resulting [Bitmap] by [degrees].
      */
-    fun rotateDualPageIfWide(imageSource: BufferedSource, degrees: Float, encoder: (Bitmap, OutputStream) -> Unit = defaultEncoder): BufferedSource =
-        if (isWideImage(imageSource)) rotateImage(imageSource, degrees, encoder) else imageSource
+    fun rotateImage(imageSource: BufferedSource, degrees: Float): Bitmap {
+        val imageBitmap = BitmapFactory.decodeStream(imageSource.inputStream())
+        val rotated = rotateBitMap(imageBitmap, degrees)
+        imageBitmap.recycle()
+        return rotated
+    }
+
+    /**
+     * If [imageSource] is a wide (double-page spread) image, rotate it by [degrees]
+     * and return the resulting [Bitmap]; otherwise return `null`.
+     */
+    fun rotateDualPageIfWide(imageSource: BufferedSource, degrees: Float): Bitmap? =
+        if (isWideImage(imageSource)) rotateImage(imageSource, degrees) else null
 
     private fun rotateBitMap(bitmap: Bitmap, degrees: Float): Bitmap {
         val matrix = Matrix().apply { postRotate(degrees) }
@@ -192,9 +184,10 @@ object ImageUtil {
     }
 
     /**
-     * Split the image into left and right parts, then merge them into a new image.
+     * Split the image into left and right parts, then merge them into a new [Bitmap]
+     * with the [upperSide] half on top.
      */
-    fun splitAndMerge(imageSource: BufferedSource, upperSide: Side, encoder: (Bitmap, OutputStream) -> Unit = defaultEncoder): BufferedSource {
+    fun splitAndMerge(imageSource: BufferedSource, upperSide: Side): Bitmap {
         val imageBitmap = BitmapFactory.decodeStream(imageSource.inputStream())
         val height = imageBitmap.height
         val width = imageBitmap.width
@@ -217,11 +210,7 @@ object ImageUtil {
             drawBitmap(imageBitmap, leftPart, bottomPart, null)
         }
         imageBitmap.recycle()
-
-        val output = Buffer()
-        encoder(result, output.outputStream())
-        result.recycle()
-        return output
+        return result
     }
 
     /**
@@ -286,8 +275,10 @@ object ImageUtil {
 
     /**
      * Combine two images vertically, placing the second image below the first.
+     * Returns a [Bitmap]; the caller decides whether to display it directly
+     * (reader) or encode it for disk persistence (downloader).
      */
-    fun mergePages(topSource: BufferedSource, bottomSource: BufferedSource, encoder: (Bitmap, OutputStream) -> Unit = defaultEncoder): BufferedSource {
+    fun mergePages(topSource: BufferedSource, bottomSource: BufferedSource): Bitmap {
         val topBitmap = BitmapFactory.decodeStream(topSource.inputStream())
         val bottomBitmap = BitmapFactory.decodeStream(bottomSource.inputStream())
 
@@ -299,11 +290,7 @@ object ImageUtil {
         }
         topBitmap.recycle()
         bottomBitmap.recycle()
-
-        val output = Buffer()
-        encoder(result, output.outputStream())
-        result.recycle()
-        return output
+        return result
     }
 
     enum class Side {

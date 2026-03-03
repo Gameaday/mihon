@@ -2,7 +2,9 @@ package eu.kanade.tachiyomi.ui.reader.viewer.pager
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
 import eu.kanade.presentation.util.formattedMessage
@@ -138,10 +140,10 @@ class PagerPageHolder(
      * Called when the page is queued.
      */
     private fun setQueued() {
-        // mergedBytes is intentionally NOT cleared here. If this page was previously merged
+        // mergedBitmap is intentionally NOT cleared here. If this page was previously merged
         // with a stub, the merge result is still valid even after a re-queue (e.g. when the
         // chapter-cache evicts the original image). setImage() will take the instant fast path
-        // using the cached bytes, so the user never sees a loading indicator or a brief
+        // using the cached bitmap, so the user never sees a loading indicator or a brief
         // unmerged image while the original re-downloads.
         initProgressIndicator()
         progressIndicator?.show()
@@ -168,55 +170,91 @@ class PagerPageHolder(
 
     /**
      * Called when the page is ready.
+     *
+     * The render pipeline has two paths:
+     * - **Bitmap path** (transform or cached merge): the [Bitmap] is passed directly to
+     *   [SubsamplingScaleImageView] via [ReaderPageImageView.setImage] — no encoding or
+     *   stream re-decoding is needed.
+     * - **Source path** (untransformed original): the raw [BufferedSource] is fed to SSIV
+     *   which uses [BitmapRegionDecoder] for efficient tiled display.
      */
     private suspend fun setImage() {
         progressIndicator?.setProgress(0)
 
-        // Fast path: if this page was already merged with its stub, use the cached bytes
+        // Fast path: if this page was already merged with its stub, use the cached bitmap
         // directly and skip re-opening the original streams entirely. This makes scrubbing
         // back to a merged page instant with zero extra I/O or network calls.
-        // streamFn is only needed when there is no cache; capturing it before the suspend
-        // point guards against the stream reference being cleared on another thread.
-        val cachedMerge = page.mergedBytes
-        val streamFn = if (cachedMerge == null) page.stream ?: return else null
+        val cachedBitmap = page.mergedBitmap
+        val streamFn = if (cachedBitmap == null) page.stream ?: return else null
 
         try {
-            val (source, isAnimated, background) = withIOContext {
-                val source = if (cachedMerge != null) {
-                    // Write the cached byte array directly into a Buffer —
-                    // no intermediate InputStream or stream copy needed.
-                    Buffer().write(cachedMerge)
+            /**
+             * Intermediate result from the IO context that carries everything the UI
+             * thread needs to display the page. Exactly one of [source]/[bitmap] is non-null.
+             */
+            class RenderData(
+                val source: BufferedSource?,
+                val bitmap: Bitmap?,
+                val isAnimated: Boolean,
+                val background: Drawable?,
+            )
+
+            val result = withIOContext {
+                if (cachedBitmap != null) {
+                    cachedPageWidth = cachedBitmap.width
+                    cachedPageHeight = cachedBitmap.height
+                    RenderData(null, cachedBitmap, false, null)
                 } else {
-                    checkNotNull(streamFn)().use { process(item, Buffer().readFrom(it)) }
+                    val source = checkNotNull(streamFn)().use { Buffer().readFrom(it) }
+                    val bitmap = process(item, source)
+                    if (bitmap != null) {
+                        // Transform produced a Bitmap — display it directly.
+                        cachedPageWidth = bitmap.width
+                        cachedPageHeight = bitmap.height
+                        RenderData(null, bitmap, false, null)
+                    } else {
+                        // No transform — pass original source through for tiled decoding.
+                        val dimOpts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                        BitmapFactory.decodeStream(source.peek().inputStream(), null, dimOpts)
+                        cachedPageWidth = dimOpts.outWidth
+                        cachedPageHeight = dimOpts.outHeight
+                        val isAnimated = ImageUtil.isAnimatedAndSupported(source)
+                        val background = if (!isAnimated && viewer.config.automaticBackground) {
+                            ImageUtil.chooseBackground(context, source.peek().inputStream())
+                        } else {
+                            null
+                        }
+                        RenderData(source, null, isAnimated, background)
+                    }
                 }
-                // Cache displayed image dimensions so setupSmartCombineRetry can perform
-                // a header-only stub check without re-buffering the stream.
-                val dimOpts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                BitmapFactory.decodeStream(source.peek().inputStream(), null, dimOpts)
-                cachedPageWidth = dimOpts.outWidth
-                cachedPageHeight = dimOpts.outHeight
-                val isAnimated = ImageUtil.isAnimatedAndSupported(source)
-                val background = if (!isAnimated && viewer.config.automaticBackground) {
-                    ImageUtil.chooseBackground(context, source.peek().inputStream())
-                } else {
-                    null
-                }
-                Triple(source, isAnimated, background)
             }
             withUIContext {
-                setImage(
-                    source,
-                    isAnimated,
-                    Config(
-                        zoomDuration = viewer.config.doubleTapAnimDuration,
-                        minimumScaleType = viewer.config.imageScaleType,
-                        cropBorders = viewer.config.imageCropBorders,
-                        zoomStartPosition = viewer.config.imageZoomType,
-                        landscapeZoom = viewer.config.landscapeZoom,
-                    ),
-                )
-                if (!isAnimated) {
-                    pageBackground = background
+                if (result.bitmap != null) {
+                    setImage(
+                        result.bitmap,
+                        Config(
+                            zoomDuration = viewer.config.doubleTapAnimDuration,
+                            minimumScaleType = viewer.config.imageScaleType,
+                            cropBorders = viewer.config.imageCropBorders,
+                            zoomStartPosition = viewer.config.imageZoomType,
+                            landscapeZoom = viewer.config.landscapeZoom,
+                        ),
+                    )
+                } else {
+                    setImage(
+                        result.source!!,
+                        result.isAnimated,
+                        Config(
+                            zoomDuration = viewer.config.doubleTapAnimDuration,
+                            minimumScaleType = viewer.config.imageScaleType,
+                            cropBorders = viewer.config.imageCropBorders,
+                            zoomStartPosition = viewer.config.imageZoomType,
+                            landscapeZoom = viewer.config.landscapeZoom,
+                        ),
+                    )
+                    if (!result.isAnimated) {
+                        pageBackground = result.background
+                    }
                 }
                 removeErrorLayout()
             }
@@ -241,7 +279,7 @@ class PagerPageHolder(
         smartCombineRetryJob?.cancel()
         if (!viewer.config.smartCombine || page is InsertPage) return
         // Already merged while the page was loading — no retry needed.
-        if (page.mergedBytes != null) return
+        if (page.mergedBitmap != null) return
         val nextPage = page.chapter.pages?.getOrNull(page.index + 1) ?: return
         // If the next page was already ready, trySmartCombine already had a chance to handle it.
         if (nextPage.status == Page.State.Ready) return
@@ -252,7 +290,7 @@ class PagerPageHolder(
             // view hierarchy, i.e. the page holder is still on screen.
             if (!isAttachedToWindow()) return@launch
             // The merge may have been completed by another path while we were waiting.
-            if (page.mergedBytes != null) return@launch
+            if (page.mergedBitmap != null) return@launch
             // Use the cached dimensions of the current page so no stream re-read is needed.
             val nextStreamFn = nextPage.stream ?: return@launch
             try {
@@ -264,14 +302,20 @@ class PagerPageHolder(
         }
     }
 
-    private fun process(page: ReaderPage, imageSource: BufferedSource): BufferedSource {
+    /**
+     * Apply reader transforms (rotation, split, smart combine) to the source image.
+     *
+     * @return a [Bitmap] if a transform was applied, or `null` if the original
+     *         [imageSource] should be used as-is for tiled decoding.
+     */
+    private fun process(page: ReaderPage, imageSource: BufferedSource): Bitmap? {
         if (viewer.config.dualPageRotateToFit) {
             val degrees = if (viewer.config.dualPageRotateToFitInvert) -90f else 90f
-            return ImageUtil.rotateDualPageIfWide(imageSource, degrees, viewer.config.readerEncoder)
+            return ImageUtil.rotateDualPageIfWide(imageSource, degrees)
         }
 
         if (!viewer.config.dualPageSplit) {
-            return trySmartCombine(page, imageSource) ?: imageSource
+            return trySmartCombine(page, imageSource)
         }
 
         if (page is InsertPage) {
@@ -280,7 +324,7 @@ class PagerPageHolder(
 
         val isDoublePage = ImageUtil.isWideImage(imageSource)
         if (!isDoublePage) {
-            return trySmartCombine(page, imageSource) ?: imageSource
+            return trySmartCombine(page, imageSource)
         }
 
         onPageSplit(page)
@@ -288,7 +332,7 @@ class PagerPageHolder(
         return splitInHalf(imageSource)
     }
 
-    private fun trySmartCombine(page: ReaderPage, imageSource: BufferedSource): BufferedSource? {
+    private fun trySmartCombine(page: ReaderPage, imageSource: BufferedSource): Bitmap? {
         if (!viewer.config.smartCombine || page is InsertPage) return null
         val nextPage = page.chapter.pages?.getOrNull(page.index + 1) ?: return null
         if (nextPage.status != Page.State.Ready) return null
@@ -305,26 +349,22 @@ class PagerPageHolder(
         // Confirmed stub and non-animated: load the full next-page stream for bitmap decoding.
         val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
         return try {
-            val mergedBuffer = ImageUtil.mergePages(imageSource, nextSource, viewer.config.readerEncoder)
-            // Persist merged bytes on the page so every subsequent render (scrubbing back,
+            val mergedBitmap = ImageUtil.mergePages(imageSource, nextSource)
+            // Persist merged bitmap on the page so every subsequent render (scrubbing back,
             // refreshAdapter, etc.) returns the cached result instantly — no re-merge,
             // no extra stream opens, no extra network or disk I/O.
-            // readByteArray() reads and removes all bytes from mergedBuffer in one pass.
-            val mergedBytes = mergedBuffer.readByteArray()
-            page.mergedBytes = mergedBytes
+            page.mergedBitmap = mergedBitmap
             // Absorb the stub only after a successful merge so that a decode failure
             // does not silently remove a page from the reader.
             onPageAbsorb(nextPage)
-            // Write the already-extracted byte array directly into a fresh Buffer —
-            // no intermediate InputStream needed.
-            Buffer().write(mergedBytes)
+            mergedBitmap
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Smart combine merge failed; showing pages separately" }
             null
         }
     }
 
-    private fun splitInHalf(imageSource: BufferedSource): BufferedSource {
+    private fun splitInHalf(imageSource: BufferedSource): Bitmap {
         var side = when {
             viewer is L2RPagerViewer && page is InsertPage -> ImageUtil.Side.RIGHT
             viewer !is L2RPagerViewer && page is InsertPage -> ImageUtil.Side.LEFT
@@ -340,7 +380,7 @@ class PagerPageHolder(
             }
         }
 
-        return ImageUtil.splitInHalf(imageSource, side, viewer.config.readerEncoder)
+        return ImageUtil.splitInHalf(imageSource, side)
     }
 
     private fun onPageSplit(page: ReaderPage) {

@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.model
 
+import android.graphics.Bitmap
 import eu.kanade.tachiyomi.source.model.Page
 import java.io.InputStream
 
@@ -13,13 +14,13 @@ open class ReaderPage(
     open lateinit var chapter: ReaderChapter
 
     /**
-     * Cached bytes of a smart-combine merge with a following stub page.
-     * Non-null once the merge has succeeded; subsequent renders write these bytes
-     * directly into a [okio.Buffer] without opening any intermediate stream.
+     * Cached [Bitmap] of a smart-combine merge with a following stub page.
+     * Non-null once the merge has succeeded; subsequent renders pass this bitmap
+     * directly to [SubsamplingScaleImageView] without any encoding or decoding.
      * Cleared to null when the page is retried so a fresh load starts clean.
      */
     @Volatile
-    var mergedBytes: ByteArray? = null
+    var mergedBitmap: Bitmap? = null
 
     /**
      * True once this page has been absorbed by the previous page as a stub during smart combine.

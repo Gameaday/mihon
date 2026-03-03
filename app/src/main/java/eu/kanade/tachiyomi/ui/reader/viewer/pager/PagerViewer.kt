@@ -342,7 +342,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                     if (!isActive) break
 
                     val page = pages[index]
-                    if (page is InsertPage || page.mergedBytes != null || page.isAbsorbed) continue
+                    if (page is InsertPage || page.mergedBitmap != null || page.isAbsorbed) continue
 
                     // Suspend until this page finishes downloading; skip on error.
                     if (page.status != Page.State.Ready) {
@@ -380,16 +380,16 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                         // Opening the stream a second time is the deliberate trade-off: it
                         // avoids a full buffer in the ~99 % non-stub case.
                         val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
-                        val mergedBytes = ImageUtil.mergePages(currentSource, nextSource, config.readerEncoder).readByteArray()
+                        val mergedBitmap = ImageUtil.mergePages(currentSource, nextSource)
                         // Guard against a concurrent merge (per-holder retry path) that may
                         // have completed while this iteration was running.
-                        if (page.mergedBytes == null) {
-                            // Mark the stub absorbed BEFORE committing mergedBytes so that any
-                            // concurrent check that sees mergedBytes != null also sees
+                        if (page.mergedBitmap == null) {
+                            // Mark the stub absorbed BEFORE committing mergedBitmap so that any
+                            // concurrent check that sees mergedBitmap != null also sees
                             // isAbsorbed == true — preventing the stub from reappearing in the
                             // adapter when setChapters rebuilds items (e.g. after a chapter switch).
                             nextPage.isAbsorbed = true
-                            page.mergedBytes = mergedBytes
+                            page.mergedBitmap = mergedBitmap
                             // onPageAbsorb uses activity.runOnUiThread internally, so it is NOT
                             // affected by coroutine cancellation and will always post the adapter
                             // update to the main thread even if preScanJob is cancelled right here.

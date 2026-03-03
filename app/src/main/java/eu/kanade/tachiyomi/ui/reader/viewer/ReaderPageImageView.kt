@@ -1,6 +1,7 @@
 package eu.kanade.tachiyomi.ui.reader.viewer
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.RectF
 import android.graphics.drawable.Animatable
@@ -154,6 +155,17 @@ open class ReaderPageImageView @JvmOverloads constructor(
             prepareNonAnimatedImageView()
             setNonAnimatedImage(drawable, config)
         }
+    }
+
+    /**
+     * Display a [Bitmap] that was produced by an in-memory transform (split, rotate, merge).
+     * The bitmap is passed directly to [SubsamplingScaleImageView] via [ImageSource.bitmap] —
+     * no encoding or stream re-decoding is needed.
+     */
+    fun setImage(bitmap: Bitmap, config: Config) {
+        this.config = config
+        prepareNonAnimatedImageView()
+        setNonAnimatedImage(BitmapDrawable(context.resources, bitmap), config)
     }
 
     fun setImage(source: BufferedSource, isAnimated: Boolean, config: Config) {

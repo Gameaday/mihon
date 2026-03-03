@@ -1,14 +1,11 @@
 package eu.kanade.tachiyomi.ui.reader.viewer
 
-import android.graphics.Bitmap
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import tachiyomi.core.common.preference.Preference
-import tachiyomi.core.common.util.system.ImageUtil
-import java.io.OutputStream
 
 /**
  * Common configuration for all viewers.
@@ -50,18 +47,6 @@ abstract class ViewerConfig(
 
     var smartCombine = false
         protected set
-
-    /**
-     * Lossless encoder for transient reader buffers (splits, merges, rotations).
-     *
-     * Always PNG — SubsamplingScaleImageView decodes via [BitmapRegionDecoder] /
-     * [BitmapFactory], which do not support JXL on API < 34. PNG is universally
-     * decodable and fast enough for temporary images that are never written to disk.
-     *
-     * Persistent storage (covers, download splits) uses the user's [ImageFormat]
-     * preference via [ImageFormat.encoder()][eu.kanade.tachiyomi.util.system.encoder].
-     */
-    val readerEncoder: (Bitmap, OutputStream) -> Unit = ImageUtil.defaultEncoder
 
     abstract var navigator: ViewerNavigation
         protected set

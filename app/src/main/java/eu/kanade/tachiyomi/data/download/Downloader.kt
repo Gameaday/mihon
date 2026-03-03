@@ -649,14 +649,15 @@ class Downloader(
                 // Stub confirmed: open the next page again for full bitmap decode and merge.
                 // currentSource still holds all its data (peek() was used above).
                 val nextSource = next.openInputStream().use { Buffer().readFrom(it) }
-                val mergedBytes = ImageUtil.mergePages(currentSource, nextSource, encoder).readByteArray()
+                val mergedBitmap = ImageUtil.mergePages(currentSource, nextSource)
 
                 // Write the merged image to a temp file, swap it in for the current file,
                 // and delete the stub.  Using a temp file prevents data loss if the write fails.
                 val baseName = current.name!!.substringBeforeLast(".")
                 val mergedTmp = tmpDir.createFile("$baseName.$ext.tmp")
                     ?: throw IOException("Could not create temp file for merged stub page")
-                mergedTmp.openOutputStream().use { it.write(mergedBytes) }
+                mergedTmp.openOutputStream().use { encoder(mergedBitmap, it) }
+                mergedBitmap.recycle()
                 current.delete()
                 next.delete()
                 pageFiles.removeAt(i + 1)
