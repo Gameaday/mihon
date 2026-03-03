@@ -10,32 +10,45 @@ import tachiyomi.domain.library.service.LibraryPreferences.ImageFormat
 import java.io.OutputStream
 
 /**
- * Returns an encoder function `(Bitmap, OutputStream) -> Unit` for the given [ImageFormat].
+ * Returns a lossless encoder for persisting images to disk (covers, splits, merges).
  *
- * PNG and WebP use Android's built-in [Bitmap.compress]; JXL uses `jxl-coder`'s native encoder.
- * All three produce **lossless** output.
+ * JXL uses effort 7 ("squirrel") — best compression ratio for stored files.
+ * WebP uses Android's built-in lossless encoder.
  */
 fun ImageFormat.encoder(): (Bitmap, OutputStream) -> Unit = when (this) {
-    ImageFormat.PNG -> { bitmap, os ->
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
-    }
     ImageFormat.WebP -> { bitmap, os ->
         bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, os)
     }
     ImageFormat.JXL -> { bitmap, os ->
-        // Effort 7 ("squirrel") balances compression ratio and encode speed.
-        // decodingSpeed=SLOWEST produces the smallest files (decoder can still be fast).
-        val bytes = JxlCoder.encode(
-            bitmap,
-            channelsConfiguration = if (bitmap.hasAlpha()) {
-                JxlChannelsConfiguration.RGBA
-            } else {
-                JxlChannelsConfiguration.RGB
-            },
-            compressionOption = JxlCompressionOption.LOSSLESS,
-            effort = JxlEffort.SQUIRREL,
-            decodingSpeed = JxlDecodingSpeed.SLOWEST,
-        )
-        os.write(bytes)
+        os.write(jxlEncode(bitmap, JxlEffort.SQUIRREL, JxlDecodingSpeed.SLOWEST))
     }
+}
+
+/**
+ * Returns a fast lossless encoder for transient in-memory buffers (reader display).
+ *
+ * JXL uses effort 1 ("lightning") — fastest encode, still lossless.
+ * WebP uses Android's built-in lossless encoder (no effort control available).
+ */
+fun ImageFormat.fastEncoder(): (Bitmap, OutputStream) -> Unit = when (this) {
+    ImageFormat.WebP -> { bitmap, os ->
+        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, os)
+    }
+    ImageFormat.JXL -> { bitmap, os ->
+        os.write(jxlEncode(bitmap, JxlEffort.LIGHTNING, JxlDecodingSpeed.FASTEST))
+    }
+}
+
+private fun jxlEncode(bitmap: Bitmap, effort: JxlEffort, decodingSpeed: JxlDecodingSpeed): ByteArray {
+    return JxlCoder.encode(
+        bitmap,
+        channelsConfiguration = if (bitmap.hasAlpha()) {
+            JxlChannelsConfiguration.RGBA
+        } else {
+            JxlChannelsConfiguration.RGB
+        },
+        compressionOption = JxlCompressionOption.LOSSLESS,
+        effort = effort,
+        decodingSpeed = decodingSpeed,
+    )
 }

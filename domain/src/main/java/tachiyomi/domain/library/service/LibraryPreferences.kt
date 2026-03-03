@@ -223,7 +223,7 @@ class LibraryPreferences(
     /**
      * Lossless image format for derived images (splits, merges, cover saves).
      *
-     * All three options are **lossless** — pixel-identical to the decoded source.
+     * Both options are **lossless** — pixel-identical to the decoded source.
      * Derived images start from already-compressed data, so lossy re-encoding
      * would introduce generational quality loss for marginal size benefit.
      *
@@ -231,7 +231,6 @@ class LibraryPreferences(
      * @property mime      MIME type
      */
     enum class ImageFormat(val extension: String, val mime: String) {
-        PNG("png", "image/png"),
         WebP("webp", "image/webp"),
         JXL("jxl", "image/jxl"),
     }

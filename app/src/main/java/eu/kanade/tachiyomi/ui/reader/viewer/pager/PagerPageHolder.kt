@@ -267,7 +267,7 @@ class PagerPageHolder(
     private fun process(page: ReaderPage, imageSource: BufferedSource): BufferedSource {
         if (viewer.config.dualPageRotateToFit) {
             val degrees = if (viewer.config.dualPageRotateToFitInvert) -90f else 90f
-            return ImageUtil.rotateDualPageIfWide(imageSource, degrees)
+            return ImageUtil.rotateDualPageIfWide(imageSource, degrees, viewer.config.readerEncoder)
         }
 
         if (!viewer.config.dualPageSplit) {
@@ -305,7 +305,7 @@ class PagerPageHolder(
         // Confirmed stub and non-animated: load the full next-page stream for bitmap decoding.
         val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
         return try {
-            val mergedBuffer = ImageUtil.mergePages(imageSource, nextSource)
+            val mergedBuffer = ImageUtil.mergePages(imageSource, nextSource, viewer.config.readerEncoder)
             // Persist merged bytes on the page so every subsequent render (scrubbing back,
             // refreshAdapter, etc.) returns the cached result instantly — no re-merge,
             // no extra stream opens, no extra network or disk I/O.
@@ -340,7 +340,7 @@ class PagerPageHolder(
             }
         }
 
-        return ImageUtil.splitInHalf(imageSource, side)
+        return ImageUtil.splitInHalf(imageSource, side, viewer.config.readerEncoder)
     }
 
     private fun onPageSplit(page: ReaderPage) {

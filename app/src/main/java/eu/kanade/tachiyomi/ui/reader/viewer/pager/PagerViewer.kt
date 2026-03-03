@@ -380,7 +380,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                         // Opening the stream a second time is the deliberate trade-off: it
                         // avoids a full buffer in the ~99 % non-stub case.
                         val nextSource = nextStreamFn().use { Buffer().readFrom(it) }
-                        val mergedBytes = ImageUtil.mergePages(currentSource, nextSource).readByteArray()
+                        val mergedBytes = ImageUtil.mergePages(currentSource, nextSource, config.readerEncoder).readByteArray()
                         // Guard against a concurrent merge (per-holder retry path) that may
                         // have completed while this iteration was running.
                         if (page.mergedBytes == null) {

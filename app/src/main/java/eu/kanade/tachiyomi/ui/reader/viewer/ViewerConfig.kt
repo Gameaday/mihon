@@ -1,16 +1,26 @@
 package eu.kanade.tachiyomi.ui.reader.viewer
 
+import android.graphics.Bitmap
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import eu.kanade.tachiyomi.util.system.fastEncoder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import tachiyomi.core.common.preference.Preference
+import tachiyomi.domain.library.service.LibraryPreferences
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
+import java.io.OutputStream
 
 /**
  * Common configuration for all viewers.
  */
-abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val scope: CoroutineScope) {
+abstract class ViewerConfig(
+    readerPreferences: ReaderPreferences,
+    private val scope: CoroutineScope,
+    libraryPreferences: LibraryPreferences = Injekt.get(),
+) {
 
     var imagePropertyChangedListener: (() -> Unit)? = null
 
@@ -44,6 +54,13 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
 
     var smartCombine = false
         protected set
+
+    /**
+     * Fast lossless encoder for transient reader buffers (splits, merges, rotations).
+     * Uses the user's preferred image format with low encode effort for minimal latency.
+     */
+    val readerEncoder: (Bitmap, OutputStream) -> Unit =
+        libraryPreferences.imageFormat().get().fastEncoder()
 
     abstract var navigator: ViewerNavigation
         protected set

@@ -227,8 +227,6 @@ object SettingsLibraryScreen : SearchableSettings {
                             stringResource(MR.strings.image_format_jxl),
                         LibraryPreferences.ImageFormat.WebP to
                             stringResource(MR.strings.image_format_webp),
-                        LibraryPreferences.ImageFormat.PNG to
-                            stringResource(MR.strings.image_format_png),
                     ),
                     title = stringResource(MR.strings.pref_image_format),
                     subtitle = stringResource(MR.strings.pref_image_format_summary),

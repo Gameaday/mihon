@@ -178,8 +178,8 @@ object ImageUtil {
      * @param degrees rotation angle in degrees; positive values rotate clockwise,
      * negative values rotate counter-clockwise.
      */
-    fun rotateDualPageIfWide(imageSource: BufferedSource, degrees: Float): BufferedSource =
-        if (isWideImage(imageSource)) rotateImage(imageSource, degrees) else imageSource
+    fun rotateDualPageIfWide(imageSource: BufferedSource, degrees: Float, encoder: (Bitmap, OutputStream) -> Unit = defaultEncoder): BufferedSource =
+        if (isWideImage(imageSource)) rotateImage(imageSource, degrees, encoder) else imageSource
 
     private fun rotateBitMap(bitmap: Bitmap, degrees: Float): Bitmap {
         val matrix = Matrix().apply { postRotate(degrees) }
