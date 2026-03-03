@@ -626,9 +626,9 @@
     <string name="webview_data_deleted">WebView data cleared</string>
     <string name="pref_refresh_library_covers">Refresh library covers</string>
     <string name="pref_image_format">Image format</string>
-    <string name="pref_image_format_summary">Format for saved/exported/split images. Downloads from sources are always preserved as-is.</string>
-    <string name="image_format_png">PNG — lossless, universal compatibility (larger files)</string>
-    <string name="image_format_webp">WebP — lossless, smaller files (default)</string>
+    <string name="pref_image_format_summary">Lossless format for saved covers, image splits, and page merges. Source downloads are always kept as-is.</string>
+    <string name="image_format_png">PNG — universal compatibility, larger files</string>
+    <string name="image_format_webp">WebP — same quality, smaller files (default)</string>
     <string name="pref_reset_viewer_flags">Reset per-series reader settings</string>
     <string name="pref_reset_viewer_flags_summary">Resets reading mode and orientation of all series</string>
     <string name="pref_reset_viewer_flags_success">All reader settings reset</string>

@@ -1,5 +1,6 @@
 package tachiyomi.domain.library.service
 
+import android.graphics.Bitmap
 import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.preference.PreferenceStore
 import tachiyomi.core.common.preference.TriState
@@ -224,23 +225,46 @@ class LibraryPreferences(
     /**
      * Preferred image format for derived images created by the app.
      *
-     * | Format | Extension | Compression | Size   | Compatibility | Notes |
-     * |--------|-----------|-------------|--------|---------------|-------|
-     * | [PNG]  | .png      | Lossless    | Largest | Universal     | Max compatibility; all tools/viewers handle PNG. Best choice if you plan to edit images later or share with apps that don't support WebP. |
-     * | [WebP] | .webp     | Lossless    | Smaller than PNG | Android-native, broad web support | Default. Same pixel-perfect fidelity as PNG but significantly smaller. Supported by all modern browsers and Android since API 14. |
+     * ## Available formats
      *
-     * **Why not lossy?** Derived images (splits, merges) start from already-compressed source
-     * data, so re-encoding with a lossy codec would introduce generational quality loss for
-     * marginal size benefit. Both options here are **lossless** — identical pixel output.
+     * | Format | Extension | Compression | Typical size vs PNG | Compatibility | Notes |
+     * |--------|-----------|-------------|---------------------|---------------|-------|
+     * | [PNG]  | .png      | Lossless    | 1× (baseline)       | Universal     | Every viewer, editor, and OS handles PNG. Best choice for sharing or post-processing. |
+     * | [WebP] | .webp     | Lossless    | ~0.7× (smaller)     | Broad         | Default. Pixel-identical to PNG but smaller. Supported on Android since API 14, all modern browsers, macOS 12+, Windows 10+. |
      *
-     * **Future: JPEG XL (.jxl)** — When Android adds native encoding support, a `JXL` value
-     * can be added here to offer smaller lossless files than PNG with fast encode/decode.
-     * The app already *decodes* JXL images via the bundled image-decoder library; only
-     * encoding support is needed to complete the round-trip.
+     * ## Formats evaluated but not offered
+     *
+     * | Format   | Why not available |
+     * |----------|-------------------|
+     * | **HEIC / HEIF** | Android can *decode* HEIC (the app already detects it in `ImageType.HEIF`) but `Bitmap.CompressFormat` has no HEIC constant — there is no built-in encoding API. Additionally, HEIC is primarily a lossy format (HEVC-based) which conflicts with our lossless-only goal for derived images. Patent licensing (HEVC Advance) also makes it less attractive as a default for an open-source project. |
+     * | **AVIF** | Excellent modern format (AV1-based, royalty-free, lossless & lossy). Android can decode AVIF since API 31 but offers no `Bitmap.CompressFormat` for encoding. A future Android release or a bundled native encoder could make this viable. |
+     * | **JPEG XL (.jxl)** | Promising successor: lossless mode compresses better than WebP lossless, fast encode/decode, supports transparency. The bundled image-decoder library already *decodes* JXL; only encoding support is needed. Once Android (or a bundled encoder) adds `CompressFormat` support, a `JXL` value here is trivial to add. |
+     * | **JPEG** | Lossy-only, no transparency. Re-encoding already-compressed manga pages with JPEG would cause generational quality loss and destroy any transparency, so it is unsuitable for derived (split/merged) images. |
+     *
+     * ## Why only lossless?
+     *
+     * Derived images (tall-image splits, page merges, rotations) start from
+     * already-compressed source data that has been decoded to a bitmap.
+     * Re-encoding with a lossy codec introduces generational quality loss for
+     * marginal size benefit. Both options here are **lossless** — the output
+     * is pixel-identical to the decoded source.
+     *
+     * ## Adding a new format
+     *
+     * 1. Add an enum value with the correct [extension], [mime], and [compressFormat].
+     * 2. Add a string resource for the settings UI label.
+     * 3. Add the entry to the `persistentMapOf` in `SettingsLibraryScreen.getCoverQualityGroup()`.
+     *
+     * All callers obtain the `Bitmap.CompressFormat` from [compressFormat], so no
+     * other code changes are needed.
      */
-    enum class ImageFormat(val extension: String, val mime: String) {
-        PNG("png", "image/png"),
-        WebP("webp", "image/webp"),
+    enum class ImageFormat(
+        val extension: String,
+        val mime: String,
+        val compressFormat: Bitmap.CompressFormat,
+    ) {
+        PNG("png", "image/png", Bitmap.CompressFormat.PNG),
+        WebP("webp", "image/webp", Bitmap.CompressFormat.WEBP_LOSSLESS),
     }
 
     companion object {

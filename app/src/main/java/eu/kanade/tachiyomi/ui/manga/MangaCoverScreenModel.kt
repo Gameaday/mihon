@@ -105,14 +105,7 @@ class MangaCoverScreenModel(
             .build()
 
         val libraryPreferences: LibraryPreferences = Injekt.get()
-        val (format, quality) = when (libraryPreferences.imageFormat().get()) {
-            LibraryPreferences.ImageFormat.PNG -> {
-                android.graphics.Bitmap.CompressFormat.PNG to 100
-            }
-            LibraryPreferences.ImageFormat.WebP -> {
-                android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS to 100
-            }
-        }
+        val fmt = libraryPreferences.imageFormat().get()
 
         return withIOContext {
             val result = context.imageLoader.execute(req).image?.asDrawable(context.resources)
@@ -124,8 +117,8 @@ class MangaCoverScreenModel(
                     bitmap = bitmap,
                     name = manga.title,
                     location = if (temp) Location.Cache else Location.Pictures.create(),
-                    compressFormat = format,
-                    compressQuality = quality,
+                    compressFormat = fmt.compressFormat,
+                    compressQuality = 100,
                 ),
             )
         }

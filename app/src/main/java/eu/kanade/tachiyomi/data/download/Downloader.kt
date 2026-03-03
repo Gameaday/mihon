@@ -569,12 +569,8 @@ class Downloader(
      * use the same format — avoiding mixed-format folders.
      */
     private fun derivedImageFormat(): Pair<android.graphics.Bitmap.CompressFormat, String> {
-        return when (libraryPreferences.imageFormat().get()) {
-            LibraryPreferences.ImageFormat.PNG ->
-                android.graphics.Bitmap.CompressFormat.PNG to "png"
-            LibraryPreferences.ImageFormat.WebP ->
-                android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS to "webp"
-        }
+        val fmt = libraryPreferences.imageFormat().get()
+        return fmt.compressFormat to fmt.extension
     }
 
     private fun splitTallImageIfNeeded(page: Page, tmpDir: UniFile) {
