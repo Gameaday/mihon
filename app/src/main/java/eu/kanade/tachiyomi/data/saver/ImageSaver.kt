@@ -149,7 +149,7 @@ sealed class Image(
         override val name: String,
         override val location: Location,
         val encoder: (Bitmap, java.io.OutputStream) -> Unit = { bmp, os ->
-            bmp.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, os)
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, os)
         },
     ) : Image(name, location)
 

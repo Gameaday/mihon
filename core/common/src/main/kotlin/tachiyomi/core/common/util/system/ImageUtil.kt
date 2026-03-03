@@ -130,7 +130,7 @@ object ImageUtil {
      * [ImageFormat][tachiyomi.domain.library.service.LibraryPreferences.ImageFormat] preference.
      */
     val defaultEncoder: (Bitmap, OutputStream) -> Unit = { bitmap, os ->
-        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, os)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
     }
 
     /**
@@ -330,7 +330,7 @@ object ImageUtil {
         imageFile: UniFile,
         filenamePrefix: String,
         encoder: (Bitmap, OutputStream) -> Unit = defaultEncoder,
-        formatExtension: String = "webp",
+        formatExtension: String = "png",
     ): Boolean {
         val imageSource = imageFile.openInputStream().use { Buffer().readFrom(it) }
         if (isAnimatedAndSupported(imageSource) || !isTallImage(imageSource)) {

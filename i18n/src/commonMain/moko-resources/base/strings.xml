@@ -628,7 +628,7 @@
     <string name="pref_image_format">Image format</string>
     <string name="pref_image_format_summary">Lossless format for saved covers, image splits, and page merges. Source downloads are always kept as-is.</string>
     <string name="image_format_jxl">JPEG XL — smallest files (default)</string>
-    <string name="image_format_webp">WebP — broad compatibility</string>
+    <string name="image_format_png">PNG — universal compatibility</string>
     <string name="pref_reset_viewer_flags">Reset per-series reader settings</string>
     <string name="pref_reset_viewer_flags_summary">Resets reading mode and orientation of all series</string>
     <string name="pref_reset_viewer_flags_success">All reader settings reset</string>

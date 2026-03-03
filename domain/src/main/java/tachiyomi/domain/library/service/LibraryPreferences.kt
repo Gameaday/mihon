@@ -231,8 +231,8 @@ class LibraryPreferences(
      * @property mime      MIME type
      */
     enum class ImageFormat(val extension: String, val mime: String) {
-        WebP("webp", "image/webp"),
         JXL("jxl", "image/jxl"),
+        PNG("png", "image/png"),
     }
 
     companion object {

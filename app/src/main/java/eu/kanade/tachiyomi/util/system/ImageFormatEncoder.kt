@@ -13,11 +13,11 @@ import java.io.OutputStream
  * Returns a lossless encoder for persisting images to disk (covers, splits, merges).
  *
  * JXL uses effort 7 ("squirrel") — best compression ratio for stored files.
- * WebP uses Android's built-in lossless encoder.
+ * PNG uses Android's built-in encoder — universal compatibility.
  */
 fun ImageFormat.encoder(): (Bitmap, OutputStream) -> Unit = when (this) {
-    ImageFormat.WebP -> { bitmap, os ->
-        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, os)
+    ImageFormat.PNG -> { bitmap, os ->
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
     }
     ImageFormat.JXL -> { bitmap, os ->
         os.write(jxlEncode(bitmap, JxlEffort.SQUIRREL, JxlDecodingSpeed.SLOWEST))
@@ -28,11 +28,11 @@ fun ImageFormat.encoder(): (Bitmap, OutputStream) -> Unit = when (this) {
  * Returns a fast lossless encoder for transient in-memory buffers (reader display).
  *
  * JXL uses effort 1 ("lightning") — fastest encode, still lossless.
- * WebP uses Android's built-in lossless encoder (no effort control available).
+ * PNG uses Android's built-in encoder (no effort control available).
  */
 fun ImageFormat.fastEncoder(): (Bitmap, OutputStream) -> Unit = when (this) {
-    ImageFormat.WebP -> { bitmap, os ->
-        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, os)
+    ImageFormat.PNG -> { bitmap, os ->
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
     }
     ImageFormat.JXL -> { bitmap, os ->
         os.write(jxlEncode(bitmap, JxlEffort.LIGHTNING, JxlDecodingSpeed.FASTEST))
