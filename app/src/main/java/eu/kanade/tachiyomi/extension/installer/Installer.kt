@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import androidx.annotation.CallSuper
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.core.content.ContextCompat
 import eu.kanade.tachiyomi.extension.ExtensionManager
 import eu.kanade.tachiyomi.extension.model.InstallStep
 import uy.kohesive.injekt.injectLazy
@@ -114,7 +114,7 @@ abstract class Installer(private val service: Service) {
      */
     @CallSuper
     open fun onDestroy() {
-        LocalBroadcastManager.getInstance(service).unregisterReceiver(cancelReceiver)
+        service.unregisterReceiver(cancelReceiver)
         queue.forEach { extensionManager.updateInstallStep(it.downloadId, InstallStep.Error) }
         queue.clear()
         waitingInstall.store(null)
@@ -151,7 +151,7 @@ abstract class Installer(private val service: Service) {
 
     init {
         val filter = IntentFilter(ACTION_CANCEL_QUEUE)
-        LocalBroadcastManager.getInstance(service).registerReceiver(cancelReceiver, filter)
+        ContextCompat.registerReceiver(service, cancelReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     companion object {
@@ -166,7 +166,7 @@ abstract class Installer(private val service: Service) {
         fun cancelInstallQueue(context: Context, downloadId: Long) {
             val intent = Intent(ACTION_CANCEL_QUEUE)
             intent.putExtra(EXTRA_DOWNLOAD_ID, downloadId)
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            context.sendBroadcast(intent.setPackage(context.packageName))
         }
     }
 }
