@@ -163,6 +163,9 @@ class MangaScreen(
                 navigator.push(MigrationConfigScreen(successState.manga.id))
             }.takeIf { successState.manga.favorite },
             onEditNotesClicked = { navigator.push(MangaNotesScreen(manga = successState.manga)) },
+            onClearMetadataSourceClicked = screenModel::clearMetadataSource.takeIf {
+                successState.manga.metadataSource?.let { it > 0 } == true
+            },
             onMultiBookmarkClicked = screenModel::bookmarkChapters,
             onMultiMarkAsReadClicked = screenModel::markChaptersRead,
             onMarkPreviousAsReadClicked = screenModel::markPreviousChapterRead,
@@ -263,6 +266,10 @@ class MangaScreen(
                             state = coverSearchState,
                             onCoverSelected = { cover ->
                                 sm.setCoverFromUrl(context, cover.thumbnailUrl, cover.sourceId)
+                                showCoverSearch = false
+                            },
+                            onSetAsMetadataSource = { cover ->
+                                screenModel.setMetadataSource(cover.sourceId, cover.mangaUrl)
                                 showCoverSearch = false
                             },
                             onRefresh = { coverSearchSm.refresh() },

@@ -14,7 +14,7 @@ data class MangaCover(
 fun Manga.asMangaCover(): MangaCover {
     return MangaCover(
         mangaId = id,
-        sourceId = source,
+        sourceId = metadataSource?.takeIf { it > 0 } ?: source,
         isMangaFavorite = favorite,
         url = thumbnailUrl,
         lastModified = coverLastModified,

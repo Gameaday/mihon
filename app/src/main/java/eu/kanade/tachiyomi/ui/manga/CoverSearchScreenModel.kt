@@ -65,6 +65,30 @@ class CoverSearchScreenModel(
         fetchFromSources(query)
     }
 
+    /**
+     * Deduplicate cover results by thumbnail URL.
+     * When multiple sources return the same URL, keeps the first occurrence
+     * and merges the source names from subsequent duplicates.
+     */
+    private fun deduplicateResults(results: List<CoverResult>): List<CoverResult> {
+        val seen = linkedMapOf<String, CoverResult>()
+        for (result in results) {
+            val existing = seen[result.thumbnailUrl]
+            if (existing != null) {
+                if (result.sourceName !in existing.additionalSourceNames &&
+                    result.sourceName != existing.sourceName
+                ) {
+                    seen[result.thumbnailUrl] = existing.copy(
+                        additionalSourceNames = existing.additionalSourceNames + result.sourceName,
+                    )
+                }
+            } else {
+                seen[result.thumbnailUrl] = result
+            }
+        }
+        return seen.values.toList()
+    }
+
     private fun fetchFromSources(query: String) {
         searchJob?.cancel()
 
@@ -96,15 +120,28 @@ class CoverSearchScreenModel(
                                         sourceName = source.name,
                                         sourceId = source.id,
                                         mangaTitle = manga.title,
+                                        mangaUrl = manga.url,
                                     )
                                 }
                             }
-                            .take(3) // Limit to 3 covers per source to reduce resource usage
 
-                        if (isActive && covers.isNotEmpty()) {
+                        // Take the best match (first result) per source.
+                        // Only include additional results from the same source if they
+                        // represent the same series (matching title) with a different cover.
+                        val bestMatch = covers.firstOrNull()
+                        val seriesCovers = if (bestMatch != null) {
+                            val normalizedTitle = bestMatch.mangaTitle.lowercase().trim()
+                            covers.filter {
+                                it.mangaTitle.lowercase().trim() == normalizedTitle
+                            }.distinctBy { it.thumbnailUrl }
+                        } else {
+                            emptyList()
+                        }
+
+                        if (isActive && seriesCovers.isNotEmpty()) {
                             mutableState.update { state ->
                                 state.copy(
-                                    results = state.results + covers,
+                                    results = deduplicateResults(state.results + seriesCovers),
                                     progress = state.progress + 1,
                                 )
                             }
@@ -174,4 +211,8 @@ data class CoverResult(
     val sourceName: String,
     val sourceId: Long,
     val mangaTitle: String,
-)
+    val mangaUrl: String,
+    val additionalSourceNames: List<String> = emptyList(),
+) {
+    val sourceCount: Int get() = 1 + additionalSourceNames.size
+}

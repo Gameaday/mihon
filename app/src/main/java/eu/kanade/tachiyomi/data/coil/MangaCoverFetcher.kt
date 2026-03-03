@@ -316,7 +316,10 @@ class MangaCoverFetcher(
                     imageLoader.components.key(data, options)
                         ?: error("No disk cache key for $data")
                 },
-                sourceLazy = lazy { sourceManager.get(data.source) as? HttpSource },
+                sourceLazy = lazy {
+                    val effectiveSourceId = data.metadataSource?.takeIf { it > 0 } ?: data.source
+                    sourceManager.get(effectiveSourceId) as? HttpSource
+                },
                 callFactoryLazy = callFactoryLazy,
                 imageLoader = imageLoader,
             )

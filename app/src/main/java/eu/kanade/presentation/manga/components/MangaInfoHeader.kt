@@ -117,6 +117,7 @@ fun MangaInfoBox(
     manga: Manga,
     sourceName: String,
     isStubSource: Boolean,
+    metadataSourceName: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -154,6 +155,7 @@ fun MangaInfoBox(
                     manga = manga,
                     sourceName = sourceName,
                     isStubSource = isStubSource,
+                    metadataSourceName = metadataSourceName,
                     onCoverClick = onCoverClick,
                     doSearch = doSearch,
                 )
@@ -163,6 +165,7 @@ fun MangaInfoBox(
                     manga = manga,
                     sourceName = sourceName,
                     isStubSource = isStubSource,
+                    metadataSourceName = metadataSourceName,
                     onCoverClick = onCoverClick,
                     doSearch = doSearch,
                 )
@@ -347,6 +350,7 @@ private fun MangaAndSourceTitlesLarge(
     manga: Manga,
     sourceName: String,
     isStubSource: Boolean,
+    metadataSourceName: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
 ) {
@@ -374,6 +378,7 @@ private fun MangaAndSourceTitlesLarge(
             status = manga.status,
             sourceName = sourceName,
             isStubSource = isStubSource,
+            metadataSourceName = metadataSourceName,
             doSearch = doSearch,
             textAlign = TextAlign.Center,
         )
@@ -386,6 +391,7 @@ private fun MangaAndSourceTitlesSmall(
     manga: Manga,
     sourceName: String,
     isStubSource: Boolean,
+    metadataSourceName: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
 ) {
@@ -418,6 +424,7 @@ private fun MangaAndSourceTitlesSmall(
                 status = manga.status,
                 sourceName = sourceName,
                 isStubSource = isStubSource,
+                metadataSourceName = metadataSourceName,
                 doSearch = doSearch,
             )
         }
@@ -432,6 +439,7 @@ private fun ColumnScope.MangaContentInfo(
     status: Long,
     sourceName: String,
     isStubSource: Boolean,
+    metadataSourceName: String?,
     doSearch: (query: String, global: Boolean) -> Unit,
     textAlign: TextAlign? = LocalTextStyle.current.textAlign,
 ) {
@@ -566,6 +574,29 @@ private fun ColumnScope.MangaContentInfo(
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )
+        }
+
+        if (metadataSourceName != null) {
+            Row(
+                modifier = Modifier.secondaryItemAlpha(),
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Sync,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = MaterialTheme.padding.extraSmall)
+                        .size(16.dp),
+                )
+                ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+                    Text(
+                        text = stringResource(MR.strings.metadata_source_label, metadataSourceName),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                }
+            }
         }
     }
 }

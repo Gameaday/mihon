@@ -105,4 +105,6 @@ private fun Manga.toBackupManga() =
         version = this.version,
         notes = this.notes,
         initialized = this.initialized,
+        metadataSource = this.metadataSource,
+        metadataUrl = this.metadataUrl,
     )

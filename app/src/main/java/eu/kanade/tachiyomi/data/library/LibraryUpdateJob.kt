@@ -366,9 +366,68 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         val sManga = manga.toSManga()
 
         // Update manga metadata if needed
+        // If a metadata source is configured, use that for metadata instead of the chapter source
         if (autoUpdateMetadata) {
-            val networkManga = source.getMangaDetails(sManga)
-            updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch = false, coverCache)
+            val metadataSourceId = manga.metadataSource?.takeIf { it > 0 }
+            val metadataUrl = manga.metadataUrl?.takeIf { it.isNotEmpty() }
+            val usingMetadataSource = metadataSourceId != null && metadataUrl != null
+
+            // When using a dedicated metadata source, throttle automatic refreshes.
+            // Metadata (description, cover, author) changes far less frequently than chapters,
+            // so we only re-fetch every 7 days to be respectful of remote sources.
+            val shouldFetchMetadata = if (usingMetadataSource) {
+                val lastUpdate = manga.lastUpdate
+                val daysSinceUpdate = if (lastUpdate > 0) {
+                    java.util.concurrent.TimeUnit.MILLISECONDS.toDays(
+                        System.currentTimeMillis() - lastUpdate,
+                    )
+                } else {
+                    Long.MAX_VALUE
+                }
+                daysSinceUpdate >= METADATA_REFRESH_INTERVAL_DAYS
+            } else {
+                true
+            }
+
+            if (shouldFetchMetadata) {
+                try {
+                    val (metaSource, metaSManga) = if (
+                        usingMetadataSource && metadataSourceId != null && metadataUrl != null
+                    ) {
+                        val metaSrc = sourceManager.getOrStub(metadataSourceId)
+                        val sM = manga.toSManga().apply { url = metadataUrl }
+                        metaSrc to sM
+                    } else {
+                        source to sManga
+                    }
+                    val networkManga = metaSource.getMangaDetails(metaSManga)
+                    // When using a metadata source, preserve the chapter source's updateStrategy
+                    // since it controls chapter fetching behavior, not metadata
+                    if (usingMetadataSource) {
+                        networkManga.update_strategy = manga.updateStrategy
+                    }
+                    updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch = false, coverCache)
+                } catch (e: Exception) {
+                    // If the metadata source fails (e.g. source removed, network issue),
+                    // fall back to the chapter source for metadata to avoid losing updates
+                    if (usingMetadataSource) {
+                        logcat(LogPriority.WARN, e) {
+                            "Metadata source failed for ${manga.title}, falling back to chapter source"
+                        }
+                        try {
+                            val networkManga = source.getMangaDetails(sManga)
+                            updateManga.awaitUpdateFromSource(
+                                manga,
+                                networkManga,
+                                manualFetch = false,
+                                coverCache,
+                            )
+                        } catch (_: Exception) {
+                            // Both sources failed, skip metadata update entirely
+                        }
+                    }
+                }
+            }
         }
 
         val chapters = source.getChapterList(sManga)
@@ -448,6 +507,14 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         private const val ERROR_LOG_HELP_URL = "https://mihon.app/docs/guides/troubleshooting/"
 
         private const val MANGA_PER_SOURCE_QUEUE_WARNING_THRESHOLD = 60
+
+        /**
+         * Minimum number of days between automatic metadata refreshes for manga
+         * with a dedicated metadata source. Metadata (description, cover, author)
+         * changes far less frequently than chapters, so we throttle to be respectful
+         * of remote sources. Manual refreshes bypass this throttle.
+         */
+        private const val METADATA_REFRESH_INTERVAL_DAYS = 7L
 
         /**
          * Key for category to update.

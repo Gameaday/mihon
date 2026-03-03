@@ -23,6 +23,7 @@ import eu.kanade.domain.manga.interactor.UpdateManga
 import eu.kanade.domain.manga.model.chaptersFiltered
 import eu.kanade.domain.manga.model.downloadedFilter
 import eu.kanade.domain.manga.model.toSManga
+import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.domain.track.interactor.AddTracks
 import eu.kanade.domain.track.interactor.RefreshTracks
 import eu.kanade.domain.track.interactor.TrackChapter
@@ -174,10 +175,14 @@ class MangaScreenModel(
             ) { mangaAndChapters, _, _ -> mangaAndChapters }
                 .flowWithLifecycle(lifecycle)
                 .collectLatest { (manga, chapters) ->
+                    val metadataSourceName = manga.metadataSource?.takeIf { it > 0 }?.let { id ->
+                        Injekt.get<SourceManager>().get(id)?.name
+                    }
                     updateSuccessState {
                         it.copy(
                             manga = manga,
                             chapters = chapters.toChapterListItems(manga),
+                            metadataSourceName = metadataSourceName,
                         )
                     }
                 }
@@ -221,9 +226,13 @@ class MangaScreenModel(
 
             // Show what we have earlier
             mutableState.update {
+                val sourceManager = Injekt.get<SourceManager>()
+                val metadataSourceName = manga.metadataSource?.takeIf { it > 0 }?.let { id ->
+                    sourceManager.get(id)?.name
+                }
                 State.Success(
                     manga = manga,
-                    source = Injekt.get<SourceManager>().getOrStub(manga.source),
+                    source = sourceManager.getOrStub(manga.source),
                     isFromSource = isFromSource,
                     chapters = chapters,
                     availableScanlators = getAvailableScanlators.await(mangaId),
@@ -231,6 +240,7 @@ class MangaScreenModel(
                     isRefreshingData = needRefreshInfo || needRefreshChapter,
                     dialog = null,
                     hideMissingChapters = libraryPreferences.hideMissingChapters().get(),
+                    metadataSourceName = metadataSourceName,
                 )
             }
 
@@ -267,13 +277,43 @@ class MangaScreenModel(
 
     /**
      * Fetch manga information from source.
+     * If a metadata source is configured, uses that for metadata instead of the chapter source.
+     * The updateStrategy is preserved from the chapter source since it controls chapter fetching.
+     * If the metadata source fails, falls back to the chapter source automatically.
      */
     private suspend fun fetchMangaFromSource(manualFetch: Boolean = false) {
         val state = successState ?: return
         try {
             withIOContext {
-                val networkManga = state.source.getMangaDetails(state.manga.toSManga())
-                updateManga.awaitUpdateFromSource(state.manga, networkManga, manualFetch)
+                val manga = state.manga
+                val metadataSourceId = manga.metadataSource?.takeIf { it > 0 }
+                val metadataUrl = manga.metadataUrl?.takeIf { it.isNotEmpty() }
+                val usingMetadataSource = metadataSourceId != null && metadataUrl != null
+
+                var networkManga: SManga? = null
+
+                // Try metadata source first if configured
+                if (usingMetadataSource && metadataSourceId != null && metadataUrl != null) {
+                    try {
+                        val metaSrc = Injekt.get<SourceManager>().getOrStub(metadataSourceId)
+                        val sM = manga.toSManga().apply { url = metadataUrl }
+                        networkManga = metaSrc.getMangaDetails(sM).also {
+                            // Preserve the chapter source's updateStrategy
+                            it.update_strategy = manga.updateStrategy
+                        }
+                    } catch (e: Throwable) {
+                        logcat(LogPriority.WARN, e) {
+                            "Metadata source failed for ${manga.title}, falling back to chapter source"
+                        }
+                    }
+                }
+
+                // Fall back to chapter source if metadata source wasn't used or failed
+                if (networkManga == null) {
+                    networkManga = state.source.getMangaDetails(manga.toSManga())
+                }
+
+                updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch)
             }
         } catch (e: Throwable) {
             // Ignore early hints "errors" that aren't handled by OkHttp
@@ -283,6 +323,42 @@ class MangaScreenModel(
             screenModelScope.launch {
                 snackbarHostState.showSnackbar(message = with(context) { e.formattedMessage })
             }
+        }
+    }
+
+    /**
+     * Set a preferred metadata source for this manga.
+     * When set, metadata (description, cover, etc.) will be fetched from this source
+     * instead of the chapter source.
+     */
+    fun setMetadataSource(sourceId: Long, mangaUrl: String) {
+        val manga = successState?.manga ?: return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    metadataSource = sourceId,
+                    metadataUrl = mangaUrl,
+                ),
+            )
+            snackbarHostState.showSnackbar(
+                context.stringResource(MR.strings.metadata_source_set),
+                withDismissAction = true,
+            )
+        }
+    }
+
+    /**
+     * Clear the preferred metadata source, reverting to using the chapter source for metadata.
+     */
+    fun clearMetadataSource() {
+        val manga = successState?.manga ?: return
+        screenModelScope.launchIO {
+            mangaRepository.clearMetadataSource(manga.id)
+            snackbarHostState.showSnackbar(
+                context.stringResource(MR.strings.metadata_source_cleared),
+                withDismissAction = true,
+            )
         }
     }
 
@@ -1141,6 +1217,7 @@ class MangaScreenModel(
             val dialog: Dialog? = null,
             val hasPromptedToAddBefore: Boolean = false,
             val hideMissingChapters: Boolean = false,
+            val metadataSourceName: String? = null,
         ) : State {
             val processedChapters by lazy {
                 chapters.applyFilters(manga).toList()
