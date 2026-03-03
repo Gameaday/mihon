@@ -366,8 +366,18 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         val sManga = manga.toSManga()
 
         // Update manga metadata if needed
+        // If a metadata source is configured, use that for metadata instead of the chapter source
         if (autoUpdateMetadata) {
-            val networkManga = source.getMangaDetails(sManga)
+            val metadataSourceId = manga.metadataSource?.takeIf { it > 0 }
+            val metadataUrl = manga.metadataUrl?.takeIf { it.isNotEmpty() }
+            val (metaSource, metaSManga) = if (metadataSourceId != null && metadataUrl != null) {
+                val metaSrc = sourceManager.getOrStub(metadataSourceId)
+                val sM = manga.toSManga().apply { url = metadataUrl }
+                metaSrc to sM
+            } else {
+                source to sManga
+            }
+            val networkManga = metaSource.getMangaDetails(metaSManga)
             updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch = false, coverCache)
         }
 

@@ -267,13 +267,24 @@ class MangaScreenModel(
 
     /**
      * Fetch manga information from source.
+     * If a metadata source is configured, uses that for metadata instead of the chapter source.
      */
     private suspend fun fetchMangaFromSource(manualFetch: Boolean = false) {
         val state = successState ?: return
         try {
             withIOContext {
-                val networkManga = state.source.getMangaDetails(state.manga.toSManga())
-                updateManga.awaitUpdateFromSource(state.manga, networkManga, manualFetch)
+                val manga = state.manga
+                val metadataSourceId = manga.metadataSource?.takeIf { it > 0 }
+                val metadataUrl = manga.metadataUrl?.takeIf { it.isNotEmpty() }
+                val (source, sManga) = if (metadataSourceId != null && metadataUrl != null) {
+                    val metaSrc = Injekt.get<SourceManager>().getOrStub(metadataSourceId)
+                    val sM = manga.toSManga().apply { url = metadataUrl }
+                    metaSrc to sM
+                } else {
+                    state.source to manga.toSManga()
+                }
+                val networkManga = source.getMangaDetails(sManga)
+                updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch)
             }
         } catch (e: Throwable) {
             // Ignore early hints "errors" that aren't handled by OkHttp
@@ -283,6 +294,48 @@ class MangaScreenModel(
             screenModelScope.launch {
                 snackbarHostState.showSnackbar(message = with(context) { e.formattedMessage })
             }
+        }
+    }
+
+    /**
+     * Set a preferred metadata source for this manga.
+     * When set, metadata (description, cover, etc.) will be fetched from this source
+     * instead of the chapter source.
+     */
+    fun setMetadataSource(sourceId: Long, mangaUrl: String) {
+        val manga = successState?.manga ?: return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    metadataSource = sourceId,
+                    metadataUrl = mangaUrl,
+                ),
+            )
+            snackbarHostState.showSnackbar(
+                context.stringResource(MR.strings.metadata_source_set),
+                withDismissAction = true,
+            )
+        }
+    }
+
+    /**
+     * Clear the preferred metadata source, reverting to using the chapter source for metadata.
+     */
+    fun clearMetadataSource() {
+        val manga = successState?.manga ?: return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    metadataSource = 0L,
+                    metadataUrl = "",
+                ),
+            )
+            snackbarHostState.showSnackbar(
+                context.stringResource(MR.strings.metadata_source_cleared),
+                withDismissAction = true,
+            )
         }
     }
 

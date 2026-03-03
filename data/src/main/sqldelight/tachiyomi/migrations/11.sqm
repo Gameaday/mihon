@@ -1,0 +1,3 @@
+-- Add metadata source fields to allow decoupling metadata from chapter source
+ALTER TABLE mangas ADD COLUMN metadata_source INTEGER;
+ALTER TABLE mangas ADD COLUMN metadata_url TEXT;

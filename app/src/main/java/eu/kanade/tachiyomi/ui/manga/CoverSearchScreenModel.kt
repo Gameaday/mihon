@@ -120,6 +120,7 @@ class CoverSearchScreenModel(
                                         sourceName = source.name,
                                         sourceId = source.id,
                                         mangaTitle = manga.title,
+                                        mangaUrl = manga.url,
                                     )
                                 }
                             }
@@ -198,6 +199,7 @@ data class CoverResult(
     val sourceName: String,
     val sourceId: Long,
     val mangaTitle: String,
+    val mangaUrl: String,
     val additionalSourceNames: List<String> = emptyList(),
 ) {
     val sourceCount: Int get() = 1 + additionalSourceNames.size

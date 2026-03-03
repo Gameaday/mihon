@@ -179,6 +179,8 @@ class MangaRepositoryImpl(
                     version = value.version,
                     isSyncing = 0,
                     notes = value.notes,
+                    metadataSource = value.metadataSource,
+                    metadataUrl = value.metadataUrl,
                 )
             }
         }

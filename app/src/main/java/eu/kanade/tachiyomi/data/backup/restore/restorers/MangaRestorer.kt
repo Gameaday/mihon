@@ -96,6 +96,8 @@ class MangaRestorer(
             status = newer.status,
             initialized = this.initialized || newer.initialized,
             version = newer.version,
+            metadataSource = newer.metadataSource ?: this.metadataSource,
+            metadataUrl = newer.metadataUrl ?: this.metadataUrl,
         )
     }
 
@@ -125,6 +127,8 @@ class MangaRestorer(
                 version = manga.version,
                 isSyncing = 1,
                 notes = manga.notes,
+                metadataSource = manga.metadataSource,
+                metadataUrl = manga.metadataUrl,
             )
         }
         return manga
