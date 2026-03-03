@@ -65,7 +65,7 @@ internal class PermissionStep : OnboardingStep {
                 override fun onResume(owner: LifecycleOwner) {
                     notificationGranted =
                         context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
-                            PackageManager.PERMISSION_GRANTED
+                        PackageManager.PERMISSION_GRANTED
                     batteryGranted = context.getSystemService<PowerManager>()!!
                         .isIgnoringBatteryOptimizations(context.packageName)
                 }

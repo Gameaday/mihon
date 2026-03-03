@@ -100,7 +100,9 @@ object ImageUtil {
             bytes[2] == 0x4E.toByte() && bytes[3] == 0x47.toByte() &&
             bytes[4] == 0x0D.toByte() && bytes[5] == 0x0A.toByte() &&
             bytes[6] == 0x1A.toByte() && bytes[7] == 0x0A.toByte()
-        ) return ImageType.PNG
+        ) {
+            return ImageType.PNG
+        }
 
         // GIF: "GIF87a" or "GIF89a"
         if (bytes.size >= 6 &&
@@ -108,13 +110,17 @@ object ImageUtil {
             bytes[2] == 0x46.toByte() && bytes[3] == 0x38.toByte() &&
             (bytes[4] == 0x37.toByte() || bytes[4] == 0x39.toByte()) &&
             bytes[5] == 0x61.toByte()
-        ) return ImageType.GIF
+        ) {
+            return ImageType.GIF
+        }
 
         // JPEG: FF D8 FF
         if (bytes.size >= 3 &&
             bytes[0] == 0xFF.toByte() && bytes[1] == 0xD8.toByte() &&
             bytes[2] == 0xFF.toByte()
-        ) return ImageType.JPEG
+        ) {
+            return ImageType.JPEG
+        }
 
         // WebP: "RIFF" at 0..3 and "WEBP" at 8..11
         if (bytes.size >= 12 &&
@@ -122,7 +128,9 @@ object ImageUtil {
             bytes[2] == 0x46.toByte() && bytes[3] == 0x46.toByte() &&
             bytes[8] == 0x57.toByte() && bytes[9] == 0x45.toByte() &&
             bytes[10] == 0x42.toByte() && bytes[11] == 0x50.toByte()
-        ) return ImageType.WEBP
+        ) {
+            return ImageType.WEBP
+        }
 
         // JXL: FF 0A (bare codestream) or 00 00 00 0C 4A 58 4C 20 (ISOBMFF container)
         if (bytes.size >= 2 && bytes[0] == 0xFF.toByte() && bytes[1] == 0x0A.toByte()) {
@@ -135,21 +143,16 @@ object ImageUtil {
             bytes[6] == 0x4C.toByte() && bytes[7] == 0x20.toByte() &&
             bytes[8] == 0x0D.toByte() && bytes[9] == 0x0A.toByte() &&
             bytes[10] == 0x87.toByte() && bytes[11] == 0x0A.toByte()
-        ) return ImageType.JXL
+        ) {
+            return ImageType.JXL
+        }
 
-        // AVIF / HEIF: ISOBMFF boxes — "ftyp" at offset 4, brand determines format
+        // AVIF / HEIF: ISOBMFF boxes — "ftyp" at offset 4, scan major + compatible brands
         if (bytes.size >= 12 &&
             bytes[4] == 0x66.toByte() && bytes[5] == 0x74.toByte() &&
             bytes[6] == 0x79.toByte() && bytes[7] == 0x70.toByte()
         ) {
-            val brand = String(bytes, 8, 4, Charsets.ISO_8859_1)
-            return when {
-                brand.startsWith("avif") || brand.startsWith("avis") -> ImageType.AVIF
-                brand.startsWith("heic") || brand.startsWith("heix") ||
-                    brand.startsWith("hevc") || brand.startsWith("hevx") ||
-                    brand.startsWith("mif1") || brand.startsWith("msf1") -> ImageType.HEIF
-                else -> null
-            }
+            return detectIsobmffType(bytes)
         }
 
         return null
@@ -172,13 +175,55 @@ object ImageUtil {
     }
 
     /**
-     * Check if the HEIF/AVIF image is animated based on the ftyp brand.
-     * "avis" and "msf1" are the sequence (animated) brands.
+     * Check if the HEIF/AVIF image is animated by scanning the ftyp box for
+     * sequence brands (`avis`, `msf1`) in both major and compatible brand lists.
      */
     private fun isAnimatedHeif(bytes: ByteArray): Boolean {
         if (bytes.size < 12) return false
-        val brand = String(bytes, 8, 4, Charsets.ISO_8859_1)
-        return brand.startsWith("avis") || brand.startsWith("msf1")
+        val animationBrands = setOf("avis", "msf1")
+        return collectFtypBrands(bytes).any { it in animationBrands }
+    }
+
+    /**
+     * Detect AVIF vs HEIF by scanning both the major brand and all compatible brands
+     * from the ISOBMFF `ftyp` box. Many files use a generic major brand like `mif1`
+     * with the actual format brand (e.g. `avif`, `heic`) only in compatible brands.
+     */
+    private fun detectIsobmffType(bytes: ByteArray): ImageType? {
+        val avifBrands = setOf("avif", "avis")
+        val heifBrands = setOf("heic", "heix", "hevc", "hevx", "mif1", "msf1")
+        val brands = collectFtypBrands(bytes)
+        // Check AVIF first — a file that lists both avif and mif1 is AVIF
+        if (brands.any { it in avifBrands }) return ImageType.AVIF
+        if (brands.any { it in heifBrands }) return ImageType.HEIF
+        return null
+    }
+
+    /**
+     * Collect all 4-byte brand strings from an ISOBMFF `ftyp` box:
+     * major brand (bytes 8..11) plus every compatible brand (bytes 16..N).
+     * Callers must have verified `ftyp` signature at bytes 4..7.
+     */
+    private fun collectFtypBrands(bytes: ByteArray): List<String> {
+        // Box size is a big-endian uint32 at bytes 0..3
+        val boxSize = ((bytes[0].toInt() and 0xFF) shl 24) or
+            ((bytes[1].toInt() and 0xFF) shl 16) or
+            ((bytes[2].toInt() and 0xFF) shl 8) or
+            (bytes[3].toInt() and 0xFF)
+        // Clamp to available data
+        val end = minOf(boxSize, bytes.size)
+        return buildList {
+            // Major brand at offset 8
+            if (bytes.size >= 12) {
+                add(String(bytes, 8, 4, Charsets.ISO_8859_1))
+            }
+            // Compatible brands start at offset 16, each 4 bytes
+            var offset = 16
+            while (offset + 4 <= end) {
+                add(String(bytes, offset, 4, Charsets.ISO_8859_1))
+                offset += 4
+            }
+        }
     }
 
     enum class ImageType(val mime: String, val extension: String) {
@@ -451,7 +496,11 @@ object ImageUtil {
         }
     }
 
-    private fun splitImageName(filenamePrefix: String, index: Int, extension: String = "webp") = "${filenamePrefix}__${"%03d".format(
+    private fun splitImageName(
+        filenamePrefix: String,
+        index: Int,
+        extension: String,
+    ) = "${filenamePrefix}__${"%03d".format(
         Locale.ENGLISH,
         index + 1,
     )}.$extension"

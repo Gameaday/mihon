@@ -16,6 +16,7 @@ import eu.kanade.tachiyomi.data.saver.ImageSaver
 import eu.kanade.tachiyomi.data.saver.Location
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.network.await
+import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.util.editCover
 import eu.kanade.tachiyomi.util.system.encoder
 import eu.kanade.tachiyomi.util.system.getBitmapOrNull
@@ -32,6 +33,7 @@ import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.domain.manga.interactor.GetManga
 import tachiyomi.domain.manga.model.Manga
+import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
@@ -168,17 +170,26 @@ class MangaCoverScreenModel(
      * format. The [ImageFormat] preference only affects *derived* images (splits, merges,
      * save/share); custom covers are stored as received to maintain byte-for-byte fidelity.
      *
+     * Uses [sourceId] to look up the [HttpSource] and apply its headers/client so that
+     * sources requiring Referer/User-Agent/cookies work correctly.
+     *
      * @param context Context.
      * @param coverUrl URL of the cover image to download.
-     * @param sourceId ID of the source (unused, kept for API compatibility).
+     * @param sourceId ID of the source that owns this cover URL.
      */
-    fun setCoverFromUrl(context: Context, coverUrl: String, @Suppress("UNUSED_PARAMETER") sourceId: Long) {
+    fun setCoverFromUrl(context: Context, coverUrl: String, sourceId: Long) {
         val manga = state.value ?: return
         screenModelScope.launchIO {
             try {
-                val networkHelper: NetworkHelper = Injekt.get()
-                val request = Request.Builder().url(coverUrl).build()
-                val response = networkHelper.client.newCall(request).await()
+                val sourceManager: SourceManager = Injekt.get()
+                val source = sourceManager.get(sourceId)
+                val httpSource = source as? HttpSource
+                val client = httpSource?.client ?: Injekt.get<NetworkHelper>().client
+                val request = Request.Builder()
+                    .url(coverUrl)
+                    .apply { httpSource?.headers?.let { headers(it) } }
+                    .build()
+                val response = client.newCall(request).await()
                 response.use { resp ->
                     if (!resp.isSuccessful) {
                         throw IllegalStateException("Failed to download cover: ${resp.code}")
