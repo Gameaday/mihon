@@ -7,8 +7,8 @@ import java.io.OutputStream
 /**
  * Returns a lossless encoder for **persisting** images to disk (covers, download splits, merges).
  *
- * WebP lossless uses Android's native encoder — hardware-accelerated decode, ~25 % smaller
- * than PNG, and fast to encode.
+ * WebP lossless uses Android's native encoder — fast to encode, produces files ~25 % smaller
+ * than PNG, and has hardware-accelerated decoding on all Android devices for efficient loading.
  * PNG uses Android's built-in encoder — universal compatibility.
  *
  * This encoder is **not** used for transient reader buffers. Reader transforms
