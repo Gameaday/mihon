@@ -116,13 +116,17 @@ fun MangaNotesTextArea(
             ) {
                 item {
                     MangaNotesTextAreaButton(
-                        onClick = { textFieldValue = textFieldValue.wrapMarkdownSyntax("**") },
+                        onClick = {
+                            textFieldValue = textFieldValue.applyIfWithinLimit { wrapMarkdownSyntax("**") }
+                        },
                         icon = Icons.Outlined.FormatBold,
                     )
                 }
                 item {
                     MangaNotesTextAreaButton(
-                        onClick = { textFieldValue = textFieldValue.wrapMarkdownSyntax("*") },
+                        onClick = {
+                            textFieldValue = textFieldValue.applyIfWithinLimit { wrapMarkdownSyntax("*") }
+                        },
                         icon = Icons.Outlined.FormatItalic,
                     )
                 }
@@ -135,13 +139,17 @@ fun MangaNotesTextArea(
                 }
                 item {
                     MangaNotesTextAreaButton(
-                        onClick = { textFieldValue = textFieldValue.toggleLinePrefix("- ") },
+                        onClick = {
+                            textFieldValue = textFieldValue.applyIfWithinLimit { toggleLinePrefix("- ") }
+                        },
                         icon = Icons.AutoMirrored.Outlined.FormatListBulleted,
                     )
                 }
                 item {
                     MangaNotesTextAreaButton(
-                        onClick = { textFieldValue = textFieldValue.toggleLinePrefix("1. ") },
+                        onClick = {
+                            textFieldValue = textFieldValue.applyIfWithinLimit { toggleLinePrefix("1. ") }
+                        },
                         icon = Icons.Outlined.FormatListNumbered,
                     )
                 }
@@ -180,12 +188,15 @@ private fun TextFieldValue.wrapMarkdownSyntax(syntax: String): TextFieldValue {
         )
     }
 
-    val newText = text.substring(0, selection.start) + syntax +
-        text.substring(selection.start, selection.end) + syntax +
-        text.substring(selection.end)
+    val selStart = selection.min
+    val selEnd = selection.max
+
+    val newText = text.substring(0, selStart) + syntax +
+        text.substring(selStart, selEnd) + syntax +
+        text.substring(selEnd)
     return this.copy(
         text = newText,
-        selection = TextRange(selection.start + syntax.length, selection.end + syntax.length),
+        selection = TextRange(selStart + syntax.length, selEnd + syntax.length),
     )
 }
 
@@ -195,7 +206,7 @@ private fun TextFieldValue.wrapMarkdownSyntax(syntax: String): TextFieldValue {
  */
 private fun TextFieldValue.toggleLinePrefix(prefix: String): TextFieldValue {
     val text = this.text
-    val cursorPos = this.selection.start
+    val cursorPos = this.selection.min
 
     val lineStart = text.lastIndexOf('\n', cursorPos - 1) + 1
     val lineFromStart = text.substring(lineStart)
@@ -213,6 +224,17 @@ private fun TextFieldValue.toggleLinePrefix(prefix: String): TextFieldValue {
         text = newText,
         selection = TextRange(cursorPos + prefix.length),
     )
+}
+
+/**
+ * Applies a transformation to this [TextFieldValue] only if the result stays within [MAX_LENGTH].
+ * Returns the original value unchanged if the transformation would exceed the limit.
+ */
+private inline fun TextFieldValue.applyIfWithinLimit(
+    transform: TextFieldValue.() -> TextFieldValue,
+): TextFieldValue {
+    val result = transform()
+    return if (result.text.length <= MAX_LENGTH) result else this
 }
 
 @Composable
