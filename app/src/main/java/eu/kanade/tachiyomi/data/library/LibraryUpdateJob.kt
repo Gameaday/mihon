@@ -378,7 +378,9 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
             val shouldFetchMetadata = if (usingMetadataSource) {
                 val lastUpdate = manga.lastUpdate
                 val daysSinceUpdate = if (lastUpdate > 0) {
-                    (System.currentTimeMillis() - lastUpdate) / (1000L * 60 * 60 * 24)
+                    java.util.concurrent.TimeUnit.MILLISECONDS.toDays(
+                        System.currentTimeMillis() - lastUpdate,
+                    )
                 } else {
                     Long.MAX_VALUE
                 }
@@ -389,11 +391,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
 
             if (shouldFetchMetadata) {
                 try {
-                    val (metaSource, metaSManga) = if (usingMetadataSource) {
-                        val msId = metadataSourceId!!
-                        val msUrl = metadataUrl!!
-                        val metaSrc = sourceManager.getOrStub(msId)
-                        val sM = manga.toSManga().apply { url = msUrl }
+                    val (metaSource, metaSManga) = if (
+                        usingMetadataSource && metadataSourceId != null && metadataUrl != null
+                    ) {
+                        val metaSrc = sourceManager.getOrStub(metadataSourceId)
+                        val sM = manga.toSManga().apply { url = metadataUrl }
                         metaSrc to sM
                     } else {
                         source to sManga

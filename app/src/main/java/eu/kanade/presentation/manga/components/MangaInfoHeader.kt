@@ -586,7 +586,7 @@ private fun ColumnScope.MangaContentInfo(
                     imageVector = Icons.Outlined.Sync,
                     contentDescription = null,
                     modifier = Modifier
-                        .padding(end = 4.dp)
+                        .padding(end = MaterialTheme.padding.extraSmall)
                         .size(16.dp),
                 )
                 ProvideTextStyle(MaterialTheme.typography.bodyMedium) {

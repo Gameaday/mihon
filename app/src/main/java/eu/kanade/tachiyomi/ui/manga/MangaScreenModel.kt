@@ -293,12 +293,10 @@ class MangaScreenModel(
                 var networkManga: SManga? = null
 
                 // Try metadata source first if configured
-                if (usingMetadataSource) {
+                if (usingMetadataSource && metadataSourceId != null && metadataUrl != null) {
                     try {
-                        val msId = metadataSourceId ?: error("unreachable")
-                        val msUrl = metadataUrl ?: error("unreachable")
-                        val metaSrc = Injekt.get<SourceManager>().getOrStub(msId)
-                        val sM = manga.toSManga().apply { url = msUrl }
+                        val metaSrc = Injekt.get<SourceManager>().getOrStub(metadataSourceId)
+                        val sM = manga.toSManga().apply { url = metadataUrl }
                         networkManga = metaSrc.getMangaDetails(sM).also {
                             // Preserve the chapter source's updateStrategy
                             it.update_strategy = manga.updateStrategy
