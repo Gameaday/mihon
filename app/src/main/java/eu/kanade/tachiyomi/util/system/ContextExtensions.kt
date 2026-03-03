@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.appcompat.view.ContextThemeWrapper
@@ -19,7 +18,6 @@ import eu.kanade.domain.ui.model.ThemeMode
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.ui.base.delegate.ThemingDelegate
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
-import eu.kanade.tachiyomi.util.lang.truncateCenter
 import logcat.LogPriority
 import rikka.sui.Sui
 import tachiyomi.core.common.i18n.stringResource
@@ -41,12 +39,7 @@ fun Context.copyToClipboard(label: String, content: String) {
     try {
         val clipboard = getSystemService<ClipboardManager>()!!
         clipboard.setPrimaryClip(ClipData.newPlainText(label, content))
-
-        // Android 13 and higher shows a visual confirmation of copied contents
-        // https://developer.android.com/about/versions/13/features/copy-paste
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-            toast(stringResource(MR.strings.copied_to_clipboard, content.truncateCenter(50)))
-        }
+        // Android 13+ shows a visual confirmation of copied contents natively
     } catch (e: Throwable) {
         logcat(LogPriority.ERROR, e)
         toast(MR.strings.clipboard_copy_error)
@@ -79,14 +72,10 @@ fun Context.openInBrowser(uri: Uri, forceDefaultBrowser: Boolean = false) {
 
 private fun Context.defaultBrowserPackageName(): String? {
     val browserIntent = Intent(Intent.ACTION_VIEW, "http://".toUri())
-    val resolveInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        packageManager.resolveActivity(
-            browserIntent,
-            PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()),
-        )
-    } else {
-        packageManager.resolveActivity(browserIntent, PackageManager.MATCH_DEFAULT_ONLY)
-    }
+    val resolveInfo = packageManager.resolveActivity(
+        browserIntent,
+        PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()),
+    )
     return resolveInfo
         ?.activityInfo?.packageName
         ?.takeUnless { it in DeviceUtil.invalidDefaultBrowsers }

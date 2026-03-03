@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Build
+
 import androidx.core.content.pm.PackageInfoCompat
 import eu.kanade.domain.extension.interactor.TrustExtension
 import eu.kanade.domain.source.service.SourcePreferences
@@ -115,11 +115,8 @@ internal object ExtensionLoader {
     suspend fun loadExtensions(context: Context): List<LoadResult> {
         val pkgManager = context.packageManager
 
-        val installedPkgs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val installedPkgs =
             pkgManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong()))
-        } else {
-            pkgManager.getInstalledPackages(PACKAGE_FLAGS)
-        }
 
         val sharedExtPkgs = installedPkgs
             .asSequence()
@@ -199,14 +196,10 @@ internal object ExtensionLoader {
         }
 
         val sharedPkg = try {
-            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(
-                    pkgName,
-                    PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong()),
-                )
-            } else {
-                context.packageManager.getPackageInfo(pkgName, PACKAGE_FLAGS)
-            }
+            val packageInfo = context.packageManager.getPackageInfo(
+                pkgName,
+                PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong()),
+            )
             packageInfo.takeIf { isPackageAnExtension(it) }
                 ?.let {
                     ExtensionInfo(

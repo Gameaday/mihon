@@ -3,7 +3,6 @@ package tachiyomi.presentation.widget
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -27,10 +26,8 @@ import coil3.executeBlocking
 import coil3.imageLoader
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import coil3.request.transformations
 import coil3.size.Precision
 import coil3.size.Scale
-import coil3.transform.RoundedCornersTransformation
 import eu.kanade.tachiyomi.core.security.SecurityPreferences
 import eu.kanade.tachiyomi.util.system.dpToPx
 import kotlinx.collections.immutable.ImmutableList
@@ -116,7 +113,6 @@ abstract class BaseUpdatesGridGlanceWidget(
         // Resize to cover size
         val widthPx = CoverWidth.value.toInt().dpToPx
         val heightPx = CoverHeight.value.toInt().dpToPx
-        val roundPx = context.resources.getDimension(R.dimen.appwidget_inner_radius)
         return withIOContext {
             this@prepareData
                 .distinctBy { it.mangaId }
@@ -136,13 +132,6 @@ abstract class BaseUpdatesGridGlanceWidget(
                         .precision(Precision.EXACT)
                         .size(widthPx, heightPx)
                         .scale(Scale.FILL)
-                        .let {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                                it.transformations(RoundedCornersTransformation(roundPx))
-                            } else {
-                                it // Handled by system
-                            }
-                        }
                         .build()
                     val bitmap = context.imageLoader.executeBlocking(request)
                         .image

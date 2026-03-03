@@ -46,7 +46,6 @@ import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageInstaller
 import android.content.res.AssetFileDescriptor
-import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.UserHandle
@@ -81,31 +80,17 @@ class ShellInterface : IShellInterface.Stub() {
                 installFlags.getInt(this) or REPLACE_EXISTING_INSTALL_FLAG,
             )
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                setPackageSource(PackageInstaller.PACKAGE_SOURCE_STORE)
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                setInstallerPackageName(packageName)
-            }
+            setPackageSource(PackageInstaller.PACKAGE_SOURCE_STORE)
+            setInstallerPackageName(packageName)
         }
 
-        val sessionId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            packageInstaller::class.java.getMethod(
-                "createSession",
-                PackageInstaller.SessionParams::class.java,
-                String::class.java,
-                String::class.java,
-                Int::class.java,
-            ).invoke(packageInstaller, params, packageName, packageName, userId) as Int
-        } else {
-            packageInstaller::class.java.getMethod(
-                "createSession",
-                PackageInstaller.SessionParams::class.java,
-                String::class.java,
-                Int::class.java,
-            ).invoke(packageInstaller, params, packageName, userId) as Int
-        }
+        val sessionId = packageInstaller::class.java.getMethod(
+            "createSession",
+            PackageInstaller.SessionParams::class.java,
+            String::class.java,
+            String::class.java,
+            Int::class.java,
+        ).invoke(packageInstaller, params, packageName, packageName, userId) as Int
 
         val session = packageInstaller::class.java
             .getMethod("openSession", Int::class.java)

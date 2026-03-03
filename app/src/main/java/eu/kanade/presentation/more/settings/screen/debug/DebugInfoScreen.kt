@@ -123,11 +123,7 @@ class DebugInfoScreen : Screen() {
                 )
             }
 
-            val androidVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Build.VERSION.RELEASE_OR_PREVIEW_DISPLAY
-            } else {
-                Build.VERSION.RELEASE_OR_CODENAME
-            }
+            val androidVersion = Build.VERSION.RELEASE_OR_PREVIEW_DISPLAY
             it.add(
                 Preference.PreferenceItem.TextPreference(
                     title = "Android version",

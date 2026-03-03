@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import androidx.core.content.IntentCompat
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
@@ -38,10 +37,5 @@ inline fun <reified T> Intent.getParcelableExtraCompat(name: String): T? {
 }
 
 inline fun <reified T : Serializable> Intent.getSerializableExtraCompat(name: String): T? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getSerializableExtra(name, T::class.java)
-    } else {
-        @Suppress("DEPRECATION")
-        getSerializableExtra(name) as? T
-    }
+    return getSerializableExtra(name, T::class.java)
 }

@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageInstaller
-import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentSanitizer
 import eu.kanade.tachiyomi.extension.model.InstallStep
@@ -68,9 +67,7 @@ class PackageInstallerInstaller(private val service: Service) : Installer(servic
         activeSession = null
         try {
             val installParams = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                installParams.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
-            }
+            installParams.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
             activeSession = entry to packageInstaller.createSession(installParams)
             val fileSize = service.getUriSize(entry.uri) ?: throw IllegalStateException()
             installParams.setSize(fileSize)
@@ -89,7 +86,7 @@ class PackageInstallerInstaller(private val service: Service) : Installer(servic
                     service,
                     activeSession!!.second,
                     Intent(INSTALL_ACTION).setPackage(service.packageName),
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0,
+                    PendingIntent.FLAG_MUTABLE,
                 ).intentSender
                 @SuppressLint("RequestInstallPackagesPolicy")
                 session.commit(intentSender)
