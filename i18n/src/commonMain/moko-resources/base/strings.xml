@@ -106,7 +106,7 @@
     <string name="metadata_source_set">Metadata source set</string>
     <string name="metadata_source_cleared">Metadata source cleared</string>
     <string name="action_clear_metadata_source">Clear metadata source</string>
-    <string name="metadata_source_label">Metadata: %1$s</string>
+    <string name="metadata_source_label">Sync source</string>
     <string name="action_view_chapters">View chapters</string>
     <string name="action_pause">Pause</string>
     <string name="action_previous_chapter">Previous chapter</string>

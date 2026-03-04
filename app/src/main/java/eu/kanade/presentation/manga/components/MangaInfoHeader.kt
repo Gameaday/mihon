@@ -580,19 +580,24 @@ private fun ColumnScope.MangaContentInfo(
     if (metadataSourceName != null) {
         Row(
             modifier = Modifier.secondaryItemAlpha(),
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = Icons.Outlined.Sync,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(end = MaterialTheme.padding.extraSmall)
+                    .padding(end = 4.dp)
                     .size(16.dp),
             )
             ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
                 Text(
-                    text = stringResource(MR.strings.metadata_source_label, metadataSourceName),
+                    text = stringResource(MR.strings.metadata_source_label),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+                DotSeparatorText()
+                Text(
+                    text = metadataSourceName,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
