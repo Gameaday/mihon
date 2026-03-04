@@ -575,27 +575,27 @@ private fun ColumnScope.MangaContentInfo(
                 maxLines = 1,
             )
         }
+    }
 
-        if (metadataSourceName != null) {
-            Row(
-                modifier = Modifier.secondaryItemAlpha(),
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Sync,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(end = MaterialTheme.padding.extraSmall)
-                        .size(16.dp),
+    if (metadataSourceName != null) {
+        Row(
+            modifier = Modifier.secondaryItemAlpha(),
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Sync,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = MaterialTheme.padding.extraSmall)
+                    .size(16.dp),
+            )
+            ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+                Text(
+                    text = stringResource(MR.strings.metadata_source_label, metadataSourceName),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
                 )
-                ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
-                    Text(
-                        text = stringResource(MR.strings.metadata_source_label, metadataSourceName),
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                    )
-                }
             }
         }
     }
