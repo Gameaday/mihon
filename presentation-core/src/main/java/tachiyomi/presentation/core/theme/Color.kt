@@ -2,7 +2,6 @@ package tachiyomi.presentation.core.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
@@ -19,13 +18,11 @@ val ColorScheme.active: Color
  * Useful for subtitles and auxiliary text sitting alongside primary-emphasis content.
  */
 val ColorScheme.onSurfaceSecondary: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.onSurface.copy(alpha = SECONDARY_ALPHA)
+    get() = onSurface.copy(alpha = SECONDARY_ALPHA)
 
 /**
  * Primary content color at disabled alpha.
  * Use for placeholder text, disabled controls, and unavailable items.
  */
 val ColorScheme.onSurfaceDisabled: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ALPHA)
+    get() = onSurface.copy(alpha = DISABLED_ALPHA)
