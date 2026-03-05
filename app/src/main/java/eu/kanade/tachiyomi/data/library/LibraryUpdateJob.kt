@@ -459,6 +459,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         val previousChapterCount = getChaptersByMangaId.await(manga.id).size
         val newStatus = detectSourceHealth(chapters.size, previousChapterCount)
         if (newStatus.value != dbManga.sourceStatus) {
+            val oldStatus = SourceStatus.fromValue(dbManga.sourceStatus)
+            logcat(LogPriority.INFO) {
+                "Source health changed for ${manga.title}: $oldStatus → $newStatus " +
+                    "(chapters: $previousChapterCount → ${chapters.size})"
+            }
             updateManga.await(
                 MangaUpdate(id = manga.id, sourceStatus = newStatus.value),
             )

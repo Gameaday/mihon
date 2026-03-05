@@ -13,11 +13,12 @@
 |---------|-----------|-------|
 | **Database schema** — `canonical_id`, `source_status`, `alternative_titles` columns on `mangas` table | Migrations 12.sqm, 13.sqm, 14.sqm | Schema validated via build |
 | **Canonical ID auto-population** — Sets `canonical_id` from tracker remote IDs on first tracker bind (MAL → `mal:`, AniList → `al:`, MangaUpdates → `mu:`) | `AddTracks.setCanonicalIdIfAbsent()` | 7 unit tests |
-| **Alternative titles pipeline** — AniList romaji/english/native/synonyms merged into manga, case-insensitive dedup | `AddTracks.mergeAlternativeTitles()`, `ALSearchItem.buildAlternativeTitles()` | 8 unit tests |
+| **Alternative titles pipeline** — AniList romaji/english/native/synonyms merged into manga, case-insensitive dedup. JSON array storage with pipe-separated fallback. | `AddTracks.mergeAlternativeTitles()`, `ALSearchItem.buildAlternativeTitles()`, `MangaMapper.parseAlternativeTitles()` | 8 + 16 unit tests |
 | **Tiered search engine** — 4-tier migration search with cross-title evaluation, dedup, near-match tracking | `BaseSmartSearchEngine.multiTitleSearch()`, `MigrationListScreenModel.searchSource()` | 16 unit tests |
 | **Canonical ID lookup** — Zero-API-call local DB match via partial index | `GetFavoritesByCanonicalId`, `mangas.sq:getFavoritesByCanonicalId`, `14.sqm` index | Tested via integration |
-| **Source health detection** — Automatic HEALTHY/DEGRADED/DEAD classification during library updates | `LibraryUpdateJob.kt:443-459` | Manual |
+| **Source health detection** — Automatic HEALTHY/DEGRADED/DEAD classification during library updates with recovery support | `LibraryUpdateJob.detectSourceHealth()` | 15 unit tests |
 | **Source health UI** — Warning banner on manga detail screen for DEGRADED/DEAD sources | `SourceHealthBanner.kt`, `MangaScreen.kt` | Visual |
+| **Source health notification** — Post-update notification listing dead/degraded sources | `LibraryUpdateNotifier.showSourceHealthNotification()` | N/A |
 | **Design token system** — Padding, Shape, Motion, Typography, Color tokens with adoption in 10+ components | `Constants.kt`, `Motion.kt`, `Shapes.kt`, `Typography.kt`, `Color.kt` | N/A |
 
 ### ⚠️ Partially Implemented
@@ -61,15 +62,16 @@
 |------|---------|--------|
 | ~~`AddTracks.setCanonicalIdIfAbsent()`~~ | ~~No unit tests~~ | ✅ 7 tests added |
 | ~~`AddTracks.mergeAlternativeTitles()`~~ | ~~No unit tests~~ | ✅ 8 tests added |
-| `LibraryUpdateJob` health detection | No unit tests | Test: HEALTHY→DEGRADED threshold, DEAD on empty chapters, recovery |
+| ~~`LibraryUpdateJob` health detection~~ | ~~No unit tests~~ | ✅ 15 tests (DEAD, DEGRADED, HEALTHY, recovery, edge cases) |
+| ~~`MangaMapper` alt title parsing~~ | ~~No unit tests~~ | ✅ 16 tests (JSON, pipe, round-trip, special chars) |
 | `GetFavoritesByCanonicalId` | No unit tests | Test: exclude self, match on canonical_id, empty results |
 | Design tokens | No tests | Snapshot tests for token values to prevent regression |
 
 ### 3. Code-Level Issues
 
+- ~~**Pipe-separated `alternative_titles`** — Stored as `TEXT` with `|` delimiter. If a title contains `|` character, it breaks parsing.~~ ✅ Fixed — now serialized as JSON array, with backward-compatible parsing for legacy pipe-separated data.
 - **`AddTracks.kt:52`** — Type check `item is TrackSearch` only works when caller passes `TrackSearch` instance; `Track` instances from general tracker bind paths won't trigger alt title merge. Consider extracting alt titles from the tracker search result before the bind.
 - **`MigrationListScreenModel.kt`** — `findByCanonicalId()` returns first match per source; doesn't consider confidence scoring or prefer certain tracker prefixes.
-- **Pipe-separated `alternative_titles`** — Stored as `TEXT` with `|` delimiter. If a title contains `|` character, it breaks parsing. Consider JSON array or different delimiter.
 
 ---
 
@@ -86,41 +88,38 @@
 #### 1.3 Unit Tests for AddTracks Pipeline ✅
 **Done:** Added 15 tests in `AddTracksTest.kt`: 7 for `setCanonicalIdIfAbsent()` (prefix mapping, first-wins, skip zero/negative/unknown tracker), 8 for `mergeAlternativeTitles()` (add, dedup, case-insensitive, blank filter, preserve existing). Changed method visibility to `internal` for testability.
 
-### Phase 2: Feature Completion (Medium Effort)
+### Phase 2: Feature Completion (Medium Effort) — ✅ COMPLETE
 
-#### 2.1 Source Health Recovery Logic
-**What:** When a previously DEGRADED/DEAD source returns to normal chapter count, auto-reset to HEALTHY.
-**Why:** Sources have temporary outages; permanent DEAD marking causes false alarms.
-**Where:** `LibraryUpdateJob.kt` — the existing health detection code already handles this via the `else -> SourceStatus.HEALTHY` branch, but verify it works correctly when chapters recover.
-**Effort:** ~1 hour (verify + test)
+#### 2.1 Source Health Recovery Logic + Tests ✅
+**Done:** Extracted `detectSourceHealth()` as a pure companion function in `LibraryUpdateJob` for testability. Added logging for status transitions (recovery from DEAD/DEGRADED → HEALTHY). Added 15 unit tests covering DEAD detection (0 chapters), DEGRADED detection (<70% threshold), HEALTHY (at/above threshold, growth), recovery from DEAD, edge cases (small manga).
 
-#### 2.2 Bulk Migration Suggestion
-**What:** When source is DEAD for 3+ consecutive updates, prompt user to migrate affected manga.
-**Why:** Automates the discovery of migration candidates instead of manual checking.
-**Where:** New notification/dialog triggered from `LibraryUpdateJob`.
-**Effort:** ~4-6 hours
+#### 2.2 Dead/Degraded Source Notification ✅
+**Done:** Added `showSourceHealthNotification()` to `LibraryUpdateNotifier` — after each library update, scans updated manga for DEAD/DEGRADED status and shows a grouped notification with affected titles. Uses error channel, auto-cancel on tap. Added `notification_source_health_title`, `notification_dead_sources`, `notification_degraded_sources` string resources.
 
-#### 2.3 Alternative Title Delimiter Safety
-**What:** Switch from pipe-separated `TEXT` to JSON array storage, or escape `|` in titles.
-**Why:** Titles containing `|` will corrupt the alt titles list.
-**Where:** Migration 15.sqm + `MangaMapper.kt` + `MangaUpdate.kt` serialization.
-**Effort:** ~3-4 hours
+#### 2.3 Alternative Title Delimiter Safety ✅
+**Done:** Migrated from pipe-separated to JSON array storage. `MangaMapper.parseAlternativeTitles()` handles both formats (JSON first, pipe fallback for backward compatibility). `serializeAlternativeTitles()` always writes JSON. Updated `MangaRepositoryImpl` and `MangaRestorer`. Added 16 unit tests covering JSON/pipe parsing, round-trip, special characters (including `|` in titles), null/blank handling.
 
 ### Phase 3: Advanced Features (High Effort)
 
-#### 3.1 Source Health History
+#### 3.1 Bulk Migration Prompt for DEAD Sources
+**What:** When source is DEAD for 3+ consecutive updates, prompt user to migrate affected manga.
+**Why:** Automates the discovery of migration candidates instead of manual checking.
+**Where:** Track consecutive DEAD count, new notification/dialog triggered from `LibraryUpdateJob`.
+**Effort:** ~4-6 hours
+
+#### 3.2 Source Health History
 **What:** Track status transitions over time to distinguish temporary outages from permanent source death.
 **Why:** A single failed update shouldn't mark a source DEAD permanently.
 **Where:** New column or table for health history timestamps.
 **Effort:** ~6-8 hours
 
-#### 3.2 Cross-Source Discovery
+#### 3.3 Cross-Source Discovery
 **What:** Implement the automated source discovery protocol from BRAINSTORM.md Part 2.
 **Why:** Enables proactive source failover instead of manual migration.
 **Where:** New discovery service, rate limiting, confidence scoring.
 **Effort:** ~20-30 hours (major feature)
 
-#### 3.3 Multi-Source Chapter Resolution
+#### 3.4 Multi-Source Chapter Resolution
 **What:** Implement HIERARCHY/ROUND_ROBIN/QUALITY strategies from BRAINSTORM.md Part 3.
 **Why:** Enables automatic chapter fetching from multiple sources per manga.
 **Where:** New `source_mappings` table (Migration 15.sqm), resolution engine.
@@ -133,12 +132,10 @@
 1. **Should we add `source_mappings` table now or later?**
    - Current approach (Approach C) is lean: 3 columns, no new tables.
    - BRAINSTORM.md Approach A adds `source_mappings` table for full multi-source.
-   - **Recommendation:** Stay with Approach C until health UI and bulk migration are shipped. Approach C → A is additive (no breaking changes).
+   - **Recommendation:** Stay with Approach C until Phase 3 features are started. Approach C → A is additive (no breaking changes).
 
-2. **Should alt titles use JSON instead of pipe-delimited?**
-   - Current: Pipe-separated in `TEXT` column. Simple but fragile.
-   - Alternative: JSON array. More robust but slightly more complex queries.
-   - **Recommendation:** Add to Phase 2 backlog. Low priority since `|` in titles is rare.
+2. ~~**Should alt titles use JSON instead of pipe-delimited?**~~
+   ✅ **Resolved:** Migrated to JSON array storage with backward-compatible pipe-separated parsing. Titles with `|` characters are now safe.
 
 3. **Should we add a `Padding.micro` (2.dp) token?**
    - Some components use `1.dp` or `3.dp` padding that doesn't fit existing tokens.
@@ -155,4 +152,5 @@
 | Health detection | Chapter count comparison (70% threshold) | Zero additional API calls, uses data already fetched |
 | Search strategy | 4-tier with cross-title evaluation | Balances API cost vs match quality |
 | Design tokens | Material Expressive system | Padding, Shape, Motion, Typography, Color tokens |
+| Alt title storage | JSON array (backward-compatible) | Handles `\|` in titles, round-trip safe, legacy pipe-separated still readable |
 | Alt title source | AniList (romaji/english/native/synonyms) | Most complete metadata; MangaDex alt titles planned but SManga lacks field |
