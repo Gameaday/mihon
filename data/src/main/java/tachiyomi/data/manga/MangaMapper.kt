@@ -1,6 +1,8 @@
 package tachiyomi.data.manga
 
 import eu.kanade.tachiyomi.source.model.UpdateStrategy
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import tachiyomi.domain.library.model.LibraryManga
 import tachiyomi.domain.manga.model.Manga
@@ -244,7 +246,7 @@ object MangaMapper {
      */
     fun serializeAlternativeTitles(titles: List<String>?): String? {
         if (titles.isNullOrEmpty()) return null
-        return Json.encodeToString(titles)
+        return Json.encodeToString(ListSerializer(String.serializer()), titles)
     }
 
     /** Legacy separator used in pre-JSON pipe-separated storage. Kept for backward compatibility. */

@@ -308,12 +308,12 @@ class LibraryUpdateNotifier(
                 context.stringResource(MR.strings.notification_dead_sources, deadManga.size),
             )
             if (!securityPreferences.hideNotificationContent().get()) {
-                deadManga.take(NOTIF_MAX_CHAPTERS).forEach { manga ->
+                deadManga.take(NOTIF_MAX_HEALTH_ENTRIES).forEach { manga ->
                     val sourceName = sourceManager.getOrStub(manga.source).name
                     lines.add("  • ${manga.title.chop(NOTIF_TITLE_MAX_LEN)} ($sourceName)")
                 }
-                if (deadManga.size > NOTIF_MAX_CHAPTERS) {
-                    lines.add("  … and ${deadManga.size - NOTIF_MAX_CHAPTERS} more")
+                if (deadManga.size > NOTIF_MAX_HEALTH_ENTRIES) {
+                    lines.add("  … and ${deadManga.size - NOTIF_MAX_HEALTH_ENTRIES} more")
                 }
             }
         }
@@ -323,12 +323,12 @@ class LibraryUpdateNotifier(
                 context.stringResource(MR.strings.notification_degraded_sources, degradedManga.size),
             )
             if (!securityPreferences.hideNotificationContent().get()) {
-                degradedManga.take(NOTIF_MAX_CHAPTERS).forEach { manga ->
+                degradedManga.take(NOTIF_MAX_HEALTH_ENTRIES).forEach { manga ->
                     val sourceName = sourceManager.getOrStub(manga.source).name
                     lines.add("  • ${manga.title.chop(NOTIF_TITLE_MAX_LEN)} ($sourceName)")
                 }
-                if (degradedManga.size > NOTIF_MAX_CHAPTERS) {
-                    lines.add("  … and ${degradedManga.size - NOTIF_MAX_CHAPTERS} more")
+                if (degradedManga.size > NOTIF_MAX_HEALTH_ENTRIES) {
+                    lines.add("  … and ${degradedManga.size - NOTIF_MAX_HEALTH_ENTRIES} more")
                 }
             }
         }
@@ -440,6 +440,7 @@ class LibraryUpdateNotifier(
             "https://mihon.app/docs/faq/library#why-am-i-warned-about-large-bulk-updates-and-downloads"
 
         private const val NOTIF_MAX_CHAPTERS = 5
+        private const val NOTIF_MAX_HEALTH_ENTRIES = 5
         private const val NOTIF_TITLE_MAX_LEN = 45
         private const val NOTIF_ICON_SIZE = 192
         private const val MANGA_PER_SOURCE_QUEUE_WARNING_THRESHOLD = 60
