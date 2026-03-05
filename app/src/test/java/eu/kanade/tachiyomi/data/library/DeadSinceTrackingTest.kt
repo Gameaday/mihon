@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
-
+import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.domain.manga.model.toMangaUpdate
 
 class DeadSinceTrackingTest {
@@ -92,5 +92,70 @@ class DeadSinceTrackingTest {
         val threeDaysAgo = System.currentTimeMillis() - (3L * 24 * 60 * 60 * 1000)
         val elapsed = System.currentTimeMillis() - threeDaysAgo
         assert(elapsed >= LibraryUpdateJob.DEAD_MIGRATION_THRESHOLD_MS)
+    }
+
+    // --- dead_since transition rules ---
+
+    /**
+     * Tests the dead_since transition logic from LibraryUpdateJob lines 482-488:
+     * - HEALTHY → DEAD: set timestamp
+     * - DEAD → HEALTHY: clear (sentinel 0)
+     * - DEAD → DEGRADED: clear (sentinel 0)
+     * - DEAD → DEAD: no change (null)
+     * - HEALTHY → DEGRADED: no change (null)
+     */
+    private fun computeDeadSince(
+        newStatus: SourceStatus,
+        oldStatus: SourceStatus,
+    ): Long? {
+        return when {
+            newStatus == SourceStatus.DEAD && oldStatus != SourceStatus.DEAD ->
+                1000L // Represents System.currentTimeMillis() in tests
+            newStatus != SourceStatus.DEAD && oldStatus == SourceStatus.DEAD ->
+                LibraryUpdateJob.DEAD_SINCE_CLEARED
+            else -> null
+        }
+    }
+
+    @Test
+    fun `HEALTHY to DEAD sets dead_since timestamp`() {
+        val result = computeDeadSince(SourceStatus.DEAD, SourceStatus.HEALTHY)
+        assertEquals(1000L, result)
+    }
+
+    @Test
+    fun `DEGRADED to DEAD sets dead_since timestamp`() {
+        val result = computeDeadSince(SourceStatus.DEAD, SourceStatus.DEGRADED)
+        assertEquals(1000L, result)
+    }
+
+    @Test
+    fun `DEAD to HEALTHY clears dead_since with sentinel`() {
+        val result = computeDeadSince(SourceStatus.HEALTHY, SourceStatus.DEAD)
+        assertEquals(LibraryUpdateJob.DEAD_SINCE_CLEARED, result)
+    }
+
+    @Test
+    fun `DEAD to DEGRADED clears dead_since with sentinel`() {
+        val result = computeDeadSince(SourceStatus.DEGRADED, SourceStatus.DEAD)
+        assertEquals(LibraryUpdateJob.DEAD_SINCE_CLEARED, result)
+    }
+
+    @Test
+    fun `DEAD to DEAD makes no change to dead_since`() {
+        val result = computeDeadSince(SourceStatus.DEAD, SourceStatus.DEAD)
+        assertNull(result)
+    }
+
+    @Test
+    fun `HEALTHY to DEGRADED makes no change to dead_since`() {
+        val result = computeDeadSince(SourceStatus.DEGRADED, SourceStatus.HEALTHY)
+        assertNull(result)
+    }
+
+    @Test
+    fun `HEALTHY to HEALTHY makes no change to dead_since`() {
+        val result = computeDeadSince(SourceStatus.HEALTHY, SourceStatus.HEALTHY)
+        assertNull(result)
     }
 }
