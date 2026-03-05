@@ -59,6 +59,7 @@ import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.domain.manga.interactor.GetLibraryManga
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
+import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.domain.manga.model.applyFilter
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.domain.track.interactor.GetTracksPerManga
@@ -167,6 +168,7 @@ class LibraryScreenModel(
                 prefs.filterBookmarked != TriState.DISABLED ||
                 prefs.filterCompleted != TriState.DISABLED ||
                 prefs.filterIntervalCustom != TriState.DISABLED ||
+                prefs.filterSourceHealthDead != TriState.DISABLED ||
                 trackFilters.values.any { it != TriState.DISABLED }
         }
             .distinctUntilChanged()
@@ -191,6 +193,7 @@ class LibraryScreenModel(
         val filterBookmarked = preferences.filterBookmarked
         val filterCompleted = preferences.filterCompleted
         val filterIntervalCustom = preferences.filterIntervalCustom
+        val filterSourceHealthDead = preferences.filterSourceHealthDead
 
         val isNotLoggedInAnyTrack = trackingFilter.isEmpty()
 
@@ -243,6 +246,13 @@ class LibraryScreenModel(
             !isExcluded && isIncluded
         }
 
+        val filterFnSourceHealthDead: (LibraryItem) -> Boolean = {
+            applyFilter(filterSourceHealthDead) {
+                val status = SourceStatus.fromValue(it.libraryManga.manga.sourceStatus)
+                status == SourceStatus.DEAD || status == SourceStatus.DEGRADED
+            }
+        }
+
         return fastFilter {
             filterFnDownloaded(it) &&
                 filterFnUnread(it) &&
@@ -250,7 +260,8 @@ class LibraryScreenModel(
                 filterFnBookmarked(it) &&
                 filterFnCompleted(it) &&
                 filterFnIntervalCustom(it) &&
-                filterFnTracking(it)
+                filterFnTracking(it) &&
+                filterFnSourceHealthDead(it)
         }
     }
 
@@ -364,6 +375,7 @@ class LibraryScreenModel(
             libraryPreferences.filterBookmarked().changes(),
             libraryPreferences.filterCompleted().changes(),
             libraryPreferences.filterIntervalCustom().changes(),
+            libraryPreferences.filterSourceHealthDead().changes(),
         ) {
             ItemPreferences(
                 downloadBadge = it[0] as Boolean,
@@ -378,6 +390,7 @@ class LibraryScreenModel(
                 filterBookmarked = it[9] as TriState,
                 filterCompleted = it[10] as TriState,
                 filterIntervalCustom = it[11] as TriState,
+                filterSourceHealthDead = it[12] as TriState,
             )
         }
     }
@@ -787,6 +800,7 @@ class LibraryScreenModel(
         val filterBookmarked: TriState,
         val filterCompleted: TriState,
         val filterIntervalCustom: TriState,
+        val filterSourceHealthDead: TriState,
     )
 
     @Immutable
