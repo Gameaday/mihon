@@ -783,6 +783,424 @@ algorithm and integration tests for the schema migration before any behavioral c
 
 ---
 
+## 🔀 Approach B: Lean Identity — The Middle Ground
+
+> **Approach A** (above, Parts 1-12) is the full multi-source system: automatic
+> discovery, source_mappings table, multiple resolution strategies, round-robin,
+> quality selection, etc. It's powerful but complex.
+>
+> **Approach B** (this section) asks: what if we keep manga identity-based but stay
+> on ONE source at a time, and only check alternatives when the user asks or when
+> something breaks?
+
+### B.1: Core Philosophy — "One Source, Smart Fallback"
+
+The key insight from the Approach A analysis is that **most of the complexity comes
+from managing multiple active sources simultaneously**. The source_mappings table,
+resolution strategies, chapter-level source tracking, per-refresh source selection —
+all of that exists to support a multi-source world.
+
+The middle ground: **Manga is identified by canonical ID (tracker remote_id), but it
+always has exactly one active source at a time**, just like today. The difference is:
+
+1. We **record the canonical ID** so we know "this is One Piece" regardless of source
+2. We **detect when the active source breaks** (returns 0 chapters, 404s, etc.)
+3. When broken, we **suggest a replacement source** using the existing migration search
+4. The user can **manually request** "check if other sources have more chapters"
+5. We **never automatically search all sources** — the user drives alternative discovery
+
+This avoids every single one of the "Open Challenges" from Approach A while retaining
+the identity foundation that makes future enhancements possible.
+
+### B.2: Schema Changes — Minimal
+
+```sql
+-- Migration 12.sqm (Approach B version)
+-- Only 2 new columns on the existing mangas table. No new tables.
+
+ALTER TABLE mangas ADD COLUMN canonical_id TEXT;
+    -- Canonical identity string. Format: "al:21" or "mal:13" or "mu:abc123"
+    -- Prefix key: al=AniList, mal=MyAnimeList, mu=MangaUpdates
+    -- Derived from manga_sync.remote_id when a tracker is linked.
+    -- Priority: AniList > MAL > MangaUpdates (first linked wins, user can change later)
+    -- NULL for manga without tracker links (legacy behavior preserved).
+    -- TEXT not INTEGER because it includes the tracker prefix for unambiguous identity.
+
+ALTER TABLE mangas ADD COLUMN source_status INTEGER NOT NULL DEFAULT 0;
+    -- 0 = HEALTHY: source is working fine (default for all existing manga)
+    -- 1 = DEGRADED: source returned fewer chapters than expected (possible removal)
+    -- 2 = DEAD: source returned 0 chapters or errored on last N refreshes
+    -- 3 = REPLACED: user switched to a new source via suggestion
+```
+
+**That's it.** No `source_mappings` table. No `source_strategy` column. No
+`resolved_source_id` on chapters. No `canonical_tracker_type` column.
+
+**Why `canonical_id` as TEXT?** Because `"anilist:21"` is self-describing. If we
+stored just `21` (an integer), we'd need a separate column to know it's an AniList
+ID vs a MAL ID. The string format is unambiguous, human-readable in DB dumps, and
+trivially parseable (`split(":")`).
+
+**Why `source_status` instead of a boolean?** Because the degraded state (fewer
+chapters than expected) is different from dead (zero chapters). Degraded suggests
+"something changed" while dead suggests "source is down." Different UI treatments.
+
+### B.3: How It Works — Day-to-Day
+
+#### Normal Library Refresh (Zero Changes)
+
+```
+LibraryUpdateJob.updateManga(manga):
+    source = sourceManager.get(manga.source)      // Same as today
+    chapters = source.getChapterList(manga.toSManga())  // Same as today
+    
+    // NEW: simple health check (3 lines of logic)
+    // CHAPTER_DROP_THRESHOLD = 0.7 — configurable, tune with real-world data
+    previousCount = getChapterCount(manga.id)
+    if chapters.isEmpty() && previousCount > 0:
+        manga.source_status = DEAD
+    else if chapters.size < previousCount * CHAPTER_DROP_THRESHOLD:
+        manga.source_status = DEGRADED
+    else:
+        manga.source_status = HEALTHY
+    
+    syncChaptersWithSource(chapters)               // Same as today
+```
+
+**API calls: Identical to current system.** Zero additional calls. The health check
+uses data we already fetched.
+
+#### When Source Breaks (Automatic Detection + User-Driven Fix)
+
+When `source_status` becomes `DEAD` or `DEGRADED`:
+
+1. **Notification**: "Source [X] may have removed [Manga Title]" with action button
+2. **Manga Detail Badge**: Visual indicator (⚠️) on the source chip
+3. **"Find Replacement" Button**: On manga detail, triggers a **single** search using
+   the existing migration engine (`SmartSourceSearchEngine`)
+4. User picks from results → manga.source is updated (standard migration)
+
+**No automatic discovery.** The user decides when and whether to look for alternatives.
+
+#### User Requests "Check Other Sources" (On-Demand Only)
+
+On the manga detail screen, a new action: **"Compare Sources"**
+
+```
+compareSourcesForManga(manga):
+    // Uses the EXISTING migration search engine — no new code needed
+    candidates = installedCatalogueSources
+        .filter { it.lang in enabledLanguages }
+        .filter { it.id != manga.source }  // Skip current source
+    
+    results = smartSearchEngine.search(candidates, manga.title)
+    // results already includes: source name, title match, chapter count
+    
+    // Show in UI: "MangaDex: 342 chapters | MangaSee: 338 chapters | ..."
+    // User can tap to switch source (same as migration)
+```
+
+**API calls: Only when the user explicitly taps "Compare Sources."** Not on refresh.
+Not in background. Not automatically.
+
+#### Canonical ID Population (Passive, Zero-Cost)
+
+```
+// When user links a tracker (already happens today):
+MangaScreenModel.registerTracking(tracker, remoteId):
+    // ... existing tracking logic ...
+    
+    // NEW: also set canonical_id if not already set
+    // Prefix map: AniList→"al", MyAnimeList→"mal", MangaUpdates→"mu"
+    if manga.canonical_id == null:
+        val prefix = TRACKER_ID_PREFIXES[tracker.id]  // e.g. 2→"al", 1→"mal", 7→"mu"
+        manga.canonical_id = "${prefix}:${remoteId}"
+        updateManga(manga)
+```
+
+**API calls: Zero additional.** We're just saving a value we already have.
+
+#### Canonical ID Use Cases (Future-Ready)
+
+With `canonical_id` populated, we can later:
+- Detect duplicate manga in library (same series from different sources)
+- Auto-suggest "you already have this" when browsing
+- Enable Approach A features incrementally (source discovery keyed by canonical_id)
+- Export/import library by identity rather than by source URL
+
+But none of this requires the full Approach A machinery. The canonical_id column is
+a **foundation investment** that pays off whether we build Approach A or not.
+
+### B.4: What This Doesn't Do (Intentionally)
+
+| Capability | Approach A | Approach B | Why B Skips It |
+|------------|-----------|-----------|----------------|
+| Automatic multi-source discovery | ✅ Full | ❌ None | Biggest API cost and complexity |
+| Automatic source failover | ✅ Silent | ⚠️ User-prompted | Avoids wrong-series risk |
+| Multiple active sources | ✅ Yes | ❌ One at a time | Eliminates chapter alignment issues |
+| Resolution strategies | ✅ 4 strategies | ❌ None | Single source = no strategy needed |
+| Per-chapter source tracking | ✅ Yes | ❌ No | All chapters from one source |
+| Negative caching | ✅ Yes | ❌ No | No discovery = no need to cache misses |
+| Quality comparison | ✅ Yes | ❌ No | User picks source, not the app |
+| Background bulk discovery | ✅ Yes | ❌ No | No discovery phase at all |
+| Confidence scoring | ✅ Weighted | ❌ No | Reuses existing migration match UI |
+| Source priority ordering | ✅ Drag/drop | ❌ No | One source = no ordering |
+
+### B.5: Direct Comparison
+
+#### Schema Complexity
+| | Approach A | Approach B |
+|--|-----------|-----------|
+| New tables | 1 (`source_mappings`) | 0 |
+| New columns on `mangas` | 3 | 2 |
+| New columns on `chapters` | 1 | 0 |
+| New indexes | 3 | 0 |
+| Migration file size | ~30 lines SQL | ~5 lines SQL |
+
+#### Code Complexity
+| | Approach A | Approach B |
+|--|-----------|-----------|
+| New domain models | 2 (`SourceMapping`, `SourceStrategy`) | 0 (just an enum for status) |
+| New use cases | 4 | 0 (reuses existing migration search) |
+| New repository interfaces | 1 (`SourceMappingRepository`) | 0 |
+| Modified files | ~15 | ~5 |
+| New background jobs | 1 (`SourceDiscoveryJob`) | 0 |
+| Implementation phases | 5 (10 weeks) | 2 (3-4 weeks) |
+
+#### API Cost
+| | Approach A | Approach B |
+|--|-----------|-----------|
+| One-time discovery cost | ~1000 calls (100 manga × 10 sources) | 0 |
+| Per-refresh cost | Same as current | Same as current |
+| On user action | None (already discovered) | ~10 calls (search 10 sources for 1 manga) |
+| Worst case (upgrade day) | 1000+ calls/user | 0 calls |
+
+#### Risk Profile
+| | Approach A | Approach B |
+|--|-----------|-----------|
+| False positive match risk | Medium (fuzzy matching) | None (user confirms) |
+| Wrong series chapters | Possible (auto-matched) | Impossible (user picks) |
+| Extension server spike | Yes (discovery phase) | No |
+| Data migration risk | Higher (more schema) | Lower (2 columns) |
+| Behavioral change surface | Large (refresh path) | Minimal (health check only) |
+
+### B.6: Avoiding Approach A's Pitfalls
+
+Each of the 8 "Open Challenges" from Approach A's Part 12, and how Approach B handles them:
+
+**Challenge 1: Tracker ID Coverage Gap**
+- Approach A: Must handle sources that don't embed tracker IDs → fuzzy matching fallback
+- **Approach B: Not a problem.** We don't search sources automatically. Canonical ID is
+  only used for identity/dedup, not for discovery. If a manga has no tracker, it works
+  exactly like today.
+
+**Challenge 2: Chapter Number Alignment Across Sources**
+- Approach A: Different sources number chapters differently → merge conflicts
+- **Approach B: Not a problem.** One source at a time = one numbering scheme. When user
+  switches sources (migration), the existing migration code handles this.
+
+**Challenge 3: Scanlator/Translation Quality Differences**
+- Approach A: Can't express "Source A for chapters 1-50, Source B for 51+"
+- **Approach B: Same limitation, but explicit.** User picks one source. If they want to
+  switch, they migrate. No hidden source-mixing that could surprise them.
+
+**Challenge 4: Discovery Timing for New Users**
+- Approach A: 200 manga × 15 sources = 3,000 search calls on first run
+- **Approach B: Zero calls on first run.** Everything works exactly as before. User can
+  compare sources one manga at a time, when they choose to.
+
+**Challenge 5: "Confirmed Not Available" Might Change**
+- Approach A: Need negative caching with expiry logic
+- **Approach B: Not a problem.** No caching of search results. Each "Compare Sources"
+  request is fresh.
+
+**Challenge 6: Extension Source ID Stability**
+- Approach A: Source ID changes orphan mappings → need migration logic
+- **Approach B: Not a problem.** No mappings table to orphan. The existing extension
+  update system already handles `manga.source` ID changes.
+
+**Challenge 7: User Mental Model**
+- Approach A: "My manga pulls from wherever" — potentially confusing
+- **Approach B: Crystal clear.** "My manga is from MangaDex. It broke. I switched to
+  MangaSee." Users always know exactly which source is active.
+
+**Challenge 8: Testing Surface Area**
+- Approach A: Database + network + background jobs + UI = large test surface
+- **Approach B: Tiny test surface.** Health check is 3 lines of logic. Canonical ID
+  is a string column. "Compare Sources" reuses existing migration search.
+
+### B.7: Implementation Plan — Two Phases
+
+#### Phase 1: Schema + Health Detection (Week 1-2)
+
+**Files to modify:**
+
+| File | Change | Lines |
+|------|--------|-------|
+| `data/.../migrations/12.sqm` | 2 ALTER TABLE statements | ~5 |
+| `data/.../data/mangas.sq` | Add 2 columns to CREATE TABLE + update insert/update queries | ~10 |
+| `domain/.../manga/model/Manga.kt` | Add `canonicalId: String?` and `sourceStatus: Int` | ~4 |
+| `data/.../manga/MangaMapper.kt` | Map new columns | ~2 |
+| `data/.../manga/MangaRepositoryImpl.kt` | Include new columns in CRUD | ~5 |
+| `app/.../data/library/LibraryUpdateJob.kt` | Health check after chapter fetch | ~10 |
+
+**Total: ~36 lines of actual code changes across 6 files.**
+
+Deliverable: Source health is tracked. Canonical ID column exists. Zero behavioral changes
+for users (health status is tracked but not yet surfaced in UI).
+
+#### Phase 2: UI + Canonical ID Population (Week 3-4)
+
+**Files to modify:**
+
+| File | Change | Lines |
+|------|--------|-------|
+| `app/.../presentation/manga/MangaScreen.kt` | Show health badge on source chip | ~15 |
+| `app/.../ui/manga/MangaScreenModel.kt` | Populate canonical_id on tracker link; "Compare Sources" action | ~20 |
+| `app/.../presentation/manga/components/MangaInfoHeader.kt` | Source health indicator | ~10 |
+| `app/.../data/library/LibraryUpdateJob.kt` | Notification for DEAD/DEGRADED manga | ~15 |
+
+**Total: ~60 lines of actual code changes across 4 files.**
+
+Deliverable: Users see when sources break. Can compare sources on demand. Canonical ID
+auto-populated when trackers are linked. Full feature complete.
+
+### B.8: Future Upgrade Path — B → A
+
+Approach B is explicitly designed as a **foundation** for Approach A. If we ship B and
+later decide we want A's features:
+
+1. **Canonical ID is already there** — No schema change needed for identity
+2. **Health detection is already there** — The `source_status` column tells A when to
+   trigger auto-discovery
+3. **source_mappings table can be added later** — Migration 13.sqm adds the table;
+   existing manga with `canonical_id` can be backfill-discovered
+4. **No data loss** — B's schema is a strict subset of A's. Adding A's columns/tables
+   is purely additive
+
+The upgrade path from B to A is:
+```
+B (canonical_id + source_status)
+  + source_mappings table
+  + source_strategy column
+  + resolved_source_id on chapters
+  + DiscoverSourcesForManga use case
+  + ResolveChapterSource use case
+  = A
+```
+
+Each step can be shipped independently. **Approach B is Phase 1 of Approach A**, just
+with a different stopping point that might be good enough for most users.
+
+---
+
+## 📊 Decision Summary: Approach A vs Approach B
+
+### Side-by-Side Verdict
+
+| Dimension | Approach A (Full Multi-Source) | Approach B (Lean Identity) | Winner |
+|-----------|------------------------------|--------------------------|--------|
+| **User value** | Automatic failover, zero-touch | Manual but reliable | A (more magic) |
+| **Implementation risk** | High (15 files, 10 weeks) | Low (6 files, 4 weeks) | **B** |
+| **API compliance** | Good steady-state, spike on discovery | Zero additional calls | **B** |
+| **Correctness** | Risk of wrong-series match | User always confirms | **B** |
+| **Complexity** | New table + 4 use cases + background job | 2 columns + health check | **B** |
+| **Test surface** | Large (DB + network + bg + UI) | Tiny (3 lines of logic) | **B** |
+| **Backwards compat** | Safe (opt-in) | Safe (opt-in) | Tie |
+| **Future extensibility** | Already maximal | Clean upgrade to A | Tie |
+| **Time to ship** | 10 weeks | 3-4 weeks | **B** |
+| **Server impact** | Discovery spike risk | Zero impact | **B** |
+
+### Recommendation
+
+**Ship Approach B first.** It delivers the canonical identity foundation, source health
+monitoring, and on-demand source comparison in 3-4 weeks with minimal risk. If user
+feedback shows demand for automatic failover, Approach A can be layered on top without
+any schema rework.
+
+The worst outcome would be building the full Approach A, discovering that false-positive
+matching causes wrong-series chapters to appear, and having to roll it back. Approach B
+avoids this entirely by keeping the user in control.
+
+### Pros of the Overall Design (Both Approaches)
+
+1. **Canonical identity is the right foundation** — Whether A or B, decoupling manga
+   identity from source is the correct architectural direction. It enables dedup,
+   smarter backup/restore, and future features.
+
+2. **Health monitoring has standalone value** — Even without source switching, knowing
+   that a source has degraded or died is useful information for users.
+
+3. **Reuses existing code** — Both approaches build on `SmartSourceSearchEngine`,
+   `manga_sync.remote_id`, and the existing migration flow. No reinventing the wheel.
+
+4. **Extension-agnostic** — Neither approach requires changes to the source API or
+   extensions. Everything works with existing extensions as-is.
+
+5. **Incremental delivery** — Both can be shipped in phases with independently testable
+   milestones.
+
+### Cons of the Overall Design (Both Approaches)
+
+1. **Canonical ID requires tracker usage** — The best identity comes from AniList/MAL
+   remote IDs. Manga without trackers get `canonical_id = NULL`, which limits dedup and
+   identity features for those entries.
+
+2. **Source health heuristics are imperfect** — "Chapter count dropped 30%" could mean
+   the source removed content, or it could mean the source fixed duplicate entries.
+   False positives are possible. Threshold tuning will require real-world data.
+
+3. **The "Compare Sources" UX needs careful design** — Showing "MangaDex: 342 chapters |
+   MangaSee: 338 chapters" is only useful if chapter counts are comparable. Different
+   sources may include/exclude bonus chapters, oneshots, etc. Raw counts can mislead.
+
+4. **Neither approach handles the "best translation" problem** — A user who wants
+   English chapters 1-50 from Source A (better quality) and 51+ from Source B (faster
+   releases) can't express this in either approach. This remains a manual process.
+
+5. **Schema migrations are one-way** — Once we add `canonical_id` and `source_status`
+   columns, they're permanent. If the feature is abandoned, the columns remain as dead
+   weight in the schema. (Low risk — these are tiny columns with sensible defaults.)
+
+### Open Challenges That Remain
+
+1. **Canonical ID format standardization** — The `"al:21"` format uses short prefixes
+   (`al`=AniList, `mal`=MAL, `mu`=MangaUpdates) mapped from tracker IDs. Priority:
+   AniList > MAL > MangaUpdates. If a manga is tracked on both AniList and MAL, the
+   canonical_id uses AniList. Changing the canonical tracker later needs a UI affordance.
+
+2. **Health check threshold tuning** — The 70% threshold for DEGRADED status is a guess.
+   Too aggressive = false alarms on sources that legitimately remove duplicate chapters.
+   Too lenient = missed removals. Needs real-world telemetry or user feedback to calibrate.
+
+3. **"Compare Sources" result presentation** — How do we show that MangaDex has "342
+   chapters" while the user's current source has "338 chapters"? Is +4 chapters meaningful
+   or noise? Need to surface which specific chapters are missing/extra, not just counts.
+
+4. **Handling source migration of read progress** — When a user switches sources via
+   "Find Replacement," their read progress (which chapters are marked read, bookmarks,
+   last page read) needs to carry over. The existing migration system handles some of
+   this, but chapter URL changes can break the mapping. This is an existing problem
+   that Approach B inherits rather than solves.
+
+5. **Tracker-less manga identity** — Without a tracker, `canonical_id` is NULL. We could
+   generate a synthetic ID from normalized title + author, but that's fuzzy and could
+   collide. Alternative: let users manually tag manga with the same identity, but that's
+   complex UI for a niche case.
+
+6. **When to show the health notification** — Showing "Source X may have removed Manga Y"
+   on every refresh where status changes could be noisy. Need debouncing: only notify if
+   the status has been DEAD for N consecutive refreshes (e.g., 3), to avoid false alarms
+   from temporary source outages.
+
+7. **Extension uninstall handling** — If a user uninstalls an extension, all manga from
+   that source become DEAD. This is a known user action, not a surprise. Should we suppress
+   the "source broken" notification for manga whose source was deliberately uninstalled?
+   Probably yes — detect extension removal and mark those manga differently (e.g., a new
+   status `UNINSTALLED = 4`).
+
+---
+
 ## 📖 Reader Improvements
 
 ### Page Turn Animations
