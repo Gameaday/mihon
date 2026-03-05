@@ -18,6 +18,8 @@ interface MangaRepository {
 
     suspend fun getFavoritesByCanonicalId(canonicalId: String, excludeMangaId: Long): List<Manga>
 
+    suspend fun getDeadFavorites(deadSinceBefore: Long): List<Manga>
+
     suspend fun getFavorites(): List<Manga>
 
     suspend fun getReadMangaNotInLibrary(): List<Manga>

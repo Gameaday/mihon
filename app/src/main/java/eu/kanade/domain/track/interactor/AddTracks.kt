@@ -102,7 +102,8 @@ class AddTracks(
                         service.match(manga)?.let { track ->
                             track.manga_id = manga.id
                             (service as Tracker).bind(track)
-                            val domainTrack = track.toDomainTrack(idRequired = false)!!
+                            val domainTrack = track.toDomainTrack(idRequired = false)
+                                ?: return@let
                             insertTrack.await(domainTrack)
 
                             // Also set canonical_id for enhanced tracker bindings

@@ -52,6 +52,12 @@ class MangaRepositoryImpl(
         }
     }
 
+    override suspend fun getDeadFavorites(deadSinceBefore: Long): List<Manga> {
+        return handler.awaitList {
+            mangasQueries.getFavoritesByDeadSinceBefore(deadSinceBefore, MangaMapper::mapManga)
+        }
+    }
+
     override suspend fun getFavorites(): List<Manga> {
         return handler.awaitList { mangasQueries.getFavorites(MangaMapper::mapManga) }
     }
