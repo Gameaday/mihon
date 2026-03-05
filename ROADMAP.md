@@ -12,25 +12,24 @@
 | Feature | Key Files | Tests |
 |---------|-----------|-------|
 | **Database schema** — `canonical_id`, `source_status`, `alternative_titles` columns on `mangas` table | Migrations 12.sqm, 13.sqm, 14.sqm | Schema validated via build |
-| **Canonical ID auto-population** — Sets `canonical_id` from tracker remote IDs on first tracker bind (MAL → `mal:`, AniList → `al:`, MangaUpdates → `mu:`) | `AddTracks.setCanonicalIdIfAbsent()` | Manual |
-| **Alternative titles pipeline** — AniList romaji/english/native/synonyms merged into manga, case-insensitive dedup | `AddTracks.mergeAlternativeTitles()`, `ALSearchItem.buildAlternativeTitles()` | Manual |
+| **Canonical ID auto-population** — Sets `canonical_id` from tracker remote IDs on first tracker bind (MAL → `mal:`, AniList → `al:`, MangaUpdates → `mu:`) | `AddTracks.setCanonicalIdIfAbsent()` | 7 unit tests |
+| **Alternative titles pipeline** — AniList romaji/english/native/synonyms merged into manga, case-insensitive dedup | `AddTracks.mergeAlternativeTitles()`, `ALSearchItem.buildAlternativeTitles()` | 8 unit tests |
 | **Tiered search engine** — 4-tier migration search with cross-title evaluation, dedup, near-match tracking | `BaseSmartSearchEngine.multiTitleSearch()`, `MigrationListScreenModel.searchSource()` | 16 unit tests |
 | **Canonical ID lookup** — Zero-API-call local DB match via partial index | `GetFavoritesByCanonicalId`, `mangas.sq:getFavoritesByCanonicalId`, `14.sqm` index | Tested via integration |
 | **Source health detection** — Automatic HEALTHY/DEGRADED/DEAD classification during library updates | `LibraryUpdateJob.kt:443-459` | Manual |
-| **Design token system** — Padding, Shape, Motion, Typography, Color tokens | `Constants.kt`, `Motion.kt`, `Shapes.kt`, `Typography.kt`, `Color.kt` | N/A |
+| **Source health UI** — Warning banner on manga detail screen for DEGRADED/DEAD sources | `SourceHealthBanner.kt`, `MangaScreen.kt` | Visual |
+| **Design token system** — Padding, Shape, Motion, Typography, Color tokens with adoption in 10+ components | `Constants.kt`, `Motion.kt`, `Shapes.kt`, `Typography.kt`, `Color.kt` | N/A |
 
 ### ⚠️ Partially Implemented
 
 | Feature | What's Done | What's Missing |
 |---------|-------------|----------------|
-| **Design token adoption** | Tokens defined; used in Pill, ListGroupHeader, SectionCard, CollapsibleBox, AdaptiveSheet, InfoScreen | ~80% of components still use hardcoded dp/sp values (see Technical Debt below) |
-| **Source health UX** | Backend detection runs automatically | No UI indicator/banner — users can't see degraded/dead status |
+| **Design token adoption** | Tokens defined; used in Pill, ListGroupHeader, SectionCard, CollapsibleBox, AdaptiveSheet, InfoScreen, LazyColumnWithAction, LinkIcon, SettingsItems, VerticalFastScroller | ~4 components still use hardcoded dp/sp values (Badges.kt, Pill.kt inner padding, Tabs.kt, NavigationBar/Rail) |
 
 ### ❌ Not Yet Implemented (Documented in BRAINSTORM.md)
 
 | Feature | Brainstorm Section | Complexity |
 |---------|-------------------|------------|
-| **Source health UI** — Banner/badge on manga detail screen showing DEGRADED/DEAD status | C.5 | Low |
 | **Source health recovery** — Auto-reset to HEALTHY when chapter count recovers | C.5 | Low |
 | **Bulk migration prompt** — Suggest migration when source is DEAD for tracked manga | C.6 | Medium |
 | **source_mappings table** — Full multi-source discovery (Approach A) | Parts 1-12 | High |
@@ -43,25 +42,25 @@
 
 ### 1. Hardcoded Design Values → Should Use Tokens
 
-| Component | File | Hardcoded Values | Recommended Token |
-|-----------|------|------------------|-------------------|
-| `Badges.kt` | `presentation-core/.../Badges.kt:50,95` | `3.dp` horizontal, `1.dp` vertical | `Padding.extraSmall` (4.dp) |
-| `Pill.kt` | `presentation-core/.../Pill.kt:35` | `6.dp, 1.dp` | New `Padding.micro` (2.dp) or keep custom |
-| `LazyColumnWithAction.kt` | `presentation-core/.../LazyColumnWithAction.kt:41` | `16.dp, 8.dp` | `Padding.medium`, `Padding.small` |
-| `SettingsItems.kt` | `presentation-core/.../SettingsItems.kt:391,449` | `4.dp`, `24.dp` | `Padding.extraSmall`, `Padding.large` |
-| `VerticalFastScroller.kt` | `presentation-core/.../VerticalFastScroller.kt` | `8.dp`, `48.dp`, `12.dp` | `Padding.small` for padding; keep component-specific for thumb |
-| `LinkIcon.kt` | `presentation-core/.../LinkIcon.kt:22` | `4.dp` | `Padding.extraSmall` |
-| `Tabs.kt` | `presentation-core/.../material/Tabs.kt:29` | `10.sp` | Typography token or `MaterialTheme.typography.labelSmall` |
-| `NavigationBar.kt` | `presentation-core/.../material/NavigationBar.kt:43` | `80.dp` | New `NavigationTokens.BarHeight` |
-| `NavigationRail.kt` | `presentation-core/.../material/NavigationRail.kt` | `80.dp` | New `NavigationTokens.RailWidth` |
-| `CircularProgressIndicator.kt` | `presentation-core/.../CircularProgressIndicator.kt` | `tween(2000)` | `MotionTokens.DurationLong` or new `DurationExtraLong` |
+| Component | File | Hardcoded Values | Status |
+|-----------|------|------------------|--------|
+| `Badges.kt` | `presentation-core/.../Badges.kt:50,95` | `3.dp` horizontal, `1.dp` vertical | Kept — intentionally tight for badge styling |
+| `Pill.kt` | `presentation-core/.../Pill.kt:35` | `6.dp, 1.dp` | Kept — custom component-specific padding |
+| ~~`LazyColumnWithAction.kt`~~ | ~~`presentation-core/.../LazyColumnWithAction.kt:41`~~ | ~~`16.dp, 8.dp`~~ | ✅ Fixed — Padding.medium, Padding.small |
+| ~~`SettingsItems.kt`~~ | ~~`presentation-core/.../SettingsItems.kt:391,449`~~ | ~~`4.dp`, `24.dp`~~ | ✅ Fixed — Padding.extraSmall, Padding.large |
+| ~~`VerticalFastScroller.kt`~~ | ~~`presentation-core/.../VerticalFastScroller.kt`~~ | ~~`8.dp`~~ | ✅ Fixed — Padding.small (thumb dimensions kept component-specific) |
+| ~~`LinkIcon.kt`~~ | ~~`presentation-core/.../LinkIcon.kt:22`~~ | ~~`4.dp`~~ | ✅ Fixed — Padding.extraSmall |
+| `Tabs.kt` | `presentation-core/.../material/Tabs.kt:29` | `10.sp` | Pending — needs typography token |
+| `NavigationBar.kt` | `presentation-core/.../material/NavigationBar.kt:43` | `80.dp` | Pending — needs component-specific token |
+| `NavigationRail.kt` | `presentation-core/.../material/NavigationRail.kt` | `80.dp` | Pending — needs component-specific token |
+| ~~`CircularProgressIndicator.kt`~~ | ~~`presentation-core/.../CircularProgressIndicator.kt`~~ | ~~`tween(2000)`~~ | ✅ Fixed — ROTATION_DURATION_MS constant |
 
 ### 2. Missing Test Coverage
 
 | Area | Current | Needed |
 |------|---------|--------|
-| `AddTracks.setCanonicalIdIfAbsent()` | No unit tests | Test: first-wins behavior, prefix mapping, remoteId=0 skip |
-| `AddTracks.mergeAlternativeTitles()` | No unit tests | Test: dedup, case-insensitivity, blank filtering, primary title exclusion |
+| ~~`AddTracks.setCanonicalIdIfAbsent()`~~ | ~~No unit tests~~ | ✅ 7 tests added |
+| ~~`AddTracks.mergeAlternativeTitles()`~~ | ~~No unit tests~~ | ✅ 8 tests added |
 | `LibraryUpdateJob` health detection | No unit tests | Test: HEALTHY→DEGRADED threshold, DEAD on empty chapters, recovery |
 | `GetFavoritesByCanonicalId` | No unit tests | Test: exclude self, match on canonical_id, empty results |
 | Design tokens | No tests | Snapshot tests for token values to prevent regression |
@@ -76,26 +75,16 @@
 
 ## Next Actions (Prioritized)
 
-### Phase 1: Quick Wins (Low Effort, High Value)
+### Phase 1: Quick Wins (Low Effort, High Value) — ✅ COMPLETE
 
-#### 1.1 Source Health UI Indicator
-**What:** Add a warning banner/chip on the manga detail screen when `sourceStatus != HEALTHY`.
-**Why:** Health detection runs but users have no visibility — wasted computation.
-**Where:** `app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt` and related composables.
-**Effort:** ~2-4 hours
-**Design:** Use `MaterialTheme.colorScheme.error` for DEAD, `tertiary` for DEGRADED. Show as a dismissible banner below the manga header.
+#### 1.1 Source Health UI Indicator ✅
+**Done:** Added `SourceHealthBanner` composable with DEGRADED (tertiary) and DEAD (error) color scheme. Wired into both small and large manga detail layouts between action row and description. Added `source_health_degraded` and `source_health_dead` string resources.
 
-#### 1.2 Migrate Remaining Hardcoded Values to Tokens
-**What:** Replace 10+ hardcoded dp/sp values in presentation components with existing design tokens.
-**Why:** Inconsistent spacing/sizing across the app; harder to maintain.
-**Where:** See Technical Debt §1 table above.
-**Effort:** ~1-2 hours (mechanical changes)
+#### 1.2 Migrate Remaining Hardcoded Values to Tokens ✅
+**Done:** Migrated 5 files: LazyColumnWithAction (→Padding.medium/small), LinkIcon (→Padding.extraSmall), SettingsItems (→Padding.extraSmall/large), VerticalFastScroller (→Padding.small), CircularProgressIndicator (→ROTATION_DURATION_MS constant). Remaining: Badges.kt (3.dp is intentionally tight), Pill.kt (6.dp/1.dp custom), Tabs.kt (10.sp label), NavigationBar/Rail (80.dp — needs component-specific token).
 
-#### 1.3 Unit Tests for AddTracks Pipeline
-**What:** Add tests for `setCanonicalIdIfAbsent()` and `mergeAlternativeTitles()`.
-**Why:** These are data integrity functions with subtle edge cases (first-wins, case-insensitive dedup).
-**Where:** New test file `app/src/test/java/eu/kanade/domain/track/interactor/AddTracksTest.kt`
-**Effort:** ~2-3 hours
+#### 1.3 Unit Tests for AddTracks Pipeline ✅
+**Done:** Added 15 tests in `AddTracksTest.kt`: 7 for `setCanonicalIdIfAbsent()` (prefix mapping, first-wins, skip zero/negative/unknown tracker), 8 for `mergeAlternativeTitles()` (add, dedup, case-insensitive, blank filter, preserve existing). Changed method visibility to `internal` for testability.
 
 ### Phase 2: Feature Completion (Medium Effort)
 
