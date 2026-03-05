@@ -39,6 +39,7 @@ CREATE TABLE mangas(
 CREATE INDEX library_favorite_index ON mangas(favorite) WHERE favorite = 1;
 CREATE INDEX mangas_url_index ON mangas(url);
 CREATE INDEX idx_mangas_source ON mangas(source);
+CREATE INDEX idx_mangas_canonical_id ON mangas(canonical_id) WHERE canonical_id IS NOT NULL;
 
 CREATE TRIGGER update_last_favorited_at_mangas
 AFTER UPDATE OF favorite ON mangas
@@ -79,6 +80,18 @@ FROM mangas
 WHERE url = :url
 AND source = :source
 LIMIT 1;
+
+-- Find library manga sharing the same canonical_id (e.g. "al:21").
+-- Used for cross-source identity matching: if we know two manga share the same
+-- AniList/MAL/MangaUpdates ID, they are the same series regardless of source.
+-- Excludes the requesting manga itself and only returns library entries.
+getFavoritesByCanonicalId:
+SELECT *
+FROM mangas
+WHERE canonical_id = :canonicalId
+AND canonical_id IS NOT NULL
+AND favorite = 1
+AND _id != :excludeMangaId;
 
 getFavorites:
 SELECT *

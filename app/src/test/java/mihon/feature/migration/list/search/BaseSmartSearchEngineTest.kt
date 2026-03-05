@@ -111,6 +111,49 @@ class BaseSmartSearchEngineTest {
     }
 
     @Test
+    fun `multiTitleSearch prefers primary title over alt title`() = runTest {
+        // Both primary and alt match, but primary should be tried first
+        var queriedTitles = mutableListOf<String>()
+        val primaryResult = TestResult("One Piece")
+        val found = engine.testMultiTitleSearch(
+            { query ->
+                queriedTitles.add(query)
+                listOf(primaryResult)
+            },
+            primaryTitle = "One Piece",
+            alternativeTitles = listOf("OP", "ワンピース"),
+        )
+        found shouldNotBe null
+        found!!.title shouldBe "One Piece"
+        // Primary title should be searched first
+        queriedTitles.first() shouldBe "One Piece"
+    }
+
+    @Test
+    fun `multiTitleSearch falls back to deep search when titles fail`() = runTest {
+        // No exact match on primary or alt titles, but deep search finds it
+        val results = listOf(TestResult("one piece"))
+        var searchCount = 0
+        val found = engine.testMultiTitleSearch(
+            { query ->
+                searchCount++
+                // Only return results for cleaned deep-search queries (lowercase, simplified)
+                if (query.lowercase() == "one piece" || query == "piece" || query == "one") {
+                    results
+                } else {
+                    emptyList()
+                }
+            },
+            primaryTitle = "One Piece [Special Edition]",
+            alternativeTitles = listOf("AAAA BBBB CCCC"),
+        )
+        found shouldNotBe null
+        found!!.title shouldBe "one piece"
+        // Should have attempted more than just primary + 1 alt title (deep search generates multiple queries)
+        (searchCount > 2) shouldBe true
+    }
+
+    @Test
     fun `deepSearch handles cleaned titles`() = runTest {
         val results = listOf(TestResult("one piece"))
         val found = engine.testDeepSearch({ results }, "One Piece [Chapter 1000]")

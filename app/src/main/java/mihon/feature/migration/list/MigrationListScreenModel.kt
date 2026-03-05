@@ -35,6 +35,7 @@ import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
+import tachiyomi.domain.manga.interactor.GetFavoritesByCanonicalId
 import tachiyomi.domain.manga.interactor.GetManga
 import tachiyomi.domain.manga.interactor.NetworkToLocalManga
 import tachiyomi.domain.manga.model.Manga
@@ -53,6 +54,7 @@ class MigrationListScreenModel(
     private val syncChaptersWithSource: SyncChaptersWithSource = Injekt.get(),
     private val getChaptersByMangaId: GetChaptersByMangaId = Injekt.get(),
     private val migrateManga: MigrateMangaUseCase = Injekt.get(),
+    private val getFavoritesByCanonicalId: GetFavoritesByCanonicalId = Injekt.get(),
 ) : StateScreenModel<MigrationListScreenModel.State>(State()) {
 
     private val smartSearchEngine = SmartSourceSearchEngine(extraSearchQuery)
@@ -182,13 +184,27 @@ class MigrationListScreenModel(
         deepSearchMode: Boolean,
     ): Pair<Manga, ChapterInfo>? {
         return try {
-            // Use multi-title search when alternative titles are available,
-            // falling back to the standard search modes otherwise.
-            val searchResult = if (manga.alternativeTitles.isNotEmpty()) {
+            // Tiered search strategy to minimize API calls:
+            // 1. Canonical ID match (FREE — local DB lookup, 0 API calls)
+            // 2. Main title search (1 API call)
+            // 3. Alternative titles search (1 API call per alt title)
+            // 4. Deep search fallback (multiple API calls)
+
+            // Tier 1: If the manga has a canonical_id, check if we already have a
+            // library entry on the target source sharing that same identity.
+            // This is zero-cost and handles the common case of manga tracked on
+            // multiple sources via the same AniList/MAL/MangaUpdates account.
+            val canonicalMatch = findByCanonicalId(manga, source.id)
+            val searchResult = if (canonicalMatch != null) {
+                canonicalMatch
+            } else if (manga.alternativeTitles.isNotEmpty()) {
+                // Tier 2+3: Multi-title search (primary → alt titles → deep search fallback)
                 smartSearchEngine.multiTitleSearch(source, manga.title, manga.alternativeTitles)
             } else if (deepSearchMode) {
+                // Tier 4: Deep search with cleaned title
                 smartSearchEngine.deepSearch(source, manga.title)
             } else {
+                // Tier 2: Regular search with primary title
                 smartSearchEngine.regularSearch(source, manga.title)
             }
 
@@ -205,6 +221,22 @@ class MigrationListScreenModel(
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Attempts to find a library manga on the target source that shares the same canonical identity.
+     * This is a zero-API-call lookup — it checks the local database only.
+     * Returns null if no canonical ID is set or no match found on the target source.
+     */
+    private suspend fun findByCanonicalId(manga: Manga, targetSourceId: Long): Manga? {
+        val canonicalId = manga.canonicalId ?: return null
+        return try {
+            getFavoritesByCanonicalId.await(canonicalId, manga.id)
+                .firstOrNull { it.source == targetSourceId }
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Canonical ID lookup failed for ${manga.title}" }
             null
         }
     }

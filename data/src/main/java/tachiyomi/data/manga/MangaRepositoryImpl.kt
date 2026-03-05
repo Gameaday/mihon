@@ -46,6 +46,12 @@ class MangaRepositoryImpl(
         }
     }
 
+    override suspend fun getFavoritesByCanonicalId(canonicalId: String, excludeMangaId: Long): List<Manga> {
+        return handler.awaitList {
+            mangasQueries.getFavoritesByCanonicalId(canonicalId, excludeMangaId, MangaMapper::mapManga)
+        }
+    }
+
     override suspend fun getFavorites(): List<Manga> {
         return handler.awaitList { mangasQueries.getFavorites(MangaMapper::mapManga) }
     }
