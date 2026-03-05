@@ -89,7 +89,6 @@ getFavoritesByCanonicalId:
 SELECT *
 FROM mangas
 WHERE canonical_id = :canonicalId
-AND canonical_id IS NOT NULL
 AND favorite = 1
 AND _id != :excludeMangaId;
 

@@ -236,7 +236,7 @@ class MigrationListScreenModel(
             getFavoritesByCanonicalId.await(canonicalId, manga.id)
                 .firstOrNull { it.source == targetSourceId }
         } catch (e: Exception) {
-            logcat(LogPriority.WARN, e) { "Canonical ID lookup failed for ${manga.title}" }
+            logcat(LogPriority.WARN, e) { "Canonical ID lookup failed for manga id=${manga.id}" }
             null
         }
     }
