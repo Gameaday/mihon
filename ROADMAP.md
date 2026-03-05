@@ -15,13 +15,14 @@
 | **Canonical ID auto-population** — Sets `canonical_id` from tracker remote IDs on first tracker bind (MAL → `mal:`, AniList → `al:`, MangaUpdates → `mu:`) | `AddTracks.setCanonicalIdIfAbsent()` | 7 unit tests |
 | **Alternative titles pipeline** — AniList romaji/english/native/synonyms merged into manga, case-insensitive dedup. JSON array storage with pipe-separated fallback. | `AddTracks.mergeAlternativeTitles()`, `ALSearchItem.buildAlternativeTitles()`, `MangaMapper.parseAlternativeTitles()` | 8 + 16 unit tests |
 | **Tiered search engine** — 4-tier migration search with cross-title evaluation, dedup, near-match tracking | `BaseSmartSearchEngine.multiTitleSearch()`, `MigrationListScreenModel.searchSource()` | 25 unit tests |
-| **Canonical ID lookup** — Zero-API-call local DB match via partial index | `GetFavoritesByCanonicalId`, `mangas.sq:getFavoritesByCanonicalId`, `14.sqm` index | Tested via integration |
+| **Canonical ID lookup** — Zero-API-call local DB match via partial index | `GetFavoritesByCanonicalId`, `mangas.sq:getFavoritesByCanonicalId`, `14.sqm` index | 6 unit tests |
 | **Source health detection** — Automatic HEALTHY/DEGRADED/DEAD classification during library updates with recovery support. Skips local sources. | `LibraryUpdateJob.detectSourceHealth()` | 18 unit tests |
 | **Source health UI** — Warning banner on manga detail screen for DEGRADED/DEAD sources. Skips local manga and stub (uninstalled) sources. | `SourceHealthBanner.kt`, `MangaScreen.kt` | 7 unit tests |
 | **Source health notification** — Post-update notification listing dead/degraded sources | `LibraryUpdateNotifier.showSourceHealthNotification()` | N/A |
 | **Bulk migration prompt** — `dead_since` timestamp tracks persistently DEAD sources, suggests migration after 3+ days | `LibraryUpdateJob`, `LibraryUpdateNotifier.showMigrationSuggestionNotification()` | 11 unit tests |
+| **GetDeadFavorites interactor** — Queries persistently DEAD manga by dead_since cutoff | `GetDeadFavorites`, `mangas.sq:getFavoritesByDeadSinceBefore` | 5 unit tests |
 | **Backup/restore completeness** — `canonicalId`, `sourceStatus`, `deadSince` persisted across backup cycles | `BackupManga`, `MangaBackupCreator`, `MangaRestorer` | Verified via integration |
-| **Library source health filter** — TriState filter toggle to show/hide DEAD/DEGRADED manga in library | `LibraryPreferences`, `LibraryScreenModel`, `LibrarySettingsDialog` | N/A |
+| **Library source health filter** — TriState filter toggle to show/hide DEAD/DEGRADED manga in library | `LibraryPreferences`, `LibraryScreenModel`, `LibrarySettingsDialog` | 19 unit tests |
 | **Design token system** — Padding, Shape, Motion, Typography, Color tokens with adoption in 10+ components | `Constants.kt`, `Motion.kt`, `Shapes.kt`, `Typography.kt`, `Color.kt` | N/A |
 
 ### ⚠️ Partially Implemented
@@ -65,7 +66,9 @@
 | ~~`AddTracks.mergeAlternativeTitles()`~~ | ~~No unit tests~~ | ✅ 8 tests added |
 | ~~`LibraryUpdateJob` health detection~~ | ~~No unit tests~~ | ✅ 18 tests (DEAD, DEGRADED, HEALTHY, recovery, edge cases, dead_since tracking) |
 | ~~`MangaMapper` alt title parsing~~ | ~~No unit tests~~ | ✅ 16 tests (JSON, pipe, round-trip, special chars) |
-| `GetFavoritesByCanonicalId` | No unit tests | Test: exclude self, match on canonical_id, empty results |
+| ~~`GetFavoritesByCanonicalId`~~ | ~~No unit tests~~ | ✅ 6 tests (match, exclude self, exclude non-favorite, null canonical, multiple sources) |
+| ~~`GetDeadFavorites`~~ | ~~No unit tests~~ | ✅ 5 tests (before cutoff, after cutoff, non-favorites, null/zero deadSince) |
+| ~~Library health filter~~ | ~~No unit tests~~ | ✅ 19 tests (SourceStatus mapping, TriState filter logic for all states) |
 | Design tokens | No tests | Snapshot tests for token values to prevent regression |
 
 ### 3. Code-Level Issues
@@ -73,8 +76,9 @@
 - ~~**Pipe-separated `alternative_titles`** — Stored as `TEXT` with `|` delimiter. If a title contains `|` character, it breaks parsing.~~ ✅ Fixed — now serialized as JSON array, with backward-compatible parsing for legacy pipe-separated data.
 - ~~**`AddTracks.kt:105`** — Non-null assertion `toDomainTrack(idRequired = false)!!` could crash.~~ ✅ Fixed — replaced with safe `?: return@let`.
 - ~~**Backup/restore** — `canonicalId`, `sourceStatus`, `deadSince` not persisted across backups.~~ ✅ Fixed — added to `BackupManga` (ProtoNumber 115-117) and `MangaBackupCreator`.
-- **`AddTracks.kt:52`** — Type check `item is TrackSearch` only works when caller passes `TrackSearch` instance; `Track` instances from general tracker bind paths won't trigger alt title merge. Consider extracting alt titles from the tracker search result before the bind.
-- **`MigrationListScreenModel.kt`** — `findByCanonicalId()` returns first match per source; doesn't consider confidence scoring or prefer certain tracker prefixes.
+- ~~**Compiler warnings** — `LibraryUpdateJob.kt:426` and `MangaScreenModel.kt:296` had always-true conditions due to redundant null checks alongside boolean.~~ ✅ Fixed — removed intermediate `usingMetadataSource` boolean, use direct null checks for Kotlin smart cast.
+- **`AddTracks.kt:52`** — Type check `item is TrackSearch` only works when caller passes `TrackSearch` instance; `Track` instances from general tracker bind paths won't trigger alt title merge. This is intentional: only `TrackSearch` instances carry alt titles from tracker API results.
+- ~~**`MigrationListScreenModel.kt`** — `findByCanonicalId()` returns first match per source; doesn't consider confidence scoring or prefer certain tracker prefixes.~~ Kept as-is — canonical IDs are unique per series, so multiple matches on the same source is a theoretical edge case not worth the complexity.
 
 ---
 
