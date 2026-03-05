@@ -21,6 +21,7 @@
 | **Source health notification** — Post-update notification listing dead/degraded sources | `LibraryUpdateNotifier.showSourceHealthNotification()` | N/A |
 | **Bulk migration prompt** — `dead_since` timestamp tracks persistently DEAD sources, suggests migration after 3+ days | `LibraryUpdateJob`, `LibraryUpdateNotifier.showMigrationSuggestionNotification()` | 11 unit tests |
 | **Backup/restore completeness** — `canonicalId`, `sourceStatus`, `deadSince` persisted across backup cycles | `BackupManga`, `MangaBackupCreator`, `MangaRestorer` | Verified via integration |
+| **Library source health filter** — TriState filter toggle to show/hide DEAD/DEGRADED manga in library | `LibraryPreferences`, `LibraryScreenModel`, `LibrarySettingsDialog` | N/A |
 | **Design token system** — Padding, Shape, Motion, Typography, Color tokens with adoption in 10+ components | `Constants.kt`, `Motion.kt`, `Shapes.kt`, `Typography.kt`, `Color.kt` | N/A |
 
 ### ⚠️ Partially Implemented
@@ -112,11 +113,8 @@
 #### 3.3 Code Quality Fixes ✅
 **Done:** Fixed non-null assertion crash in `AddTracks.bindEnhancedTrackers()` (replaced `!!` with safe `?: return@let`). Added deep search empty title guard. Local source and stub source filtering for health detection and UI.
 
-#### 3.4 Library Source Health Filter
-**What:** Add a library filter option to show/hide manga by source health status (DEAD/DEGRADED).
-**Why:** Users with many manga need to quickly find titles with broken sources.
-**Where:** `LibraryPreferences`, `LibraryScreenModel` filter logic, filter UI.
-**Effort:** ~4-6 hours
+#### 3.4 Library Source Health Filter ✅
+**Done:** Added `filterSourceHealthDead` TriState preference in `LibraryPreferences`. Filter toggle in `LibrarySettingsDialog` filter tab. `LibraryScreenModel.applyFilters()` checks `sourceStatus` for DEAD/DEGRADED. ENABLED_IS shows only affected manga, ENABLED_NOT hides them.
 
 #### 3.5 Source Health History
 **What:** Track status transitions over time to distinguish temporary outages from permanent source death.
