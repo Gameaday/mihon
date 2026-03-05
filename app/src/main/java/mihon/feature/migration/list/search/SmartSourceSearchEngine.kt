@@ -23,16 +23,18 @@ class SmartSourceSearchEngine(extraSearchParams: String?) : BaseSmartSearchEngin
 
     /**
      * Enhanced search that tries multiple known titles for a manga.
-     * Attempts exact match with primary title first, then tries each alternative
-     * title, and falls back to deep search. This dramatically improves matching
-     * for manga that use different titles across sources (e.g. romaji vs english).
+     * Implements tiered fallback: primary title → alt titles → near-match → deep search.
+     *
+     * @param deepSearchFallback If true, falls back to deep search when no title matches.
+     *   Set to false to limit to title-based matching only (fewer API calls).
      */
     suspend fun multiTitleSearch(
         source: CatalogueSource,
         primaryTitle: String,
         alternativeTitles: List<String> = emptyList(),
+        deepSearchFallback: Boolean = true,
     ): Manga? {
-        return multiTitleSearch(makeSearchAction(source), primaryTitle, alternativeTitles)?.let {
+        return multiTitleSearch(makeSearchAction(source), primaryTitle, alternativeTitles, deepSearchFallback)?.let {
             it.toDomainManga(source.id)
         }
     }

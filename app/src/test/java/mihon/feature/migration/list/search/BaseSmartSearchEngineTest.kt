@@ -40,7 +40,8 @@ class BaseSmartSearchEngineTest {
             searchAction: SearchAction<TestResult>,
             primaryTitle: String,
             alternativeTitles: List<String> = emptyList(),
-        ) = multiTitleSearch(searchAction, primaryTitle, alternativeTitles)
+            deepSearchFallback: Boolean = true,
+        ) = multiTitleSearch(searchAction, primaryTitle, alternativeTitles, deepSearchFallback)
     }
 
     private val engine = TestSearchEngine()
@@ -151,6 +152,49 @@ class BaseSmartSearchEngineTest {
         found!!.title shouldBe "one piece"
         // Should have attempted more than just primary + 1 alt title (deep search generates multiple queries)
         (searchCount > 2) shouldBe true
+    }
+
+    @Test
+    fun `multiTitleSearch skips deep search when deepSearchFallback is false`() = runTest {
+        var searchCount = 0
+        val found = engine.testMultiTitleSearch(
+            { query ->
+                searchCount++
+                emptyList() // Nothing matches
+            },
+            primaryTitle = "One Piece [Special Edition]",
+            alternativeTitles = listOf("AAAA BBBB CCCC"),
+            deepSearchFallback = false,
+        )
+        found shouldBe null
+        // Should only have tried primary + 1 alt title (no deep search queries)
+        searchCount shouldBe 2
+    }
+
+    @Test
+    fun `multiTitleSearch returns near-match before attempting deep search`() = runTest {
+        // Primary title search returns a near-match (not exact), alt titles return nothing
+        val nearMatch = TestResult("One Piece - Special")
+        var deepSearchCalled = false
+        val found = engine.testMultiTitleSearch(
+            { query ->
+                if (query == "One Piece") {
+                    listOf(nearMatch, TestResult("Something Else"))
+                } else if (query.lowercase().let { it == "one piece" || it == "piece" || it == "one" }) {
+                    // Deep search queries would hit here
+                    deepSearchCalled = true
+                    listOf(TestResult("one piece"))
+                } else {
+                    emptyList()
+                }
+            },
+            primaryTitle = "One Piece",
+            alternativeTitles = listOf("ZZZZ Nonexistent"),
+        )
+        found shouldNotBe null
+        // Should return the near-match from primary search rather than doing deep search
+        found!!.title shouldBe "One Piece - Special"
+        deepSearchCalled shouldBe false
     }
 
     @Test

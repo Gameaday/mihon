@@ -184,29 +184,19 @@ class MigrationListScreenModel(
         deepSearchMode: Boolean,
     ): Pair<Manga, ChapterInfo>? {
         return try {
-            // Tiered search strategy to minimize API calls:
-            // 1. Canonical ID match (FREE — local DB lookup, 0 API calls)
-            // 2. Main title search (1 API call)
-            // 3. Alternative titles search (1 API call per alt title)
-            // 4. Deep search fallback (multiple API calls)
-
-            // Tier 1: If the manga has a canonical_id, check if we already have a
-            // library entry on the target source sharing that same identity.
-            // This is zero-cost and handles the common case of manga tracked on
-            // multiple sources via the same AniList/MAL/MangaUpdates account.
-            val canonicalMatch = findByCanonicalId(manga, source.id)
-            val searchResult = if (canonicalMatch != null) {
-                canonicalMatch
-            } else if (manga.alternativeTitles.isNotEmpty()) {
-                // Tier 2+3: Multi-title search (primary → alt titles → deep search fallback)
-                smartSearchEngine.multiTitleSearch(source, manga.title, manga.alternativeTitles)
-            } else if (deepSearchMode) {
-                // Tier 4: Deep search with cleaned title
-                smartSearchEngine.deepSearch(source, manga.title)
-            } else {
-                // Tier 2: Regular search with primary title
-                smartSearchEngine.regularSearch(source, manga.title)
-            }
+            // Tiered search strategy — each tier is tried only if the previous returned null.
+            // Tier 1: Canonical ID (FREE — local DB lookup, 0 API calls)
+            // Tier 2: Primary title search (1 API call)
+            // Tier 3: Alternative titles search (1 API call per alt title)
+            // Tier 3b: Best near-match from tiers 2–3 (0 additional API calls)
+            // Tier 4: Deep search with cleaned/split title (multiple API calls, only if enabled)
+            val searchResult = findByCanonicalId(manga, source.id)
+                ?: smartSearchEngine.multiTitleSearch(
+                    source = source,
+                    primaryTitle = manga.title,
+                    alternativeTitles = manga.alternativeTitles,
+                    deepSearchFallback = deepSearchMode,
+                )
 
             if (searchResult == null || (searchResult.url == manga.url && source.id == manga.source)) return null
 
