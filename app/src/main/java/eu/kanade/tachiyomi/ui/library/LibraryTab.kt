@@ -186,6 +186,8 @@ data object LibraryTab : Tab {
                         currentPage = state.coercedActiveCategoryIndex,
                         hasActiveFilters = state.hasActiveFilters,
                         showPageTabs = state.showCategoryTabs || !state.searchQuery.isNullOrEmpty(),
+                        deadSourceCount = state.deadSourceCount,
+                        degradedSourceCount = state.degradedSourceCount,
                         onChangeCurrentPage = screenModel::updateActiveCategoryIndex,
                         onClickManga = { navigator.push(MangaScreen(it)) },
                         onContinueReadingClicked = { it: LibraryManga ->
@@ -210,6 +212,7 @@ data object LibraryTab : Tab {
                         onGlobalSearchClicked = {
                             navigator.push(GlobalSearchScreen(screenModel.state.value.searchQuery ?: ""))
                         },
+                        onClickHealthFilter = screenModel::enableHealthFilter,
                         getItemCountForCategory = { state.getItemCountForCategory(it) },
                         getDisplayMode = { screenModel.getDisplayMode() },
                         getColumnsForOrientation = { screenModel.getColumnsForOrientation(it) },

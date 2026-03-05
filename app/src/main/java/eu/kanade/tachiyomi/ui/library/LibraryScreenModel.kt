@@ -662,6 +662,10 @@ class LibraryScreenModel(
         mutableState.update { it.copy(dialog = Dialog.SettingsSheet) }
     }
 
+    fun enableHealthFilter() {
+        libraryPreferences.filterSourceHealthDead().set(TriState.ENABLED_IS)
+    }
+
     private var lastSelectionCategory: Long? = null
 
     fun clearSelection() {
@@ -842,6 +846,20 @@ class LibraryScreenModel(
         val isLibraryEmpty = libraryData.favorites.isEmpty()
 
         val selectionMode = selection.isNotEmpty()
+
+        /** Count of manga with DEAD source status across the entire library. */
+        val deadSourceCount: Int by lazy {
+            libraryData.favorites.count {
+                SourceStatus.fromValue(it.libraryManga.manga.sourceStatus) == SourceStatus.DEAD
+            }
+        }
+
+        /** Count of manga with DEGRADED source status across the entire library. */
+        val degradedSourceCount: Int by lazy {
+            libraryData.favorites.count {
+                SourceStatus.fromValue(it.libraryManga.manga.sourceStatus) == SourceStatus.DEGRADED
+            }
+        }
 
         val selectedManga by lazy { selection.mapNotNull { libraryData.favoritesById[it]?.libraryManga?.manga } }
 

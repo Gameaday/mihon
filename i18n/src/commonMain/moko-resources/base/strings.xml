@@ -1075,4 +1075,9 @@
     <!-- Migration suggestion notifications -->
     <string name="notification_migration_suggestion_title">Sources still dead — consider migrating</string>
     <string name="notification_migration_suggestion_body">%d manga have had dead sources for 3+ days</string>
+
+    <!-- Library health banner -->
+    <string name="library_health_banner_dead">%d dead</string>
+    <string name="library_health_banner_degraded">%d degraded</string>
+    <string name="library_health_banner_summary">Source issues:</string>
 </resources>
