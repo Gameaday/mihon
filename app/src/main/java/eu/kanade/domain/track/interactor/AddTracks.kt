@@ -41,10 +41,10 @@ class AddTracks(
 
             insertTrack.await(track)
 
-            // Populate canonical_id from tracker remote_id if not already set.
+            // Set canonical_id from tracker remote_id if not already set.
             // This links the manga's identity to the tracker's ID (e.g. "al:21" for AniList).
             // Only set on first tracker link — subsequent trackers don't overwrite.
-            populateCanonicalId(mangaId, tracker.id, track.remoteId)
+            setCanonicalIdIfAbsent(mangaId, tracker.id, track.remoteId)
 
             // TODO: merge into [SyncChapterProgressWithTrack]?
             // Update chapter progress if newer chapters marked read locally
@@ -98,8 +98,8 @@ class AddTracks(
                             val domainTrack = track.toDomainTrack(idRequired = false)!!
                             insertTrack.await(domainTrack)
 
-                            // Also populate canonical_id for enhanced tracker bindings
-                            populateCanonicalId(manga.id, service.id, domainTrack.remoteId)
+                            // Also set canonical_id for enhanced tracker bindings
+                            setCanonicalIdIfAbsent(manga.id, service.id, domainTrack.remoteId)
 
                             syncChapterProgressWithTrack.await(
                                 manga.id,
@@ -121,9 +121,9 @@ class AddTracks(
      * Sets the canonical_id on a manga from a tracker's remote_id, if not already set.
      * Format: "al:21" for AniList, "mal:13" for MyAnimeList, "mu:abc123" for MangaUpdates.
      * Only authoritative trackers (AniList, MAL, MangaUpdates) produce canonical IDs.
-     * Priority is first-linked-wins: once set, canonical_id is not overwritten.
+     * Once set, canonical_id is not overwritten by subsequent tracker bindings.
      */
-    private suspend fun populateCanonicalId(mangaId: Long, trackerId: Long, remoteId: Long) {
+    private suspend fun setCanonicalIdIfAbsent(mangaId: Long, trackerId: Long, remoteId: Long) {
         if (remoteId <= 0) return
 
         val prefix = TRACKER_CANONICAL_PREFIXES[trackerId] ?: return
@@ -144,12 +144,15 @@ class AddTracks(
         /**
          * Mapping of tracker IDs to canonical ID prefixes.
          * Only authoritative metadata trackers are included.
-         * AniList (2) → "al", MyAnimeList (1) → "mal", MangaUpdates (7) → "mu"
+         * Uses TrackerManager constants where available.
          */
+        private const val MYANIMELIST_ID = 1L
+        private const val MANGAUPDATES_ID = 7L
+
         val TRACKER_CANONICAL_PREFIXES = mapOf(
-            1L to "mal",   // MyAnimeList
-            2L to "al",    // AniList
-            7L to "mu",    // MangaUpdates
+            MYANIMELIST_ID to "mal",         // MyAnimeList
+            TrackerManager.ANILIST to "al",  // AniList
+            MANGAUPDATES_ID to "mu",         // MangaUpdates
         )
     }
 }

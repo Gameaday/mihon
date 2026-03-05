@@ -445,8 +445,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         val previousChapterCount = getChaptersByMangaId.await(manga.id).size
         val newStatus = when {
             chapters.isEmpty() && previousChapterCount > 0 -> SourceStatus.DEAD
+            // Use integer comparison to avoid floating-point precision issues:
+            // chapters.size * 10 < previousChapterCount * 7 is equivalent to
+            // chapters.size < previousChapterCount * 0.7
             previousChapterCount > 0 &&
-                chapters.size < previousChapterCount * CHAPTER_DROP_THRESHOLD -> SourceStatus.DEGRADED
+                chapters.size * 10 < previousChapterCount * 7 -> SourceStatus.DEGRADED
             else -> SourceStatus.HEALTHY
         }
         if (newStatus.value != dbManga.sourceStatus) {
@@ -534,12 +537,6 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          * of remote sources. Manual refreshes bypass this throttle.
          */
         private const val METADATA_REFRESH_INTERVAL_DAYS = 7L
-
-        /**
-         * Fraction threshold for detecting degraded sources. If a source returns fewer
-         * chapters than `previousCount * CHAPTER_DROP_THRESHOLD`, it is marked DEGRADED.
-         */
-        private const val CHAPTER_DROP_THRESHOLD = 0.7
 
         /**
          * Key for category to update.
