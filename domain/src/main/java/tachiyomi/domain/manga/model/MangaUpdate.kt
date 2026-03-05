@@ -27,6 +27,8 @@ data class MangaUpdate(
     val notes: String? = null,
     val metadataSource: Long? = null,
     val metadataUrl: String? = null,
+    val canonicalId: String? = null,
+    val sourceStatus: Int? = null,
 )
 
 fun Manga.toMangaUpdate(): MangaUpdate {
@@ -55,5 +57,7 @@ fun Manga.toMangaUpdate(): MangaUpdate {
         notes = notes,
         metadataSource = metadataSource,
         metadataUrl = metadataUrl,
+        canonicalId = canonicalId,
+        sourceStatus = sourceStatus,
     )
 }

@@ -1,0 +1,5 @@
+-- Add canonical identity and source health tracking columns.
+-- canonical_id: Canonical identity string (e.g. "al:21" for AniList ID 21).
+-- source_status: 0=HEALTHY, 1=DEGRADED, 2=DEAD, 3=REPLACED.
+ALTER TABLE mangas ADD COLUMN canonical_id TEXT;
+ALTER TABLE mangas ADD COLUMN source_status INTEGER NOT NULL DEFAULT 0;

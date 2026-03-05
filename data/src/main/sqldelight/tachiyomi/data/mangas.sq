@@ -30,7 +30,9 @@ CREATE TABLE mangas(
     is_syncing INTEGER NOT NULL DEFAULT 0,
     notes TEXT NOT NULL DEFAULT "",
     metadata_source INTEGER,
-    metadata_url TEXT
+    metadata_url TEXT,
+    canonical_id TEXT,
+    source_status INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX library_favorite_index ON mangas(favorite) WHERE favorite = 1;
@@ -196,8 +198,8 @@ AND (
 );
 
 insert:
-INSERT INTO mangas(source, url, artist, author, description, genre, title, status, thumbnail_url, favorite, last_update, next_update, initialized, viewer, chapter_flags, cover_last_modified, date_added, update_strategy, calculate_interval, last_modified_at, version, notes, metadata_source, metadata_url)
-VALUES (:source, :url, :artist, :author, :description, :genre, :title, :status, :thumbnailUrl, :favorite, :lastUpdate, :nextUpdate, :initialized, :viewerFlags, :chapterFlags, :coverLastModified, :dateAdded, :updateStrategy, :calculateInterval, 0, :version, :notes, :metadataSource, :metadataUrl);
+INSERT INTO mangas(source, url, artist, author, description, genre, title, status, thumbnail_url, favorite, last_update, next_update, initialized, viewer, chapter_flags, cover_last_modified, date_added, update_strategy, calculate_interval, last_modified_at, version, notes, metadata_source, metadata_url, canonical_id, source_status)
+VALUES (:source, :url, :artist, :author, :description, :genre, :title, :status, :thumbnailUrl, :favorite, :lastUpdate, :nextUpdate, :initialized, :viewerFlags, :chapterFlags, :coverLastModified, :dateAdded, :updateStrategy, :calculateInterval, 0, :version, :notes, :metadataSource, :metadataUrl, :canonicalId, :sourceStatus);
 
 update:
 UPDATE mangas SET
@@ -224,7 +226,9 @@ UPDATE mangas SET
     is_syncing = coalesce(:isSyncing, is_syncing),
     notes = coalesce(:notes, notes),
     metadata_source = coalesce(:metadataSource, metadata_source),
-    metadata_url = coalesce(:metadataUrl, metadata_url)
+    metadata_url = coalesce(:metadataUrl, metadata_url),
+    canonical_id = coalesce(:canonicalId, canonical_id),
+    source_status = coalesce(:sourceStatus, source_status)
 WHERE _id = :mangaId;
 
 clearMetadataSource:

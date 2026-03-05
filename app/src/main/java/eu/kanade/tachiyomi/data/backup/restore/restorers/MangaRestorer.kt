@@ -129,6 +129,8 @@ class MangaRestorer(
                 notes = manga.notes,
                 metadataSource = manga.metadataSource,
                 metadataUrl = manga.metadataUrl,
+                canonicalId = manga.canonicalId,
+                sourceStatus = manga.sourceStatus.toLong(),
             )
         }
         return manga
@@ -262,6 +264,8 @@ class MangaRestorer(
                 notes = manga.notes,
                 metadataSource = manga.metadataSource,
                 metadataUrl = manga.metadataUrl,
+                canonicalId = manga.canonicalId,
+                sourceStatus = manga.sourceStatus.toLong(),
             )
             mangasQueries.selectLastInsertedRowId()
         }

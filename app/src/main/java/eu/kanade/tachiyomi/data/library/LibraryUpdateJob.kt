@@ -46,6 +46,7 @@ import tachiyomi.core.common.preference.getAndSet
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.category.model.Category
+import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.chapter.model.NoChaptersException
 import tachiyomi.domain.library.model.LibraryManga
@@ -61,6 +62,8 @@ import tachiyomi.domain.manga.interactor.FetchInterval
 import tachiyomi.domain.manga.interactor.GetLibraryManga
 import tachiyomi.domain.manga.interactor.GetManga
 import tachiyomi.domain.manga.model.Manga
+import tachiyomi.domain.manga.model.MangaUpdate
+import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.domain.source.model.SourceNotInstalledException
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.i18n.MR
@@ -90,6 +93,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
     private val syncChaptersWithSource: SyncChaptersWithSource = Injekt.get()
     private val fetchInterval: FetchInterval = Injekt.get()
     private val filterChaptersForDownload: FilterChaptersForDownload = Injekt.get()
+    private val getChaptersByMangaId: GetChaptersByMangaId = Injekt.get()
 
     private val notifier = LibraryUpdateNotifier(context)
 
@@ -436,6 +440,21 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         // to get latest data so it doesn't get overwritten later on
         val dbManga = getManga.await(manga.id)?.takeIf { it.favorite } ?: return emptyList()
 
+        // Source health detection: compare fetched chapter count against what we had before.
+        // This runs on every refresh using data we already fetched — zero additional API cost.
+        val previousChapterCount = getChaptersByMangaId.await(manga.id).size
+        val newStatus = when {
+            chapters.isEmpty() && previousChapterCount > 0 -> SourceStatus.DEAD
+            previousChapterCount > 0 &&
+                chapters.size < previousChapterCount * CHAPTER_DROP_THRESHOLD -> SourceStatus.DEGRADED
+            else -> SourceStatus.HEALTHY
+        }
+        if (newStatus.value != dbManga.sourceStatus) {
+            updateManga.await(
+                MangaUpdate(id = manga.id, sourceStatus = newStatus.value),
+            )
+        }
+
         return syncChaptersWithSource.await(chapters, dbManga, source, false, fetchWindow)
     }
 
@@ -515,6 +534,12 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          * of remote sources. Manual refreshes bypass this throttle.
          */
         private const val METADATA_REFRESH_INTERVAL_DAYS = 7L
+
+        /**
+         * Fraction threshold for detecting degraded sources. If a source returns fewer
+         * chapters than `previousCount * CHAPTER_DROP_THRESHOLD`, it is marked DEGRADED.
+         */
+        private const val CHAPTER_DROP_THRESHOLD = 0.7
 
         /**
          * Key for category to update.

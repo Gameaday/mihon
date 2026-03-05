@@ -191,6 +191,8 @@ class MangaRepositoryImpl(
                     notes = value.notes,
                     metadataSource = value.metadataSource,
                     metadataUrl = value.metadataUrl,
+                    canonicalId = value.canonicalId,
+                    sourceStatus = value.sourceStatus?.toLong(),
                 )
             }
         }

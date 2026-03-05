@@ -1094,33 +1094,164 @@ with a different stopping point that might be good enough for most users.
 
 ---
 
-## 📊 Decision Summary: Approach A vs Approach B
+## ✅ Chosen Approach: C — Curated Search with Lean Identity
+
+> **Status: IMPLEMENTING** — This is the selected design, combining Approach B's lean
+> backend with a curated search UX that makes finding manga feel fundamentally better.
+
+### C.1: The Core Insight
+
+The current search experience is confusing: a user types "One Piece" and gets 5+ sources
+each showing multiple results of varying quality. The user has no idea which to pick.
+
+**Approach C** inverts this: search hits **authoritative metadata sources** (AniList, MAL)
+first to identify *what* the user wants, then recommends the **best chapter source** based
+on coverage metrics. The user experience becomes:
+
+1. **Search**: "What do you want to read?" → Results from AniList/MAL (one canonical entry
+   per series, with cover, description, score, status)
+2. **Select**: User picks "One Piece" → App shows the authoritative metadata
+3. **Source**: App recommends the best available chapter source based on chapter count and
+   availability, with alternatives visible but secondary
+4. **Add**: User adds to library with one tap
+
+This is fundamentally different from the current "search every extension and see what sticks"
+approach. It reduces API calls (only hit authoritative sources for search), improves result
+quality (no duplicates, no mystery sources), and feels more like a curated catalog than a
+raw search engine.
+
+### C.2: Two-Tier Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Tier 1: AUTHORITATIVE SEARCH (metadata identity)   │
+│  AniList, MAL, MangaUpdates                         │
+│  Used for: Search, metadata, covers, descriptions   │
+│  When: User searches for new manga                  │
+│  Cost: 1 API call per search (already rate-limited) │
+└─────────────────────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────┐
+│  Tier 2: CHAPTER SOURCES (reading content)          │
+│  Extension sources (MangaDex, MangaSee, etc.)       │
+│  Used for: Chapter lists, page images               │
+│  When: User selects manga AND asks for chapters     │
+│  Cost: Search only selected extensions, not all     │
+└─────────────────────────────────────────────────────┘
+```
+
+### C.3: Schema — Same as Approach B (Minimal)
+
+```sql
+-- Migration 12.sqm
+ALTER TABLE mangas ADD COLUMN canonical_id TEXT;
+    -- Format: "al:21" or "mal:13" or "mu:abc123"
+    -- Set when tracker is linked. NULL = legacy (no tracker linked)
+
+ALTER TABLE mangas ADD COLUMN source_status INTEGER NOT NULL DEFAULT 0;
+    -- 0 = HEALTHY, 1 = DEGRADED, 2 = DEAD, 3 = REPLACED
+```
+
+**No new tables. No changes to chapters table. 2 columns on mangas.**
+
+### C.4: Implementation — What We Build Now
+
+#### 1. Schema + Domain Model (this PR)
+
+- Migration 12.sqm: 2 ALTER TABLE statements
+- Manga.kt: Add `canonicalId: String?` and `sourceStatus: Int` fields
+- MangaUpdate.kt: Add corresponding update fields
+- MangaMapper.kt: Map new columns
+- MangaRepositoryImpl.kt: Include in partialUpdate
+- SourceStatus enum: HEALTHY (0), DEGRADED (1), DEAD (2), REPLACED (3)
+
+#### 2. Source Health Detection (this PR)
+
+- LibraryUpdateJob: After fetching chapters, compare count to previous
+- If chapters.isEmpty() && previousCount > 0 → DEAD
+- If chapters.size < previousCount * 0.7 → DEGRADED
+- Otherwise → HEALTHY
+
+#### 3. Canonical ID Population (this PR)
+
+- When user links a tracker: auto-set canonical_id from tracker remote_id
+- Priority: AniList (al:) > MAL (mal:) > MangaUpdates (mu:)
+- Only set if canonical_id is currently NULL (first-linked wins)
+
+#### Future enhancements (not this PR):
+
+- Curated search UI (search AniList/MAL first, then find chapter sources)
+- Source health badges on manga detail screen
+- "Compare Sources" / "Find Replacement" actions
+- Duplicate detection via canonical_id
+- Smart migration suggestions when source is DEAD
+
+### C.5: Why This Design Wins
+
+| Dimension | Current | Approach A | Approach B | **Approach C** |
+|-----------|---------|-----------|-----------|---------------|
+| Search UX | Confusing (N sources × M results) | Same search, better failover | Same search, health monitor | **Curated (1 result per series)** |
+| API cost | Hits all sources | Spike on discovery | Zero increase | **Zero increase now; search only authoritative later** |
+| Schema complexity | — | 1 new table, 4 new columns | 2 columns | **2 columns** (same as B) |
+| Implementation risk | — | High | Low | **Low** (same as B) |
+| "Feels better" | No | No (same UX) | Slightly (health badges) | **Yes** (curated catalog) |
+| Future potential | — | Already maximal | Foundation for A | **Foundation for A + curated search** |
+
+### C.6: How Curated Search Will Work (Future)
+
+```
+User types "One Piece" in search bar
+
+STEP 1: Hit AniList API (already integrated via Tracker)
+  → Returns: One Piece (id: 21, cover, description, 1088 chapters, score: 87%)
+  → Also returns: One Piece Party, One Piece: Chin Piece (related titles)
+  → One result per series, no source confusion
+
+STEP 2: User taps "One Piece"
+  → Shows AniList metadata (cover, description, status, score)
+  → Below: "Available from:" section shows installed extension sources
+  → Each source shows: chapter count, last update, language
+  → Recommended source highlighted (highest chapter count + active)
+
+STEP 3: User taps "Add to Library"
+  → Manga created with source = recommended extension source
+  → canonical_id = "al:21" (from AniList selection)
+  → metadataSource = AniList source ID (for ongoing metadata)
+  → Tracker auto-linked (since we already know the AniList ID)
+```
+
+**Key optimization**: During Step 1, we only hit ONE API (AniList). We don't hit any
+extension sources until the user actually selects a manga. And even then, we only search
+the installed extensions for that specific title — not all of them for every search term.
+
+---
+
+## 📊 Decision Summary: Approach A vs Approach B vs C
 
 ### Side-by-Side Verdict
 
-| Dimension | Approach A (Full Multi-Source) | Approach B (Lean Identity) | Winner |
-|-----------|------------------------------|--------------------------|--------|
-| **User value** | Automatic failover, zero-touch | Manual but reliable | A (more magic) |
-| **Implementation risk** | High (15 files, 10 weeks) | Low (6 files, 4 weeks) | **B** |
-| **API compliance** | Good steady-state, spike on discovery | Zero additional calls | **B** |
-| **Correctness** | Risk of wrong-series match | User always confirms | **B** |
-| **Complexity** | New table + 4 use cases + background job | 2 columns + health check | **B** |
-| **Test surface** | Large (DB + network + bg + UI) | Tiny (3 lines of logic) | **B** |
-| **Backwards compat** | Safe (opt-in) | Safe (opt-in) | Tie |
-| **Future extensibility** | Already maximal | Clean upgrade to A | Tie |
-| **Time to ship** | 10 weeks | 3-4 weeks | **B** |
-| **Server impact** | Discovery spike risk | Zero impact | **B** |
+| Dimension | Approach A (Full Multi-Source) | Approach B (Lean Identity) | **Approach C (Curated Search)** | Winner |
+|-----------|------------------------------|--------------------------|-------------------------------|--------|
+| **User value** | Automatic failover, zero-touch | Manual but reliable | **Curated catalog feel** | **C** |
+| **Implementation risk** | High (15 files, 10 weeks) | Low (6 files, 4 weeks) | **Low (same schema as B)** | B/C tie |
+| **API compliance** | Good steady-state, spike on discovery | Zero additional calls | **Zero now; authoritative-only later** | **C** |
+| **Correctness** | Risk of wrong-series match | User always confirms | **User confirms + canonical ID** | B/C tie |
+| **Complexity** | New table + 4 use cases + background job | 2 columns + health check | **2 columns + health check** | B/C tie |
+| **Test surface** | Large (DB + network + bg + UI) | Tiny (3 lines of logic) | **Tiny (same as B)** | B/C tie |
+| **Backwards compat** | Safe (opt-in) | Safe (opt-in) | **Safe (opt-in)** | Tie |
+| **Future extensibility** | Already maximal | Clean upgrade to A | **Foundation for A + curated search** | **C** |
+| **Time to ship** | 10 weeks | 3-4 weeks | **Phase 1: 2 weeks (schema)** | **C** |
+| **Server impact** | Discovery spike risk | Zero impact | **Zero impact; reduces future** | **C** |
+| **Search UX** | Same as current | Same as current | **Curated, catalog-like** | **C** |
 
-### Recommendation
+### Recommendation — FINAL
 
-**Ship Approach B first.** It delivers the canonical identity foundation, source health
-monitoring, and on-demand source comparison in 3-4 weeks with minimal risk. If user
-feedback shows demand for automatic failover, Approach A can be layered on top without
-any schema rework.
+**Ship Approach C.** It is Approach B's schema with a clear UX vision for curated search.
 
-The worst outcome would be building the full Approach A, discovering that false-positive
-matching causes wrong-series chapters to appear, and having to roll it back. Approach B
-avoids this entirely by keeping the user in control.
+Phase 1 (this PR): Schema foundation + health detection + canonical ID population.
+Phase 2 (next PR): Source health UI badges + "Compare Sources" action.
+Phase 3 (future): Curated search UI (AniList-first search, source recommendation).
+Phase ∞ (if needed): Layer Approach A's auto-discovery on top.
 
 ### Pros of the Overall Design (Both Approaches)
 
