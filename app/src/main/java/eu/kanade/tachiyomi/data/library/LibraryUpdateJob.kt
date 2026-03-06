@@ -367,9 +367,10 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
 
         // Check for manga that have been persistently DEAD — suggest bulk migration.
         // Only prompt if there are manga that have been DEAD for >= DEAD_MIGRATION_THRESHOLD_MS.
+        val now = System.currentTimeMillis()
         val persistentlyDead = deadManga.filter { manga ->
-            manga.deadSince != null &&
-                (System.currentTimeMillis() - manga.deadSince!!) >= DEAD_MIGRATION_THRESHOLD_MS
+            val deadSince = manga.deadSince
+            deadSince != null && (now - deadSince) >= DEAD_MIGRATION_THRESHOLD_MS
         }
         if (persistentlyDead.isNotEmpty()) {
             notifier.showMigrationSuggestionNotification(persistentlyDead)

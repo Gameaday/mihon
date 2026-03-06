@@ -88,9 +88,8 @@ class TrackerListImporter(
             return false
         }
 
-        // Also check by URL+source to avoid duplicates
-        val authorityUrl = "mal:${trackSearch.remote_id}"
-        val existingByUrl = mangaRepository.getMangaByUrlAndSourceId(authorityUrl, AUTHORITY_SOURCE_ID)
+        // Also check by URL+source to avoid duplicates for unfavorited entries
+        val existingByUrl = mangaRepository.getMangaByUrlAndSourceId(canonicalId, AUTHORITY_SOURCE_ID)
         if (existingByUrl?.favorite == true) {
             logcat(LogPriority.DEBUG) { "MAL import: skipping '${trackSearch.title}' — already exists" }
             return false
@@ -101,7 +100,7 @@ class TrackerListImporter(
             existingByUrl
         } else {
             val newManga = Manga.create().copy(
-                url = authorityUrl,
+                url = canonicalId,
                 title = trackSearch.title,
                 source = AUTHORITY_SOURCE_ID,
                 thumbnailUrl = trackSearch.cover_url.ifBlank { null },
