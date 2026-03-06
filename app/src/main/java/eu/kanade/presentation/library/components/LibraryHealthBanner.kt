@@ -1,7 +1,10 @@
 package eu.kanade.presentation.library.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,9 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.theme.MotionTokens
 
 @Composable
 fun LibraryHealthBanner(
@@ -30,42 +35,66 @@ fun LibraryHealthBanner(
 ) {
     AnimatedVisibility(
         visible = deadCount > 0 || degradedCount > 0,
-        enter = expandVertically(),
-        exit = shrinkVertically(),
+        enter = expandVertically(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationMedium,
+                easing = MotionTokens.EasingDecelerate,
+            ),
+        ) + fadeIn(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationMedium,
+                easing = MotionTokens.EasingStandard,
+            ),
+        ),
+        exit = shrinkVertically(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationShort,
+                easing = MotionTokens.EasingAccelerate,
+            ),
+        ) + fadeOut(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationShort,
+                easing = MotionTokens.EasingStandard,
+            ),
+        ),
     ) {
+        val isDead = deadCount > 0
+        val containerColor = if (isDead) {
+            MaterialTheme.colorScheme.errorContainer
+        } else {
+            MaterialTheme.colorScheme.tertiaryContainer
+        }
+        val contentColor = if (isDead) {
+            MaterialTheme.colorScheme.onErrorContainer
+        } else {
+            MaterialTheme.colorScheme.onTertiaryContainer
+        }
+
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .background(
-                    if (deadCount > 0) {
-                        MaterialTheme.colorScheme.errorContainer
-                    } else {
-                        MaterialTheme.colorScheme.tertiaryContainer
-                    },
+                .background(containerColor)
+                .clickable(
+                    onClickLabel = stringResource(MR.strings.source_health_banner_description),
+                    onClick = onClickFilter,
                 )
-                .clickable(onClick = onClickFilter)
                 .padding(
                     horizontal = MaterialTheme.padding.medium,
                     vertical = MaterialTheme.padding.small,
-                ),
+                )
+                .semantics(mergeDescendants = true) {},
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
         ) {
             Icon(
                 imageVector = Icons.Outlined.Warning,
-                contentDescription = null,
-                tint = if (deadCount > 0) {
-                    MaterialTheme.colorScheme.onErrorContainer
+                contentDescription = if (isDead) {
+                    stringResource(MR.strings.source_health_warning_dead)
                 } else {
-                    MaterialTheme.colorScheme.onTertiaryContainer
+                    stringResource(MR.strings.source_health_warning_degraded)
                 },
+                tint = contentColor,
             )
-
-            val contentColor = if (deadCount > 0) {
-                MaterialTheme.colorScheme.onErrorContainer
-            } else {
-                MaterialTheme.colorScheme.onTertiaryContainer
-            }
 
             Text(
                 text = stringResource(MR.strings.library_health_banner_summary),

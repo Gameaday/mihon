@@ -1,5 +1,11 @@
 package eu.kanade.presentation.manga.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +20,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
 import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.theme.MotionTokens
 
 /**
  * Banner displayed on the manga detail screen when the source health is not HEALTHY.
@@ -32,53 +40,84 @@ fun SourceHealthBanner(
     deadSince: Long? = null,
     onMigrateClick: (() -> Unit)? = null,
 ) {
-    if (sourceStatus == SourceStatus.HEALTHY || sourceStatus == SourceStatus.REPLACED) return
+    val isVisible = sourceStatus != SourceStatus.HEALTHY && sourceStatus != SourceStatus.REPLACED
 
-    val containerColor = when (sourceStatus) {
-        SourceStatus.DEAD -> MaterialTheme.colorScheme.errorContainer
-        else -> MaterialTheme.colorScheme.tertiaryContainer
-    }
-    val contentColor = when (sourceStatus) {
-        SourceStatus.DEAD -> MaterialTheme.colorScheme.onErrorContainer
-        else -> MaterialTheme.colorScheme.onTertiaryContainer
-    }
-    val text = when (sourceStatus) {
-        SourceStatus.DEAD -> {
-            val baseText = stringResource(MR.strings.source_health_dead)
-            val durationText = deadSince?.let { formatDeadDuration(it) }
-            if (durationText != null) "$baseText ($durationText)" else baseText
-        }
-        else -> stringResource(MR.strings.source_health_degraded)
-    }
-
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = containerColor,
-        contentColor = contentColor,
-    ) {
-        Row(
-            modifier = Modifier.padding(
-                horizontal = MaterialTheme.padding.medium,
-                vertical = MaterialTheme.padding.small,
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = expandVertically(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationMedium,
+                easing = MotionTokens.EasingDecelerate,
             ),
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
-            verticalAlignment = Alignment.CenterVertically,
+        ) + fadeIn(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationMedium,
+                easing = MotionTokens.EasingStandard,
+            ),
+        ),
+        exit = shrinkVertically(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationShort,
+                easing = MotionTokens.EasingAccelerate,
+            ),
+        ) + fadeOut(
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationShort,
+                easing = MotionTokens.EasingStandard,
+            ),
+        ),
+    ) {
+        val containerColor = when (sourceStatus) {
+            SourceStatus.DEAD -> MaterialTheme.colorScheme.errorContainer
+            else -> MaterialTheme.colorScheme.tertiaryContainer
+        }
+        val contentColor = when (sourceStatus) {
+            SourceStatus.DEAD -> MaterialTheme.colorScheme.onErrorContainer
+            else -> MaterialTheme.colorScheme.onTertiaryContainer
+        }
+        val text = when (sourceStatus) {
+            SourceStatus.DEAD -> {
+                val baseText = stringResource(MR.strings.source_health_dead)
+                val durationText = deadSince?.let { formatDeadDuration(it) }
+                if (durationText != null) "$baseText ($durationText)" else baseText
+            }
+            else -> stringResource(MR.strings.source_health_degraded)
+        }
+
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            color = containerColor,
+            contentColor = contentColor,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Warning,
-                contentDescription = null,
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.weight(1f),
-            )
-            if (sourceStatus == SourceStatus.DEAD && onMigrateClick != null) {
-                TextButton(onClick = onMigrateClick) {
-                    Text(
-                        text = stringResource(MR.strings.migrate),
-                        style = MaterialTheme.typography.labelMedium,
+            Row(
+                modifier = Modifier
+                    .padding(
+                        horizontal = MaterialTheme.padding.medium,
+                        vertical = MaterialTheme.padding.small,
                     )
+                    .semantics(mergeDescendants = true) {},
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Warning,
+                    contentDescription = when (sourceStatus) {
+                        SourceStatus.DEAD -> stringResource(MR.strings.source_health_warning_dead)
+                        else -> stringResource(MR.strings.source_health_warning_degraded)
+                    },
+                )
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
+                if (sourceStatus == SourceStatus.DEAD && onMigrateClick != null) {
+                    TextButton(onClick = onMigrateClick) {
+                        Text(
+                            text = stringResource(MR.strings.migrate),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
                 }
             }
         }

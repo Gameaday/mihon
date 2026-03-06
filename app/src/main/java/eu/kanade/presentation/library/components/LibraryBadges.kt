@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import eu.kanade.presentation.theme.TachiyomiPreviewTheme
 import tachiyomi.domain.manga.model.SourceStatus
+import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.Badge
+import tachiyomi.presentation.core.i18n.stringResource
 
 @Composable
 internal fun DownloadsBadge(count: Long) {
@@ -57,11 +59,13 @@ internal fun SourceHealthBadge(sourceStatus: Int) {
             imageVector = Icons.Outlined.Warning,
             color = MaterialTheme.colorScheme.error,
             iconColor = MaterialTheme.colorScheme.onError,
+            contentDescription = stringResource(MR.strings.source_health_warning_dead),
         )
         SourceStatus.DEGRADED -> Badge(
             imageVector = Icons.Outlined.Warning,
             color = MaterialTheme.colorScheme.tertiary,
             iconColor = MaterialTheme.colorScheme.onTertiary,
+            contentDescription = stringResource(MR.strings.source_health_warning_degraded),
         )
         else -> {}
     }

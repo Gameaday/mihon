@@ -62,6 +62,7 @@ fun Badge(
     color: Color = MaterialTheme.colorScheme.secondary,
     iconColor: Color = MaterialTheme.colorScheme.onSecondary,
     shape: Shape = RectangleShape,
+    contentDescription: String? = null,
 ) {
     val iconContentPlaceholder = "[icon]"
     val text = buildAnnotatedString {
@@ -80,7 +81,7 @@ fun Badge(
                 Icon(
                     imageVector = imageVector,
                     tint = iconColor,
-                    contentDescription = null,
+                    contentDescription = contentDescription,
                 )
             },
         ),
