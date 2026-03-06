@@ -258,6 +258,6 @@ private fun <T> AnchoredDraggableState<T>.preUpPostDownNestedScrollConnection(
 }
 
 private val sheetAnimationSpec = tween<Float>(
-    durationMillis = MotionTokens.DurationMedium,
+    durationMillis = MotionTokens.DURATION_MEDIUM,
     easing = MotionTokens.EasingEmphasized,
 )

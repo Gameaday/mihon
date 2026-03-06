@@ -3,9 +3,9 @@ package eu.kanade.tachiyomi.ui.home
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
@@ -68,7 +68,7 @@ object HomeScreen : Screen() {
     private val showBottomNavEvent = Channel<Boolean>()
 
     @Suppress("ConstPropertyName")
-    private const val TabFadeDuration = MotionTokens.DurationShort
+    private const val TabFadeDuration = MotionTokens.DURATION_SHORT
 
     @Suppress("ConstPropertyName")
     private const val TabNavigatorKey = "HomeTabs"
@@ -109,13 +109,13 @@ object HomeScreen : Screen() {
                                 visible = bottomNavVisible,
                                 enter = expandVertically(
                                     animationSpec = tween(
-                                        durationMillis = MotionTokens.DurationMedium,
+                                        durationMillis = MotionTokens.DURATION_MEDIUM,
                                         easing = MotionTokens.EasingDecelerate,
                                     ),
                                 ),
                                 exit = shrinkVertically(
                                     animationSpec = tween(
-                                        durationMillis = MotionTokens.DurationShort,
+                                        durationMillis = MotionTokens.DURATION_SHORT,
                                         easing = MotionTokens.EasingAccelerate,
                                     ),
                                 ),

@@ -33,7 +33,8 @@ class GetFavoritesByCanonicalIdTest {
         override fun getMangaByUrlAndSourceIdAsFlow(url: String, sourceId: Long) = throw NotImplementedError()
         override suspend fun getFavorites(): List<Manga> = throw NotImplementedError()
         override suspend fun getReadMangaNotInLibrary(): List<Manga> = throw NotImplementedError()
-        override suspend fun getLibraryManga(): List<tachiyomi.domain.library.model.LibraryManga> = throw NotImplementedError()
+        override suspend fun getLibraryManga(): List<tachiyomi.domain.library.model.LibraryManga> =
+            throw NotImplementedError()
         override fun getLibraryMangaAsFlow() = throw NotImplementedError()
         override fun getFavoritesBySourceId(sourceId: Long) = throw NotImplementedError()
         override suspend fun getDuplicateLibraryManga(id: Long, title: String) = throw NotImplementedError()
@@ -41,7 +42,9 @@ class GetFavoritesByCanonicalIdTest {
         override suspend fun resetViewerFlags() = throw NotImplementedError()
         override suspend fun setMangaCategories(mangaId: Long, categoryIds: List<Long>) = throw NotImplementedError()
         override suspend fun update(update: tachiyomi.domain.manga.model.MangaUpdate) = throw NotImplementedError()
-        override suspend fun updateAll(mangaUpdates: List<tachiyomi.domain.manga.model.MangaUpdate>) = throw NotImplementedError()
+        override suspend fun updateAll(
+            mangaUpdates: List<tachiyomi.domain.manga.model.MangaUpdate>,
+        ) = throw NotImplementedError()
         override suspend fun clearMetadataSource(mangaId: Long) = throw NotImplementedError()
         override suspend fun insertNetworkManga(manga: List<Manga>) = throw NotImplementedError()
     }

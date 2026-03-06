@@ -46,23 +46,23 @@ fun SourceHealthBanner(
         visible = isVisible,
         enter = expandVertically(
             animationSpec = tween(
-                durationMillis = MotionTokens.DurationMedium,
+                durationMillis = MotionTokens.DURATION_MEDIUM,
                 easing = MotionTokens.EasingDecelerate,
             ),
         ) + fadeIn(
             animationSpec = tween(
-                durationMillis = MotionTokens.DurationMedium,
+                durationMillis = MotionTokens.DURATION_MEDIUM,
                 easing = MotionTokens.EasingStandard,
             ),
         ),
         exit = shrinkVertically(
             animationSpec = tween(
-                durationMillis = MotionTokens.DurationShort,
+                durationMillis = MotionTokens.DURATION_SHORT,
                 easing = MotionTokens.EasingAccelerate,
             ),
         ) + fadeOut(
             animationSpec = tween(
-                durationMillis = MotionTokens.DurationShort,
+                durationMillis = MotionTokens.DURATION_SHORT,
                 easing = MotionTokens.EasingStandard,
             ),
         ),

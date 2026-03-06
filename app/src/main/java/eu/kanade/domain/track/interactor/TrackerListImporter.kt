@@ -152,7 +152,7 @@ class TrackerListImporter(
             }
         }
 
-        logcat(LogPriority.INFO) { "MAL import: imported '${trackSearch.title}' (${canonicalId})" }
+        logcat(LogPriority.INFO) { "MAL import: imported '${trackSearch.title}' ($canonicalId)" }
         return true
     }
 

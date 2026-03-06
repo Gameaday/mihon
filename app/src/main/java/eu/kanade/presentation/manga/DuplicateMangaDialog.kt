@@ -226,17 +226,19 @@ private fun DuplicateMangaListItem(
             maxLines = 2,
         )
 
-        if (!manga.author.isNullOrBlank()) {
+        val author = manga.author
+        if (!author.isNullOrBlank()) {
             MangaDetailRow(
-                text = manga.author!!,
+                text = author,
                 iconImageVector = Icons.Filled.PersonOutline,
                 maxLines = 2,
             )
         }
 
-        if (!manga.artist.isNullOrBlank() && manga.author != manga.artist) {
+        val artist = manga.artist
+        if (!artist.isNullOrBlank() && author != artist) {
             MangaDetailRow(
-                text = manga.artist!!,
+                text = artist,
                 iconImageVector = Icons.Filled.Brush,
                 maxLines = 2,
             )

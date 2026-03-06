@@ -194,9 +194,9 @@ class AddTracks(
         private const val MANGAUPDATES_ID = 7L
 
         val TRACKER_CANONICAL_PREFIXES = mapOf(
-            MYANIMELIST_ID to "mal",         // MyAnimeList
-            TrackerManager.ANILIST to "al",  // AniList
-            MANGAUPDATES_ID to "mu",         // MangaUpdates
+            MYANIMELIST_ID to "mal", // MyAnimeList
+            TrackerManager.ANILIST to "al", // AniList
+            MANGAUPDATES_ID to "mu", // MangaUpdates
         )
     }
 }

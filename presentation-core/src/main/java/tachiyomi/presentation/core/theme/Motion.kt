@@ -20,13 +20,13 @@ object MotionTokens {
     // --- Durations ---
 
     /** Short duration for micro-interactions like icon toggles and ripples. */
-    const val DurationShort = 150
+    const val DURATION_SHORT = 150
 
     /** Medium duration for expanding/collapsing components and tab switches. */
-    const val DurationMedium = 300
+    const val DURATION_MEDIUM = 300
 
     /** Long duration for full-screen transitions and shared element animations. */
-    const val DurationLong = 500
+    const val DURATION_LONG = 500
 
     // --- Easing curves ---
 
@@ -46,31 +46,31 @@ object MotionTokens {
 
     /** Quick tween for micro-interactions. */
     fun <T> tweenShort(): FiniteAnimationSpec<T> = tween(
-        durationMillis = DurationShort,
+        durationMillis = DURATION_SHORT,
         easing = EasingStandard,
     )
 
     /** Standard tween for component-level transitions. */
     fun <T> tweenMedium(): FiniteAnimationSpec<T> = tween(
-        durationMillis = DurationMedium,
+        durationMillis = DURATION_MEDIUM,
         easing = EasingStandard,
     )
 
     /** Emphasized tween for attention-drawing transitions. */
     fun <T> tweenEmphasized(): FiniteAnimationSpec<T> = tween(
-        durationMillis = DurationLong,
+        durationMillis = DURATION_LONG,
         easing = EasingEmphasized,
     )
 
     /** Enter transition tween for elements appearing on screen. */
     fun <T> tweenEnter(): FiniteAnimationSpec<T> = tween(
-        durationMillis = DurationMedium,
+        durationMillis = DURATION_MEDIUM,
         easing = EasingDecelerate,
     )
 
     /** Exit transition tween for elements leaving the screen. */
     fun <T> tweenExit(): FiniteAnimationSpec<T> = tween(
-        durationMillis = DurationShort,
+        durationMillis = DURATION_SHORT,
         easing = EasingAccelerate,
     )
 }
