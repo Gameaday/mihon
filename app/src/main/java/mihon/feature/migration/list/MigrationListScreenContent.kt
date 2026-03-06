@@ -1,5 +1,10 @@
 package mihon.feature.migration.list
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,6 +72,7 @@ import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.components.material.topSmallPaddingValues
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.theme.MotionTokens
 import tachiyomi.presentation.core.util.plus
 
 @Composable
@@ -254,69 +260,81 @@ fun MigrationListItemResult(
     onItemClick: (Manga) -> Unit,
 ) {
     Box(modifier.height(IntrinsicSize.Min)) {
-        when (result) {
-            MigratingManga.SearchResult.Searching -> {
-                Box(
-                    modifier = Modifier
-                        .widthIn(max = 150.dp)
-                        .fillMaxSize()
-                        .aspectRatio(MangaCover.Book.ratio),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-            MigratingManga.SearchResult.NotFound -> {
-                Column(
-                    Modifier
-                        .widthIn(max = 150.dp)
-                        .fillMaxSize()
-                        .padding(4.dp),
-                ) {
-                    Image(
-                        painter = rememberResourceBitmapPainter(id = R.drawable.cover_error),
-                        contentDescription = null,
+        AnimatedContent(
+            targetState = result,
+            transitionSpec = {
+                fadeIn(
+                    animationSpec = tween(durationMillis = MotionTokens.DURATION_MEDIUM),
+                ) togetherWith fadeOut(
+                    animationSpec = tween(durationMillis = MotionTokens.DURATION_SHORT),
+                )
+            },
+            label = "migration_result",
+        ) { targetResult ->
+            when (targetResult) {
+                MigratingManga.SearchResult.Searching -> {
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(MangaCover.Book.ratio)
-                            .clip(MaterialTheme.shapes.extraSmall),
-                        contentScale = ContentScale.Crop,
-                    )
-                    Text(
-                        text = stringResource(MR.strings.migrationListScreen_noMatchFoundText),
-                        modifier = Modifier.padding(MaterialTheme.padding.extraSmall),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
+                            .widthIn(max = 150.dp)
+                            .fillMaxSize()
+                            .aspectRatio(MangaCover.Book.ratio),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            }
-            is MigratingManga.SearchResult.Success -> {
-                Column(Modifier.fillMaxSize()) {
-                    MigrationListItem(
-                        modifier = Modifier.fillMaxWidth(),
-                        manga = result.manga,
-                        source = result.source,
-                        chapterCount = result.chapterCount,
-                        latestChapter = result.latestChapter,
-                        onClick = { onItemClick(result.manga) },
-                    )
-                    if (result.matchConfidence < 1.0) {
-                        val confidencePercent = (result.matchConfidence * 100).toInt()
-                        Text(
-                            text = stringResource(
-                                MR.strings.migration_match_confidence,
-                                confidencePercent,
-                            ),
-                            modifier = Modifier.padding(
-                                horizontal = MaterialTheme.padding.extraSmall,
-                            ),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = when {
-                                result.matchConfidence >= 0.9 -> MaterialTheme.colorScheme.primary
-                                result.matchConfidence >= 0.7 -> MaterialTheme.colorScheme.tertiary
-                                else -> MaterialTheme.colorScheme.error
-                            },
-                            maxLines = 1,
+                MigratingManga.SearchResult.NotFound -> {
+                    Column(
+                        Modifier
+                            .widthIn(max = 150.dp)
+                            .fillMaxSize()
+                            .padding(4.dp),
+                    ) {
+                        Image(
+                            painter = rememberResourceBitmapPainter(id = R.drawable.cover_error),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(MangaCover.Book.ratio)
+                                .clip(MaterialTheme.shapes.extraSmall),
+                            contentScale = ContentScale.Crop,
                         )
+                        Text(
+                            text = stringResource(MR.strings.migrationListScreen_noMatchFoundText),
+                            modifier = Modifier.padding(MaterialTheme.padding.extraSmall),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                    }
+                }
+                is MigratingManga.SearchResult.Success -> {
+                    Column(Modifier.fillMaxSize()) {
+                        MigrationListItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            manga = targetResult.manga,
+                            source = targetResult.source,
+                            chapterCount = targetResult.chapterCount,
+                            latestChapter = targetResult.latestChapter,
+                            onClick = { onItemClick(targetResult.manga) },
+                        )
+                        if (targetResult.matchConfidence < 1.0) {
+                            val confidencePercent = (targetResult.matchConfidence * 100).toInt()
+                            Text(
+                                text = stringResource(
+                                    MR.strings.migration_match_confidence,
+                                    confidencePercent,
+                                ),
+                                modifier = Modifier.padding(
+                                    horizontal = MaterialTheme.padding.extraSmall,
+                                ),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = when {
+                                    targetResult.matchConfidence >= 0.9 -> MaterialTheme.colorScheme.primary
+                                    targetResult.matchConfidence >= 0.7 -> MaterialTheme.colorScheme.tertiary
+                                    else -> MaterialTheme.colorScheme.error
+                                },
+                                maxLines = 1,
+                            )
+                        }
                     }
                 }
             }
