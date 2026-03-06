@@ -96,6 +96,7 @@ import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.findChildOfType
 import tachiyomi.domain.manga.model.Manga
+import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
 import tachiyomi.presentation.core.components.material.TextButton
@@ -117,6 +118,7 @@ fun MangaInfoBox(
     manga: Manga,
     sourceName: String,
     isStubSource: Boolean,
+    sourceStatus: Int,
     metadataSourceName: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
@@ -155,6 +157,7 @@ fun MangaInfoBox(
                     manga = manga,
                     sourceName = sourceName,
                     isStubSource = isStubSource,
+                    sourceStatus = sourceStatus,
                     metadataSourceName = metadataSourceName,
                     onCoverClick = onCoverClick,
                     doSearch = doSearch,
@@ -165,6 +168,7 @@ fun MangaInfoBox(
                     manga = manga,
                     sourceName = sourceName,
                     isStubSource = isStubSource,
+                    sourceStatus = sourceStatus,
                     metadataSourceName = metadataSourceName,
                     onCoverClick = onCoverClick,
                     doSearch = doSearch,
@@ -350,6 +354,7 @@ private fun MangaAndSourceTitlesLarge(
     manga: Manga,
     sourceName: String,
     isStubSource: Boolean,
+    sourceStatus: Int,
     metadataSourceName: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
@@ -378,6 +383,7 @@ private fun MangaAndSourceTitlesLarge(
             status = manga.status,
             sourceName = sourceName,
             isStubSource = isStubSource,
+            sourceStatus = sourceStatus,
             metadataSourceName = metadataSourceName,
             doSearch = doSearch,
             textAlign = TextAlign.Center,
@@ -391,6 +397,7 @@ private fun MangaAndSourceTitlesSmall(
     manga: Manga,
     sourceName: String,
     isStubSource: Boolean,
+    sourceStatus: Int,
     metadataSourceName: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
@@ -424,6 +431,7 @@ private fun MangaAndSourceTitlesSmall(
                 status = manga.status,
                 sourceName = sourceName,
                 isStubSource = isStubSource,
+                sourceStatus = sourceStatus,
                 metadataSourceName = metadataSourceName,
                 doSearch = doSearch,
             )
@@ -439,6 +447,7 @@ private fun ColumnScope.MangaContentInfo(
     status: Long,
     sourceName: String,
     isStubSource: Boolean,
+    sourceStatus: Int,
     metadataSourceName: String?,
     doSearch: (query: String, global: Boolean) -> Unit,
     textAlign: TextAlign? = LocalTextStyle.current.textAlign,
@@ -563,6 +572,11 @@ private fun ColumnScope.MangaContentInfo(
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
+            val sourceNameColor = when (SourceStatus.fromValue(sourceStatus)) {
+                SourceStatus.DEAD -> MaterialTheme.colorScheme.error
+                SourceStatus.DEGRADED -> MaterialTheme.colorScheme.tertiary
+                else -> LocalContentColor.current
+            }
             Text(
                 text = sourceName,
                 modifier = Modifier.clickableNoIndication {
@@ -571,6 +585,7 @@ private fun ColumnScope.MangaContentInfo(
                         false,
                     )
                 },
+                color = sourceNameColor,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )

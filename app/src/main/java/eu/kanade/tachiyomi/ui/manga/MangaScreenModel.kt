@@ -288,12 +288,11 @@ class MangaScreenModel(
                 val manga = state.manga
                 val metadataSourceId = manga.metadataSource?.takeIf { it > 0 }
                 val metadataUrl = manga.metadataUrl?.takeIf { it.isNotEmpty() }
-                val usingMetadataSource = metadataSourceId != null && metadataUrl != null
 
                 var networkManga: SManga? = null
 
                 // Try metadata source first if configured
-                if (usingMetadataSource && metadataSourceId != null && metadataUrl != null) {
+                if (metadataSourceId != null && metadataUrl != null) {
                     try {
                         val metaSrc = Injekt.get<SourceManager>().getOrStub(metadataSourceId)
                         val sM = manga.toSManga().apply { url = metadataUrl }

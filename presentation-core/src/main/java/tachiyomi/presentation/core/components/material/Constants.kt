@@ -4,12 +4,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 
-val topSmallPaddingValues = PaddingValues(top = MaterialTheme.padding.small)
+val topSmallPaddingValues = PaddingValues(top = Padding.small)
 
 const val DISABLED_ALPHA = .38f
 const val SECONDARY_ALPHA = .78f
 
-class Padding {
+object Padding {
 
     val extraLarge = 32.dp
 
@@ -23,4 +23,4 @@ class Padding {
 }
 
 val MaterialTheme.padding: Padding
-    get() = Padding()
+    get() = Padding

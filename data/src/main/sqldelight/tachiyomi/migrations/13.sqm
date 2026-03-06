@@ -1,0 +1,4 @@
+-- Add alternative titles for cross-source matching.
+-- Stored as pipe-separated values (e.g. "One Piece|ワンピース|Wan Pīsu").
+-- Populated from authoritative trackers (AniList romaji/english/native + synonyms).
+ALTER TABLE mangas ADD COLUMN alternative_titles TEXT;

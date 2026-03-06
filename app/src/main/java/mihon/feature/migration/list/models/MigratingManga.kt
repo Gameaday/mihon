@@ -26,6 +26,7 @@ class MigratingManga(
             val chapterCount: Int,
             val latestChapter: Double?,
             val source: String,
+            val matchConfidence: Double = 1.0,
         ) : SearchResult
     }
 }

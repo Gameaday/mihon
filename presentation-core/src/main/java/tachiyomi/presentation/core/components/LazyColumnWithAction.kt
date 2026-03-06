@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import tachiyomi.presentation.core.components.material.Padding
 
 @Composable
 fun LazyColumnWithAction(
@@ -38,7 +39,7 @@ fun LazyColumnWithAction(
 
         Button(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = Padding.medium, vertical = Padding.small)
                 .fillMaxWidth(),
             enabled = actionEnabled,
             onClick = onClickAction,

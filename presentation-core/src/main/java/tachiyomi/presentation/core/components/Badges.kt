@@ -20,8 +20,8 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentMapOf
+import tachiyomi.presentation.core.components.material.BadgeTokens
 
 @Composable
 fun BadgeGroup(
@@ -47,7 +47,7 @@ fun Badge(
         modifier = modifier
             .clip(shape)
             .background(color)
-            .padding(horizontal = 3.dp, vertical = 1.dp),
+            .padding(horizontal = BadgeTokens.HorizontalPadding, vertical = BadgeTokens.VerticalPadding),
         color = textColor,
         fontWeight = FontWeight.Medium,
         maxLines = 1,
@@ -62,6 +62,7 @@ fun Badge(
     color: Color = MaterialTheme.colorScheme.secondary,
     iconColor: Color = MaterialTheme.colorScheme.onSecondary,
     shape: Shape = RectangleShape,
+    contentDescription: String? = null,
 ) {
     val iconContentPlaceholder = "[icon]"
     val text = buildAnnotatedString {
@@ -80,7 +81,7 @@ fun Badge(
                 Icon(
                     imageVector = imageVector,
                     tint = iconColor,
-                    contentDescription = null,
+                    contentDescription = contentDescription,
                 )
             },
         ),
@@ -92,7 +93,7 @@ fun Badge(
         modifier = modifier
             .clip(shape)
             .background(color)
-            .padding(horizontal = 3.dp, vertical = 1.dp),
+            .padding(horizontal = BadgeTokens.HorizontalPadding, vertical = BadgeTokens.VerticalPadding),
         color = iconColor,
         fontWeight = FontWeight.Medium,
         maxLines = 1,

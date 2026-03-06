@@ -50,6 +50,7 @@ internal fun LibraryCompactGrid(
                     UnreadBadge(count = libraryItem.unreadCount)
                 },
                 coverBadgeEnd = {
+                    SourceHealthBadge(sourceStatus = manga.sourceStatus)
                     LanguageBadge(
                         isLocal = libraryItem.isLocal,
                         sourceLanguage = libraryItem.sourceLanguage,

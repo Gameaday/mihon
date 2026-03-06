@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.sample
 import tachiyomi.presentation.core.components.Scroller.STICKY_HEADER_KEY_PREFIX
+import tachiyomi.presentation.core.components.material.Padding
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -216,7 +217,7 @@ fun VerticalFastScroller(
                         },
                     )
                     .height(ThumbLength)
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = Padding.small)
                     .padding(end = endContentPadding)
                     .width(ThumbThickness)
                     .alpha(alpha.value)

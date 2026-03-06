@@ -57,7 +57,7 @@ fun CombinedCircularProgressIndicator(
                 initialValue = 0f,
                 targetValue = 360f,
                 animationSpec = infiniteRepeatable(
-                    animation = tween(2000, easing = LinearEasing),
+                    animation = tween(ROTATION_DURATION_MS, easing = LinearEasing),
                     repeatMode = RepeatMode.Restart,
                 ),
                 label = "rotation",
@@ -110,3 +110,6 @@ private fun CombinedCircularProgressIndicatorPreview() {
         }
     }
 }
+
+/** Duration for one full rotation of the determinate progress indicator. */
+private const val ROTATION_DURATION_MS = 2000

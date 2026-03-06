@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 
 /**
  * Center-aligned M3 Navigation rail
@@ -38,13 +37,13 @@ fun NavigationRail(
         color = containerColor,
         contentColor = contentColor,
         modifier = modifier,
-        tonalElevation = 3.dp,
+        tonalElevation = NavigationTokens.NavRailTonalElevation,
     ) {
         Column(
             Modifier
                 .fillMaxHeight()
                 .windowInsetsPadding(windowInsets)
-                .widthIn(min = 80.dp)
+                .widthIn(min = NavigationTokens.NavRailMinWidth)
                 .padding(vertical = MaterialTheme.padding.extraSmall)
                 .selectableGroup(),
             horizontalAlignment = Alignment.CenterHorizontally,

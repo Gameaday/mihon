@@ -7,8 +7,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import tachiyomi.presentation.core.components.Pill
+import tachiyomi.presentation.core.theme.badgeLabel
 
 @Composable
 fun TabText(text: String, badgeCount: Int? = null) {
@@ -26,7 +26,7 @@ fun TabText(text: String, badgeCount: Int? = null) {
             Pill(
                 text = "$badgeCount",
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = pillAlpha),
-                fontSize = 10.sp,
+                style = MaterialTheme.typography.badgeLabel,
             )
         }
     }

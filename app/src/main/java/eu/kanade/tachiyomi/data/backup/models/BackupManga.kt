@@ -45,6 +45,10 @@ data class BackupManga(
     @ProtoNumber(111) var initialized: Boolean = false,
     @ProtoNumber(112) var metadataSource: Long? = null,
     @ProtoNumber(113) var metadataUrl: String? = null,
+    @ProtoNumber(114) var alternativeTitles: List<String> = emptyList(),
+    @ProtoNumber(115) var canonicalId: String? = null,
+    @ProtoNumber(116) var sourceStatus: Int = 0,
+    @ProtoNumber(117) var deadSince: Long? = null,
 ) {
     fun getMangaImpl(): Manga {
         return Manga.create().copy(
@@ -69,6 +73,10 @@ data class BackupManga(
             initialized = this@BackupManga.initialized,
             metadataSource = this@BackupManga.metadataSource,
             metadataUrl = this@BackupManga.metadataUrl,
+            alternativeTitles = this@BackupManga.alternativeTitles,
+            canonicalId = this@BackupManga.canonicalId,
+            sourceStatus = this@BackupManga.sourceStatus,
+            deadSince = this@BackupManga.deadSince,
         )
     }
 }

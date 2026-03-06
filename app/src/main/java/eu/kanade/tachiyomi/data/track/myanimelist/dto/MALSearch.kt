@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.data.track.myanimelist.dto
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,6 +12,8 @@ data class MALSearchResult(
 @Serializable
 data class MALSearchResultNode(
     val node: MALManga,
+    @SerialName("list_status")
+    val listStatus: MALListItemStatus? = null,
 )
 
 @Serializable

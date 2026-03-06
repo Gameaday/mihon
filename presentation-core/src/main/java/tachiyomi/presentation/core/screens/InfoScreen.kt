@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
+import tachiyomi.presentation.core.theme.displayEmphasis
 import tachiyomi.presentation.core.util.secondaryItemAlpha
 
 @Composable
@@ -111,7 +112,7 @@ fun InfoScreen(
             )
             Text(
                 text = headingText,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.displayEmphasis,
             )
             Text(
                 text = subtitleText,

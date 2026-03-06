@@ -18,6 +18,7 @@ enum class EditCoverAction {
 enum class MangaScreenItem {
     INFO_BOX,
     ACTION_ROW,
+    SOURCE_HEALTH_BANNER,
     DESCRIPTION_WITH_TAG,
     CHAPTER_HEADER,
     CHAPTER,

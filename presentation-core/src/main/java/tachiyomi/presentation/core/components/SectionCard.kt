@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import dev.icerock.moko.resources.StringResource
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.theme.sectionLabel
 
 @Composable
 fun LazyItemScope.SectionCard(
@@ -23,7 +24,7 @@ fun LazyItemScope.SectionCard(
         Text(
             modifier = Modifier.padding(horizontal = MaterialTheme.padding.extraLarge),
             text = stringResource(titleRes),
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.sectionLabel,
         )
     }
 

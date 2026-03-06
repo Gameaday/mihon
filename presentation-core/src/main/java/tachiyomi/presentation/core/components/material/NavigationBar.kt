@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
 /**
  * M3 Navbar with no horizontal spacer
@@ -40,7 +39,7 @@ fun NavigationBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsPadding(windowInsets)
-                .height(80.dp)
+                .height(NavigationTokens.NavBarHeight)
                 .selectableGroup(),
             content = content,
         )

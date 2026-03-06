@@ -54,6 +54,7 @@ import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.preference.TriState
 import tachiyomi.core.common.preference.toggle
 import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
+import tachiyomi.presentation.core.components.material.Padding
 import tachiyomi.presentation.core.components.material.Slider
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
@@ -388,7 +389,7 @@ fun TextItem(label: String, value: String, onChange: (String) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = SettingsItemsPaddings.Horizontal, vertical = 4.dp),
+            .padding(horizontal = SettingsItemsPaddings.Horizontal, vertical = Padding.extraSmall),
         label = { Text(text = label) },
         value = value,
         onValueChange = onChange,
@@ -446,7 +447,7 @@ private fun BaseSettingsItem(
                 vertical = SettingsItemsPaddings.Vertical,
             ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(Padding.large),
     ) {
         widget(this)
         Text(

@@ -89,6 +89,11 @@ class LibraryPreferences(
         TriState.DISABLED,
     )
 
+    fun filterSourceHealthDead() = preferenceStore.getEnum(
+        "pref_filter_library_source_health_dead",
+        TriState.DISABLED,
+    )
+
     fun filterTracking(id: Int) = preferenceStore.getEnum(
         "pref_filter_library_tracked_${id}_v2",
         TriState.DISABLED,

@@ -56,6 +56,7 @@ import eu.kanade.presentation.manga.components.MangaChapterListItem
 import eu.kanade.presentation.manga.components.MangaInfoBox
 import eu.kanade.presentation.manga.components.MangaToolbar
 import eu.kanade.presentation.manga.components.MissingChapterCountListItem
+import eu.kanade.presentation.manga.components.SourceHealthBanner
 import eu.kanade.presentation.util.formatChapterNumber
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.source.getNameForMangaInfo
@@ -66,6 +67,7 @@ import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.chapter.service.missingChaptersCount
 import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.domain.manga.model.Manga
+import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.domain.source.model.StubSource
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.TwoPanelBox
@@ -385,6 +387,7 @@ private fun MangaScreenSmallImpl(
                             manga = state.manga,
                             sourceName = remember { state.source.getNameForMangaInfo() },
                             isStubSource = remember { state.source is StubSource },
+                            sourceStatus = state.manga.sourceStatus,
                             metadataSourceName = state.metadataSourceName,
                             onCoverClick = onCoverClicked,
                             doSearch = onSearch,
@@ -407,6 +410,20 @@ private fun MangaScreenSmallImpl(
                             onEditIntervalClicked = onEditIntervalClicked,
                             onEditCategory = onEditCategoryClicked,
                         )
+                    }
+
+                    // Only show source health banner for real remote sources (not local or stub)
+                    if (!state.manga.isLocal() && state.source !is StubSource) {
+                        item(
+                            key = MangaScreenItem.SOURCE_HEALTH_BANNER,
+                            contentType = MangaScreenItem.SOURCE_HEALTH_BANNER,
+                        ) {
+                            SourceHealthBanner(
+                                sourceStatus = SourceStatus.fromValue(state.manga.sourceStatus),
+                                deadSince = state.manga.deadSince,
+                                onMigrateClick = onMigrateClicked,
+                            )
+                        }
                     }
 
                     item(
@@ -624,6 +641,7 @@ fun MangaScreenLargeImpl(
                             manga = state.manga,
                             sourceName = remember { state.source.getNameForMangaInfo() },
                             isStubSource = remember { state.source is StubSource },
+                            sourceStatus = state.manga.sourceStatus,
                             metadataSourceName = state.metadataSourceName,
                             onCoverClick = onCoverClicked,
                             doSearch = onSearch,
@@ -640,6 +658,14 @@ fun MangaScreenLargeImpl(
                             onEditIntervalClicked = onEditIntervalClicked,
                             onEditCategory = onEditCategoryClicked,
                         )
+                        // Only show source health banner for real remote sources (not local or stub)
+                        if (!state.manga.isLocal() && state.source !is StubSource) {
+                            SourceHealthBanner(
+                                sourceStatus = SourceStatus.fromValue(state.manga.sourceStatus),
+                                deadSince = state.manga.deadSince,
+                                onMigrateClick = onMigrateClicked,
+                            )
+                        }
                         ExpandableMangaDescription(
                             defaultExpandState = true,
                             description = state.manga.description,

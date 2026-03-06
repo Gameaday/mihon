@@ -48,6 +48,8 @@ class TrackSearch : Track {
 
     var start_date: String = ""
 
+    var alternative_titles: List<String> = emptyList()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

@@ -46,6 +46,7 @@ import tachiyomi.core.common.preference.getAndSet
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.category.model.Category
+import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.chapter.model.NoChaptersException
 import tachiyomi.domain.library.model.LibraryManga
@@ -61,9 +62,12 @@ import tachiyomi.domain.manga.interactor.FetchInterval
 import tachiyomi.domain.manga.interactor.GetLibraryManga
 import tachiyomi.domain.manga.interactor.GetManga
 import tachiyomi.domain.manga.model.Manga
+import tachiyomi.domain.manga.model.MangaUpdate
+import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.domain.source.model.SourceNotInstalledException
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.i18n.MR
+import tachiyomi.source.local.isLocal
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
@@ -90,6 +94,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
     private val syncChaptersWithSource: SyncChaptersWithSource = Injekt.get()
     private val fetchInterval: FetchInterval = Injekt.get()
     private val filterChaptersForDownload: FilterChaptersForDownload = Injekt.get()
+    private val getChaptersByMangaId: GetChaptersByMangaId = Injekt.get()
 
     private val notifier = LibraryUpdateNotifier(context)
 
@@ -343,6 +348,33 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
                 errorFile.getUriCompat(context),
             )
         }
+
+        // Check for unhealthy sources among the manga we just updated.
+        // This queries the local DB — zero additional API cost.
+        val deadManga = mutableListOf<Manga>()
+        val degradedManga = mutableListOf<Manga>()
+        for (libraryManga in mangaToUpdate) {
+            val refreshed = getManga.await(libraryManga.manga.id) ?: continue
+            // Skip local sources — they don't have network health concerns
+            if (refreshed.isLocal()) continue
+            when (SourceStatus.fromValue(refreshed.sourceStatus)) {
+                SourceStatus.DEAD -> deadManga.add(refreshed)
+                SourceStatus.DEGRADED -> degradedManga.add(refreshed)
+                else -> { /* HEALTHY or REPLACED — no notification needed */ }
+            }
+        }
+        notifier.showSourceHealthNotification(deadManga, degradedManga)
+
+        // Check for manga that have been persistently DEAD — suggest bulk migration.
+        // Only prompt if there are manga that have been DEAD for >= DEAD_MIGRATION_THRESHOLD_MS.
+        val now = System.currentTimeMillis()
+        val persistentlyDead = deadManga.filter { manga ->
+            val deadSince = manga.deadSince
+            deadSince != null && (now - deadSince) >= DEAD_MIGRATION_THRESHOLD_MS
+        }
+        if (persistentlyDead.isNotEmpty()) {
+            notifier.showMigrationSuggestionNotification(persistentlyDead)
+        }
     }
 
     private fun downloadChapters(manga: Manga, chapters: List<Chapter>) {
@@ -370,12 +402,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         if (autoUpdateMetadata) {
             val metadataSourceId = manga.metadataSource?.takeIf { it > 0 }
             val metadataUrl = manga.metadataUrl?.takeIf { it.isNotEmpty() }
-            val usingMetadataSource = metadataSourceId != null && metadataUrl != null
 
             // When using a dedicated metadata source, throttle automatic refreshes.
             // Metadata (description, cover, author) changes far less frequently than chapters,
             // so we only re-fetch every 7 days to be respectful of remote sources.
-            val shouldFetchMetadata = if (usingMetadataSource) {
+            val shouldFetchMetadata = if (metadataSourceId != null && metadataUrl != null) {
                 val lastUpdate = manga.lastUpdate
                 val daysSinceUpdate = if (lastUpdate > 0) {
                     java.util.concurrent.TimeUnit.MILLISECONDS.toDays(
@@ -392,7 +423,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
             if (shouldFetchMetadata) {
                 try {
                     val (metaSource, metaSManga) = if (
-                        usingMetadataSource && metadataSourceId != null && metadataUrl != null
+                        metadataSourceId != null && metadataUrl != null
                     ) {
                         val metaSrc = sourceManager.getOrStub(metadataSourceId)
                         val sM = manga.toSManga().apply { url = metadataUrl }
@@ -403,14 +434,14 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
                     val networkManga = metaSource.getMangaDetails(metaSManga)
                     // When using a metadata source, preserve the chapter source's updateStrategy
                     // since it controls chapter fetching behavior, not metadata
-                    if (usingMetadataSource) {
+                    if (metadataSourceId != null) {
                         networkManga.update_strategy = manga.updateStrategy
                     }
                     updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch = false, coverCache)
                 } catch (e: Exception) {
                     // If the metadata source fails (e.g. source removed, network issue),
                     // fall back to the chapter source for metadata to avoid losing updates
-                    if (usingMetadataSource) {
+                    if (metadataSourceId != null) {
                         logcat(LogPriority.WARN, e) {
                             "Metadata source failed for ${manga.title}, falling back to chapter source"
                         }
@@ -435,6 +466,36 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         // Get manga from database to account for if it was removed during the update and
         // to get latest data so it doesn't get overwritten later on
         val dbManga = getManga.await(manga.id)?.takeIf { it.favorite } ?: return emptyList()
+
+        // Source health detection: compare fetched chapter count against what we had before.
+        // This runs on every refresh using data we already fetched — zero additional API cost.
+        // Skip for local sources — they don't have network health concerns.
+        if (!manga.isLocal()) {
+            val previousChapterCount = getChaptersByMangaId.await(manga.id).size
+            val newStatus = detectSourceHealth(chapters.size, previousChapterCount)
+            if (newStatus.value != dbManga.sourceStatus) {
+                val oldStatus = SourceStatus.fromValue(dbManga.sourceStatus)
+                logcat(LogPriority.INFO) {
+                    "Source health changed for ${manga.title}: $oldStatus → $newStatus " +
+                        "(chapters: $previousChapterCount → ${chapters.size})"
+                }
+                // Track dead_since: set timestamp when first marked DEAD, clear on recovery
+                val deadSince = when {
+                    newStatus == SourceStatus.DEAD && oldStatus != SourceStatus.DEAD ->
+                        System.currentTimeMillis()
+                    newStatus != SourceStatus.DEAD && oldStatus == SourceStatus.DEAD ->
+                        DEAD_SINCE_CLEARED
+                    else -> null // No change to dead_since
+                }
+                updateManga.await(
+                    MangaUpdate(
+                        id = manga.id,
+                        sourceStatus = newStatus.value,
+                        deadSince = deadSince,
+                    ),
+                )
+            }
+        }
 
         return syncChaptersWithSource.await(chapters, dbManga, source, false, fetchWindow)
     }
@@ -507,6 +568,47 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         private const val ERROR_LOG_HELP_URL = "https://mihon.app/docs/guides/troubleshooting/"
 
         private const val MANGA_PER_SOURCE_QUEUE_WARNING_THRESHOLD = 60
+
+        /**
+         * Chapter drop threshold for DEGRADED detection.
+         * If newCount < previousCount * 0.7, the source is marked DEGRADED.
+         * Uses integer comparison (newCount * 10 < previousCount * 7) to avoid floating-point issues.
+         */
+        internal const val CHAPTER_DROP_THRESHOLD_NUMERATOR = 7
+        internal const val CHAPTER_DROP_THRESHOLD_DENOMINATOR = 10
+
+        /**
+         * Sentinel value used when clearing dead_since on recovery.
+         * Using 0 instead of null since SQLDelight coalesce(:deadSince, dead_since)
+         * can't distinguish "set null" from "no change". We use 0 as the SQL update
+         * handles this via a CASE expression.
+         */
+        internal const val DEAD_SINCE_CLEARED = 0L
+
+        /**
+         * How long a manga must be DEAD before suggesting migration (3 days in ms).
+         * This avoids prompting for temporary outages.
+         */
+        internal const val DEAD_MIGRATION_THRESHOLD_MS = 3L * 24 * 60 * 60 * 1000
+
+        /**
+         * Determines source health status by comparing fetched chapter count to previous count.
+         * Pure function extracted for testability.
+         *
+         * Rules:
+         * - DEAD: fetched 0 chapters when previously had > 0
+         * - DEGRADED: fetched < 70% of previous chapter count
+         * - HEALTHY: all other cases (including recovery from DEGRADED/DEAD)
+         */
+        internal fun detectSourceHealth(fetchedCount: Int, previousCount: Int): SourceStatus {
+            return when {
+                fetchedCount == 0 && previousCount > 0 -> SourceStatus.DEAD
+                previousCount > 0 &&
+                    fetchedCount * CHAPTER_DROP_THRESHOLD_DENOMINATOR <
+                    previousCount * CHAPTER_DROP_THRESHOLD_NUMERATOR -> SourceStatus.DEGRADED
+                else -> SourceStatus.HEALTHY
+            }
+        }
 
         /**
          * Minimum number of days between automatic metadata refreshes for manga

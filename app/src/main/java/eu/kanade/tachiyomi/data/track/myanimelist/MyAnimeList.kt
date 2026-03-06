@@ -133,6 +133,8 @@ class MyAnimeList(id: Long) : BaseTracker(id, "MyAnimeList"), DeletableTracker {
         return api.findListItem(track) ?: add(track)
     }
 
+    suspend fun getUserFullList() = api.getUserFullList()
+
     override suspend fun login(username: String, password: String) = login(password)
 
     suspend fun login(authCode: String) {

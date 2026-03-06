@@ -58,6 +58,7 @@
     <string name="action_filter_tracked">Tracked</string>
     <string name="action_filter_unread">Unread</string>
     <string name="action_filter_interval_custom">Customized update frequency</string>
+    <string name="action_filter_source_health_dead">Source dead/degraded</string>
     <!-- reserved for #4048 -->
     <string name="action_filter_empty">Remove filter</string>
     <string name="action_sort_alpha">Alphabetically</string>
@@ -1063,4 +1064,48 @@
     <string name="migrationListScreen.migrateDialog.cancelLabel">Cancel</string>
     <string name="migrationListScreen.progressDialog.cancelLabel">Cancel</string>
     <string name="migrationListScreen.matchWithoutChapterToast">No chapters found, this entry cannot be used for migration</string>
+    <!-- Source health status -->
+    <string name="source_health_degraded">Source may be degraded — fewer chapters than expected</string>
+    <string name="source_health_dead">Source appears dead — no chapters found on last update</string>
+    <!-- Source health notifications -->
+    <string name="notification_source_health_title">%d manga with source issues</string>
+    <string name="notification_dead_sources">🔴 %d manga with dead sources:</string>
+    <string name="notification_degraded_sources">🟡 %d manga with degraded sources:</string>
+
+    <!-- Migration suggestion notifications -->
+    <string name="notification_migration_suggestion_title">Sources still dead — consider migrating</string>
+    <string name="notification_migration_suggestion_body">%d manga have had dead sources for 3+ days</string>
+
+    <!-- Notification list formatting -->
+    <string name="notification_list_item">  • %1$s (%2$s)</string>
+    <string name="notification_and_more">  … and %d more</string>
+
+    <!-- Library health banner -->
+    <string name="library_health_banner_dead">%d dead</string>
+    <string name="library_health_banner_degraded">%d degraded</string>
+    <string name="library_health_banner_summary">Source issues:</string>
+
+    <!-- Migration match confidence -->
+    <string name="migration_match_confidence">%d%% match</string>
+
+    <!-- Tracker import -->
+    <string name="tracker_import_title">Import from %s</string>
+    <string name="tracker_import_label">Import library from %s</string>
+    <string name="tracker_import_subtitle">Add your %s reading list to library with chapter progress</string>
+    <string name="tracker_import_loading">Importing from %s…</string>
+    <string name="tracker_import_confirm_body">This will add all manga from your %s reading list to your library with chapter progress. Manga already in your library will be skipped.</string>
+    <string name="tracker_import_success">Imported %1$d manga</string>
+    <string name="tracker_import_skipped"> (%d already in library)</string>
+    <string name="tracker_import_error">Import failed: %s</string>
+    <string name="tracker_import_group_title">Import from tracker</string>
+    <string name="action_import">Import</string>
+
+    <!-- Accessibility content descriptions for source health -->
+    <string name="source_health_warning_dead">Warning: source is dead</string>
+    <string name="source_health_warning_degraded">Warning: source is degraded</string>
+    <string name="source_health_banner_description">Source health warning — tap to filter</string>
+
+    <!-- Dead duration formatting -->
+    <string name="source_dead_duration_days">%d days</string>
+    <string name="source_dead_duration_less_than_day">less than a day</string>
 </resources>

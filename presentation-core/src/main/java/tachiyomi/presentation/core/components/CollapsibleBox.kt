@@ -1,6 +1,8 @@
 package tachiyomi.presentation.core.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +21,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.material.padding
+import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.theme.MotionTokens
 import tachiyomi.presentation.core.theme.header
 
 @Composable
@@ -34,7 +39,10 @@ fun CollapsibleBox(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
-                .padding(horizontal = 24.dp, vertical = 12.dp),
+                .padding(
+                    horizontal = MaterialTheme.padding.large,
+                    vertical = MaterialTheme.padding.small,
+                ),
         ) {
             Text(
                 text = heading,
@@ -45,11 +53,17 @@ fun CollapsibleBox(
 
             Icon(
                 imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = null,
+                contentDescription = stringResource(
+                    if (expanded) MR.strings.manga_info_collapse else MR.strings.manga_info_expand,
+                ),
             )
         }
 
-        AnimatedVisibility(visible = expanded) {
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(animationSpec = MotionTokens.tweenMedium()),
+            exit = shrinkVertically(animationSpec = MotionTokens.tweenMedium()),
+        ) {
             content()
         }
     }

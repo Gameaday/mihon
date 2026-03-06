@@ -173,6 +173,51 @@ class MyAnimeListApi(
         }
     }
 
+    /**
+     * Fetches the user's full manga reading list with reading status data.
+     * Returns pairs of (TrackSearch, MALListItemStatus?) for each manga on the user's list.
+     * Paginates iteratively through all results to avoid nested coroutine contexts.
+     */
+    suspend fun getUserFullList(): List<Pair<TrackSearch, MALListItemStatus?>> {
+        return withIOContext {
+            val listFields =
+                "$SEARCH_FIELDS,list_status{num_chapters_read,status,score,start_date,finish_date,is_rereading}"
+            val allItems = mutableListOf<Pair<TrackSearch, MALListItemStatus?>>()
+            var offset = 0
+            var hasMore = true
+
+            while (hasMore) {
+                val urlBuilder = "$BASE_API_URL/users/@me/mangalist".toUri().buildUpon()
+                    .appendQueryParameter("fields", listFields)
+                    .appendQueryParameter("limit", LIST_PAGINATION_AMOUNT.toString())
+                if (offset > 0) {
+                    urlBuilder.appendQueryParameter("offset", offset.toString())
+                }
+
+                val request = Request.Builder()
+                    .url(urlBuilder.build().toString())
+                    .get()
+                    .build()
+                val result = with(json) {
+                    authClient.newCall(request)
+                        .awaitSuccess()
+                        .parseAs<MALSearchResult>()
+                }
+
+                val items = result.data
+                    .filter { !(it.node.mediaType.contains("novel")) }
+                    .map { parseSearchItem(it.node) to it.listStatus }
+
+                allItems.addAll(items)
+
+                hasMore = !result.paging.next.isNullOrBlank()
+                offset += LIST_PAGINATION_AMOUNT
+            }
+
+            allItems
+        }
+    }
+
     private suspend fun getListPage(offset: Int): MALSearchResult {
         return withIOContext {
             val urlBuilder = "$BASE_API_URL/users/@me/mangalist".toUri().buildUpon()

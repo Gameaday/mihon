@@ -1,0 +1,4 @@
+-- Add dead_since timestamp column to track when a manga's source was first marked DEAD.
+-- NULL means source is not DEAD (HEALTHY/DEGRADED/REPLACED).
+-- Used to determine when manga have been persistently DEAD to suggest bulk migration.
+ALTER TABLE mangas ADD COLUMN dead_since INTEGER DEFAULT NULL;

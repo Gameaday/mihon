@@ -46,6 +46,18 @@ class MangaRepositoryImpl(
         }
     }
 
+    override suspend fun getFavoritesByCanonicalId(canonicalId: String, excludeMangaId: Long): List<Manga> {
+        return handler.awaitList {
+            mangasQueries.getFavoritesByCanonicalId(canonicalId, excludeMangaId, MangaMapper::mapManga)
+        }
+    }
+
+    override suspend fun getDeadFavorites(deadSinceBefore: Long): List<Manga> {
+        return handler.awaitList {
+            mangasQueries.getFavoritesByDeadSinceBefore(deadSinceBefore, MangaMapper::mapManga)
+        }
+    }
+
     override suspend fun getFavorites(): List<Manga> {
         return handler.awaitList { mangasQueries.getFavorites(MangaMapper::mapManga) }
     }
@@ -191,6 +203,10 @@ class MangaRepositoryImpl(
                     notes = value.notes,
                     metadataSource = value.metadataSource,
                     metadataUrl = value.metadataUrl,
+                    canonicalId = value.canonicalId,
+                    sourceStatus = value.sourceStatus?.toLong(),
+                    alternativeTitles = MangaMapper.serializeAlternativeTitles(value.alternativeTitles),
+                    deadSince = value.deadSince,
                 )
             }
         }

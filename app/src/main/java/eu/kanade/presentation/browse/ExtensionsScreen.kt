@@ -249,14 +249,15 @@ private fun ExtensionContent(
             }
         }
     }
-    if (trustState != null) {
+    val currentTrustState = trustState
+    if (currentTrustState != null) {
         ExtensionTrustDialog(
             onClickConfirm = {
-                onTrustExtension(trustState!!)
+                onTrustExtension(currentTrustState)
                 trustState = null
             },
             onClickDismiss = {
-                onUninstallExtension(trustState!!)
+                onUninstallExtension(currentTrustState)
                 trustState = null
             },
             onDismissRequest = {

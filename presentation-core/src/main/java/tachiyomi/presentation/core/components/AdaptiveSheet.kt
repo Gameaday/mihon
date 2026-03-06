@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import tachiyomi.presentation.core.theme.MotionTokens
 import kotlin.math.roundToInt
 
 @Composable
@@ -256,4 +257,7 @@ private fun <T> AnchoredDraggableState<T>.preUpPostDownNestedScrollConnection(
     private fun Offset.toFloat(): Float = this.y
 }
 
-private val sheetAnimationSpec = tween<Float>(durationMillis = 350)
+private val sheetAnimationSpec = tween<Float>(
+    durationMillis = MotionTokens.DURATION_MEDIUM,
+    easing = MotionTokens.EasingEmphasized,
+)

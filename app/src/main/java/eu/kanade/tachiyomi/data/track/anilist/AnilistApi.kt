@@ -155,7 +155,11 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
                         |}
                         |title {
                             |userPreferred
+                            |romaji
+                            |english
+                            |native
                         |}
+                        |synonyms
                         |coverImage {
                             |large
                         |}

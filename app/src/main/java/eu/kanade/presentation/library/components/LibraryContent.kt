@@ -34,6 +34,8 @@ fun LibraryContent(
     currentPage: Int,
     hasActiveFilters: Boolean,
     showPageTabs: Boolean,
+    deadSourceCount: Int,
+    degradedSourceCount: Int,
     onChangeCurrentPage: (Int) -> Unit,
     onClickManga: (Long) -> Unit,
     onContinueReadingClicked: ((LibraryManga) -> Unit)?,
@@ -41,6 +43,7 @@ fun LibraryContent(
     onToggleRangeSelection: (Category, LibraryManga) -> Unit,
     onRefresh: () -> Boolean,
     onGlobalSearchClicked: () -> Unit,
+    onClickHealthFilter: () -> Unit,
     getItemCountForCategory: (Category) -> Int?,
     getDisplayMode: (Int) -> PreferenceMutableState<LibraryDisplayMode>,
     getColumnsForOrientation: (Boolean) -> PreferenceMutableState<Int>,
@@ -75,6 +78,12 @@ fun LibraryContent(
                 },
             )
         }
+
+        LibraryHealthBanner(
+            deadCount = deadSourceCount,
+            degradedCount = degradedSourceCount,
+            onClickFilter = onClickHealthFilter,
+        )
 
         PullRefresh(
             refreshing = isRefreshing,

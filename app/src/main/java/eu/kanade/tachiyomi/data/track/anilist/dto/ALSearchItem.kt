@@ -14,6 +14,7 @@ data class ALSearchItem(
     val chapters: Long?,
     val averageScore: Int?,
     val staff: ALStaff,
+    val synonyms: List<String>? = null,
 ) {
     fun toALManga(): ALManga = ALManga(
         remoteId = id,
@@ -26,12 +27,33 @@ data class ALSearchItem(
         totalChapters = chapters ?: 0,
         averageScore = averageScore ?: -1,
         staff = staff,
+        alternativeTitles = buildAlternativeTitles(),
     )
+
+    /**
+     * Collects all distinct non-blank alternative titles from AniList data:
+     * romaji, english, native title variants + synonyms.
+     * Excludes the primary userPreferred title since that's already stored as the main title.
+     */
+    private fun buildAlternativeTitles(): List<String> {
+        val primary = title.userPreferred
+        return buildList {
+            title.romaji?.let { add(it) }
+            title.english?.let { add(it) }
+            title.native?.let { add(it) }
+            synonyms?.let { addAll(it) }
+        }
+            .filterNot { it.isBlank() || it == primary }
+            .distinct()
+    }
 }
 
 @Serializable
 data class ALItemTitle(
     val userPreferred: String,
+    val romaji: String? = null,
+    val english: String? = null,
+    val native: String? = null,
 )
 
 @Serializable

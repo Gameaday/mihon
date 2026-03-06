@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
+import tachiyomi.presentation.core.components.material.Padding
+import tachiyomi.presentation.core.components.material.PillTokens
+import tachiyomi.presentation.core.theme.ShapeTokens
 
 @Composable
 fun Pill(
@@ -24,14 +26,14 @@ fun Pill(
 ) {
     Surface(
         modifier = modifier
-            .padding(start = 4.dp),
-        shape = MaterialTheme.shapes.extraLarge,
+            .padding(start = Padding.extraSmall),
+        shape = ShapeTokens.pill,
         color = color,
         contentColor = contentColor,
     ) {
         Box(
             modifier = Modifier
-                .padding(6.dp, 1.dp),
+                .padding(PillTokens.HorizontalPadding, PillTokens.VerticalPadding),
             contentAlignment = Alignment.Center,
         ) {
             Text(

@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import tachiyomi.presentation.core.components.material.Padding
 
 @Composable
 fun LinkIcon(
@@ -19,7 +20,7 @@ fun LinkIcon(
 ) {
     val uriHandler = LocalUriHandler.current
     IconButton(
-        modifier = modifier.padding(4.dp),
+        modifier = modifier.padding(Padding.extraSmall),
         onClick = { uriHandler.openUri(url) },
     ) {
         Icon(
