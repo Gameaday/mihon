@@ -28,6 +28,7 @@ import eu.kanade.presentation.more.settings.widget.TitleFontSize
 import eu.kanade.presentation.more.settings.widget.TrackingPreferenceWidget
 import kotlinx.coroutines.launch
 import tachiyomi.presentation.core.components.BaseSliderItem
+import tachiyomi.presentation.core.theme.MotionTokens
 import tachiyomi.presentation.core.util.collectAsState
 
 val LocalPreferenceHighlighted = compositionLocalOf(structuralEqualityPolicy()) { false }
@@ -43,8 +44,12 @@ fun StatusWrapper(
     val highlighted = item.title == highlightKey
     AnimatedVisibility(
         visible = enabled,
-        enter = expandVertically() + fadeIn(),
-        exit = shrinkVertically() + fadeOut(),
+        enter = expandVertically(animationSpec = MotionTokens.tweenEnter()) + fadeIn(
+            animationSpec = MotionTokens.tweenEnter(),
+        ),
+        exit = shrinkVertically(animationSpec = MotionTokens.tweenExit()) + fadeOut(
+            animationSpec = MotionTokens.tweenExit(),
+        ),
         content = {
             CompositionLocalProvider(
                 LocalPreferenceHighlighted provides highlighted,

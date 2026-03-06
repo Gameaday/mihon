@@ -100,8 +100,8 @@ object SettingsDataScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val backupPreferences = Injekt.get<BackupPreferences>()
-        val storagePreferences = Injekt.get<StoragePreferences>()
+        val backupPreferences = remember { Injekt.get<BackupPreferences>() }
+        val storagePreferences = remember { Injekt.get<StoragePreferences>() }
 
         return persistentListOf(
             getStorageLocationPref(storagePreferences = storagePreferences),
