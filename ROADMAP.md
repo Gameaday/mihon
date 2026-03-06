@@ -31,9 +31,10 @@ This fork adds an **authority-first identity system** on top of Mihon's source-b
 - Duplicate detection — manga already in your library are skipped
 - After import, you can link content sources for any manga you want to read online, or keep tracking-only
 
-**What could be built later** (not currently planned):
+**What could be built next:**
 - Import from AniList reading list
 - Two-way sync (push new library additions back to tracker)
+- Import with volume-level chapter data from richer metadata sources
 
 ### 3. The Local Reader (existing library)
 
@@ -106,7 +107,7 @@ This fork adds an **authority-first identity system** on top of Mihon's source-b
 
 ### 9. The Sharer
 
-*"I want to share my favorites or export parts of my library."*
+*"I want to share my favorites, collections, and recommendations with friends."*
 
 **What works today:**
 - **Share manga** link directly from manga detail screen (shares source URL)
@@ -114,10 +115,12 @@ This fork adds an **authority-first identity system** on top of Mihon's source-b
 - **Backup export** with granular options: library entries, categories, chapters, tracking, history, app settings — mix and match
 - Backup files are portable `.tachibk` format for sharing between devices
 
-**What could be built later** (not currently planned):
-- Share a curated list of series (subset export by category)
-- Share notes or recommendations as formatted text
-- Group/list sharing with friends
+**What could be built next:**
+- Share manga with the user's **personal notes** included (formatted text or image card)
+- **Collections** — curated, ordered groups of series (beyond categories). Automatic collections (e.g., "Completed this month"), smart collections (by genre/author/status), and custom hand-picked collections
+- **Collection notes** — add descriptions, commentary, or suggested reading order to collections
+- Share collections as formatted lists with notes, custom ordering, and cover art
+- Export a collection as a standalone shareable file (subset of library)
 
 ### 10. The Explorer
 
@@ -128,9 +131,10 @@ This fork adds an **authority-first identity system** on top of Mihon's source-b
 - **Global search** across all installed sources simultaneously
 - Source-specific popular/latest listings
 
-**What could be built later** (not currently planned):
+**What could be built next:**
 - "More like this" recommendations based on linked tracker data (genre, author, similar users)
 - Tracker-based discovery: "users who read X also read Y"
+- "Like this" button on manga detail to find similar series across sources
 
 ## Fork Features Summary
 
@@ -151,8 +155,37 @@ This fork adds an **authority-first identity system** on top of Mihon's source-b
 | Manga notes | ✅ Upstream feature, fully supported |
 | Categories + organization | ✅ Upstream feature, fully supported |
 | Tracker sync | ✅ Upstream feature, fully supported |
+| Share manga with notes | 📋 Next up |
+| Collections (custom, smart, auto) | 📋 Next up |
+| Collection notes + sharing | 📋 Next up |
+| Recommendations / "like this" | 📋 Planned |
+| AniList list import | 📋 Planned |
+| Cross-media authority sources | 🔮 Future vision |
 
 145 unit tests. Zero compiler warnings.
+
+## Future Vision: Cross-Media Collections
+
+The authority-first model isn't limited to manga. The canonical ID system, tracker integration, authority chapters, collections, and sharing features could extend to other media types:
+
+| Media Type | Potential Authority Sources | Tracker Integration |
+|-----------|---------------------------|-------------------|
+| **Light Novels** | MAL (already tracks LNs), AniList, NovelUpdates | Reading progress, volumes, chapters |
+| **Books** | MAL (LN overlap), Goodreads, OpenLibrary | Reading status, ratings |
+| **Anime** | MAL, AniList, Kitsu | Episode progress, watch status |
+| **Games** | IGDB, HowLongToBeat, Steam | Play status, completion |
+| **Movies/TV** | TMDB, Trakt, IMDb | Watch status, ratings |
+
+**Cross-media collections** would enable users to curate multi-format series guides — for example, sharing all .hack media (manga, anime, games, light novels) with personal notes on each entry and a recommended experience order. A single shared collection could include:
+- Manga volumes with reading progress
+- Anime seasons with episode tracking
+- Light novels with chapter progress
+- Games with completion status
+- User notes explaining the recommended order and why
+
+This builds on the existing architecture: canonical IDs identify entries across sources, authority chapters provide progress tracking without content, and the collection/sharing system provides the presentation layer.
+
+**Not currently planned** — documenting the vision to guide architectural decisions that keep these doors open.
 
 ## Architecture
 
