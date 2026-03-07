@@ -1239,21 +1239,23 @@ class MangaScreenModel(
                     // (e.g. hides the "Link to authority" toolbar button, shows updated metadata)
                     val updatedManga = mangaRepository.getMangaById(mangaId)
                     updateSuccessState { it.copy(manga = updatedManga) }
-                }
-                withUIContext {
-                    if (result != null) {
+                    withUIContext {
                         snackbarHostState.showSnackbar(
                             context.stringResource(MR.strings.manga_linked_success, result),
                         )
-                    } else if (!matchUnlinkedManga.hasQueryableTracker()) {
-                        // No trackers available for search — guide user to settings
-                        snackbarHostState.showSnackbar(
-                            context.stringResource(MR.strings.no_tracker_for_linking),
-                        )
-                    } else {
-                        snackbarHostState.showSnackbar(
-                            context.stringResource(MR.strings.manga_linked_no_match),
-                        )
+                    }
+                } else {
+                    withUIContext {
+                        if (!matchUnlinkedManga.hasQueryableTracker()) {
+                            // No trackers available for search — guide user to settings
+                            snackbarHostState.showSnackbar(
+                                context.stringResource(MR.strings.no_tracker_for_linking),
+                            )
+                        } else {
+                            snackbarHostState.showSnackbar(
+                                context.stringResource(MR.strings.manga_linked_no_match),
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
