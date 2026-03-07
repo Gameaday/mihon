@@ -1178,4 +1178,16 @@
     <!-- Authority linking -->
     <string name="authority_badge_description">Linked to authority</string>
     <string name="authority_linked_label">Authority</string>
+
+    <!-- Authority match results screen -->
+    <string name="match_results_title">Authority Matching Results</string>
+    <string name="match_results_summary">Resolved %1$d of %2$d manga</string>
+    <string name="match_results_all_linked">All library manga are linked to an authority</string>
+    <string name="match_results_unlinked_header">Unlinked manga</string>
+    <string name="match_results_linked_header">Recently linked</string>
+    <string name="match_results_retry_single">Retry</string>
+    <string name="match_results_matching">Matching…</string>
+    <string name="match_results_no_match">No match found</string>
+    <string name="match_results_linked_badge">Linked</string>
+    <string name="match_results_retry_all">Retry all unlinked</string>
 </resources>
