@@ -3,6 +3,7 @@ package eu.kanade.domain.track.interactor
 import eu.kanade.tachiyomi.data.track.Tracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import logcat.LogPriority
@@ -305,6 +306,8 @@ class MatchUnlinkedManga(
                 }
             }
             null
+        } catch (e: CancellationException) {
+            throw e // Don't swallow cancellation — let WorkManager handle it promptly
         } catch (e: Exception) {
             logcat(LogPriority.DEBUG, e) { "Search failed for '$query'" }
             null
@@ -376,6 +379,8 @@ class MatchUnlinkedManga(
             if (result.alternative_titles.isNotEmpty()) {
                 mergeAlternativeTitles(manga, result)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logcat(LogPriority.DEBUG, e) { "Failed to enrich metadata for '${manga.title}'" }
         }

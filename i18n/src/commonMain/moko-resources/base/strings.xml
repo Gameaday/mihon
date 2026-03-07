@@ -1153,10 +1153,8 @@
     <string name="tracker_match_all_running_subtitle">Searching trackers by name for each unlinked manga…</string>
     <string name="tracker_match_all_started">Authority matching started — check notifications for progress</string>
     <string name="tracker_match_all_complete_title">Authority matching complete</string>
-    <string name="tracker_match_all_success">Resolved %d manga to canonical IDs</string>
     <string name="tracker_match_all_result_detail">Resolved %1$d manga: %2$d from trackers, %3$d from search (%4$d unmatched)</string>
     <string name="tracker_match_all_none">All library manga already have canonical IDs</string>
-    <string name="tracker_match_all_no_matches">No new matches found — resolve remaining manually</string>
     <string name="tracker_match_all_no_matches_detail">No matches found for %d unlinked manga — try adding tracker bindings or resolve manually</string>
     <string name="tracker_match_all_failed">Matching failed — check your connection and try again</string>
     <string name="channel_match_progress">Authority matching</string>
