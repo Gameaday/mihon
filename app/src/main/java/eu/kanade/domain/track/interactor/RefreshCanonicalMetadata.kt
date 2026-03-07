@@ -159,8 +159,9 @@ class RefreshCanonicalMetadata(
         fun parseCanonicalId(canonicalId: String): Pair<String, Long>? {
             val parts = canonicalId.split(":", limit = 2)
             if (parts.size != 2) return null
+            val prefix = parts[0].takeIf { it.isNotEmpty() } ?: return null
             val remoteId = parts[1].toLongOrNull() ?: return null
-            return parts[0] to remoteId
+            return prefix to remoteId
         }
     }
 }
