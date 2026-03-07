@@ -43,7 +43,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
-import eu.kanade.domain.track.interactor.LinkTrackedMangaToAuthority
 import eu.kanade.domain.track.interactor.MatchUnlinkedManga
 import eu.kanade.domain.track.interactor.TrackerListImporter
 import eu.kanade.domain.track.model.AutoTrackState
@@ -98,8 +97,9 @@ object SettingsTrackingScreen : SearchableSettings {
 
         var dialog by remember { mutableStateOf<Any?>(null) }
         var importingFromMal by remember { mutableStateOf(false) }
-        var linkingToAuthority by remember { mutableStateOf(false) }
-        var matchingUnlinked by remember { mutableStateOf(false) }
+        var resolvingUnlinked by remember { mutableStateOf(false) }
+        var resolveProgress by remember { mutableStateOf(0) }
+        var resolveTotal by remember { mutableStateOf(0) }
         dialog?.run {
             when (this) {
                 is LoginDialog -> {
@@ -274,60 +274,45 @@ object SettingsTrackingScreen : SearchableSettings {
                     addAll(importPreferences)
                     add(
                         Preference.PreferenceItem.TextPreference(
-                            title = if (linkingToAuthority) {
-                                stringResource(MR.strings.tracker_link_running)
-                            } else {
-                                stringResource(MR.strings.tracker_link_action)
-                            },
-                            subtitle = stringResource(MR.strings.tracker_link_subtitle),
-                            enabled = !linkingToAuthority,
-                            onClick = {
-                                linkingToAuthority = true
-                                scope.launchIO {
-                                    val linker = Injekt.get<LinkTrackedMangaToAuthority>()
-                                    val count = linker.await()
-                                    withUIContext {
-                                        linkingToAuthority = false
-                                        if (count > 0) {
-                                            context.toast(
-                                                context.stringResource(
-                                                    MR.strings.tracker_link_success,
-                                                    count,
-                                                ),
-                                            )
-                                        } else {
-                                            context.toast(MR.strings.tracker_link_none)
-                                        }
-                                    }
-                                }
-                            },
-                        ),
-                    )
-                    add(
-                        Preference.PreferenceItem.TextPreference(
-                            title = if (matchingUnlinked) {
+                            title = if (resolvingUnlinked && resolveTotal > 0) {
+                                stringResource(
+                                    MR.strings.tracker_match_all_running_progress,
+                                    resolveProgress,
+                                    resolveTotal,
+                                )
+                            } else if (resolvingUnlinked) {
                                 stringResource(MR.strings.tracker_match_all_running)
                             } else {
                                 stringResource(MR.strings.tracker_match_all_action)
                             },
                             subtitle = stringResource(MR.strings.tracker_match_all_subtitle),
-                            enabled = !matchingUnlinked,
+                            enabled = !resolvingUnlinked,
                             onClick = {
-                                matchingUnlinked = true
+                                resolvingUnlinked = true
+                                resolveProgress = 0
+                                resolveTotal = 0
                                 scope.launchIO {
                                     val matcher = Injekt.get<MatchUnlinkedManga>()
-                                    val count = matcher.await()
+                                    val result = matcher.await { current, total ->
+                                        withUIContext {
+                                            resolveProgress = current
+                                            resolveTotal = total
+                                        }
+                                    }
                                     withUIContext {
-                                        matchingUnlinked = false
-                                        if (count > 0) {
+                                        resolvingUnlinked = false
+                                        val totalResolved = result.linked + result.matched
+                                        if (totalResolved > 0) {
                                             context.toast(
                                                 context.stringResource(
                                                     MR.strings.tracker_match_all_success,
-                                                    count,
+                                                    totalResolved,
                                                 ),
                                             )
-                                        } else {
+                                        } else if (result.total == 0) {
                                             context.toast(MR.strings.tracker_match_all_none)
+                                        } else {
+                                            context.toast(MR.strings.tracker_match_all_no_matches)
                                         }
                                     }
                                 }

@@ -1130,11 +1130,13 @@
     <string name="discover_merge_message">Your library already has entries matching \"%s\" without canonical IDs. Tap one to link it, or skip to create a new entry.</string>
     <string name="discover_merge_chapters">%d chapters</string>
     <string name="discover_merge_skip">Create new entry</string>
-    <string name="tracker_match_all_action">Match all unlinked manga</string>
-    <string name="tracker_match_all_subtitle">Search canonical IDs for library manga without one</string>
-    <string name="tracker_match_all_running">Matching…</string>
-    <string name="tracker_match_all_success">Matched %d manga to canonical IDs</string>
+    <string name="tracker_match_all_action">Resolve all unlinked manga</string>
+    <string name="tracker_match_all_subtitle">Link from trackers and search canonical IDs for remaining</string>
+    <string name="tracker_match_all_running">Resolving…</string>
+    <string name="tracker_match_all_running_progress">Resolving… %1$d/%2$d</string>
+    <string name="tracker_match_all_success">Resolved %d manga to canonical IDs</string>
     <string name="tracker_match_all_none">All library manga already have canonical IDs</string>
+    <string name="tracker_match_all_no_matches">No new matches found — resolve remaining manually</string>
     <string name="label_content_sources">Sources</string>
 
     <!-- Accessibility content descriptions for source health -->
