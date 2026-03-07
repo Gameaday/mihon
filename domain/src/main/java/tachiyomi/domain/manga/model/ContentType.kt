@@ -41,10 +41,11 @@ enum class ContentType(val value: Int) {
          */
         fun fromPublishingType(publishingType: String): ContentType {
             return when (publishingType.lowercase().trim()) {
-                // Standard manga variants
+                // Standard manga variants (including regional terms)
                 "manga", "manhwa", "manhua", "webtoon", "comic",
                 "oneshot", "one_shot", "one-shot", "one shot",
-                "doujinshi", "doujin", "oel",
+                "doujinshi", "doujin",
+                "oel", // Original English Language manga
                 -> MANGA
 
                 // Novel variants

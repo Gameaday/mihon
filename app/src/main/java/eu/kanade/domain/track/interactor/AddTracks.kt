@@ -203,8 +203,10 @@ class AddTracks(
          * - Determine which trackers to search when the user's content type is known.
          * - Future: filter Discover search results by content type.
          *
-         * All current trackers support MANGA. As novel/book trackers are added,
-         * this map determines which tracker handles which content type.
+         * All current canonical trackers (MAL, AniList, MangaUpdates) support both
+         * MANGA and NOVEL. Only trackers listed in [TRACKER_CANONICAL_PREFIXES] are
+         * included here — self-hosted trackers (Kavita, Suwayomi, Komga) are not
+         * canonical authority sources and handle content type internally.
          */
         val TRACKER_CONTENT_TYPES: Map<Long, Set<ContentType>> = mapOf(
             MYANIMELIST_ID to setOf(ContentType.MANGA, ContentType.NOVEL),
