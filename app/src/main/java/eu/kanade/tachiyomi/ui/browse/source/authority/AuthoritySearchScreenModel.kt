@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.ui.browse.source.authority
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import eu.kanade.domain.manga.interactor.FindContentSource
 import eu.kanade.domain.track.interactor.AddTracks
 import eu.kanade.domain.track.interactor.TrackerListImporter
 import eu.kanade.tachiyomi.data.track.Tracker
@@ -30,6 +31,7 @@ class AuthoritySearchScreenModel(
     private val mangaRepository: MangaRepository = Injekt.get(),
     private val insertTrack: InsertTrack = Injekt.get(),
     private val generateAuthorityChapters: GenerateAuthorityChapters = Injekt.get(),
+    private val findContentSource: FindContentSource = Injekt.get(),
 ) : StateScreenModel<AuthoritySearchState>(AuthoritySearchState()) {
 
     /**
@@ -302,8 +304,43 @@ class AuthoritySearchScreenModel(
             sourcePromptManga = SourcePromptInfo(
                 title = result.title,
                 mangaId = manga.id,
+                isSearching = true,
             ),
         )
+
+        // Automatically search for content sources in the background
+        autoSearchForSources(manga)
+    }
+
+    /**
+     * Automatically searches enabled content sources for a matching manga.
+     * Updates the source prompt with results as they come in.
+     */
+    private fun autoSearchForSources(manga: Manga) {
+        screenModelScope.launch {
+            try {
+                val matches = withIOContext {
+                    findContentSource.findSources(manga, maxResults = 5, deepSearch = false)
+                }
+                val currentPrompt = mutableState.value.sourcePromptManga ?: return@launch
+                if (currentPrompt.mangaId == manga.id) {
+                    mutableState.value = mutableState.value.copy(
+                        sourcePromptManga = currentPrompt.copy(
+                            sourceMatches = matches.toImmutableList(),
+                            isSearching = false,
+                        ),
+                    )
+                }
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Auto-search for sources failed" }
+                val currentPrompt = mutableState.value.sourcePromptManga ?: return@launch
+                if (currentPrompt.mangaId == manga.id) {
+                    mutableState.value = mutableState.value.copy(
+                        sourcePromptManga = currentPrompt.copy(isSearching = false),
+                    )
+                }
+            }
+        }
     }
 
     /** Dismiss the source prompt dialog. */
@@ -356,6 +393,10 @@ data class AuthoritySearchState(
 data class SourcePromptInfo(
     val title: String,
     val mangaId: Long,
+    /** Auto-search results from FindContentSource, populated asynchronously. */
+    val sourceMatches: ImmutableList<FindContentSource.SourceMatch> = persistentListOf(),
+    /** True while auto-search is in progress. */
+    val isSearching: Boolean = true,
 )
 
 /** Info for the "merge with existing?" prompt shown when library has unpaired matches. */

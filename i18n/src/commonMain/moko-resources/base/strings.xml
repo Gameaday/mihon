@@ -1123,7 +1123,9 @@
     <string name="discover_added">Already in library</string>
     <string name="discover_find_source_title">Add a content source?</string>
     <string name="discover_find_source_message">Would you like to find a content source for \"%s\"? You can read chapters from a source, or keep tracking progress without one.</string>
-    <string name="discover_find_source_action">Find source</string>
+    <string name="discover_find_source_searching">Searching installed sources…</string>
+    <string name="discover_find_source_found">Found sources matching \"%s\". Tap one to browse, or search manually for more options.</string>
+    <string name="discover_find_source_action">Search manually</string>
     <string name="discover_find_source_skip">Skip</string>
     <string name="discover_login_for_more">Log in to more trackers for additional results</string>
     <string name="discover_merge_title">Merge with existing?</string>

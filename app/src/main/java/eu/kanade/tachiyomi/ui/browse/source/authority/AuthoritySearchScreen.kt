@@ -61,6 +61,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import eu.kanade.domain.manga.interactor.FindContentSource
 import eu.kanade.domain.track.interactor.AddTracks
 import eu.kanade.presentation.components.AdaptiveSheet
 import eu.kanade.presentation.components.TabContent
@@ -127,7 +128,18 @@ fun Screen.discoverTab(): TabContent {
             if (sourcePrompt != null) {
                 FindSourceDialog(
                     mangaTitle = sourcePrompt.title,
-                    onFindSource = {
+                    sourceMatches = sourcePrompt.sourceMatches,
+                    isSearching = sourcePrompt.isSearching,
+                    onSelectSource = { match ->
+                        screenModel.dismissSourcePrompt()
+                        navigator.push(
+                            eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceScreen(
+                                match.sourceId,
+                                match.manga.title,
+                            ),
+                        )
+                    },
+                    onManualSearch = {
                         screenModel.dismissSourcePrompt()
                         navigator.push(GlobalSearchScreen(sourcePrompt.title))
                     },
@@ -607,23 +619,99 @@ private fun MergeWithExistingDialog(
 
 /**
  * Dialog prompting the user to find a content source after adding an authority manga.
+ * Shows auto-search results when available, with option for manual search fallback.
  * This bridges the authority-first model with source pairing: manga exist by their
  * canonical identity first, and a content source is an optional addition on top.
  */
 @Composable
 private fun FindSourceDialog(
     mangaTitle: String,
-    onFindSource: () -> Unit,
+    sourceMatches: List<FindContentSource.SourceMatch>,
+    isSearching: Boolean,
+    onSelectSource: (FindContentSource.SourceMatch) -> Unit,
+    onManualSearch: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(MR.strings.discover_find_source_title)) },
         text = {
-            Text(stringResource(MR.strings.discover_find_source_message, mangaTitle))
+            Column {
+                if (isSearching) {
+                    Text(
+                        text = stringResource(MR.strings.discover_find_source_searching),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(MaterialTheme.padding.medium))
+                    androidx.compose.material3.LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else if (sourceMatches.isNotEmpty()) {
+                    Text(
+                        text = stringResource(MR.strings.discover_find_source_found, mangaTitle),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(MaterialTheme.padding.medium))
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+                    ) {
+                        items(
+                            sourceMatches,
+                            key = { it.sourceId },
+                        ) { match ->
+                            ElevatedCard(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onSelectSource(match) },
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(MaterialTheme.padding.medium),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        MaterialTheme.padding.medium,
+                                    ),
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = match.sourceName,
+                                            style = MaterialTheme.typography.titleSmall,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                        Text(
+                                            text = match.manga.title,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                    }
+                                    val confidencePercent = (match.confidence * 100).toInt()
+                                    Text(
+                                        text = "$confidencePercent%",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (match.confidence >= 0.9) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Text(
+                        text = stringResource(MR.strings.discover_find_source_message, mangaTitle),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
         },
         confirmButton = {
-            TextButton(onClick = onFindSource) {
+            TextButton(onClick = onManualSearch) {
                 Text(stringResource(MR.strings.discover_find_source_action))
             }
         },
