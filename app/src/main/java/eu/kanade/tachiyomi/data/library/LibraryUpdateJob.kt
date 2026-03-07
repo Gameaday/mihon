@@ -95,6 +95,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
     private val fetchInterval: FetchInterval = Injekt.get()
     private val filterChaptersForDownload: FilterChaptersForDownload = Injekt.get()
     private val getChaptersByMangaId: GetChaptersByMangaId = Injekt.get()
+    private val refreshCanonicalMetadata: eu.kanade.domain.track.interactor.RefreshCanonicalMetadata = Injekt.get()
 
     private val notifier = LibraryUpdateNotifier(context)
 
@@ -462,6 +463,29 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
                         } catch (_: Exception) {
                             // Both sources failed, skip metadata update entirely
                         }
+                    }
+                }
+            }
+        }
+
+        // Refresh canonical metadata from the authoritative tracker source.
+        // This captures updates like series status changes, new descriptions, and cover art
+        // from the canonical source (MAL/AniList/MangaUpdates). Throttled to every 7 days.
+        if (autoUpdateMetadata && manga.canonicalId != null) {
+            val lastUpdate = manga.lastUpdate
+            val daysSinceUpdate = if (lastUpdate > 0) {
+                java.util.concurrent.TimeUnit.MILLISECONDS.toDays(
+                    System.currentTimeMillis() - lastUpdate,
+                )
+            } else {
+                Long.MAX_VALUE
+            }
+            if (daysSinceUpdate >= METADATA_REFRESH_INTERVAL_DAYS) {
+                try {
+                    refreshCanonicalMetadata.await(manga)
+                } catch (e: Exception) {
+                    logcat(LogPriority.DEBUG, e) {
+                        "Canonical metadata refresh failed for ${manga.title}"
                     }
                 }
             }

@@ -34,7 +34,8 @@ CREATE TABLE mangas(
     canonical_id TEXT,
     source_status INTEGER NOT NULL DEFAULT 0,
     alternative_titles TEXT,
-    dead_since INTEGER
+    dead_since INTEGER,
+    content_type INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX library_favorite_index ON mangas(favorite) WHERE favorite = 1;
@@ -155,14 +156,26 @@ track_dupes AS (
     AND S1.manga_id != S2.manga_id
     WHERE S1.manga_id = :id
 ),
+canonical_dupes AS (
+    SELECT M2._id AS manga_id
+    FROM mangas M1
+    INNER JOIN mangas M2
+    ON M1.canonical_id = M2.canonical_id
+    AND M1._id != M2._id
+    WHERE M1._id = :id
+    AND M1.canonical_id IS NOT NULL
+    AND M2.favorite = 1
+),
 duplicates AS (
     SELECT M.*
     FROM mangas M
     LEFT JOIN track_dupes D
     ON D.manga_id = _id
+    LEFT JOIN canonical_dupes CD
+    ON CD.manga_id = _id
     WHERE favorite = 1
     AND _id != :id
-    AND (lower(title) LIKE '%' || lower(:title) || '%' OR D.manga_id IS NOT NULL)
+    AND (lower(title) LIKE '%' || lower(:title) || '%' OR D.manga_id IS NOT NULL OR CD.manga_id IS NOT NULL)
 ),
 chapter_counts AS (
     SELECT
@@ -222,8 +235,8 @@ AND (
 );
 
 insert:
-INSERT INTO mangas(source, url, artist, author, description, genre, title, status, thumbnail_url, favorite, last_update, next_update, initialized, viewer, chapter_flags, cover_last_modified, date_added, update_strategy, calculate_interval, last_modified_at, version, notes, metadata_source, metadata_url, canonical_id, source_status, alternative_titles, dead_since)
-VALUES (:source, :url, :artist, :author, :description, :genre, :title, :status, :thumbnailUrl, :favorite, :lastUpdate, :nextUpdate, :initialized, :viewerFlags, :chapterFlags, :coverLastModified, :dateAdded, :updateStrategy, :calculateInterval, 0, :version, :notes, :metadataSource, :metadataUrl, :canonicalId, :sourceStatus, :alternativeTitles, :deadSince);
+INSERT INTO mangas(source, url, artist, author, description, genre, title, status, thumbnail_url, favorite, last_update, next_update, initialized, viewer, chapter_flags, cover_last_modified, date_added, update_strategy, calculate_interval, last_modified_at, version, notes, metadata_source, metadata_url, canonical_id, source_status, alternative_titles, dead_since, content_type)
+VALUES (:source, :url, :artist, :author, :description, :genre, :title, :status, :thumbnailUrl, :favorite, :lastUpdate, :nextUpdate, :initialized, :viewerFlags, :chapterFlags, :coverLastModified, :dateAdded, :updateStrategy, :calculateInterval, 0, :version, :notes, :metadataSource, :metadataUrl, :canonicalId, :sourceStatus, :alternativeTitles, :deadSince, :contentType);
 
 update:
 UPDATE mangas SET
@@ -254,7 +267,8 @@ UPDATE mangas SET
     canonical_id = coalesce(:canonicalId, canonical_id),
     source_status = coalesce(:sourceStatus, source_status),
     alternative_titles = coalesce(:alternativeTitles, alternative_titles),
-    dead_since = CASE WHEN :deadSince = 0 THEN NULL WHEN :deadSince IS NOT NULL THEN :deadSince ELSE dead_since END
+    dead_since = CASE WHEN :deadSince = 0 THEN NULL WHEN :deadSince IS NOT NULL THEN :deadSince ELSE dead_since END,
+    content_type = coalesce(:contentType, content_type)
 WHERE _id = :mangaId;
 
 clearMetadataSource:

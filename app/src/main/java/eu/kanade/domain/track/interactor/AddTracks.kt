@@ -15,8 +15,10 @@ import tachiyomi.core.common.util.lang.withNonCancellableContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.history.interactor.GetHistory
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
+import tachiyomi.domain.manga.model.mergedAlternativeTitles
 import tachiyomi.domain.manga.repository.MangaRepository
 import tachiyomi.domain.track.interactor.InsertTrack
 import uy.kohesive.injekt.Injekt
@@ -157,27 +159,13 @@ class AddTracks(
     internal suspend fun mergeAlternativeTitles(mangaId: Long, newTitles: List<String>) {
         try {
             val manga = mangaRepository.getMangaById(mangaId)
-            val primary = manga.title
-            val existing = manga.alternativeTitles.toMutableList()
-            val previousSize = existing.size
-
-            // Add new titles, excluding the primary title, blanks, and case-insensitive duplicates
-            val existingLower = existing.map { it.lowercase() }.toMutableSet()
-            val primaryLower = primary.lowercase()
-            for (title in newTitles) {
-                if (title.isBlank()) continue
-                val titleLower = title.lowercase()
-                if (titleLower == primaryLower) continue
-                if (!existingLower.add(titleLower)) continue
-                existing.add(title)
-            }
-            if (existing.size == previousSize) return // No new titles to add
+            val merged = manga.mergedAlternativeTitles(newTitles) ?: return
 
             mangaRepository.update(
-                MangaUpdate(id = mangaId, alternativeTitles = existing),
+                MangaUpdate(id = mangaId, alternativeTitles = merged),
             )
             logcat(LogPriority.INFO) {
-                "Updated alternative_titles for ${manga.title}: +${existing.size - previousSize} titles"
+                "Updated alternative_titles for ${manga.title}: +${merged.size - manga.alternativeTitles.size} titles"
             }
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Failed to update alternative_titles for manga $mangaId" }
@@ -206,5 +194,36 @@ class AddTracks(
         val TRACKERS_WITH_PUBLIC_SEARCH = setOf(
             MANGAUPDATES_ID, // MangaUpdates search is unauthenticated
         )
+
+        /**
+         * Content types supported by each canonical tracker.
+         *
+         * Used to:
+         * - Filter which trackers to suggest for a given content type.
+         * - Determine which trackers to search when the user's content type is known.
+         * - Future: filter Discover search results by content type.
+         *
+         * All current canonical trackers (MAL, AniList, MangaUpdates) support both
+         * MANGA and NOVEL. Only trackers listed in [TRACKER_CANONICAL_PREFIXES] are
+         * included here — self-hosted trackers (Kavita, Suwayomi, Komga) are not
+         * canonical authority sources and handle content type internally.
+         */
+        val TRACKER_CONTENT_TYPES: Map<Long, Set<ContentType>> = mapOf(
+            MYANIMELIST_ID to setOf(ContentType.MANGA, ContentType.NOVEL),
+            TrackerManager.ANILIST to setOf(ContentType.MANGA, ContentType.NOVEL),
+            MANGAUPDATES_ID to setOf(ContentType.MANGA, ContentType.NOVEL),
+        )
+
+        /**
+         * Returns tracker IDs that support the given content type.
+         * If [contentType] is [ContentType.UNKNOWN], returns all canonical trackers.
+         */
+        fun trackersForContentType(contentType: ContentType): Set<Long> {
+            if (contentType == ContentType.UNKNOWN) return TRACKER_CANONICAL_PREFIXES.keys
+            return TRACKER_CONTENT_TYPES.entries
+                .filter { contentType in it.value }
+                .map { it.key }
+                .toSet()
+        }
     }
 }

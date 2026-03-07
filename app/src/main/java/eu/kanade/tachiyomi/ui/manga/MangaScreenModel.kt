@@ -24,6 +24,7 @@ import eu.kanade.domain.manga.model.chaptersFiltered
 import eu.kanade.domain.manga.model.downloadedFilter
 import eu.kanade.domain.manga.model.toSManga
 import eu.kanade.domain.track.interactor.AddTracks
+import eu.kanade.domain.track.interactor.MatchUnlinkedManga
 import eu.kanade.domain.track.interactor.RefreshTracks
 import eu.kanade.domain.track.interactor.TrackChapter
 import eu.kanade.domain.track.model.AutoTrackState
@@ -313,6 +314,21 @@ class MangaScreenModel(
                 }
 
                 updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch)
+
+                // On manual refresh, also refresh metadata from the canonical tracker source
+                // to capture updates (status changes, new cover art, description updates).
+                // This uses a separate API call from the content source refresh above.
+                if (manualFetch && manga.canonicalId != null) {
+                    try {
+                        val refreshCanonical: eu.kanade.domain.track.interactor.RefreshCanonicalMetadata =
+                            Injekt.get()
+                        refreshCanonical.await(manga)
+                    } catch (e: Exception) {
+                        logcat(LogPriority.DEBUG, e) {
+                            "Canonical metadata refresh failed for ${manga.title}"
+                        }
+                    }
+                }
             }
         } catch (e: Throwable) {
             // Ignore early hints "errors" that aren't handled by OkHttp
@@ -1195,6 +1211,53 @@ class MangaScreenModel(
     fun setExcludedScanlators(excludedScanlators: Set<String>) {
         screenModelScope.launchIO {
             setExcludedScanlators.await(mangaId, excludedScanlators)
+        }
+    }
+
+    /**
+     * Resolves the canonical ID for this manga by checking tracker bindings and searching
+     * tracker APIs. Shows a snackbar with the result.
+     * If no trackers are available for search (Phase 2), guides the user to enable one.
+     * This is the per-manga version of the bulk "Resolve all unlinked" operation.
+     */
+    fun resolveCanonicalId() {
+        val manga = successState?.manga ?: return
+        if (manga.canonicalId != null) {
+            screenModelScope.launch {
+                snackbarHostState.showSnackbar(
+                    context.stringResource(MR.strings.manga_already_linked),
+                )
+            }
+            return
+        }
+        screenModelScope.launchIO {
+            try {
+                val matchUnlinkedManga: MatchUnlinkedManga = Injekt.get()
+                val result = matchUnlinkedManga.awaitSingle(manga)
+                withUIContext {
+                    if (result != null) {
+                        snackbarHostState.showSnackbar(
+                            context.stringResource(MR.strings.manga_linked_success, result),
+                        )
+                    } else if (!matchUnlinkedManga.hasQueryableTracker()) {
+                        // No trackers available for search — guide user to settings
+                        snackbarHostState.showSnackbar(
+                            context.stringResource(MR.strings.no_tracker_for_linking),
+                        )
+                    } else {
+                        snackbarHostState.showSnackbar(
+                            context.stringResource(MR.strings.manga_linked_no_match),
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                logcat(LogPriority.ERROR, e) { "Failed to resolve canonical ID" }
+                withUIContext {
+                    snackbarHostState.showSnackbar(
+                        context.stringResource(MR.strings.manga_linked_no_match),
+                    )
+                }
+            }
         }
     }
 

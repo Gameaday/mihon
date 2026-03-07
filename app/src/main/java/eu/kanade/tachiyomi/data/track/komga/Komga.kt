@@ -70,7 +70,9 @@ class Komga(id: Long) : BaseTracker(id, "Komga"), EnhancedTracker {
     }
 
     override suspend fun search(query: String): List<TrackSearch> {
-        TODO("Not yet implemented: search")
+        // Komga is a self-hosted tracker that auto-binds via enhanced matching.
+        // It does not support general title search — return empty so callers don't crash.
+        return emptyList()
     }
 
     override suspend fun refresh(track: Track): Track {

@@ -166,6 +166,9 @@ class MangaScreen(
             onClearMetadataSourceClicked = screenModel::clearMetadataSource.takeIf {
                 successState.manga.metadataSource?.let { it > 0 } == true
             },
+            onResolveCanonicalClicked = screenModel::resolveCanonicalId.takeIf {
+                successState.manga.favorite && successState.manga.canonicalId == null
+            },
             onMultiBookmarkClicked = screenModel::bookmarkChapters,
             onMultiMarkAsReadClicked = screenModel::markChaptersRead,
             onMarkPreviousAsReadClicked = screenModel::markPreviousChapterRead,

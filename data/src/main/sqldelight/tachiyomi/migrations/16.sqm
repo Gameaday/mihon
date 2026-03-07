@@ -1,0 +1,4 @@
+-- Add content_type column to categorize media (manga, novel, book, etc.).
+-- 0 = UNKNOWN, 1 = MANGA, 2 = NOVEL, 3 = BOOK.
+-- Populated from tracker publishing_type during canonical ID resolution and metadata refresh.
+ALTER TABLE mangas ADD COLUMN content_type INTEGER NOT NULL DEFAULT 0;
