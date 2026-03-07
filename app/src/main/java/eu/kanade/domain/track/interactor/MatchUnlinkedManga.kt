@@ -45,7 +45,7 @@ class MatchUnlinkedManga(
 
         var matched = 0
         for (manga in unlinked) {
-            yield() // Cooperative cancellation and UI responsiveness
+            yield() // Allow cooperative cancellation and maintain UI responsiveness
             val canonicalId = searchForCanonicalId(manga, tracker, prefix)
             if (canonicalId != null) {
                 try {

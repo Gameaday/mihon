@@ -412,7 +412,6 @@ private fun MergeWithExistingDialog(
                 Text(stringResource(MR.strings.discover_merge_skip))
             }
         },
-        dismissButton = {},
     )
 }
 

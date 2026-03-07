@@ -1127,7 +1127,7 @@
     <string name="discover_find_source_skip">Skip</string>
     <string name="discover_login_for_more">Log in to more trackers for additional results</string>
     <string name="discover_merge_title">Merge with existing?</string>
-    <string name="discover_merge_message">Your library already has entries matching \"%s\" without a canonical ID. Tap one to link it, or skip to create a new entry.</string>
+    <string name="discover_merge_message">Your library already has entries matching \"%s\" without canonical IDs. Tap one to link it, or skip to create a new entry.</string>
     <string name="discover_merge_chapters">%d chapters</string>
     <string name="discover_merge_skip">Create new entry</string>
     <string name="tracker_match_all_action">Match all unlinked manga</string>
