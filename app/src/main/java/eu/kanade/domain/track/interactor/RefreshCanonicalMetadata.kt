@@ -6,6 +6,7 @@ import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import logcat.LogPriority
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
 import tachiyomi.domain.manga.model.mergedAlternativeTitles
@@ -83,13 +84,18 @@ class RefreshCanonicalMetadata(
         val artist = result.artists.joinToString(", ").takeIf { it.isNotBlank() }
         val thumbnailUrl = result.cover_url.takeIf { it.isNotBlank() }
         val status = mapTrackerStatus(result.publishing_status)
+        // Infer content type from tracker's publishing_type
+        val contentType = ContentType.fromPublishingType(result.publishing_type).takeIf {
+            it != ContentType.UNKNOWN
+        }
 
         // Check if there's actually something to update
         val hasChanges = (description != null && description != manga.description) ||
             (author != null && author != manga.author) ||
             (artist != null && artist != manga.artist) ||
             (thumbnailUrl != null && thumbnailUrl != manga.thumbnailUrl) ||
-            (status != null && status != manga.status)
+            (status != null && status != manga.status) ||
+            (contentType != null && contentType != manga.contentType)
 
         if (!hasChanges) {
             // Still merge alt titles even if main metadata didn't change
@@ -105,6 +111,7 @@ class RefreshCanonicalMetadata(
                 artist = artist,
                 thumbnailUrl = thumbnailUrl,
                 status = status,
+                contentType = contentType,
             ),
         )
 

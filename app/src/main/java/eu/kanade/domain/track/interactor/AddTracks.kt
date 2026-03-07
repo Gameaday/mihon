@@ -15,6 +15,7 @@ import tachiyomi.core.common.util.lang.withNonCancellableContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.history.interactor.GetHistory
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
 import tachiyomi.domain.manga.model.mergedAlternativeTitles
@@ -193,5 +194,34 @@ class AddTracks(
         val TRACKERS_WITH_PUBLIC_SEARCH = setOf(
             MANGAUPDATES_ID, // MangaUpdates search is unauthenticated
         )
+
+        /**
+         * Content types supported by each canonical tracker.
+         *
+         * Used to:
+         * - Filter which trackers to suggest for a given content type.
+         * - Determine which trackers to search when the user's content type is known.
+         * - Future: filter Discover search results by content type.
+         *
+         * All current trackers support MANGA. As novel/book trackers are added,
+         * this map determines which tracker handles which content type.
+         */
+        val TRACKER_CONTENT_TYPES: Map<Long, Set<ContentType>> = mapOf(
+            MYANIMELIST_ID to setOf(ContentType.MANGA, ContentType.NOVEL),
+            TrackerManager.ANILIST to setOf(ContentType.MANGA, ContentType.NOVEL),
+            MANGAUPDATES_ID to setOf(ContentType.MANGA, ContentType.NOVEL),
+        )
+
+        /**
+         * Returns tracker IDs that support the given content type.
+         * If [contentType] is [ContentType.UNKNOWN], returns all canonical trackers.
+         */
+        fun trackersForContentType(contentType: ContentType): Set<Long> {
+            if (contentType == ContentType.UNKNOWN) return TRACKER_CANONICAL_PREFIXES.keys
+            return TRACKER_CONTENT_TYPES.entries
+                .filter { contentType in it.value }
+                .map { it.key }
+                .toSet()
+        }
     }
 }

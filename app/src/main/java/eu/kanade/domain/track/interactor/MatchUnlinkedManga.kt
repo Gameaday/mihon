@@ -7,6 +7,7 @@ import kotlinx.coroutines.yield
 import logcat.LogPriority
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
 import tachiyomi.domain.manga.model.mergedAlternativeTitles
@@ -250,9 +251,15 @@ class MatchUnlinkedManga(
             val thumbnailUrl = result.cover_url.takeIf {
                 it.isNotBlank() && manga.thumbnailUrl.isNullOrBlank()
             }
+            // Infer content type from tracker's publishing_type if not already set
+            val contentType = ContentType.fromPublishingType(result.publishing_type).takeIf {
+                it != ContentType.UNKNOWN && manga.contentType == ContentType.UNKNOWN
+            }
 
             // Only update if there's something new to add
-            if (description != null || author != null || artist != null || thumbnailUrl != null) {
+            if (description != null || author != null || artist != null ||
+                thumbnailUrl != null || contentType != null
+            ) {
                 mangaRepository.update(
                     MangaUpdate(
                         id = manga.id,
@@ -260,6 +267,7 @@ class MatchUnlinkedManga(
                         author = author,
                         artist = artist,
                         thumbnailUrl = thumbnailUrl,
+                        contentType = contentType,
                     ),
                 )
                 logcat(LogPriority.INFO) {

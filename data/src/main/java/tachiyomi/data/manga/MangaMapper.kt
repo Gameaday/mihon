@@ -5,6 +5,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import tachiyomi.domain.library.model.LibraryManga
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaWithChapterCount
 
@@ -42,6 +43,7 @@ object MangaMapper {
         sourceStatus: Long,
         alternativeTitles: String?,
         deadSince: Long?,
+        contentType: Long,
     ): Manga = Manga(
         id = id,
         source = source,
@@ -73,6 +75,7 @@ object MangaMapper {
         sourceStatus = sourceStatus.toInt(),
         alternativeTitles = parseAlternativeTitles(alternativeTitles),
         deadSince = deadSince,
+        contentType = ContentType.fromValue(contentType.toInt()),
     )
 
     fun mapLibraryManga(
@@ -107,6 +110,7 @@ object MangaMapper {
         sourceStatus: Long,
         alternativeTitles: String?,
         deadSince: Long?,
+        contentType: Long,
         totalCount: Long,
         readCount: Double,
         latestUpload: Long,
@@ -147,6 +151,7 @@ object MangaMapper {
             sourceStatus,
             alternativeTitles,
             deadSince,
+            contentType,
         ),
         categories = categories.split(",").map { it.toLong() },
         totalChapters = totalCount,
@@ -189,6 +194,7 @@ object MangaMapper {
         sourceStatus: Long,
         alternativeTitles: String?,
         deadSince: Long?,
+        contentType: Long,
         totalCount: Long,
     ): MangaWithChapterCount = MangaWithChapterCount(
         manga = mapManga(
@@ -223,6 +229,7 @@ object MangaMapper {
             sourceStatus,
             alternativeTitles,
             deadSince,
+            contentType,
         ),
         chapterCount = totalCount,
     )

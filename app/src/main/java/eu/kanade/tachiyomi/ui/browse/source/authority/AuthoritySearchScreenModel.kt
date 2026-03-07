@@ -16,6 +16,7 @@ import logcat.LogPriority
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.interactor.GenerateAuthorityChapters
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
 import tachiyomi.domain.manga.model.MangaWithChapterCount
@@ -163,6 +164,9 @@ class AuthoritySearchScreenModel(
                             thumbnailUrl = result.cover_url.takeIf {
                                 it.isNotBlank() && manga.thumbnailUrl.isNullOrBlank()
                             },
+                            contentType = ContentType.fromPublishingType(result.publishing_type).takeIf {
+                                it != ContentType.UNKNOWN && manga.contentType == ContentType.UNKNOWN
+                            },
                         ),
                     )
                     logcat(LogPriority.INFO) {
@@ -259,13 +263,15 @@ class AuthoritySearchScreenModel(
             inserted.firstOrNull() ?: return
         }
 
-        // Mark as favourite
+        // Mark as favourite and set content type from publishing_type
+        val inferredType = ContentType.fromPublishingType(result.publishing_type)
         mangaRepository.update(
             MangaUpdate(
                 id = manga.id,
                 favorite = true,
                 dateAdded = System.currentTimeMillis(),
                 canonicalId = canonicalId,
+                contentType = inferredType.takeIf { it != ContentType.UNKNOWN },
             ),
         )
 
