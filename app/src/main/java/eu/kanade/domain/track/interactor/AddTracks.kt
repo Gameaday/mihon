@@ -198,5 +198,13 @@ class AddTracks(
             TrackerManager.ANILIST to "al", // AniList
             MANGAUPDATES_ID to "mu", // MangaUpdates
         )
+
+        /**
+         * Tracker IDs whose search API works without user authentication.
+         * These trackers can be used in Discover search even when not logged in.
+         */
+        val TRACKERS_WITH_PUBLIC_SEARCH = setOf(
+            MANGAUPDATES_ID, // MangaUpdates search is unauthenticated
+        )
     }
 }

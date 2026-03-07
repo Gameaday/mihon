@@ -1117,10 +1117,15 @@
     <string name="label_discover">Discover</string>
     <string name="label_search">Search</string>
     <string name="discover_search_hint">Search by title…</string>
-    <string name="discover_empty_state">Search a tracker to find manga and add to your library</string>
+    <string name="discover_empty_state">Search to find manga and add to your library</string>
     <string name="discover_no_trackers">Log in to a tracker in Settings → Tracking to search here</string>
     <string name="discover_add">Add to library</string>
     <string name="discover_added">Already in library</string>
+    <string name="discover_find_source_title">Add a content source?</string>
+    <string name="discover_find_source_message">Would you like to find a content source for \"%s\"? You can read chapters from a source, or keep tracking progress without one.</string>
+    <string name="discover_find_source_action">Find source</string>
+    <string name="discover_find_source_skip">Skip</string>
+    <string name="discover_login_for_more">Log in to more trackers for additional results</string>
     <string name="label_content_sources">Sources</string>
 
     <!-- Accessibility content descriptions for source health -->

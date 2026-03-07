@@ -30,9 +30,16 @@ class AuthoritySearchScreenModel(
     private val generateAuthorityChapters: GenerateAuthorityChapters = Injekt.get(),
 ) : StateScreenModel<AuthoritySearchState>(AuthoritySearchState()) {
 
-    /** Logged-in trackers that support authority search (canonical ID assignment). */
+    /**
+     * Trackers available for authority search.
+     * Includes logged-in authoritative trackers AND trackers with public search APIs.
+     * This allows discovery to work without login for trackers like MangaUpdates.
+     */
     val availableTrackers: ImmutableList<Tracker> = trackerManager.trackers
-        .filter { it.isLoggedIn && AddTracks.TRACKER_CANONICAL_PREFIXES.containsKey(it.id) }
+        .filter {
+            AddTracks.TRACKER_CANONICAL_PREFIXES.containsKey(it.id) &&
+                (it.isLoggedIn || it.id in AddTracks.TRACKERS_WITH_PUBLIC_SEARCH)
+        }
         .toImmutableList()
 
     init {
@@ -74,7 +81,9 @@ class AuthoritySearchScreenModel(
     }
 
     /**
-     * Adds a search result to the library as an authority-only manga entry with tracker binding.
+     * Adds a search result to the library as an authority-only manga entry.
+     * If the tracker is logged in, also creates a tracker binding.
+     * If not logged in (public search), creates the authority entry without binding.
      */
     fun addToLibrary(result: TrackSearch) {
         val tracker = mutableState.value.selectedTracker ?: return
@@ -126,24 +135,26 @@ class AuthoritySearchScreenModel(
                         ),
                     )
 
-                    // Bind the tracker
-                    val track = Track(
-                        id = 0L,
-                        mangaId = manga.id,
-                        trackerId = tracker.id,
-                        remoteId = result.remote_id,
-                        libraryId = null,
-                        title = result.title,
-                        lastChapterRead = result.last_chapter_read,
-                        totalChapters = result.total_chapters,
-                        status = result.status,
-                        score = result.score,
-                        remoteUrl = result.tracking_url,
-                        startDate = result.started_reading_date,
-                        finishDate = result.finished_reading_date,
-                        private = result.private,
-                    )
-                    insertTrack.await(track)
+                    // Bind the tracker only if user is logged in
+                    if (tracker.isLoggedIn) {
+                        val track = Track(
+                            id = 0L,
+                            mangaId = manga.id,
+                            trackerId = tracker.id,
+                            remoteId = result.remote_id,
+                            libraryId = null,
+                            title = result.title,
+                            lastChapterRead = result.last_chapter_read,
+                            totalChapters = result.total_chapters,
+                            status = result.status,
+                            score = result.score,
+                            remoteUrl = result.tracking_url,
+                            startDate = result.started_reading_date,
+                            finishDate = result.finished_reading_date,
+                            private = result.private,
+                        )
+                        insertTrack.await(track)
+                    }
 
                     // Generate authority chapters so the user can mark progress
                     if (result.total_chapters > 0) {
@@ -156,12 +167,21 @@ class AuthoritySearchScreenModel(
 
                     mutableState.value = mutableState.value.copy(
                         addedCanonicalIds = mutableState.value.addedCanonicalIds + canonicalId,
+                        sourcePromptManga = SourcePromptInfo(
+                            title = result.title,
+                            mangaId = manga.id,
+                        ),
                     )
                 }
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e) { "Failed to add authority manga: canonical_id=$canonicalId" }
             }
         }
+    }
+
+    /** Dismiss the source prompt dialog. */
+    fun dismissSourcePrompt() {
+        mutableState.value = mutableState.value.copy(sourcePromptManga = null)
     }
 }
 
@@ -172,4 +192,12 @@ data class AuthoritySearchState(
     val results: ImmutableList<TrackSearch> = persistentListOf(),
     /** Canonical IDs of manga already added to the library in this session. */
     val addedCanonicalIds: Set<String> = emptySet(),
+    /** Non-null when the user just added a manga and should be prompted to find a source. */
+    val sourcePromptManga: SourcePromptInfo? = null,
+)
+
+/** Info for the "find content source?" prompt shown after adding authority manga. */
+data class SourcePromptInfo(
+    val title: String,
+    val mangaId: Long,
 )

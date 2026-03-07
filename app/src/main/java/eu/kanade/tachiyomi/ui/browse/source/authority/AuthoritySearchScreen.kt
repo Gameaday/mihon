@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,10 +50,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import eu.kanade.domain.track.interactor.AddTracks
 import eu.kanade.presentation.components.TabContent
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
+import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchScreen
 import kotlinx.collections.immutable.persistentListOf
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.ScrollbarLazyColumn
@@ -72,6 +77,7 @@ import tachiyomi.presentation.core.theme.MotionTokens
  */
 @Composable
 fun Screen.discoverTab(): TabContent {
+    val navigator = LocalNavigator.currentOrThrow
     val screenModel = rememberScreenModel { AuthoritySearchScreenModel() }
     val state by screenModel.state.collectAsState()
 
@@ -87,6 +93,19 @@ fun Screen.discoverTab(): TabContent {
                 onAddToLibrary = screenModel::addToLibrary,
                 contentPadding = contentPadding,
             )
+
+            // "Find content source?" prompt shown after adding an authority manga
+            val sourcePrompt = state.sourcePromptManga
+            if (sourcePrompt != null) {
+                FindSourceDialog(
+                    mangaTitle = sourcePrompt.title,
+                    onFindSource = {
+                        screenModel.dismissSourcePrompt()
+                        navigator.push(GlobalSearchScreen(sourcePrompt.title))
+                    },
+                    onDismiss = screenModel::dismissSourcePrompt,
+                )
+            }
         },
     )
 }
@@ -302,6 +321,36 @@ private fun DiscoverResultCard(
             }
         }
     }
+}
+
+/**
+ * Dialog prompting the user to find a content source after adding an authority manga.
+ * This bridges the authority-first model with source pairing: manga exist by their
+ * canonical identity first, and a content source is an optional addition on top.
+ */
+@Composable
+private fun FindSourceDialog(
+    mangaTitle: String,
+    onFindSource: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(MR.strings.discover_find_source_title)) },
+        text = {
+            Text(stringResource(MR.strings.discover_find_source_message, mangaTitle))
+        },
+        confirmButton = {
+            TextButton(onClick = onFindSource) {
+                Text(stringResource(MR.strings.discover_find_source_action))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(MR.strings.discover_find_source_skip))
+            }
+        },
+    )
 }
 
 /** Display states for the animated content area — avoids Triple allocations. */
