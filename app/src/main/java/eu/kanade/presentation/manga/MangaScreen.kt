@@ -114,6 +114,7 @@ fun MangaScreen(
     onMigrateClicked: (() -> Unit)?,
     onEditNotesClicked: () -> Unit,
     onClearMetadataSourceClicked: (() -> Unit)?,
+    onResolveCanonicalClicked: (() -> Unit)?,
 
     // For bottom action menu
     onMultiBookmarkClicked: (List<Chapter>, bookmarked: Boolean) -> Unit,
@@ -164,6 +165,7 @@ fun MangaScreen(
             onMigrateClicked = onMigrateClicked,
             onEditNotesClicked = onEditNotesClicked,
             onClearMetadataSourceClicked = onClearMetadataSourceClicked,
+            onResolveCanonicalClicked = onResolveCanonicalClicked,
             onMultiBookmarkClicked = onMultiBookmarkClicked,
             onMultiMarkAsReadClicked = onMultiMarkAsReadClicked,
             onMarkPreviousAsReadClicked = onMarkPreviousAsReadClicked,
@@ -201,6 +203,7 @@ fun MangaScreen(
             onMigrateClicked = onMigrateClicked,
             onEditNotesClicked = onEditNotesClicked,
             onClearMetadataSourceClicked = onClearMetadataSourceClicked,
+            onResolveCanonicalClicked = onResolveCanonicalClicked,
             onMultiBookmarkClicked = onMultiBookmarkClicked,
             onMultiMarkAsReadClicked = onMultiMarkAsReadClicked,
             onMarkPreviousAsReadClicked = onMarkPreviousAsReadClicked,
@@ -248,6 +251,7 @@ private fun MangaScreenSmallImpl(
     onMigrateClicked: (() -> Unit)?,
     onEditNotesClicked: () -> Unit,
     onClearMetadataSourceClicked: (() -> Unit)?,
+    onResolveCanonicalClicked: (() -> Unit)?,
 
     // For bottom action menu
     onMultiBookmarkClicked: (List<Chapter>, bookmarked: Boolean) -> Unit,
@@ -308,6 +312,7 @@ private fun MangaScreenSmallImpl(
                 onClickMigrate = onMigrateClicked,
                 onClickEditNotes = onEditNotesClicked,
                 onClickClearMetadataSource = onClearMetadataSourceClicked,
+                onClickResolveCanonical = onResolveCanonicalClicked,
                 actionModeCounter = selectedChapterCount,
                 onCancelActionMode = { onAllChapterSelected(false) },
                 onSelectAll = { onAllChapterSelected(true) },
@@ -508,6 +513,7 @@ fun MangaScreenLargeImpl(
     onMigrateClicked: (() -> Unit)?,
     onEditNotesClicked: () -> Unit,
     onClearMetadataSourceClicked: (() -> Unit)?,
+    onResolveCanonicalClicked: (() -> Unit)?,
 
     // For bottom action menu
     onMultiBookmarkClicked: (List<Chapter>, bookmarked: Boolean) -> Unit,
@@ -561,6 +567,7 @@ fun MangaScreenLargeImpl(
                 onClickMigrate = onMigrateClicked,
                 onClickEditNotes = onEditNotesClicked,
                 onClickClearMetadataSource = onClearMetadataSourceClicked,
+                onClickResolveCanonical = onResolveCanonicalClicked,
                 onCancelActionMode = { onAllChapterSelected(false) },
                 actionModeCounter = selectedChapterCount,
                 onSelectAll = { onAllChapterSelected(true) },

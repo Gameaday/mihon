@@ -110,6 +110,40 @@ class MatchUnlinkedManga(
     }
 
     /**
+     * Resolves the canonical ID for a single manga.
+     * Uses the same two-phase strategy as [await] but for a single entry.
+     *
+     * @return The resolved canonical ID, or null if no match was found.
+     */
+    suspend fun awaitSingle(manga: Manga): String? = withIOContext {
+        if (manga.canonicalId != null) return@withIOContext manga.canonicalId
+
+        // Phase 1: Try existing tracker bindings
+        var canonicalId = resolveFromTrackerBindings(manga)
+        var matchedResult: TrackSearch? = null
+
+        // Phase 2: Fall back to public API search
+        if (canonicalId == null) {
+            val tracker = AddTracks.TRACKERS_WITH_PUBLIC_SEARCH
+                .firstNotNullOfOrNull { id -> trackerManager.get(id) }
+            val prefix = tracker?.let { AddTracks.TRACKER_CANONICAL_PREFIXES[it.id] }
+            if (tracker != null && prefix != null) {
+                val searchResult = searchForMatch(manga, tracker, prefix)
+                canonicalId = searchResult?.first
+                matchedResult = searchResult?.second
+            }
+        }
+
+        if (canonicalId != null) {
+            mangaRepository.update(tachiyomi.domain.manga.model.MangaUpdate(id = manga.id, canonicalId = canonicalId))
+            if (matchedResult != null) {
+                enrichFromSearchResult(manga, matchedResult)
+            }
+        }
+        canonicalId
+    }
+
+    /**
      * Resolves the canonical ID from existing tracker bindings (zero API calls).
      * Returns the first authoritative canonical ID found, or null.
      */

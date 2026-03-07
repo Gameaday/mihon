@@ -24,6 +24,7 @@ import eu.kanade.domain.manga.model.chaptersFiltered
 import eu.kanade.domain.manga.model.downloadedFilter
 import eu.kanade.domain.manga.model.toSManga
 import eu.kanade.domain.track.interactor.AddTracks
+import eu.kanade.domain.track.interactor.MatchUnlinkedManga
 import eu.kanade.domain.track.interactor.RefreshTracks
 import eu.kanade.domain.track.interactor.TrackChapter
 import eu.kanade.domain.track.model.AutoTrackState
@@ -1195,6 +1196,42 @@ class MangaScreenModel(
     fun setExcludedScanlators(excludedScanlators: Set<String>) {
         screenModelScope.launchIO {
             setExcludedScanlators.await(mangaId, excludedScanlators)
+        }
+    }
+
+    /**
+     * Resolves the canonical ID for this manga by checking tracker bindings and searching
+     * public tracker APIs. Shows a snackbar with the result.
+     * This is the per-manga version of the bulk "Resolve all unlinked" operation.
+     */
+    fun resolveCanonicalId() {
+        val manga = successState?.manga ?: return
+        if (manga.canonicalId != null) {
+            screenModelScope.launch {
+                snackbarHostState.showSnackbar(
+                    context.stringResource(MR.strings.manga_already_linked),
+                )
+            }
+            return
+        }
+        screenModelScope.launchIO {
+            try {
+                val matchUnlinkedManga: MatchUnlinkedManga = Injekt.get()
+                val result = matchUnlinkedManga.awaitSingle(manga)
+                withUIContext {
+                    if (result != null) {
+                        snackbarHostState.showSnackbar(
+                            context.stringResource(MR.strings.manga_linked_success, result),
+                        )
+                    } else {
+                        snackbarHostState.showSnackbar(
+                            context.stringResource(MR.strings.manga_linked_no_match),
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                logcat(LogPriority.ERROR, e) { "Failed to resolve canonical ID" }
+            }
         }
     }
 
