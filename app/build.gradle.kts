@@ -155,6 +155,7 @@ android {
         aidl = true
 
         // Disable some unused things
+        dataBinding = false
         renderScript = false
         shaders = false
     }
