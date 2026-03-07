@@ -121,7 +121,7 @@ class AuthoritySearchScreenModel(
                 mutableState.value = mutableState.value.copy(
                     isSearching = false,
                     results = persistentListOf(),
-                    searchError = e.message ?: "Search failed",
+                    searchError = e.message ?: e.javaClass.simpleName,
                 )
             }
         }
