@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -52,6 +54,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -189,6 +192,7 @@ private fun DiscoverContent(
     // Trackers filtered by the selected content type
     val filteredTrackers = trackersForFilter(state.contentTypeFilter)
 
+    val focusManager = LocalFocusManager.current
     var query by remember { mutableStateOf("") }
 
     Column(
@@ -213,54 +217,73 @@ private fun DiscoverContent(
                     contentDescription = null,
                 )
             },
+            trailingIcon = {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { query = "" }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            },
             singleLine = true,
             shape = RoundedCornerShape(28.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { onSearch(query) }),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    onSearch(query)
+                    focusManager.clearFocus()
+                },
+            ),
         )
 
         // Content type filter chips — always visible, controls which trackers are shown.
         // This organizes authorities by what they are an authority of, so only
         // relevant trackers are queried — saving API calls as more authorities are added.
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = MaterialTheme.padding.medium,
-                    vertical = MaterialTheme.padding.extraSmall,
-                ),
+        val typeFilters = remember {
+            listOf(ContentType.UNKNOWN, ContentType.MANGA, ContentType.NOVEL)
+        }
+        val typeFilterLabels = mapOf(
+            ContentType.UNKNOWN to stringResource(MR.strings.discover_filter_all),
+            ContentType.MANGA to stringResource(MR.strings.discover_filter_manga),
+            ContentType.NOVEL to stringResource(MR.strings.discover_filter_novel),
+        )
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(
+                horizontal = MaterialTheme.padding.medium,
+                vertical = MaterialTheme.padding.extraSmall,
+            ),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
         ) {
-            val typeFilters = listOf(
-                ContentType.UNKNOWN to stringResource(MR.strings.discover_filter_all),
-                ContentType.MANGA to stringResource(MR.strings.discover_filter_manga),
-                ContentType.NOVEL to stringResource(MR.strings.discover_filter_novel),
-            )
-            typeFilters.forEach { (type, label) ->
+            items(typeFilters.size) { index ->
+                val type = typeFilters[index]
                 FilterChip(
                     selected = state.contentTypeFilter == type,
                     onClick = { onSetContentTypeFilter(type) },
-                    label = { Text(label) },
+                    label = { Text(typeFilterLabels[type] ?: "") },
                 )
             }
         }
 
         // Tracker filter chips — filtered by the selected content type.
         // Only shown when multiple trackers match the current type.
+        // Uses LazyRow for horizontal scrolling if many trackers are available.
         if (filteredTrackers.size > 1) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = MaterialTheme.padding.medium,
-                        vertical = MaterialTheme.padding.extraSmall,
-                    ),
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(
+                    horizontal = MaterialTheme.padding.medium,
+                    vertical = MaterialTheme.padding.extraSmall,
+                ),
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
             ) {
-                filteredTrackers.forEach { tracker ->
+                items(filteredTrackers.size) { index ->
+                    val tracker = filteredTrackers[index]
                     FilterChip(
                         selected = tracker == state.selectedTracker,
                         onClick = { onSelectTracker(tracker) },
@@ -270,10 +293,34 @@ private fun DiscoverContent(
             }
         }
 
+        // Result count indicator — shows how many results are displayed
+        val displayResults = state.filteredResults
+        if (displayResults.isNotEmpty()) {
+            val countText = if (
+                state.contentTypeFilter != ContentType.UNKNOWN &&
+                displayResults.size != state.results.size
+            ) {
+                stringResource(
+                    MR.strings.discover_result_count_filtered,
+                    displayResults.size,
+                    state.results.size,
+                )
+            } else {
+                stringResource(MR.strings.discover_result_count, displayResults.size)
+            }
+            Text(
+                text = countText,
+                modifier = Modifier.padding(
+                    horizontal = MaterialTheme.padding.medium,
+                    vertical = MaterialTheme.padding.extraSmall,
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
         // Animated content area — search results or landing state
         // Derive a stable display state to avoid unnecessary transitions
-        // Use filteredResults for display when content type filter is active
-        val displayResults = state.filteredResults
         val displayState = when {
             state.isSearching -> DiscoverDisplayState.LOADING
             state.results.isEmpty() && state.query.isBlank() -> DiscoverDisplayState.LANDING
@@ -368,12 +415,19 @@ private fun DiscoverResultCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                if (result.publishing_type.isNotBlank()) {
+                // Type + status metadata row for disambiguation
+                val metaItems = buildList {
+                    if (result.publishing_type.isNotBlank()) add(result.publishing_type)
+                    if (result.publishing_status.isNotBlank()) add(result.publishing_status)
+                    if (result.start_date.isNotBlank()) add(result.start_date)
+                }
+                if (metaItems.isNotEmpty()) {
                     Text(
-                        text = result.publishing_type,
+                        text = metaItems.joinToString(" · "),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 if (result.summary.isNotBlank()) {

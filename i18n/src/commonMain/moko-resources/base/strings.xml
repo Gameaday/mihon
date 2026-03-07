@@ -1142,6 +1142,8 @@
     <string name="discover_filter_all">All</string>
     <string name="discover_filter_manga">Manga</string>
     <string name="discover_filter_novel">Novel</string>
+    <string name="discover_result_count">%d results</string>
+    <string name="discover_result_count_filtered">%1$d of %2$d results</string>
     <string name="tracker_match_all_action">Resolve all unlinked manga</string>
     <string name="tracker_match_all_subtitle">Link from trackers and search canonical IDs for remaining</string>
     <string name="tracker_match_all_running">Resolving…</string>
