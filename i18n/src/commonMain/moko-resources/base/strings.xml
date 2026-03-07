@@ -1174,4 +1174,8 @@
     <!-- Dead duration formatting -->
     <string name="source_dead_duration_days">%d days</string>
     <string name="source_dead_duration_less_than_day">less than a day</string>
+
+    <!-- Authority linking -->
+    <string name="authority_badge_description">Linked to authority</string>
+    <string name="authority_linked_label">Authority</string>
 </resources>

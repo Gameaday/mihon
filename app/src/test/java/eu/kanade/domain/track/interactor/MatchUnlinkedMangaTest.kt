@@ -774,4 +774,121 @@ class MatchUnlinkedMangaTest {
         updates[1].description shouldBe "Soul reaper manga"
         updates[1].author shouldBe "Tite Kubo"
     }
+
+    // ========== Tier 3: Alternative title matching ==========
+
+    @Test
+    fun `matches via result alternative titles (Tier 3)`() = runTest {
+        val manga = testManga(id = 1L, title = "Attack on Titan")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        // The result's primary title doesn't match, but its alternative titles include ours
+        coEvery { muTracker.search("Attack on Titan") } returns listOf(
+            testTrackSearch(
+                title = "Shingeki no Kyojin",
+                remoteId = 500L,
+                alternativeTitles = listOf("Attack on Titan", "進撃の巨人"),
+            ),
+        )
+        val updates = mutableListOf<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updates)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        result.matched shouldBe 1
+        updates.first().canonicalId shouldBe "mu:500"
+    }
+
+    @Test
+    fun `Tier 3 matches normalized result alt titles`() = runTest {
+        val manga = testManga(id = 1L, title = "Re:Zero")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("Re:Zero") } returns listOf(
+            testTrackSearch(
+                title = "Different Primary Title",
+                remoteId = 800L,
+                alternativeTitles = listOf("Re Zero - Starting Life"),
+            ),
+        )
+        val updateSlot = slot<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updateSlot)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        // Tier 3 checks alt_titles with normalization, so "Re:Zero" normalized = "re zero"
+        // But "Re Zero - Starting Life" normalized = "re zero starting life" ≠ "re zero"
+        // No match here because normalized comparison is exact, not substring
+        result.matched shouldBe 0
+    }
+
+    // ========== Tier 4: Substring matching ==========
+
+    @Test
+    fun `matches via substring containment (Tier 4)`() = runTest {
+        val manga = testManga(id = 1L, title = "Sword Art Online: Alicization")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("Sword Art Online: Alicization") } returns listOf(
+            testTrackSearch(
+                title = "Sword Art Online - Alicization - War of Underworld",
+                remoteId = 900L,
+            ),
+        )
+        val updateSlot = slot<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updateSlot)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        // "sword art online alicization" is contained in "sword art online alicization war of underworld"
+        result.matched shouldBe 1
+        updateSlot.captured.canonicalId shouldBe "mu:900"
+    }
+
+    @Test
+    fun `substring match rejects short titles to avoid false positives`() = runTest {
+        val manga = testManga(id = 1L, title = "One")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("One") } returns listOf(
+            testTrackSearch("One Piece", 100L),
+        )
+        coEvery { mangaRepository.update(any()) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        // "one" is only 3 chars, below MIN_SUBSTRING_LENGTH — no match
+        result.matched shouldBe 0
+    }
+
+    // ========== containsSubstringMatch unit tests ==========
+
+    @Test
+    fun `containsSubstringMatch returns true when shorter is contained in longer`() {
+        MatchUnlinkedManga.containsSubstringMatch(
+            "sword art online",
+            "sword art online alicization",
+        ) shouldBe true
+    }
+
+    @Test
+    fun `containsSubstringMatch returns true regardless of argument order`() {
+        MatchUnlinkedManga.containsSubstringMatch(
+            "sword art online alicization",
+            "sword art online",
+        ) shouldBe true
+    }
+
+    @Test
+    fun `containsSubstringMatch rejects short strings`() {
+        MatchUnlinkedManga.containsSubstringMatch("one", "one piece") shouldBe false
+    }
+
+    @Test
+    fun `containsSubstringMatch rejects non-containing strings`() {
+        MatchUnlinkedManga.containsSubstringMatch(
+            "naruto shippuden",
+            "one piece adventure",
+        ) shouldBe false
+    }
 }

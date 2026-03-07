@@ -305,6 +305,40 @@ class MatchUnlinkedManga(
                     return "$prefix:${normalizedMatch.remote_id}" to normalizedMatch
                 }
             }
+
+            // Tier 3: Match against the result's alternative titles
+            // Authority results often list the same manga under different names
+            if (normalizedTitles.isNotEmpty()) {
+                val altTitleMatches = results.filter { result ->
+                    result.remote_id > 0 &&
+                        result.alternative_titles.any { altTitle ->
+                            val norm = normalizeTitle(altTitle)
+                            norm.isNotBlank() && norm in normalizedTitles
+                        }
+                }
+                val altTitleMatch = pickBestByContentType(altTitleMatches, contentType)
+                if (altTitleMatch != null) {
+                    return "$prefix:${altTitleMatch.remote_id}" to altTitleMatch
+                }
+            }
+
+            // Tier 4: Substring containment — catches "Title: Subtitle" vs "Title"
+            // Only matches if one normalized title fully contains the other and
+            // the shorter title has at least MIN_SUBSTRING_LENGTH characters
+            if (normalizedTitles.isNotEmpty()) {
+                val substringMatches = results.filter { result ->
+                    result.remote_id > 0 && normalizeTitle(result.title).let { resultNorm ->
+                        resultNorm.isNotBlank() && normalizedTitles.any { localNorm ->
+                            containsSubstringMatch(localNorm, resultNorm)
+                        }
+                    }
+                }
+                val substringMatch = pickBestByContentType(substringMatches, contentType)
+                if (substringMatch != null) {
+                    return "$prefix:${substringMatch.remote_id}" to substringMatch
+                }
+            }
+
             null
         } catch (e: CancellationException) {
             throw e // Don't swallow cancellation — let WorkManager handle it promptly
@@ -409,6 +443,12 @@ class MatchUnlinkedManga(
         private val MULTI_SPACE_REGEX = Regex("\\s+")
 
         /**
+         * Minimum length for substring matching in Tier 4.
+         * Prevents false positives from very short titles (e.g. "One" matching "One Piece").
+         */
+        private const val MIN_SUBSTRING_LENGTH = 8
+
+        /**
          * Delay between API search calls during bulk matching to avoid tracker throttling.
          * Most tracker APIs have rate limits (e.g. AniList: 90/min, MU: unspecified).
          * A 500ms delay keeps us well within limits while still being fast enough
@@ -427,6 +467,17 @@ class MatchUnlinkedManga(
                 .replace(PUNCT_REGEX, " ")
                 .replace(MULTI_SPACE_REGEX, " ")
                 .trim()
+        }
+
+        /**
+         * Checks if one normalized title is a substring of the other.
+         * Both must be non-blank and the shorter one must have at least
+         * [MIN_SUBSTRING_LENGTH] characters to avoid false positives.
+         */
+        fun containsSubstringMatch(a: String, b: String): Boolean {
+            val shorter = if (a.length <= b.length) a else b
+            val longer = if (a.length <= b.length) b else a
+            return shorter.length >= MIN_SUBSTRING_LENGTH && longer.contains(shorter)
         }
     }
 }
