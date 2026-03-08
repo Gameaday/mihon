@@ -167,7 +167,7 @@ class DomainModule : InjektModule {
         addFactory { SyncChapterProgressWithTrack(get(), get(), get()) }
         addFactory { TrackerListImporter(get(), get(), get(), get()) }
         addFactory { LinkTrackedMangaToAuthority(get(), get()) }
-        addFactory { MatchUnlinkedManga(get(), get(), get()) }
+        addFactory { MatchUnlinkedManga(get(), get(), get(), get()) }
         addFactory { RefreshCanonicalMetadata(get(), get()) }
 
         addSingletonFactory<ChapterRepository> { ChapterRepositoryImpl(get()) }

@@ -128,7 +128,7 @@ class RefreshCanonicalMetadataTest {
     }
 
     @Test
-    fun `updates metadata when tracker returns matching result with changes`() = runTest {
+    fun `overwrites metadata with fresh authority values by default`() = runTest {
         val manga = testManga(
             title = "Test Manga",
             canonicalId = "mu:12345",
@@ -153,6 +153,7 @@ class RefreshCanonicalMetadataTest {
         val updateSlot = slot<MangaUpdate>()
         coVerify { mangaRepository.update(capture(updateSlot)) }
         val update = updateSlot.captured
+        // Authority source overwrites existing fields (it's the source of truth)
         update.description shouldBe "New and improved description"
         update.author shouldBe "New Author"
         update.artist shouldBe "New Artist"
@@ -161,7 +162,7 @@ class RefreshCanonicalMetadataTest {
     }
 
     @Test
-    fun `returns false when no metadata changes detected`() = runTest {
+    fun `returns true even when values are same since authority always writes`() = runTest {
         val manga = testManga(
             title = "Test Manga",
             canonicalId = "mu:12345",
@@ -183,18 +184,19 @@ class RefreshCanonicalMetadataTest {
             ),
         )
 
+        // Authority always overwrites, so even identical data counts as an update
         val result = refreshCanonicalMetadata.await(manga)
-        result shouldBe false
+        result shouldBe true
     }
 
     @Test
-    fun `status change is detected and updated`() = runTest {
+    fun `updates status from authority even when already set`() = runTest {
         val manga = testManga(
             title = "Test Manga",
             canonicalId = "mu:12345",
             description = "Same description",
             author = "Same Author",
-            status = 1L, // ONGOING
+            status = 1L, // ONGOING — authority says Completed, should overwrite
         )
         coEvery { muTracker.search("Test Manga") } returns listOf(
             testTrackSearch(
@@ -211,7 +213,71 @@ class RefreshCanonicalMetadataTest {
 
         val updateSlot = slot<MangaUpdate>()
         coVerify { mangaRepository.update(capture(updateSlot)) }
-        updateSlot.captured.status shouldBe 2L // COMPLETED
+        updateSlot.captured.status shouldBe 2L // COMPLETED — authority overwrite
+    }
+
+    @Test
+    fun `fillOnly mode does not overwrite existing fields`() = runTest {
+        val manga = testManga(
+            title = "Test Manga",
+            canonicalId = "mu:12345",
+            description = "Old description",
+            author = "Old Author",
+            status = 1L, // ONGOING
+        )
+        coEvery { muTracker.search("Test Manga") } returns listOf(
+            testTrackSearch(
+                title = "Test Manga",
+                remoteId = 12345L,
+                summary = "New description",
+                authors = listOf("New Author"),
+                artists = listOf("New Artist"),
+                coverUrl = "https://example.com/new-cover.jpg",
+                publishingStatus = "Completed",
+            ),
+        )
+
+        val result = refreshCanonicalMetadata.await(manga, fillOnly = true)
+        result shouldBe true
+
+        val updateSlot = slot<MangaUpdate>()
+        coVerify { mangaRepository.update(capture(updateSlot)) }
+        val update = updateSlot.captured
+        // Existing fields NOT overwritten in fill-only mode
+        update.description shouldBe null
+        update.author shouldBe null
+        update.status shouldBe null
+        // Missing fields ARE filled
+        update.artist shouldBe "New Artist"
+        update.thumbnailUrl shouldBe "https://example.com/new-cover.jpg"
+    }
+
+    @Test
+    fun `fillOnly mode returns false when all fields populated`() = runTest {
+        val manga = testManga(
+            title = "Test Manga",
+            canonicalId = "mu:12345",
+            description = "Same description",
+            author = "Same Author",
+            artist = "Same Artist",
+            thumbnailUrl = "https://example.com/cover.jpg",
+            status = 1L,
+        )
+        coEvery { muTracker.search("Test Manga") } returns listOf(
+            testTrackSearch(
+                title = "Test Manga",
+                remoteId = 12345L,
+                summary = "New description",
+                authors = listOf("New Author"),
+                artists = listOf("New Artist"),
+                coverUrl = "https://example.com/new-cover.jpg",
+                publishingStatus = "Completed",
+            ),
+        )
+
+        val result = refreshCanonicalMetadata.await(manga, fillOnly = true)
+        // All fields populated, nothing to fill
+        result shouldBe false
     }
 
     @Test

@@ -41,6 +41,7 @@ import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Sync
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -92,9 +93,11 @@ import eu.kanade.presentation.components.DropdownMenu
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.util.system.copyToClipboard
+import eu.kanade.tachiyomi.util.system.openInBrowser
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.findChildOfType
+import tachiyomi.domain.manga.model.CanonicalId
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.i18n.MR
@@ -385,6 +388,7 @@ private fun MangaAndSourceTitlesLarge(
             isStubSource = isStubSource,
             sourceStatus = sourceStatus,
             metadataSourceName = metadataSourceName,
+            canonicalId = manga.canonicalId,
             doSearch = doSearch,
             textAlign = TextAlign.Center,
         )
@@ -433,6 +437,7 @@ private fun MangaAndSourceTitlesSmall(
                 isStubSource = isStubSource,
                 sourceStatus = sourceStatus,
                 metadataSourceName = metadataSourceName,
+                canonicalId = manga.canonicalId,
                 doSearch = doSearch,
             )
         }
@@ -449,6 +454,7 @@ private fun ColumnScope.MangaContentInfo(
     isStubSource: Boolean,
     sourceStatus: Int,
     metadataSourceName: String?,
+    canonicalId: String?,
     doSearch: (query: String, global: Boolean) -> Unit,
     textAlign: TextAlign? = LocalTextStyle.current.textAlign,
 ) {
@@ -616,6 +622,54 @@ private fun ColumnScope.MangaContentInfo(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
+            }
+        }
+    }
+
+    if (canonicalId != null) {
+        val authorityLabel = remember(canonicalId) { CanonicalId.toLabel(canonicalId) }
+        val authorityUrl = remember(canonicalId) { CanonicalId.toUrl(canonicalId) }
+        if (authorityLabel != null) {
+            Row(
+                modifier = Modifier
+                    .secondaryItemAlpha()
+                    .then(
+                        if (authorityUrl != null) {
+                            Modifier.clickableNoIndication {
+                                context.openInBrowser(authorityUrl)
+                            }
+                        } else {
+                            Modifier
+                        },
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Verified,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+                    Text(
+                        text = stringResource(MR.strings.authority_linked_label),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                    DotSeparatorText()
+                    Text(
+                        text = authorityLabel,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = if (authorityUrl != null) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            LocalContentColor.current
+                        },
+                    )
+                }
             }
         }
     }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.domain.source.model.StubSource
 import tachiyomi.domain.source.repository.StubSourceRepository
 import tachiyomi.domain.source.service.SourceManager
@@ -111,6 +112,15 @@ class AndroidSourceManager(
     }
 
     private suspend fun createStubSource(id: Long): StubSource {
+        // Authority-only manga (no content source) — return a named stub
+        // so the UI shows "Authority" instead of "-1".
+        if (id == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID) {
+            return StubSource(
+                id = id,
+                lang = "all",
+                name = context.stringResource(tachiyomi.i18n.MR.strings.authority_source_name),
+            )
+        }
         sourceRepository.getStubSource(id)?.let {
             return it
         }

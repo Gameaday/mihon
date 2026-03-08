@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -43,6 +46,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
+import eu.kanade.domain.track.interactor.AddTracks
 import eu.kanade.domain.track.interactor.MatchUnlinkedJob
 import eu.kanade.domain.track.interactor.TrackerListImporter
 import eu.kanade.domain.track.model.AutoTrackState
@@ -264,12 +268,118 @@ object SettingsTrackingScreen : SearchableSettings {
                 ),
             )
             // Authority management: consolidated import + link in one group
-            val hasAuthoritativeTracker = trackerManager.myAnimeList.isLoggedIn ||
-                trackerManager.aniList.isLoggedIn ||
-                trackerManager.mangaUpdates.isLoggedIn
+            // MangaUpdates is always available (public search — no login required).
+            val hasAuthoritativeTracker = true
             if (hasAuthoritativeTracker) {
                 val isJobRunning = MatchUnlinkedJob.isRunning(context)
+
+                // --- Authority tracker order (reorderable) ---
+                val orderPref = trackPreferences.authorityTrackerOrder()
+                var currentOrder by remember { mutableStateOf(orderPref.get()) }
+
+                // Build label map for all canonical trackers
+                val trackerLabels: Map<Long, String> = buildMap {
+                    put(trackerManager.mangaUpdates.id, trackerManager.mangaUpdates.name)
+                    put(trackerManager.aniList.id, trackerManager.aniList.name)
+                    put(trackerManager.myAnimeList.id, trackerManager.myAnimeList.name)
+                }
+
+                fun isAvailable(trackerId: Long): Boolean {
+                    val tracker = trackerManager.get(trackerId) ?: return false
+                    if (trackerId in AddTracks.TRACKERS_WITH_PUBLIC_SEARCH) return true
+                    return tracker.isLoggedIn
+                }
+
                 val authorityItems = buildList {
+                    add(
+                        Preference.PreferenceItem.CustomPreference(
+                            title = stringResource(MR.strings.pref_authority_order_title),
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(MR.strings.pref_authority_order_subtitle),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                currentOrder.forEachIndexed { index, trackerId ->
+                                    val label = trackerLabels[trackerId] ?: "Unknown"
+                                    val available = isAvailable(trackerId)
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    ) {
+                                        Text(
+                                            text = "${index + 1}.",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.padding(end = 4.dp),
+                                        )
+                                        Text(
+                                            text = label,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = if (available) {
+                                                MaterialTheme.colorScheme.onSurface
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        if (!available) {
+                                            Text(
+                                                text = stringResource(MR.strings.pref_authority_not_available),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                if (index > 0) {
+                                                    val newOrder = currentOrder.toMutableList()
+                                                    java.util.Collections.swap(newOrder, index, index - 1)
+                                                    currentOrder = newOrder
+                                                    orderPref.set(newOrder)
+                                                }
+                                            },
+                                            enabled = index > 0,
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.ArrowUpward,
+                                                contentDescription = null,
+                                                tint = if (index > 0) {
+                                                    MaterialTheme.colorScheme.onSurface
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                                },
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                if (index < currentOrder.lastIndex) {
+                                                    val newOrder = currentOrder.toMutableList()
+                                                    java.util.Collections.swap(newOrder, index, index + 1)
+                                                    currentOrder = newOrder
+                                                    orderPref.set(newOrder)
+                                                }
+                                            },
+                                            enabled = index < currentOrder.lastIndex,
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.ArrowDownward,
+                                                contentDescription = null,
+                                                tint = if (index < currentOrder.lastIndex) {
+                                                    MaterialTheme.colorScheme.onSurface
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                                },
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    )
                     addAll(importPreferences)
                     add(
                         Preference.PreferenceItem.TextPreference(

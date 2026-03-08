@@ -1,5 +1,6 @@
 package eu.kanade.domain.track.interactor
 
+import eu.kanade.domain.track.service.TrackPreferences
 import eu.kanade.tachiyomi.data.track.Tracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
+import tachiyomi.core.common.preference.Preference
 import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
@@ -31,6 +33,7 @@ class MatchUnlinkedMangaTest {
     private lateinit var mangaRepository: MangaRepository
     private lateinit var trackerManager: TrackerManager
     private lateinit var getTracks: GetTracks
+    private lateinit var trackPreferences: TrackPreferences
     private lateinit var matchUnlinkedManga: MatchUnlinkedManga
 
     private lateinit var muTracker: Tracker
@@ -98,13 +101,19 @@ class MatchUnlinkedMangaTest {
         mangaRepository = mockk(relaxed = true)
         trackerManager = mockk(relaxed = true)
         getTracks = mockk(relaxed = true)
+        trackPreferences = mockk(relaxed = true)
         muTracker = mockk(relaxed = true)
 
         // MangaUpdates tracker (ID 7) is the public-search tracker
         every { muTracker.id } returns 7L
         every { trackerManager.get(7L) } returns muTracker
 
-        matchUnlinkedManga = MatchUnlinkedManga(mangaRepository, trackerManager, getTracks)
+        // Default authority order: MU (7) → AniList (2) → MAL (1)
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns TrackPreferences.DEFAULT_AUTHORITY_ORDER
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
+
+        matchUnlinkedManga = MatchUnlinkedManga(mangaRepository, trackerManager, getTracks, trackPreferences)
     }
 
     // ========== Empty / all-linked scenarios ==========
@@ -773,5 +782,213 @@ class MatchUnlinkedMangaTest {
         updates[0].canonicalId shouldBe "mu:200"
         updates[1].description shouldBe "Soul reaper manga"
         updates[1].author shouldBe "Tite Kubo"
+    }
+
+    // ========== Tier 3: Alternative title matching ==========
+
+    @Test
+    fun `matches via result alternative titles (Tier 3)`() = runTest {
+        val manga = testManga(id = 1L, title = "Attack on Titan")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        // The result's primary title doesn't match, but its alternative titles include ours
+        coEvery { muTracker.search("Attack on Titan") } returns listOf(
+            testTrackSearch(
+                title = "Shingeki no Kyojin",
+                remoteId = 500L,
+                alternativeTitles = listOf("Attack on Titan", "進撃の巨人"),
+            ),
+        )
+        val updates = mutableListOf<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updates)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        result.matched shouldBe 1
+        updates.first().canonicalId shouldBe "mu:500"
+    }
+
+    @Test
+    fun `Tier 3 matches normalized result alt titles`() = runTest {
+        val manga = testManga(id = 1L, title = "Re:Zero")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("Re:Zero") } returns listOf(
+            testTrackSearch(
+                title = "Different Primary Title",
+                remoteId = 800L,
+                alternativeTitles = listOf("Re Zero - Starting Life"),
+            ),
+        )
+        val updateSlot = slot<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updateSlot)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        // Tier 3 checks alt_titles with normalization, so "Re:Zero" normalized = "re zero"
+        // But "Re Zero - Starting Life" normalized = "re zero starting life" ≠ "re zero"
+        // No match here because normalized comparison is exact, not substring.
+        // Tier 4 substring also doesn't match because "re zero" (7 chars) < MIN_SUBSTRING_LENGTH (8).
+        result.matched shouldBe 0
+    }
+
+    // ========== Tier 4: Substring matching ==========
+
+    @Test
+    fun `matches via substring containment (Tier 4)`() = runTest {
+        val manga = testManga(id = 1L, title = "Sword Art Online: Alicization")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("Sword Art Online: Alicization") } returns listOf(
+            testTrackSearch(
+                title = "Sword Art Online - Alicization - War of Underworld",
+                remoteId = 900L,
+            ),
+        )
+        val updateSlot = slot<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updateSlot)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        // "sword art online alicization" is contained in "sword art online alicization war of underworld"
+        result.matched shouldBe 1
+        updateSlot.captured.canonicalId shouldBe "mu:900"
+    }
+
+    @Test
+    fun `substring match rejects short titles to avoid false positives`() = runTest {
+        val manga = testManga(id = 1L, title = "One")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("One") } returns listOf(
+            testTrackSearch("One Piece", 100L),
+        )
+        coEvery { mangaRepository.update(any()) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        // "one" is only 3 chars, below MIN_SUBSTRING_LENGTH — no match
+        result.matched shouldBe 0
+    }
+
+    // ========== containsSubstringMatch unit tests ==========
+
+    @Test
+    fun `containsSubstringMatch returns true when shorter is contained in longer`() {
+        MatchUnlinkedManga.containsSubstringMatch(
+            "sword art online",
+            "sword art online alicization",
+        ) shouldBe true
+    }
+
+    @Test
+    fun `containsSubstringMatch returns true regardless of argument order`() {
+        MatchUnlinkedManga.containsSubstringMatch(
+            "sword art online alicization",
+            "sword art online",
+        ) shouldBe true
+    }
+
+    @Test
+    fun `containsSubstringMatch rejects short strings`() {
+        MatchUnlinkedManga.containsSubstringMatch("one", "one piece") shouldBe false
+    }
+
+    @Test
+    fun `containsSubstringMatch rejects non-containing strings`() {
+        MatchUnlinkedManga.containsSubstringMatch(
+            "naruto shippuden",
+            "one piece adventure",
+        ) shouldBe false
+    }
+
+    // ========== Authority tracker order ==========
+
+    @Test
+    fun `uses first available tracker in ordered list`() = runTest {
+        val alTracker = mockk<Tracker>(relaxed = true)
+        every { alTracker.id } returns 2L
+        every { alTracker.isLoggedIn } returns true
+        every { trackerManager.get(2L) } returns alTracker
+        coEvery { alTracker.search("One Piece") } returns listOf(
+            testTrackSearch("One Piece", 21L),
+        )
+
+        // Set AniList first in order
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns listOf(2L, 7L, 1L) // AniList → MU → MAL
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
+
+        val manga = testManga(id = 1L, title = "One Piece")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+
+        val updateSlot = slot<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updateSlot)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        result.matched shouldBe 1
+        // Should use AniList prefix (al), not MangaUpdates (mu)
+        updateSlot.captured.canonicalId shouldBe "al:21"
+    }
+
+    @Test
+    fun `skips unavailable tracker and uses next in order`() = runTest {
+        val alTracker = mockk<Tracker>(relaxed = true)
+        every { alTracker.id } returns 2L
+        every { alTracker.isLoggedIn } returns false // Not logged in
+        every { trackerManager.get(2L) } returns alTracker
+
+        // AniList first but not logged in → should fall through to MangaUpdates
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns listOf(2L, 7L, 1L)
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
+
+        val manga = testManga(id = 1L, title = "One Piece")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("One Piece") } returns listOf(
+            testTrackSearch("One Piece", 100L),
+        )
+
+        val updateSlot = slot<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updateSlot)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        result.matched shouldBe 1
+        // Should fall back to MangaUpdates (mu) since AniList isn't logged in
+        updateSlot.captured.canonicalId shouldBe "mu:100"
+    }
+
+    @Test
+    fun `default order uses MangaUpdates first`() = runTest {
+        // Default order: 7 (MU) → 2 (AL) → 1 (MAL)
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns TrackPreferences.DEFAULT_AUTHORITY_ORDER
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
+
+        val manga = testManga(id = 1L, title = "One Piece")
+        coEvery { mangaRepository.getFavorites() } returns listOf(manga)
+        coEvery { getTracks.await(1L) } returns emptyList()
+        coEvery { muTracker.search("One Piece") } returns listOf(
+            testTrackSearch("One Piece", 100L),
+        )
+
+        val updateSlot = slot<MangaUpdate>()
+        coEvery { mangaRepository.update(capture(updateSlot)) } returns true
+
+        val result = matchUnlinkedManga.await()
+
+        result.matched shouldBe 1
+        // Default → picks MangaUpdates (public search)
+        updateSlot.captured.canonicalId shouldBe "mu:100"
+    }
+
+    @Test
+    fun `ordered list still checked for hasQueryableTracker`() {
+        // With MangaUpdates always available, hasQueryableTracker should be true
+        matchUnlinkedManga.hasQueryableTracker() shouldBe true
     }
 }

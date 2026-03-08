@@ -1107,6 +1107,12 @@
 
     <!-- Authority management (import + retroactive link in one section) -->
     <string name="tracker_authority_group_title">Authority management</string>
+    <string name="pref_authority_order_title">Authority source order</string>
+    <string name="pref_authority_order_subtitle">Sources are checked in this order. Unavailable sources are skipped.</string>
+    <string name="pref_authority_not_available">Not logged in</string>
+    <string name="pref_authority_tracker_title">Preferred authority source</string>
+    <string name="pref_authority_tracker_subtitle">%s</string>
+    <string name="pref_authority_tracker_auto">Auto (best available)</string>
     <string name="tracker_link_action">Link tracked manga</string>
     <string name="tracker_link_subtitle">Set authority IDs for manga that already have trackers</string>
     <string name="tracker_link_success">Linked %d manga to authority</string>
@@ -1174,4 +1180,23 @@
     <!-- Dead duration formatting -->
     <string name="source_dead_duration_days">%d days</string>
     <string name="source_dead_duration_less_than_day">less than a day</string>
+
+    <!-- Authority linking -->
+    <string name="authority_badge_description">Linked to authority</string>
+    <string name="authority_linked_label">Authority</string>
+    <string name="authority_source_name">Authority</string>
+    <string name="authority_refresh_from_authority">Refresh from authority</string>
+
+    <!-- Authority match results screen -->
+    <string name="match_results_title">Authority Matching Results</string>
+    <string name="match_results_summary">Resolved %1$d of %2$d manga</string>
+    <string name="match_results_all_linked">All library manga are linked to an authority</string>
+    <string name="match_results_unlinked_header">Unlinked manga</string>
+    <string name="match_results_linked_header">Recently linked</string>
+    <string name="match_results_unlinked_count">%d unlinked</string>
+    <string name="match_results_retry_single">Retry</string>
+    <string name="match_results_matching">Matching…</string>
+    <string name="match_results_no_match">No match found</string>
+    <string name="match_results_linked_badge">Linked</string>
+    <string name="match_results_retry_all">Retry all unlinked</string>
 </resources>

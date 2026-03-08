@@ -288,6 +288,19 @@ class MangaScreenModel(
         try {
             withIOContext {
                 val manga = state.manga
+                val isAuthorityOnly =
+                    manga.source == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID
+
+                // Authority-only manga have no content source — refresh from canonical tracker only.
+                if (isAuthorityOnly) {
+                    if (manga.canonicalId != null) {
+                        val refreshCanonical: eu.kanade.domain.track.interactor.RefreshCanonicalMetadata =
+                            Injekt.get()
+                        refreshCanonical.await(manga)
+                    }
+                    return@withIOContext
+                }
+
                 val metadataSourceId = manga.metadataSource?.takeIf { it > 0 }
                 val metadataUrl = manga.metadataUrl?.takeIf { it.isNotEmpty() }
 
@@ -647,6 +660,8 @@ class MangaScreenModel(
      */
     private suspend fun fetchChaptersFromSource(manualFetch: Boolean = false) {
         val state = successState ?: return
+        // Authority-only manga have no content source — no chapters to fetch.
+        if (state.manga.source == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID) return
         try {
             withIOContext {
                 val chapters = state.source.getChapterList(state.manga.toSManga())

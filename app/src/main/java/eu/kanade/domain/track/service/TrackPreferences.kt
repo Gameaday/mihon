@@ -6,6 +6,7 @@ import eu.kanade.tachiyomi.data.track.anilist.Anilist
 import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.preference.PreferenceStore
 import tachiyomi.core.common.preference.getEnum
+import tachiyomi.core.common.preference.getLongArray
 
 class TrackPreferences(
     private val preferenceStore: PreferenceStore,
@@ -34,6 +35,29 @@ class TrackPreferences(
 
     fun trackToken(tracker: Tracker) = preferenceStore.getString(Preference.privateKey("track_token_${tracker.id}"), "")
 
+    /**
+     * Ordered list of preferred authority trackers for matching.
+     *
+     * The matching engine walks this list in order, trying each tracker.
+     * A tracker is skipped if it is not available (not logged in and does not support
+     * public search) or does not support the requested content type.
+     *
+     * Default order: MangaUpdates (public, no login), AniList, MyAnimeList.
+     */
+    fun authorityTrackerOrder() = preferenceStore.getLongArray(
+        "pref_authority_tracker_order",
+        DEFAULT_AUTHORITY_ORDER,
+    )
+
+    /**
+     * Legacy single-preference accessor kept for backward compatibility.
+     * @see authorityTrackerOrder
+     */
+    fun preferredAuthorityTracker() = preferenceStore.getLong(
+        "pref_preferred_authority_tracker",
+        AUTHORITY_TRACKER_AUTO,
+    )
+
     fun anilistScoreType() = preferenceStore.getString("anilist_score_type", Anilist.POINT_10)
 
     fun autoUpdateTrack() = preferenceStore.getBoolean("pref_auto_update_manga_sync_key", true)
@@ -42,4 +66,12 @@ class TrackPreferences(
         "pref_auto_update_manga_on_mark_read",
         AutoTrackState.ALWAYS,
     )
+
+    companion object {
+        /** Sentinel value: let the system pick the best available tracker automatically. */
+        const val AUTHORITY_TRACKER_AUTO = 0L
+
+        /** Default authority order: MangaUpdates (7, public) → AniList (2) → MAL (1). */
+        val DEFAULT_AUTHORITY_ORDER = listOf(7L, 2L, 1L)
+    }
 }

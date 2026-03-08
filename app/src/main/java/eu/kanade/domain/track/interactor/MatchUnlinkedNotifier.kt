@@ -1,14 +1,18 @@
 package eu.kanade.domain.track.interactor
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
 import eu.kanade.tachiyomi.data.notification.Notifications
+import eu.kanade.tachiyomi.ui.main.MainActivity
 import eu.kanade.tachiyomi.util.system.cancelNotification
 import eu.kanade.tachiyomi.util.system.notificationBuilder
 import eu.kanade.tachiyomi.util.system.notify
+import tachiyomi.core.common.Constants
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
 
@@ -22,6 +26,18 @@ class MatchUnlinkedNotifier(private val context: Context) {
 
     private val cancelIntent by lazy {
         NotificationReceiver.cancelMatchUnlinkedPendingBroadcast(context)
+    }
+
+    private val resultsPendingIntent by lazy {
+        PendingIntent.getActivity(
+            context,
+            0,
+            Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                action = Constants.SHORTCUT_MATCH_RESULTS
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     private val notificationBitmap by lazy {
@@ -106,12 +122,14 @@ class MatchUnlinkedNotifier(private val context: Context) {
                 setSmallIcon(R.drawable.ic_mihon)
                 setLargeIcon(notificationBitmap)
                 setAutoCancel(true)
+                setContentIntent(resultsPendingIntent)
             }.build(),
         )
     }
 
     /**
      * Shows a failure notification when the job encounters an unexpected error.
+     * Clicking opens the results screen so the user can retry individual items.
      */
     fun showFailureNotification() {
         cancelProgressNotification()
@@ -128,6 +146,7 @@ class MatchUnlinkedNotifier(private val context: Context) {
                 setSmallIcon(R.drawable.ic_mihon)
                 setLargeIcon(notificationBitmap)
                 setAutoCancel(true)
+                setContentIntent(resultsPendingIntent)
             }.build(),
         )
     }

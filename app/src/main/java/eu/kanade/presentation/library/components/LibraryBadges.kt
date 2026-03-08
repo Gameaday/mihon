@@ -3,6 +3,7 @@ package eu.kanade.presentation.library.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -71,6 +72,18 @@ internal fun SourceHealthBadge(sourceStatus: Int) {
     }
 }
 
+@Composable
+internal fun AuthorityBadge(hasCanonicalId: Boolean) {
+    if (hasCanonicalId) {
+        Badge(
+            imageVector = Icons.Outlined.Verified,
+            color = MaterialTheme.colorScheme.primary,
+            iconColor = MaterialTheme.colorScheme.onPrimary,
+            contentDescription = stringResource(MR.strings.authority_badge_description),
+        )
+    }
+}
+
 @PreviewLightDark
 @Composable
 private fun BadgePreview() {
@@ -82,6 +95,7 @@ private fun BadgePreview() {
             LanguageBadge(isLocal = false, sourceLanguage = "EN")
             SourceHealthBadge(sourceStatus = SourceStatus.DEAD.value)
             SourceHealthBadge(sourceStatus = SourceStatus.DEGRADED.value)
+            AuthorityBadge(hasCanonicalId = true)
         }
     }
 }
