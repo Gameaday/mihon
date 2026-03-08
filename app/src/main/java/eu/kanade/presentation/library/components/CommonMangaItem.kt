@@ -43,7 +43,6 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.BadgeGroup
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.theme.ShapeTokens
-import tachiyomi.presentation.core.util.selectedBackground
 import tachiyomi.domain.manga.model.MangaCover as MangaCoverModel
 
 object CommonMangaItemDefaults {
@@ -333,6 +332,8 @@ private fun Modifier.selectedOutline(
 
 /**
  * Layout of list item.
+ * Uses tonal [secondaryContainer] selection to match the grid selection pattern
+ * following Material Expression guidelines.
  */
 @Composable
 fun MangaListItem(
@@ -345,9 +346,16 @@ fun MangaListItem(
     coverAlpha: Float = 1f,
     onClickContinueReading: (() -> Unit)? = null,
 ) {
+    val selectionColor = MaterialTheme.colorScheme.secondaryContainer
     Row(
         modifier = Modifier
-            .selectedBackground(isSelected)
+            .then(
+                if (isSelected) {
+                    Modifier.drawBehind { drawRect(color = selectionColor) }
+                } else {
+                    Modifier
+                },
+            )
             .height(56.dp)
             .combinedClickable(
                 onClick = onClick,
@@ -356,29 +364,36 @@ fun MangaListItem(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MangaCover.Square(
-            modifier = Modifier
-                .fillMaxHeight()
-                .alpha(coverAlpha),
-            data = coverData,
-        )
-        Text(
-            text = title,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .weight(1f),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        BadgeGroup(content = badge)
-        if (onClickContinueReading != null) {
-            ContinueReadingButton(
-                size = ContinueReadingButtonSizeSmall,
-                iconSize = ContinueReadingButtonIconSizeSmall,
-                onClick = onClickContinueReading,
-                modifier = Modifier.padding(start = ContinueReadingButtonListSpacing),
+        val contentColor = if (isSelected) {
+            MaterialTheme.colorScheme.onSecondaryContainer
+        } else {
+            LocalContentColor.current
+        }
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
+            MangaCover.Square(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .alpha(coverAlpha),
+                data = coverData,
             )
+            Text(
+                text = title,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .weight(1f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            BadgeGroup(content = badge)
+            if (onClickContinueReading != null) {
+                ContinueReadingButton(
+                    size = ContinueReadingButtonSizeSmall,
+                    iconSize = ContinueReadingButtonIconSizeSmall,
+                    onClick = onClickContinueReading,
+                    modifier = Modifier.padding(start = ContinueReadingButtonListSpacing),
+                )
+            }
         }
     }
 }

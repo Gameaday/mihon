@@ -446,6 +446,13 @@ object SettingsTrackingScreen : SearchableSettings {
                             ),
                         )
                     }
+                    add(
+                        Preference.PreferenceItem.SwitchPreference(
+                            preference = libraryPreferences.jellyfinCompatibleNaming(),
+                            title = stringResource(MR.strings.pref_jellyfin_compatible_naming),
+                            subtitle = stringResource(MR.strings.pref_jellyfin_compatible_naming_summary),
+                        ),
+                    )
                 }
                 add(
                     Preference.PreferenceGroup(
