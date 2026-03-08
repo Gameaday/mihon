@@ -16,8 +16,15 @@ actual class LocalCoverManager(
 
     actual fun find(mangaUrl: String): UniFile? {
         return fileSystem.getFilesInMangaDirectory(mangaUrl)
-            // Get all file whose names start with "cover"
-            .filter { it.isFile && it.nameWithoutExtension.equals("cover", ignoreCase = true) }
+            // Get all files whose names match known cover naming conventions.
+            // Supports: cover.*, poster.*, folder.* (Jellyfin convention)
+            .filter {
+                it.isFile && it.nameWithoutExtension.let { name ->
+                    name.equals("cover", ignoreCase = true) ||
+                        name.equals("poster", ignoreCase = true) ||
+                        name.equals("folder", ignoreCase = true)
+                }
+            }
             // Get the first actual image
             .firstOrNull { ImageUtil.isImage(it.name) { it.openInputStream() } }
     }

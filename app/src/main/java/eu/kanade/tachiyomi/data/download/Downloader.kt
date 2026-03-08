@@ -347,11 +347,22 @@ class Downloader(
             return
         }
 
-        val chapterDirname = provider.getChapterDirName(
-            download.chapter.name,
-            download.chapter.scanlator,
-            download.chapter.url,
-        )
+        val chapterDirname = if (
+            libraryPreferences.jellyfinCompatibleNaming().get() &&
+            downloadPreferences.saveChaptersAsCBZ().get()
+        ) {
+            provider.getJellyfinChapterDirName(
+                download.manga.title,
+                download.chapter.chapterNumber,
+                download.chapter.name,
+            )
+        } else {
+            provider.getChapterDirName(
+                download.chapter.name,
+                download.chapter.scanlator,
+                download.chapter.url,
+            )
+        }
         val tmpDir = mangaDir.createDirectory(chapterDirname + TMP_DIR_SUFFIX)
             ?: error("Failed to create temporary download directory for chapter ${download.chapter.name}")
 
