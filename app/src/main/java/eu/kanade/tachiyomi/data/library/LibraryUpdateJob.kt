@@ -207,12 +207,6 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         mangaToUpdate = listToUpdate
             .filter {
                 when {
-                    // Authority manga (source = -1L) have no real source to fetch from.
-                    // Skip them entirely to avoid spurious "source not installed" errors.
-                    it.manga.source == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID -> {
-                        false
-                    }
-
                     it.manga.updateStrategy == UpdateStrategy.ONLY_FETCH_ONCE && it.totalChapters > 0L -> {
                         skippedUpdates.add(it.manga to skipReasonNotAlwaysUpdate)
                         false
@@ -401,6 +395,23 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         fetchWindow: Pair<Long, Long>,
         autoUpdateMetadata: Boolean,
     ): List<Chapter> {
+        val isAuthorityOnly = manga.source == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID
+
+        // Authority-only manga (no content source) — refresh canonical metadata only,
+        // skip source fetching and chapter listing entirely.
+        if (isAuthorityOnly) {
+            if (autoUpdateMetadata && manga.canonicalId != null) {
+                try {
+                    refreshCanonicalMetadata.await(manga)
+                } catch (e: Exception) {
+                    logcat(LogPriority.DEBUG, e) {
+                        "Canonical metadata refresh failed for authority manga ${manga.title}"
+                    }
+                }
+            }
+            return emptyList()
+        }
+
         val source = sourceManager.getOrStub(manga.source)
         val sManga = manga.toSManga()
 

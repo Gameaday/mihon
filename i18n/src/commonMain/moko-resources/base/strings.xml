@@ -1184,6 +1184,8 @@
     <!-- Authority linking -->
     <string name="authority_badge_description">Linked to authority</string>
     <string name="authority_linked_label">Authority</string>
+    <string name="authority_source_name">Authority</string>
+    <string name="authority_refresh_from_authority">Refresh from authority</string>
 
     <!-- Authority match results screen -->
     <string name="match_results_title">Authority Matching Results</string>
