@@ -61,11 +61,12 @@ class LockedFieldTest {
         LockedField.label(LockedField.STATUS) shouldBe "Status"
         LockedField.label(LockedField.CONTENT_TYPE) shouldBe "Content type"
         LockedField.label(LockedField.GENRE) shouldBe "Genre"
+        LockedField.label(LockedField.TITLE) shouldBe "Title"
     }
 
     @Test
-    fun `ALL_FIELDS contains exactly 7 fields`() {
-        LockedField.ALL_FIELDS.size shouldBe 7
+    fun `ALL_FIELDS contains exactly 8 fields`() {
+        LockedField.ALL_FIELDS.size shouldBe 8
     }
 
     @Test
@@ -73,5 +74,13 @@ class LockedFieldTest {
         val mask = LockedField.GENRE
         LockedField.isLocked(mask, LockedField.GENRE) shouldBe true
         LockedField.isLocked(mask, LockedField.DESCRIPTION) shouldBe false
+    }
+
+    @Test
+    fun `TITLE flag works correctly`() {
+        val mask = LockedField.TITLE
+        LockedField.isLocked(mask, LockedField.TITLE) shouldBe true
+        LockedField.isLocked(mask, LockedField.DESCRIPTION) shouldBe false
+        LockedField.isLocked(mask, LockedField.GENRE) shouldBe false
     }
 }

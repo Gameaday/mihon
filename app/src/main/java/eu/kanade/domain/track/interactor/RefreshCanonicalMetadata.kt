@@ -110,6 +110,11 @@ class RefreshCanonicalMetadata(
     private suspend fun applyMetadataUpdate(manga: Manga, result: TrackSearch, fillOnly: Boolean): Boolean {
         val locked = manga.lockedFields
 
+        val title = result.title.takeIf {
+            it.isNotBlank() &&
+                !LockedField.isLocked(locked, LockedField.TITLE) &&
+                (!fillOnly || manga.title.isBlank())
+        }
         val description = result.summary.takeIf {
             it.isNotBlank() &&
                 !LockedField.isLocked(locked, LockedField.DESCRIPTION) &&
@@ -153,7 +158,7 @@ class RefreshCanonicalMetadata(
             merged.takeIf { it.toSet() != existing }
         }
 
-        val hasChanges = description != null || author != null || artist != null ||
+        val hasChanges = title != null || description != null || author != null || artist != null ||
             thumbnailUrl != null || status != null || contentType != null || genre != null
 
         if (!hasChanges) {
@@ -165,6 +170,7 @@ class RefreshCanonicalMetadata(
         mangaRepository.update(
             MangaUpdate(
                 id = manga.id,
+                title = title,
                 description = description,
                 author = author,
                 artist = artist,

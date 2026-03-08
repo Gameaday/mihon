@@ -684,4 +684,78 @@ class RefreshCanonicalMetadataTest {
         val update = updateSlot.captured
         update.genre shouldBe listOf("Action", "Adventure")
     }
+
+    @Test
+    fun `overwrite mode updates title from authority when not locked`() = runTest {
+        val manga = testManga(
+            title = "Old Title",
+            canonicalId = "mu:12345",
+        )
+
+        coEvery { muTracker.search("Old Title") } returns listOf(
+            testTrackSearch(
+                title = "New Authority Title",
+                remoteId = 12345L,
+            ),
+        )
+
+        val result = refreshCanonicalMetadata.await(manga)
+        result shouldBe true
+
+        val updateSlot = slot<MangaUpdate>()
+        coVerify { mangaRepository.update(capture(updateSlot)) }
+        val update = updateSlot.captured
+        update.title shouldBe "New Authority Title"
+    }
+
+    @Test
+    fun `locked TITLE field prevents title overwrite`() = runTest {
+        val manga = testManga(
+            title = "My Custom Title",
+            canonicalId = "mu:12345",
+        ).copy(lockedFields = tachiyomi.domain.manga.model.LockedField.TITLE)
+
+        coEvery { muTracker.search("My Custom Title") } returns listOf(
+            testTrackSearch(
+                title = "Authority Title",
+                remoteId = 12345L,
+                summary = "New description",
+            ),
+        )
+
+        val result = refreshCanonicalMetadata.await(manga)
+        result shouldBe true
+
+        val updateSlot = slot<MangaUpdate>()
+        coVerify { mangaRepository.update(capture(updateSlot)) }
+        val update = updateSlot.captured
+        update.title shouldBe null // title not updated because locked
+        update.description shouldBe "New description" // other fields still updated
+    }
+
+    @Test
+    fun `fillOnly mode does not overwrite existing title`() = runTest {
+        val manga = testManga(
+            title = "Existing Title",
+            canonicalId = "mu:12345",
+            description = null,
+        )
+
+        coEvery { muTracker.search("Existing Title") } returns listOf(
+            testTrackSearch(
+                title = "Authority Title",
+                remoteId = 12345L,
+                summary = "A description",
+            ),
+        )
+
+        val result = refreshCanonicalMetadata.await(manga, fillOnly = true)
+        result shouldBe true
+
+        val updateSlot = slot<MangaUpdate>()
+        coVerify { mangaRepository.update(capture(updateSlot)) }
+        val update = updateSlot.captured
+        update.title shouldBe null // title not updated because already exists
+        update.description shouldBe "A description"
+    }
 }

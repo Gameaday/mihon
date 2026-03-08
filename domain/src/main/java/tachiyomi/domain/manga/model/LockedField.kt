@@ -47,8 +47,11 @@ object LockedField {
     /** Genre / tag list. */
     const val GENRE: Long = 1L shl 6 // 0x40
 
+    /** Title (primary series name). */
+    const val TITLE: Long = 1L shl 7 // 0x80
+
     /** All lockable fields ORed together. */
-    const val ALL: Long = DESCRIPTION or AUTHOR or ARTIST or COVER or STATUS or CONTENT_TYPE or GENRE
+    const val ALL: Long = DESCRIPTION or AUTHOR or ARTIST or COVER or STATUS or CONTENT_TYPE or GENRE or TITLE
 
     /** No fields locked. */
     const val NONE: Long = 0L
@@ -62,11 +65,13 @@ object LockedField {
         STATUS -> "Status"
         CONTENT_TYPE -> "Content type"
         GENRE -> "Genre"
+        TITLE -> "Title"
         else -> "Unknown"
     }
 
     /** All individual field flags in display order. */
     val ALL_FIELDS: List<Long> = listOf(
+        TITLE,
         DESCRIPTION,
         AUTHOR,
         ARTIST,

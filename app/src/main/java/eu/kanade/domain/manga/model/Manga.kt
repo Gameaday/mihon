@@ -84,6 +84,7 @@ fun getComicInfo(
     categories: List<String>?,
     sourceName: String,
     sourceLang: String? = null,
+    startYear: Int = 0,
 ) = ComicInfo(
     title = ComicInfo.Title(chapter.name),
     series = ComicInfo.Series(manga.title),
@@ -98,6 +99,7 @@ fun getComicInfo(
     volume = null,
     web = ComicInfo.Web(urls.joinToString(" ")),
     summary = manga.description?.let { ComicInfo.Summary(it) },
+    year = startYear.takeIf { it > 0 }?.let { ComicInfo.Year(it) },
     writer = manga.author?.let { ComicInfo.Writer(it) },
     penciller = manga.artist?.let { ComicInfo.Penciller(it) },
     translator = chapter.scanlator?.let { ComicInfo.Translator(it) },

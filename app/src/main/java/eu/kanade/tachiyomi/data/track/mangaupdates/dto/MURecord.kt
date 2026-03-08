@@ -47,6 +47,8 @@ fun MURecord.toTrackSearch(id: Long): TrackSearch {
         publishing_status = this@toTrackSearch.status ?: ""
         publishing_type = this@toTrackSearch.type ?: ""
         start_date = this@toTrackSearch.year ?: ""
+        start_year = this@toTrackSearch.year?.take(4)?.toIntOrNull() ?: 0
+        score = this@toTrackSearch.bayesianRating ?: -1.0
         genres = this@toTrackSearch.genres.mapNotNull { it.genre }
         alternative_titles = this@toTrackSearch.associated
             .mapNotNull { it.title?.htmlDecode() }

@@ -262,6 +262,7 @@ class MyAnimeListApi(
             publishing_status = searchItem.status.replace("_", " ")
             publishing_type = searchItem.mediaType.replace("_", " ")
             start_date = searchItem.startDate ?: ""
+            start_year = searchItem.startDate?.take(4)?.toIntOrNull() ?: 0
             artists = searchItem.authors
                 .filter { authorNode -> authorNode.role == "Art" }
                 .mapNotNull { authorNode -> authorNode.node.getFullName() }

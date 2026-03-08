@@ -20,6 +20,18 @@ object CanonicalId {
         "mu" to "MangaUpdates",
     )
 
+    /** All recognized canonical ID prefixes. */
+    val ALL_PREFIXES: Set<String> = TRACKER_URLS.keys
+
+    /**
+     * Creates a canonical ID string from a prefix and remote ID.
+     * @return canonical ID (e.g. "al:21") or null if prefix is unrecognized.
+     */
+    fun create(prefix: String, remoteId: Long): String? {
+        if (prefix !in TRACKER_URLS || remoteId <= 0) return null
+        return "$prefix:$remoteId"
+    }
+
     /**
      * Parses a canonical ID string into (prefix, remoteId).
      * @return pair of (prefix, remoteId) or null if the format is invalid.
@@ -49,5 +61,39 @@ object CanonicalId {
     fun toLabel(canonicalId: String): String? {
         val (prefix, _) = parse(canonicalId) ?: return null
         return TRACKER_LABELS[prefix]
+    }
+
+    /**
+     * Attempts to extract a canonical ID from a tracker URL.
+     * Supports AniList, MyAnimeList, and MangaUpdates URL formats.
+     *
+     * @return canonical ID (e.g. "al:21") or null if the URL is unrecognized.
+     */
+    fun fromUrl(url: String): String? {
+        val trimmed = url.trim().removeSuffix("/")
+        return when {
+            // https://anilist.co/manga/21 or https://anilist.co/manga/21/title
+            trimmed.contains("anilist.co/manga/") -> {
+                val id = trimmed.substringAfter("anilist.co/manga/")
+                    .substringBefore("/")
+                    .toLongOrNull()
+                id?.let { create("al", it) }
+            }
+            // https://myanimelist.net/manga/13 or https://myanimelist.net/manga/13/title
+            trimmed.contains("myanimelist.net/manga/") -> {
+                val id = trimmed.substringAfter("myanimelist.net/manga/")
+                    .substringBefore("/")
+                    .toLongOrNull()
+                id?.let { create("mal", it) }
+            }
+            // https://www.mangaupdates.com/series.html?id=54321
+            trimmed.contains("mangaupdates.com/series") -> {
+                val id = trimmed.substringAfter("id=")
+                    .substringBefore("&")
+                    .toLongOrNull()
+                id?.let { create("mu", it) }
+            }
+            else -> null
+        }
     }
 }

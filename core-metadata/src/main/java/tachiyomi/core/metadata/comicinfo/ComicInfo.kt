@@ -21,6 +21,7 @@ fun SManga.getComicInfo() = ComicInfo(
     number = null,
     count = null,
     volume = null,
+    year = null,
     web = null,
     translator = null,
     inker = null,
@@ -76,6 +77,7 @@ data class ComicInfo(
     val count: Count?,
     val volume: Volume?,
     val summary: Summary?,
+    val year: Year?,
     val writer: Writer?,
     val penciller: Penciller?,
     val inker: Inker?,
@@ -123,6 +125,10 @@ data class ComicInfo(
     @Serializable
     @XmlSerialName("Summary", "", "")
     data class Summary(@XmlValue(true) val value: String = "")
+
+    @Serializable
+    @XmlSerialName("Year", "", "")
+    data class Year(@XmlValue(true) val value: Int = -1)
 
     @Serializable
     @XmlSerialName("Writer", "", "")

@@ -30,6 +30,7 @@ data class ALSearchItem(
         staff = staff,
         alternativeTitles = buildAlternativeTitles(),
         genres = genres ?: emptyList(),
+        startYear = startDate.year ?: 0,
     )
 
     /**
