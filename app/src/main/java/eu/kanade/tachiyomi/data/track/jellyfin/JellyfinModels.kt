@@ -60,6 +60,9 @@ data class JellyfinItem(
     @SerialName("PremiereDate") val premiereDate: String? = null,
     @SerialName("OfficialRating") val officialRating: String? = null,
     @SerialName("SortName") val sortName: String? = null,
+    @SerialName("ParentId") val parentId: String? = null,
+    @SerialName("ExternalUrls") val externalUrls: List<JellyfinExternalUrl>? = null,
+    @SerialName("ProviderIds") val providerIds: Map<String, String>? = null,
 ) {
     /**
      * Returns true if this item has at least one displayable image.
@@ -109,6 +112,7 @@ data class JellyfinUserData(
     @SerialName("Played") val played: Boolean = false,
     @SerialName("IsFavorite") val isFavorite: Boolean = false,
     @SerialName("PlayCount") val playCount: Int = 0,
+    @SerialName("LastPlayedDate") val lastPlayedDate: String? = null,
 )
 
 @Serializable
@@ -121,4 +125,14 @@ data class JellyfinLibrary(
 @Serializable
 data class JellyfinPlayedRequest(
     @SerialName("Played") val played: Boolean,
+)
+
+/**
+ * Jellyfin external URL DTO — provides links to external metadata providers
+ * (e.g., AniList, MAL, MangaUpdates URLs configured in Jellyfin's metadata plugins).
+ */
+@Serializable
+data class JellyfinExternalUrl(
+    @SerialName("Name") val name: String,
+    @SerialName("Url") val url: String,
 )

@@ -477,7 +477,7 @@ class JellyfinApi(
 
         /** Fields requested from the Jellyfin API for series metadata. */
         private const val SERIES_FIELDS =
-            "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount,Studios,Tags,DateCreated,SortName"
+            "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount,Studios,Tags,DateCreated,SortName,ExternalUrls,ProviderIds"
 
         /**
          * Converts a [JellyfinItem] to a [TrackSearch] for the tracker system.
