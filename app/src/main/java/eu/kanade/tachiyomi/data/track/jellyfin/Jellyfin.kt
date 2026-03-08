@@ -107,9 +107,18 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
 
     override suspend fun bind(track: Track, hasReadChapters: Boolean): Track {
         // On bind, pull Jellyfin's played state when the local track
-        // has no read progress yet — adopts server-side read count
+        // has no read progress yet — adopts server-side read count.
+        // Also push local progress to server when we already have reads
+        // (edge case: user reads offline, then links to Jellyfin later).
         if (track.last_chapter_read < 1.0) {
             pullRemoteProgress(track)
+        } else if (libraryPreferences.jellyfinSyncEnabled().get()) {
+            // Push existing local progress to the server on initial bind
+            try {
+                syncReadProgressToServer(track)
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Failed to push progress on Jellyfin bind" }
+            }
         }
         return track
     }
@@ -145,8 +154,21 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
             track.copyPersonalFrom(remoteTrack)
             track.total_chapters = remoteTrack.total_chapters
 
-            // Pull read progress from Jellyfin when the server is ahead
-            pullRemoteProgress(track, remoteTrack)
+            // Bidirectional sync: pull when server ahead, push when local ahead
+            if (remoteTrack.last_chapter_read > track.last_chapter_read) {
+                // Server is ahead — adopt server's progress
+                track.last_chapter_read = remoteTrack.last_chapter_read
+                track.status = remoteTrack.status
+            } else if (track.last_chapter_read > remoteTrack.last_chapter_read &&
+                libraryPreferences.jellyfinSyncEnabled().get()
+            ) {
+                // Local is ahead — push progress to server
+                try {
+                    syncReadProgressToServer(track)
+                } catch (e: Exception) {
+                    logcat(LogPriority.WARN, e) { "Failed to push local progress during refresh" }
+                }
+            }
             track
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Jellyfin refresh failed for ${track.tracking_url}" }
@@ -218,14 +240,28 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
 
         return try {
             val results = api.searchSeries(serverUrl, userId, manga.title)
-            // Exact title match preferred
+            // Exact title match preferred, then normalized match, then first result
             results.firstOrNull {
                 it.title.equals(manga.title, ignoreCase = true)
+            } ?: results.firstOrNull {
+                normalizeTitle(it.title) == normalizeTitle(manga.title)
             } ?: results.firstOrNull()
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Jellyfin match failed for: ${manga.title}" }
             null
         }
+    }
+
+    /**
+     * Normalizes a title for matching by removing common punctuation and
+     * collapsing whitespace. This improves matching between slightly different
+     * title formats (e.g., "Series: Part 1" vs "Series - Part 1").
+     */
+    private fun normalizeTitle(title: String): String {
+        return title.lowercase()
+            .replace(Regex("[\\-–—:,!?.'\"()\\[\\]{}]"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
     }
 
     override fun isTrackFrom(track: DomainTrack, manga: Manga, source: Source?): Boolean {
