@@ -11,6 +11,7 @@ import logcat.LogPriority
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.manga.model.CanonicalId
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.repository.MangaRepository
 import uy.kohesive.injekt.Injekt
@@ -44,11 +45,16 @@ class MatchResultsScreenModel(
                     .sortedByDescending { it.lastModifiedAt }
                     .take(MAX_RECENTLY_LINKED)
                     .toImmutableList()
+                // Compute content type counts for the summary
+                val mangaCount = favorites.count { it.contentType == ContentType.MANGA }
+                val novelCount = favorites.count { it.contentType == ContentType.NOVEL }
                 mutableState.value = mutableState.value.copy(
                     isLoading = false,
                     unlinkedManga = unlinked,
                     recentlyLinked = linked,
                     totalFavorites = favorites.size,
+                    mangaCount = mangaCount,
+                    novelCount = novelCount,
                 )
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e) { "Failed to load manga for match results" }
@@ -129,6 +135,8 @@ data class MatchResultsState(
     val unlinkedManga: ImmutableList<Manga> = persistentListOf(),
     val recentlyLinked: ImmutableList<Manga> = persistentListOf(),
     val totalFavorites: Int = 0,
+    val mangaCount: Int = 0,
+    val novelCount: Int = 0,
     /** IDs of manga currently being matched individually. */
     val matchingIds: Set<Long> = emptySet(),
     /** IDs of manga that failed to match. */

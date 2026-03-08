@@ -121,6 +121,8 @@ private fun MatchResultsContent(
                 totalLinked = state.totalLinked,
                 totalFavorites = state.totalFavorites,
                 unlinkedCount = state.unlinkedManga.size,
+                mangaCount = state.mangaCount,
+                novelCount = state.novelCount,
             )
         }
 
@@ -244,6 +246,8 @@ private fun SummaryCard(
     totalLinked: Int,
     totalFavorites: Int,
     unlinkedCount: Int,
+    mangaCount: Int,
+    novelCount: Int,
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -262,6 +266,20 @@ private fun SummaryCard(
                         if (totalFavorites > 0) totalLinked.toFloat() / totalFavorites else 0f
                     },
                     modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            // Content type breakdown
+            if (mangaCount > 0 || novelCount > 0) {
+                Spacer(modifier = Modifier.height(MaterialTheme.padding.extraSmall))
+                val parts = mutableListOf<String>()
+                if (mangaCount > 0) parts.add("$mangaCount manga")
+                if (novelCount > 0) parts.add("$novelCount novels")
+                val otherCount = totalFavorites - mangaCount - novelCount
+                if (otherCount > 0) parts.add("$otherCount unclassified")
+                Text(
+                    text = parts.joinToString(" · "),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             if (unlinkedCount > 0) {
@@ -322,6 +340,20 @@ private fun UnlinkedMangaItem(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
+                // Show content type when known
+                val contentTypeLabel = when (manga.contentType) {
+                    tachiyomi.domain.manga.model.ContentType.MANGA -> "Manga"
+                    tachiyomi.domain.manga.model.ContentType.NOVEL -> "Novel"
+                    tachiyomi.domain.manga.model.ContentType.BOOK -> "Book"
+                    else -> null
+                }
+                if (contentTypeLabel != null && !hasFailed && !isMatching) {
+                    Text(
+                        text = contentTypeLabel,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 if (hasFailed) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
