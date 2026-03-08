@@ -91,6 +91,7 @@ data class TrackInfoDialogHomeScreen(
     private val mangaId: Long,
     private val mangaTitle: String,
     private val sourceId: Long,
+    private val canonicalId: String? = null,
 ) : Screen() {
 
     @Composable
@@ -105,6 +106,7 @@ data class TrackInfoDialogHomeScreen(
         TrackInfoDialogHome(
             trackItems = state.trackItems,
             dateFormat = dateFormat,
+            canonicalId = canonicalId,
             onStatusClick = {
                 navigator.push(
                     TrackStatusSelectorScreen(

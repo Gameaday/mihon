@@ -416,6 +416,36 @@ object SettingsTrackingScreen : SearchableSettings {
                             subtitle = stringResource(MR.strings.pref_jellyfin_sync_enabled_summary),
                         ),
                     )
+                    // Show connection test when Jellyfin is logged in
+                    if (trackerManager.jellyfin.isLoggedIn) {
+                        add(
+                            Preference.PreferenceItem.TextPreference(
+                                title = stringResource(MR.strings.jellyfin_test_connection),
+                                subtitle = stringResource(MR.strings.jellyfin_test_connection_summary),
+                                onClick = {
+                                    scope.launchIO {
+                                        try {
+                                            val info = trackerManager.jellyfin.api.getSystemInfo(
+                                                trackerManager.jellyfin.getUsername().trimEnd('/'),
+                                            )
+                                            withUIContext {
+                                                context.toast(
+                                                    context.stringResource(
+                                                        MR.strings.jellyfin_test_success,
+                                                        info.serverName,
+                                                    ),
+                                                )
+                                            }
+                                        } catch (e: Exception) {
+                                            withUIContext {
+                                                context.toast(MR.strings.jellyfin_test_failed)
+                                            }
+                                        }
+                                    }
+                                },
+                            ),
+                        )
+                    }
                 }
                 add(
                     Preference.PreferenceGroup(

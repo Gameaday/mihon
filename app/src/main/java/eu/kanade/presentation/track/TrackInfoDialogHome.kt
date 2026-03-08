@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DropdownMenuItem
@@ -66,6 +67,7 @@ import java.time.format.DateTimeFormatter
 fun TrackInfoDialogHome(
     trackItems: List<TrackItem>,
     dateFormat: DateTimeFormatter,
+    canonicalId: String? = null,
     onStatusClick: (TrackItem) -> Unit,
     onChapterClick: (TrackItem) -> Unit,
     onScoreClick: (TrackItem) -> Unit,
@@ -77,6 +79,21 @@ fun TrackInfoDialogHome(
     onCopyLink: (TrackItem) -> Unit,
     onTogglePrivate: (TrackItem) -> Unit,
 ) {
+    // Determine authority tracker ID from canonical prefix
+    val authorityTrackerId = remember(canonicalId) {
+        if (canonicalId == null) return@remember null
+        val prefix = canonicalId.substringBefore(":", "")
+        AUTHORITY_PREFIX_TO_TRACKER[prefix]
+    }
+
+    // Sort: authority tracker first, then bound trackers, then unbound
+    val sortedItems = remember(trackItems, authorityTrackerId) {
+        trackItems.sortedWith(
+            compareByDescending<TrackItem> { it.tracker.id == authorityTrackerId && it.track != null }
+                .thenByDescending { it.track != null },
+        )
+    }
+
     Column(
         modifier = Modifier
             .animateContentSize()
@@ -86,7 +103,8 @@ fun TrackInfoDialogHome(
             .windowInsetsPadding(WindowInsets.systemBars),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        trackItems.forEach { item ->
+        sortedItems.forEach { item ->
+            val isAuthority = item.tracker.id == authorityTrackerId && item.track != null
             if (item.track != null) {
                 val supportsScoring = item.tracker.getScoreList().isNotEmpty()
                 val supportsReadingDates = item.tracker.supportsReadingDates
@@ -94,6 +112,7 @@ fun TrackInfoDialogHome(
                 TrackInfoItem(
                     title = item.track.title,
                     tracker = item.tracker,
+                    isAuthority = isAuthority,
                     status = item.tracker.getStatus(item.track.status),
                     onStatusClick = { onStatusClick(item) },
                     chapters = "${item.track.lastChapterRead.toInt()}".let {
@@ -136,10 +155,21 @@ fun TrackInfoDialogHome(
     }
 }
 
+/**
+ * Maps canonical ID prefixes to tracker IDs for authority identification.
+ */
+private val AUTHORITY_PREFIX_TO_TRACKER = mapOf(
+    "al" to 2L, // AniList
+    "mal" to 1L, // MyAnimeList
+    "mu" to 7L, // MangaUpdates
+    "jf" to 10L, // Jellyfin
+)
+
 @Composable
 private fun TrackInfoItem(
     title: String,
     tracker: Tracker,
+    isAuthority: Boolean,
     status: StringResource?,
     onStatusClick: () -> Unit,
     chapters: String,
@@ -164,7 +194,19 @@ private fun TrackInfoItem(
         ) {
             BadgedBox(
                 badge = {
-                    if (private) {
+                    if (isAuthority) {
+                        Badge(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.absoluteOffset(x = (-5).dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Verified,
+                                contentDescription = stringResource(MR.strings.authority_badge_description),
+                                modifier = Modifier.size(14.dp),
+                            )
+                        }
+                    } else if (private) {
                         Badge(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -220,7 +262,13 @@ private fun TrackInfoItem(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                .background(
+                    if (isAuthority) {
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainerHighest
+                    },
+                )
                 .padding(8.dp)
                 .clip(RoundedCornerShape(6.dp)),
         ) {

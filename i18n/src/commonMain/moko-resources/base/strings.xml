@@ -1230,4 +1230,9 @@
     <string name="jellyfin_sync_description">Sync read progress with a Jellyfin media server. Chapters marked as read are reflected on the server.</string>
     <string name="pref_jellyfin_sync_enabled">Jellyfin read progress sync</string>
     <string name="pref_jellyfin_sync_enabled_summary">Sync chapter read status with Jellyfin server. Requires Jellyfin tracker to be configured.</string>
+    <string name="jellyfin_test_connection">Test connection</string>
+    <string name="jellyfin_test_connection_summary">Verify connectivity with the configured Jellyfin server</string>
+    <string name="jellyfin_test_success">Connected to %s</string>
+    <string name="jellyfin_test_failed">Connection failed — check server URL and API key</string>
+    <string name="tracking_linked">Linked</string>
 </resources>
