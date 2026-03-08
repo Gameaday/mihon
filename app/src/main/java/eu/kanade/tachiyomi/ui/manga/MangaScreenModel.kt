@@ -288,7 +288,8 @@ class MangaScreenModel(
         try {
             withIOContext {
                 val manga = state.manga
-                val isAuthorityOnly = manga.source == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID
+                val isAuthorityOnly =
+                    manga.source == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID
 
                 // Authority-only manga have no content source — refresh from canonical tracker only.
                 if (isAuthorityOnly) {

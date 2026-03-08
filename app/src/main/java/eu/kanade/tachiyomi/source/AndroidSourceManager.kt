@@ -115,7 +115,11 @@ class AndroidSourceManager(
         // Authority-only manga (no content source) — return a named stub
         // so the UI shows "Authority" instead of "-1".
         if (id == eu.kanade.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID) {
-            return StubSource(id = id, lang = "all", name = context.stringResource(tachiyomi.i18n.MR.strings.authority_source_name))
+            return StubSource(
+                id = id,
+                lang = "all",
+                name = context.stringResource(tachiyomi.i18n.MR.strings.authority_source_name),
+            )
         }
         sourceRepository.getStubSource(id)?.let {
             return it
