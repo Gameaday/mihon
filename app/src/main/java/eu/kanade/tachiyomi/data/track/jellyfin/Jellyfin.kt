@@ -106,9 +106,9 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
     }
 
     override suspend fun bind(track: Track, hasReadChapters: Boolean): Track {
-        // On bind, adopt Jellyfin's read progress if the user already has
-        // chapters marked as played on the server
-        if (hasReadChapters && track.last_chapter_read == 0.0) {
+        // On bind, pull Jellyfin's played state when the local track
+        // has no read progress yet — adopts server-side read count
+        if (track.last_chapter_read == 0.0) {
             val serverUrl = api.getServerUrlFromTrackUrl(track.tracking_url)
             val itemId = api.getItemIdFromUrl(track.tracking_url)
             val userId = trackPreferences.jellyfinUserId().get()

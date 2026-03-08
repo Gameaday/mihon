@@ -6,11 +6,10 @@ import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
-import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody.Companion.toRequestBody
 import tachiyomi.core.common.util.lang.withIOContext
-import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.injectLazy
 
 /**
@@ -156,7 +155,7 @@ class JellyfinApi(
         val url = "$serverUrl/Users/$userId/PlayedItems/$itemId"
         val request = okhttp3.Request.Builder()
             .url(url)
-            .method(method, if (method == "POST") okhttp3.RequestBody.create(null, ByteArray(0)) else null)
+            .method(method, if (method == "POST") ByteArray(0).toRequestBody() else null)
             .build()
         client.newCall(request).awaitSuccess()
     }
@@ -201,7 +200,7 @@ class JellyfinApi(
         val url = "$serverUrl/Users/$userId/FavoriteItems/$itemId"
         val request = okhttp3.Request.Builder()
             .url(url)
-            .method(method, if (method == "POST") okhttp3.RequestBody.create(null, ByteArray(0)) else null)
+            .method(method, if (method == "POST") ByteArray(0).toRequestBody() else null)
             .build()
         client.newCall(request).awaitSuccess()
     }
