@@ -297,22 +297,25 @@ class MatchUnlinkedManga(
 
             /**
              * Checks if a result has a valid remote identifier.
-             * Supports both numeric IDs (MAL/AniList/MU) and string IDs (Jellyfin).
+             * Supports both numeric IDs (MAL/AniList/MU) and URL-based IDs (Jellyfin).
              */
             fun hasValidId(result: TrackSearch): Boolean =
-                result.remote_id > 0 || (prefix == "jf" && result.tracking_url.contains("/Items/"))
+                result.remote_id > 0 || result.tracking_url.isNotBlank()
 
             /**
              * Builds a canonical ID string from the result.
-             * Uses numeric remote_id for standard trackers, or extracts the
-             * Jellyfin item ID from tracking_url for Jellyfin.
+             * Uses numeric remote_id when available, otherwise extracts an
+             * identifier from tracking_url for trackers with string-based IDs.
              */
             fun buildCanonicalId(result: TrackSearch): String = if (result.remote_id > 0) {
                 "$prefix:${result.remote_id}"
             } else {
-                // Jellyfin: extract item ID from tracking_url (format: .../Items/{id})
-                val itemId = result.tracking_url.substringAfterLast("/Items/").substringBefore("?")
-                "$prefix:$itemId"
+                // Extract ID from tracking URL (e.g., .../Items/{id} for Jellyfin)
+                val urlId = result.tracking_url
+                    .trimEnd('/')
+                    .substringAfterLast("/")
+                    .substringBefore("?")
+                "$prefix:$urlId"
             }
 
             // Tier 1: Exact case-insensitive match against any known title
