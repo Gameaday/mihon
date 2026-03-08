@@ -19,6 +19,8 @@ fun SManga.getComicInfo() = ComicInfo(
     ),
     title = null,
     number = null,
+    count = null,
+    volume = null,
     web = null,
     translator = null,
     inker = null,
@@ -28,6 +30,8 @@ fun SManga.getComicInfo() = ComicInfo(
     tags = null,
     categories = null,
     source = null,
+    languageISO = null,
+    manga = null,
 )
 
 fun SManga.copyFromComicInfo(comicInfo: ComicInfo) {
@@ -69,6 +73,8 @@ data class ComicInfo(
     val title: Title?,
     val series: Series?,
     val number: Number?,
+    val count: Count?,
+    val volume: Volume?,
     val summary: Summary?,
     val writer: Writer?,
     val penciller: Penciller?,
@@ -80,6 +86,8 @@ data class ComicInfo(
     val genre: Genre?,
     val tags: Tags?,
     val web: Web?,
+    val languageISO: LanguageISO?,
+    val manga: Manga?,
     val publishingStatus: PublishingStatusTachiyomi?,
     val categories: CategoriesTachiyomi?,
     val source: SourceMihon?,
@@ -103,6 +111,14 @@ data class ComicInfo(
     @Serializable
     @XmlSerialName("Number", "", "")
     data class Number(@XmlValue(true) val value: String = "")
+
+    @Serializable
+    @XmlSerialName("Count", "", "")
+    data class Count(@XmlValue(true) val value: Int = -1)
+
+    @Serializable
+    @XmlSerialName("Volume", "", "")
+    data class Volume(@XmlValue(true) val value: Int = -1)
 
     @Serializable
     @XmlSerialName("Summary", "", "")
@@ -147,6 +163,18 @@ data class ComicInfo(
     @Serializable
     @XmlSerialName("Web", "", "")
     data class Web(@XmlValue(true) val value: String = "")
+
+    @Serializable
+    @XmlSerialName("LanguageISO", "", "")
+    data class LanguageISO(@XmlValue(true) val value: String = "")
+
+    /**
+     * ComicInfo v2.0 Manga field: "Yes", "No", "YesAndRightToLeft".
+     * Jellyfin uses this to identify manga content and set reading direction.
+     */
+    @Serializable
+    @XmlSerialName("Manga", "", "")
+    data class Manga(@XmlValue(true) val value: String = "")
 
     // The spec doesn't have a good field for this
     @Serializable

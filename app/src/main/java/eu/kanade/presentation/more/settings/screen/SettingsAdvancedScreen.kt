@@ -330,6 +330,11 @@ object SettingsAdvancedScreen : SearchableSettings {
                     title = stringResource(MR.strings.pref_disallow_non_ascii_filenames),
                     subtitle = stringResource(MR.strings.pref_disallow_non_ascii_filenames_details),
                 ),
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = libraryPreferences.jellyfinCompatibleNaming(),
+                    title = stringResource(MR.strings.pref_jellyfin_compatible_naming),
+                    subtitle = stringResource(MR.strings.pref_jellyfin_compatible_naming_summary),
+                ),
             ),
         )
     }

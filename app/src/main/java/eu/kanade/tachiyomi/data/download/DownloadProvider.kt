@@ -11,6 +11,7 @@ import tachiyomi.core.common.storage.displayablePath
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.library.service.LibraryPreferences
+import tachiyomi.domain.manga.model.JellyfinNaming
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.storage.service.StorageManager
 import tachiyomi.i18n.MR
@@ -173,6 +174,31 @@ class DownloadProvider(
         dirName = DiskUtil.buildValidFilename(dirName, DiskUtil.MAX_FILE_NAME_BYTES - 11, disallowNonAsciiFilenames)
         dirName += "_" + md5(chapterUrl).take(6)
         return dirName
+    }
+
+    /**
+     * Returns a Jellyfin-compatible chapter file name for CBZ downloads.
+     *
+     * Format: `Series Name Ch. 001` (or `Series Name Vol. 01 Ch. 001`)
+     *
+     * This naming follows Jellyfin's Bookshelf plugin conventions so that
+     * downloaded CBZ files can be directly served by a Jellyfin media server.
+     *
+     * @param mangaTitle the manga/series title.
+     * @param chapterNumber the chapter number (from ChapterRecognition).
+     * @param chapterName the chapter name (used as fallback title).
+     * @return Jellyfin-compatible file name without extension.
+     */
+    fun getJellyfinChapterDirName(
+        mangaTitle: String,
+        chapterNumber: Double,
+        chapterName: String,
+    ): String {
+        return JellyfinNaming.chapterFileName(
+            seriesTitle = mangaTitle,
+            chapterNumber = chapterNumber.takeIf { it >= 0 },
+            chapterTitle = chapterName.takeIf { it != mangaTitle },
+        )
     }
 
     /**

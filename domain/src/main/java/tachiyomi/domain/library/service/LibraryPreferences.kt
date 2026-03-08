@@ -199,6 +199,16 @@ class LibraryPreferences(
 
     fun disallowNonAsciiFilenames() = preferenceStore.getBoolean("disallow_non_ascii_filenames", false)
 
+    /**
+     * When enabled, downloads use Jellyfin-compatible naming conventions:
+     * `Series Name/Series Name Ch. 001.cbz` instead of the default
+     * `Source/Series Name/chapter_hash/` structure.
+     *
+     * This allows downloaded content to be directly served by a Jellyfin
+     * media server with the Bookshelf plugin without manual renaming.
+     */
+    fun jellyfinCompatibleNaming() = preferenceStore.getBoolean("pref_jellyfin_compatible_naming", false)
+
     // endregion
 
     // region Image Format

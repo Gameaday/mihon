@@ -92,6 +92,8 @@ fun getComicInfo(
             ComicInfo.Number(it.toString())
         }
     },
+    count = null,
+    volume = null,
     web = ComicInfo.Web(urls.joinToString(" ")),
     summary = manga.description?.let { ComicInfo.Summary(it) },
     writer = manga.author?.let { ComicInfo.Writer(it) },
@@ -103,6 +105,8 @@ fun getComicInfo(
     ),
     categories = categories?.let { ComicInfo.CategoriesTachiyomi(it.joinToString()) },
     source = ComicInfo.SourceMihon(sourceName),
+    languageISO = null,
+    manga = ComicInfo.Manga("YesAndRightToLeft"),
     inker = null,
     colorist = null,
     letterer = null,
