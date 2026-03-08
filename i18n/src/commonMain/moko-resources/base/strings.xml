@@ -1202,7 +1202,11 @@
     <string name="match_results_linked_badge">Linked</string>
     <string name="match_results_retry_all">Retry all unlinked</string>
 
-    <!-- Metadata field locking (Jellyfin-style) -->
+    <!-- Metadata editing & field locking (Jellyfin-style) -->
+    <string name="edit_metadata_title">Edit metadata</string>
+    <string name="edit_metadata_subtitle">Edit fields and toggle locks. Locked fields are preserved during authority refresh.</string>
+    <string name="edit_metadata_identify">Identify</string>
+    <string name="edit_metadata_identify_hint">Search metadata providers</string>
     <string name="metadata_locks_title">Metadata locks</string>
     <string name="metadata_locks_subtitle">Locked fields are preserved during authority refresh</string>
     <string name="locked_field_description">Description</string>

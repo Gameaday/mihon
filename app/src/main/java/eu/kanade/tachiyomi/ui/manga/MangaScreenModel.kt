@@ -1279,6 +1279,7 @@ class MangaScreenModel(
         data object TrackSheet : Dialog
         data object FullCover : Dialog
         data object MetadataLocks : Dialog
+        data object EditMetadata : Dialog
     }
 
     fun dismissDialog() {
@@ -1303,6 +1304,101 @@ class MangaScreenModel(
 
     fun showMetadataLocksDialog() {
         updateSuccessState { it.copy(dialog = Dialog.MetadataLocks) }
+    }
+
+    fun showEditMetadataDialog() {
+        updateSuccessState { it.copy(dialog = Dialog.EditMetadata) }
+    }
+
+    /**
+     * Updates a single metadata field and auto-locks it (Jellyfin behavior:
+     * manual edits are automatically protected from authority overwrite).
+     */
+    fun editTitle(value: String) {
+        val manga = successState?.manga ?: return
+        if (value == manga.title) return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    title = value,
+                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.TITLE,
+                ),
+            )
+        }
+    }
+
+    fun editAuthor(value: String) {
+        val manga = successState?.manga ?: return
+        val newValue = value.ifBlank { null }
+        if (newValue == manga.author) return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    author = newValue,
+                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.AUTHOR,
+                ),
+            )
+        }
+    }
+
+    fun editArtist(value: String) {
+        val manga = successState?.manga ?: return
+        val newValue = value.ifBlank { null }
+        if (newValue == manga.artist) return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    artist = newValue,
+                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.ARTIST,
+                ),
+            )
+        }
+    }
+
+    fun editDescription(value: String) {
+        val manga = successState?.manga ?: return
+        val newValue = value.ifBlank { null }
+        if (newValue == manga.description) return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    description = newValue,
+                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.DESCRIPTION,
+                ),
+            )
+        }
+    }
+
+    fun editStatus(value: Long) {
+        val manga = successState?.manga ?: return
+        if (value == manga.status) return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    status = value,
+                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.STATUS,
+                ),
+            )
+        }
+    }
+
+    fun editGenres(value: List<String>) {
+        val manga = successState?.manga ?: return
+        if (value == manga.genre) return
+        screenModelScope.launchIO {
+            updateManga.await(
+                tachiyomi.domain.manga.model.MangaUpdate(
+                    id = manga.id,
+                    genre = value,
+                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.GENRE,
+                ),
+            )
+        }
     }
 
     fun showMigrateDialog(duplicate: Manga) {

@@ -34,6 +34,7 @@ import eu.kanade.presentation.manga.EditCoverAction
 import eu.kanade.presentation.manga.MangaScreen
 import eu.kanade.presentation.manga.components.CoverSearchDialog
 import eu.kanade.presentation.manga.components.DeleteChaptersDialog
+import eu.kanade.presentation.manga.components.EditMetadataDialog
 import eu.kanade.presentation.manga.components.MangaCoverDialog
 import eu.kanade.presentation.manga.components.MetadataLocksDialog
 import eu.kanade.presentation.manga.components.ScanlatorFilterDialog
@@ -164,8 +165,8 @@ class MangaScreen(
                 navigator.push(MigrationConfigScreen(successState.manga.id))
             }.takeIf { successState.manga.favorite },
             onEditNotesClicked = { navigator.push(MangaNotesScreen(manga = successState.manga)) },
-            onMetadataLocksClicked = screenModel::showMetadataLocksDialog.takeIf {
-                successState.manga.favorite && successState.manga.canonicalId != null
+            onEditMetadataClicked = screenModel::showEditMetadataDialog.takeIf {
+                successState.manga.favorite
             },
             onMultiBookmarkClicked = screenModel::bookmarkChapters,
             onMultiMarkAsReadClicked = screenModel::markChaptersRead,
@@ -314,6 +315,39 @@ class MangaScreen(
                     lockedFields = successState.manga.lockedFields,
                     onToggleField = screenModel::toggleLockedField,
                     onSetAllFields = screenModel::setLockedFields,
+                    onDismissRequest = onDismissRequest,
+                )
+            }
+            MangaScreenModel.Dialog.EditMetadata -> {
+                val manga = successState.manga
+                EditMetadataDialog(
+                    title = manga.title,
+                    author = manga.author,
+                    artist = manga.artist,
+                    description = manga.description,
+                    status = manga.status,
+                    genres = manga.genre ?: emptyList(),
+                    lockedFields = manga.lockedFields,
+                    hasAuthority = manga.canonicalId != null,
+                    onSaveTitle = screenModel::editTitle,
+                    onSaveAuthor = screenModel::editAuthor,
+                    onSaveArtist = screenModel::editArtist,
+                    onSaveDescription = screenModel::editDescription,
+                    onSaveStatus = screenModel::editStatus,
+                    onSaveGenres = screenModel::editGenres,
+                    onToggleLock = screenModel::toggleLockedField,
+                    onSetAllLocks = screenModel::setLockedFields,
+                    onIdentify = if (manga.canonicalId == null) {
+                        {
+                            screenModel.dismissDialog()
+                            screenModel.resolveCanonicalId()
+                        }
+                    } else {
+                        {
+                            screenModel.dismissDialog()
+                            screenModel.refreshFromAuthority()
+                        }
+                    },
                     onDismissRequest = onDismissRequest,
                 )
             }
