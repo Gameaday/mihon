@@ -1313,6 +1313,8 @@ class MangaScreenModel(
     /**
      * Applies a metadata field update and auto-locks the field (Jellyfin behavior:
      * manual edits are automatically protected from authority overwrite).
+     * When the manga is linked to a Jellyfin authority, also pushes the metadata
+     * change back to the Jellyfin server (bidirectional sync).
      */
     private fun editFieldAndLock(
         lockField: Long,
@@ -1323,7 +1325,37 @@ class MangaScreenModel(
             updateManga.await(
                 buildUpdate(manga.id, manga.lockedFields or lockField),
             )
+            // Push metadata to Jellyfin if linked via "jf" canonical prefix
+            pushMetadataToJellyfinIfLinked(manga)
         }
+    }
+
+    /**
+     * Pushes updated metadata to the Jellyfin server when the manga is linked
+     * to Jellyfin as its authority source. This enables bidirectional metadata sync —
+     * edits in the app are reflected on the server.
+     */
+    private suspend fun pushMetadataToJellyfinIfLinked(manga: Manga) {
+        val canonicalId = manga.canonicalId ?: return
+        if (!canonicalId.startsWith("jf:")) return
+        val jellyfin = trackerManager.jellyfin
+        if (!jellyfin.isLoggedIn) return
+
+        // Find the Jellyfin track for this manga to get the tracking URL
+        val tracks = getTracks.await(manga.id)
+        val jellyfinTrack = tracks.firstOrNull {
+            it.trackerId == trackerManager.jellyfin.id
+        } ?: return
+
+        // Re-read the manga to get the latest values after the update
+        val updated = getMangaAndChapters.awaitManga(manga.id)
+
+        jellyfin.pushMetadataToServer(
+            trackingUrl = jellyfinTrack.remoteUrl,
+            title = updated.title,
+            description = updated.description,
+            genres = updated.genre,
+        )
     }
 
     fun editTitle(value: String) {

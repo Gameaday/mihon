@@ -1238,11 +1238,12 @@
     <string name="jellyfin_user_id_hint">Jellyfin user ID for read progress sync</string>
     <string name="jellyfin_connected">Connected to %s</string>
     <string name="jellyfin_sync_description">Sync read progress with a Jellyfin media server. Chapters marked as read are reflected on the server.</string>
-    <string name="pref_jellyfin_sync_enabled">Jellyfin read progress sync</string>
-    <string name="pref_jellyfin_sync_enabled_summary">Sync chapter read status with Jellyfin server. Requires Jellyfin tracker to be configured.</string>
+    <string name="pref_jellyfin_sync_enabled">Jellyfin bidirectional sync</string>
+    <string name="pref_jellyfin_sync_enabled_summary">Sync read progress and metadata edits with Jellyfin server. Chapters read in the app are marked as played on the server, and metadata edits are pushed back.</string>
     <string name="jellyfin_test_connection">Test connection</string>
     <string name="jellyfin_test_connection_summary">Verify connectivity with the configured Jellyfin server</string>
     <string name="jellyfin_test_success">Connected to %s</string>
     <string name="jellyfin_test_failed">Connection failed — check server URL and API key</string>
+    <string name="jellyfin_metadata_pushed">Metadata synced to Jellyfin</string>
     <string name="tracking_linked">Linked</string>
 </resources>

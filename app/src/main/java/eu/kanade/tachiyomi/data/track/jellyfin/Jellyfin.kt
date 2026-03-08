@@ -259,10 +259,78 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         }
     }
 
+    /**
+     * Pushes local metadata edits back to the Jellyfin server.
+     * This enables bidirectional metadata sync — edits made in the app
+     * are reflected on the Jellyfin server.
+     *
+     * @param trackingUrl The Jellyfin tracking URL containing server URL and item ID
+     * @param title Updated title (null = no change)
+     * @param description Updated description (null = no change)
+     * @param genres Updated genres list (null = no change)
+     * @param rating Updated community rating (null = no change)
+     * @param year Updated production year (null = no change)
+     */
+    suspend fun pushMetadataToServer(
+        trackingUrl: String,
+        title: String? = null,
+        description: String? = null,
+        genres: List<String>? = null,
+        rating: Double? = null,
+        year: Int? = null,
+    ) {
+        if (!isLoggedIn || !libraryPreferences.jellyfinSyncEnabled().get()) return
+        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        val itemId = api.getItemIdFromUrl(trackingUrl)
+        try {
+            api.updateItemMetadata(
+                serverUrl = serverUrl,
+                itemId = itemId,
+                name = title,
+                overview = description,
+                genres = genres,
+                communityRating = rating,
+                productionYear = year,
+            )
+            logcat(LogPriority.INFO) { "Pushed metadata to Jellyfin for item $itemId" }
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to push metadata to Jellyfin for item $itemId" }
+        }
+    }
+
+    /**
+     * Returns the list of child items (chapters/books) for the series
+     * linked to this track. Useful for identifying missing chapters.
+     */
+    suspend fun getChaptersFromServer(trackingUrl: String): List<JellyfinItem> {
+        if (!isLoggedIn) return emptyList()
+        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        val itemId = api.getItemIdFromUrl(trackingUrl)
+        val userId = trackPreferences.jellyfinUserId().get()
+        if (userId.isBlank()) return emptyList()
+        return try {
+            api.getSeriesChildren(serverUrl, userId, itemId)
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin chapters for $trackingUrl" }
+            emptyList()
+        }
+    }
+
+    /**
+     * Returns the download URL for a specific Jellyfin chapter/book item.
+     * The URL can be used with the authenticated client to download the file.
+     */
+    fun getChapterDownloadUrl(trackingUrl: String, childItemId: String): String {
+        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        return api.getItemDownloadUrl(serverUrl, childItemId)
+    }
+
     // -- Private helpers --
 
     /**
      * Syncs read progress back to Jellyfin by marking children as played/unplayed.
+     * Only syncs items that have changed to minimize API calls (Jellyfin-friendly:
+     * bandwidth to LAN server is cheap, but reducing round-trips improves responsiveness).
      */
     private suspend fun syncReadProgressToServer(track: Track) {
         val serverUrl = api.getServerUrlFromTrackUrl(track.tracking_url)

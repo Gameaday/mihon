@@ -46,10 +46,36 @@ data class JellyfinItem(
     @SerialName("ProductionYear") val productionYear: Int? = null,
     @SerialName("UserData") val userData: JellyfinUserData? = null,
     @SerialName("ImageTags") val imageTags: Map<String, String>? = null,
+    @SerialName("BackdropImageTags") val backdropImageTags: List<String>? = null,
     @SerialName("RecursiveItemCount") val recursiveItemCount: Int? = null,
     @SerialName("ChildCount") val childCount: Int? = null,
     @SerialName("SeriesName") val seriesName: String? = null,
     @SerialName("IndexNumber") val indexNumber: Int? = null,
+    @SerialName("Path") val path: String? = null,
+    @SerialName("MediaSources") val mediaSources: List<JellyfinMediaSource>? = null,
+    @SerialName("SeriesId") val seriesId: String? = null,
+) {
+    /**
+     * Returns true if this item has at least one displayable image.
+     * Checks Primary, Thumb, and Backdrop image tags.
+     */
+    fun hasImage(): Boolean {
+        return imageTags?.containsKey("Primary") == true ||
+            imageTags?.containsKey("Thumb") == true ||
+            !backdropImageTags.isNullOrEmpty()
+    }
+}
+
+/**
+ * Jellyfin media source DTO — provides access to the physical file path
+ * and container format of a media item (chapter/book).
+ */
+@Serializable
+data class JellyfinMediaSource(
+    @SerialName("Id") val id: String,
+    @SerialName("Path") val path: String? = null,
+    @SerialName("Container") val container: String? = null,
+    @SerialName("Size") val size: Long? = null,
 )
 
 @Serializable

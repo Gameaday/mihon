@@ -16,7 +16,8 @@ import uy.kohesive.injekt.injectLazy
 /**
  * Jellyfin REST API client.
  *
- * Supports server info, library browsing, series search, and read-progress sync.
+ * Supports server info, library browsing, series search, read-progress sync,
+ * metadata push, and content download URL generation.
  * Reference: https://api.jellyfin.org/
  */
 class JellyfinApi(
@@ -32,6 +33,60 @@ class JellyfinApi(
      */
     fun getServerUrl(jellyfin: Jellyfin): String {
         return jellyfin.getUsername().trimEnd('/')
+    }
+
+    // -- Image URL helpers (Jellyfin-style: quality params for caching) --
+
+    /**
+     * Builds an image URL for a Jellyfin item with optional quality/size parameters.
+     * Jellyfin serves images at `/Items/{id}/Images/{type}` with query params for
+     * scaling and quality.
+     *
+     * Falls back through image types: Primary → Thumb → Backdrop.
+     * Returns empty string only if no image type is available — avoiding blank covers
+     * in search results (Jellyfin's cover search never shows blanks).
+     *
+     * @param serverUrl Base server URL
+     * @param item The Jellyfin item to get an image for
+     * @param maxWidth Maximum width in pixels (null = original size)
+     * @param quality JPEG quality 0-100 (null = server default)
+     */
+    fun buildImageUrl(
+        serverUrl: String,
+        item: JellyfinItem,
+        maxWidth: Int? = null,
+        quality: Int? = null,
+    ): String {
+        // Determine best available image type
+        val imageType = when {
+            item.imageTags?.containsKey("Primary") == true -> "Primary"
+            item.imageTags?.containsKey("Thumb") == true -> "Thumb"
+            !item.backdropImageTags.isNullOrEmpty() -> "Backdrop/0"
+            else -> return "" // No image available
+        }
+
+        val url = "$serverUrl/Items/${item.id}/Images/$imageType".toHttpUrl().newBuilder()
+        if (maxWidth != null) url.addQueryParameter("maxWidth", maxWidth.toString())
+        if (quality != null) url.addQueryParameter("quality", quality.toString())
+        return url.build().toString()
+    }
+
+    /**
+     * Builds a cover image URL optimized for list/grid display (max 400px, 90% quality).
+     * Reduces bandwidth for LAN connections while maintaining visual quality.
+     */
+    fun buildCoverUrl(serverUrl: String, item: JellyfinItem): String {
+        return buildImageUrl(serverUrl, item, maxWidth = COVER_MAX_WIDTH, quality = COVER_QUALITY)
+    }
+
+    /**
+     * Returns the direct download URL for a Jellyfin item (chapter/book).
+     * Uses Jellyfin's `/Items/{id}/Download` endpoint which returns the original file.
+     *
+     * Authentication is handled by [JellyfinInterceptor] adding the X-Emby-Token header.
+     */
+    fun getItemDownloadUrl(serverUrl: String, itemId: String): String {
+        return "$serverUrl/Items/$itemId/Download"
     }
 
     /**
@@ -77,6 +132,8 @@ class JellyfinApi(
     /**
      * Searches for series in a user's library matching the given query.
      * Filters to "books" collection type items (manga/comics).
+     * Results without any available cover image are sorted to the end,
+     * matching Jellyfin's search behavior where items with images appear first.
      */
     suspend fun searchSeries(
         serverUrl: String,
@@ -87,7 +144,11 @@ class JellyfinApi(
             .addQueryParameter("searchTerm", query)
             .addQueryParameter("IncludeItemTypes", "Series")
             .addQueryParameter("Recursive", "true")
-            .addQueryParameter("Fields", "Overview,Genres,CommunityRating,ProductionYear")
+            .addQueryParameter(
+                "Fields",
+                "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount",
+            )
+            .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
             .addQueryParameter("Limit", "20")
             .build()
 
@@ -96,13 +157,14 @@ class JellyfinApi(
 
         with(json) {
             response.parseAs<JellyfinItemsResponse>()
-        }.items.map { item ->
-            item.toTrackSearch(trackId, serverUrl)
-        }
+        }.items
+            .sortedByDescending { it.hasImage() } // Items with covers first
+            .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
     }
 
     /**
      * Gets a specific series by its Jellyfin item ID.
+     * Includes image types for cover fallback.
      */
     suspend fun getSeries(
         serverUrl: String,
@@ -110,18 +172,23 @@ class JellyfinApi(
         itemId: String,
     ): TrackSearch = withIOContext {
         val url = "$serverUrl/Users/$userId/Items/$itemId".toHttpUrl().newBuilder()
-            .addQueryParameter("Fields", "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount")
+            .addQueryParameter(
+                "Fields",
+                "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount",
+            )
+            .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
             .build()
 
         val response = client.newCall(GET(url.toString()))
             .awaitSuccess()
 
         val item = with(json) { response.parseAs<JellyfinItem>() }
-        item.toTrackSearch(trackId, serverUrl)
+        item.toTrackSearch(trackId, serverUrl, this@JellyfinApi)
     }
 
     /**
      * Gets child items (chapters/volumes) of a series to compute read progress.
+     * Includes Path and MediaSources fields for content file access.
      */
     suspend fun getSeriesChildren(
         serverUrl: String,
@@ -130,7 +197,7 @@ class JellyfinApi(
     ): List<JellyfinItem> = withIOContext {
         val url = "$serverUrl/Users/$userId/Items".toHttpUrl().newBuilder()
             .addQueryParameter("ParentId", itemId)
-            .addQueryParameter("Fields", "UserData")
+            .addQueryParameter("Fields", "UserData,Path,MediaSources")
             .addQueryParameter("SortBy", "SortName")
             .addQueryParameter("SortOrder", "Ascending")
             .addQueryParameter("Recursive", "true")
@@ -257,18 +324,26 @@ class JellyfinApi(
     }
 
     companion object {
+        /** Maximum cover image width for list/grid display. */
+        const val COVER_MAX_WIDTH = 400
+
+        /** JPEG quality percentage for cover images. */
+        const val COVER_QUALITY = 90
+
         /**
          * Converts a [JellyfinItem] to a [TrackSearch] for the tracker system.
+         * Uses [api] for image URL construction with quality parameters and
+         * cover fallback through Primary → Thumb → Backdrop image types.
          */
-        private fun JellyfinItem.toTrackSearch(trackId: Long, serverUrl: String): TrackSearch {
+        private fun JellyfinItem.toTrackSearch(
+            trackId: Long,
+            serverUrl: String,
+            api: JellyfinApi,
+        ): TrackSearch {
             return TrackSearch.create(trackId).also { track ->
                 track.title = name
                 track.summary = overview.orEmpty()
-                track.cover_url = if (imageTags?.containsKey("Primary") == true) {
-                    "$serverUrl/Items/$id/Images/Primary"
-                } else {
-                    ""
-                }
+                track.cover_url = api.buildCoverUrl(serverUrl, this)
                 track.tracking_url = "$serverUrl/Items/$id"
                 track.total_chapters = (recursiveItemCount ?: childCount ?: 0).toLong()
                 track.score = communityRating ?: 0.0
