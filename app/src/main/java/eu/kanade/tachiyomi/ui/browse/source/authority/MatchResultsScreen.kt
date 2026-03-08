@@ -275,7 +275,7 @@ private fun SummaryCard(
                 if (mangaCount > 0) parts.add("$mangaCount manga")
                 if (novelCount > 0) parts.add("$novelCount novels")
                 val otherCount = totalFavorites - mangaCount - novelCount
-                if (otherCount > 0) parts.add("$otherCount unclassified")
+                if (otherCount > 0) parts.add("$otherCount other")
                 Text(
                     text = parts.joinToString(" · "),
                     style = MaterialTheme.typography.bodySmall,
