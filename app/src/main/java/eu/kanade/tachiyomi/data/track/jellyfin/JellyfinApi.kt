@@ -377,6 +377,12 @@ class JellyfinApi(
                 track.publishing_status = status.orEmpty()
                 track.publishing_type = type
 
+                // Map Jellyfin Studios to authors (book/comic creator convention)
+                val creators = getCreators()
+                if (creators.isNotEmpty()) {
+                    track.authors = creators
+                }
+
                 // Compute read progress from user data
                 val totalChildren = recursiveItemCount ?: childCount ?: 0
                 val unplayed = userData?.unplayedItemCount ?: totalChildren

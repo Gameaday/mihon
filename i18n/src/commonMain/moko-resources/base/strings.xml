@@ -1248,5 +1248,6 @@
     <string name="jellyfin_library">Jellyfin library</string>
     <string name="jellyfin_library_all">All libraries</string>
     <string name="jellyfin_library_selected">Library: %s</string>
+    <string name="jellyfin_user_selected">User: %s</string>
     <string name="tracking_linked">Linked</string>
 </resources>

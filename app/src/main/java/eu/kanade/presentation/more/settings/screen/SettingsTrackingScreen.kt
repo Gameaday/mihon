@@ -512,6 +512,49 @@ object SettingsTrackingScreen : SearchableSettings {
                         )
                         add(
                             Preference.PreferenceItem.TextPreference(
+                                title = stringResource(MR.strings.jellyfin_user_id),
+                                subtitle = trackPreferences.jellyfinUserId().get()
+                                    .takeIf { it.isNotBlank() }
+                                    ?: stringResource(MR.strings.jellyfin_user_id_hint),
+                                onClick = {
+                                    scope.launchIO {
+                                        try {
+                                            val serverUrl =
+                                                trackerManager.jellyfin.getUsername().trimEnd('/')
+                                            val users =
+                                                trackerManager.jellyfin.api.getUsers(serverUrl)
+                                            val currentUserId =
+                                                trackPreferences.jellyfinUserId().get()
+                                            val currentIdx = users.indexOfFirst {
+                                                it.id == currentUserId
+                                            }
+                                            val nextUser = if (currentIdx < users.lastIndex) {
+                                                users[currentIdx + 1]
+                                            } else {
+                                                users.firstOrNull()
+                                            }
+                                            if (nextUser != null) {
+                                                trackPreferences.jellyfinUserId().set(nextUser.id)
+                                                withUIContext {
+                                                    context.toast(
+                                                        context.stringResource(
+                                                            MR.strings.jellyfin_user_selected,
+                                                            nextUser.name,
+                                                        ),
+                                                    )
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            withUIContext {
+                                                context.toast(MR.strings.jellyfin_test_failed)
+                                            }
+                                        }
+                                    }
+                                },
+                            ),
+                        )
+                        add(
+                            Preference.PreferenceItem.TextPreference(
                                 title = stringResource(MR.strings.jellyfin_test_connection),
                                 subtitle = stringResource(MR.strings.jellyfin_test_connection_summary),
                                 onClick = {
