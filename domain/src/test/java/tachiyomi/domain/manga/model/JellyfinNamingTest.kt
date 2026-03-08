@@ -78,6 +78,14 @@ class JellyfinNamingTest {
     }
 
     @Test
+    fun `chapterFileName handles multi-digit decimal chapters`() {
+        assertEquals(
+            "Title Ch. 010.25",
+            JellyfinNaming.chapterFileName("Title", chapterNumber = 10.25),
+        )
+    }
+
+    @Test
     fun `chapterFileName volume only`() {
         assertEquals(
             "Title Vol. 03",
@@ -98,6 +106,14 @@ class JellyfinNamingTest {
         assertEquals(
             "Title Ch. 001",
             JellyfinNaming.chapterFileName("Title", chapterNumber = 1.0, chapterTitle = "Chapter 1"),
+        )
+    }
+
+    @Test
+    fun `chapterFileName skips redundant chapter title case insensitive`() {
+        assertEquals(
+            "Title Ch. 001",
+            JellyfinNaming.chapterFileName("Title", chapterNumber = 1.0, chapterTitle = "CHAPTER 1"),
         )
     }
 

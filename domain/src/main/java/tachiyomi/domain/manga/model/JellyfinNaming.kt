@@ -103,9 +103,12 @@ object JellyfinNaming {
                 // Integer chapter number — pad to 3 digits
                 chapterNumber.toLong().toString().padStart(3, '0')
             } else {
-                // Decimal chapter number (e.g., 10.5)
-                val intPart = chapterNumber.toLong().toString().padStart(3, '0')
-                val decPart = ((chapterNumber - chapterNumber.toLong()) * 10).toLong()
+                // Decimal chapter number (e.g., 10.5, 10.25)
+                // Preserve the full decimal portion via string conversion
+                val fullStr = chapterNumber.toBigDecimal().toPlainString()
+                val dotIndex = fullStr.indexOf('.')
+                val intPart = fullStr.substring(0, dotIndex).padStart(3, '0')
+                val decPart = fullStr.substring(dotIndex + 1)
                 "$intPart.$decPart"
             }
             parts.add("Ch. $chapterStr")
@@ -117,8 +120,8 @@ object JellyfinNaming {
         if (!chapterTitle.isNullOrBlank() && chapterTitle != seriesTitle) {
             val sanitizedChapterTitle = sanitize(chapterTitle)
             // Only append if it doesn't duplicate the chapter number info
-            if (!sanitizedChapterTitle.startsWith("Ch.") &&
-                !sanitizedChapterTitle.startsWith("Chapter")
+            if (!sanitizedChapterTitle.startsWith("Ch.", ignoreCase = true) &&
+                !sanitizedChapterTitle.startsWith("Chapter", ignoreCase = true)
             ) {
                 result += " - $sanitizedChapterTitle"
             }
