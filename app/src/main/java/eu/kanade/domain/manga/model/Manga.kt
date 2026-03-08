@@ -9,6 +9,7 @@ import tachiyomi.core.common.preference.TriState
 import tachiyomi.core.metadata.comicinfo.ComicInfo
 import tachiyomi.core.metadata.comicinfo.ComicInfoPublishingStatus
 import tachiyomi.domain.chapter.model.Chapter
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
@@ -108,10 +109,34 @@ fun getComicInfo(
     source = ComicInfo.SourceMihon(sourceName),
     languageISO = sourceLang?.takeIf { it.isNotBlank() && it != "all" }
         ?.let { ComicInfo.LanguageISO(it) },
-    manga = ComicInfo.Manga("YesAndRightToLeft"),
+    manga = determineMangaField(manga),
     inker = null,
     colorist = null,
     letterer = null,
     coverArtist = null,
     tags = null,
 )
+
+/**
+ * Determines the ComicInfo Manga field value based on content type and reading mode.
+ *
+ * Values per ComicInfo v2.0 spec:
+ * - "YesAndRightToLeft": manga with right-to-left reading order (default for manga)
+ * - "Yes": manga/comic with left-to-right or vertical reading order
+ * - null: not a comic/manga format (novels, books)
+ */
+private fun determineMangaField(manga: Manga): ComicInfo.Manga? {
+    return when (manga.contentType) {
+        ContentType.NOVEL, ContentType.BOOK -> null
+        ContentType.MANGA, ContentType.UNKNOWN -> {
+            val mode = ReadingMode.fromPreference(manga.readingMode.toInt())
+            when (mode) {
+                ReadingMode.LEFT_TO_RIGHT -> ComicInfo.Manga("Yes")
+                ReadingMode.WEBTOON, ReadingMode.CONTINUOUS_VERTICAL -> ComicInfo.Manga("Yes")
+                ReadingMode.VERTICAL -> ComicInfo.Manga("Yes")
+                // RIGHT_TO_LEFT and DEFAULT both get manga RTL
+                else -> ComicInfo.Manga("YesAndRightToLeft")
+            }
+        }
+    }
+}
