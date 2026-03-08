@@ -108,21 +108,8 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
     override suspend fun bind(track: Track, hasReadChapters: Boolean): Track {
         // On bind, pull Jellyfin's played state when the local track
         // has no read progress yet — adopts server-side read count
-        if (track.last_chapter_read == 0.0) {
-            val serverUrl = api.getServerUrlFromTrackUrl(track.tracking_url)
-            val itemId = api.getItemIdFromUrl(track.tracking_url)
-            val userId = trackPreferences.jellyfinUserId().get()
-            if (userId.isNotBlank()) {
-                try {
-                    val remoteTrack = api.getSeries(serverUrl, userId, itemId)
-                    if (remoteTrack.last_chapter_read > 0) {
-                        track.last_chapter_read = remoteTrack.last_chapter_read
-                        track.status = remoteTrack.status
-                    }
-                } catch (e: Exception) {
-                    logcat(LogPriority.WARN, e) { "Failed to pull Jellyfin progress on bind" }
-                }
-            }
+        if (track.last_chapter_read < 1.0) {
+            pullRemoteProgress(track)
         }
         return track
     }
@@ -158,13 +145,8 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
             track.copyPersonalFrom(remoteTrack)
             track.total_chapters = remoteTrack.total_chapters
 
-            // Pull read progress from Jellyfin: if the server has more chapters
-            // read than the local track, adopt the server's count so that
-            // Jellyfin can be the canonical source for read-state.
-            if (remoteTrack.last_chapter_read > track.last_chapter_read) {
-                track.last_chapter_read = remoteTrack.last_chapter_read
-                track.status = remoteTrack.status
-            }
+            // Pull read progress from Jellyfin when the server is ahead
+            pullRemoteProgress(track, remoteTrack)
             track
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Jellyfin refresh failed for ${track.tracking_url}" }
@@ -301,6 +283,32 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
                     logcat(LogPriority.WARN, e) { "Failed to mark Jellyfin item ${child.id} as played=$shouldBePlayed" }
                 }
             }
+        }
+    }
+
+    /**
+     * Pulls read progress from Jellyfin when the server is ahead of the local track.
+     * Used by both [bind] (initial link) and [refresh] (periodic updates).
+     *
+     * When [remoteTrack] is null, fetches the series from the server first.
+     */
+    private suspend fun pullRemoteProgress(track: Track, remoteTrack: TrackSearch? = null) {
+        val remote = remoteTrack ?: run {
+            val serverUrl = api.getServerUrlFromTrackUrl(track.tracking_url)
+            val itemId = api.getItemIdFromUrl(track.tracking_url)
+            val userId = trackPreferences.jellyfinUserId().get()
+            if (userId.isBlank()) return
+            try {
+                api.getSeries(serverUrl, userId, itemId)
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Failed to pull Jellyfin progress" }
+                return
+            }
+        }
+
+        if (remote.last_chapter_read > track.last_chapter_read) {
+            track.last_chapter_read = remote.last_chapter_read
+            track.status = remote.status
         }
     }
 }
