@@ -187,6 +187,7 @@ fun MangaInfoBox(
 fun MangaActionRow(
     favorite: Boolean,
     trackingCount: Int,
+    hasAuthority: Boolean,
     nextUpdate: Instant?,
     isUserIntervalMode: Boolean,
     onAddToLibraryClicked: () -> Unit,
@@ -236,13 +237,30 @@ fun MangaActionRow(
             onClick = { onEditIntervalClicked?.invoke() },
         )
         MangaActionButton(
-            title = if (trackingCount == 0) {
-                stringResource(MR.strings.manga_tracking_tab)
-            } else {
-                pluralStringResource(MR.plurals.num_trackers, count = trackingCount, trackingCount)
+            title = when {
+                hasAuthority && trackingCount > 0 -> pluralStringResource(
+                    MR.plurals.num_trackers,
+                    count = trackingCount,
+                    trackingCount,
+                )
+                hasAuthority -> stringResource(MR.strings.manga_tracking_tab)
+                trackingCount == 0 -> stringResource(MR.strings.manga_tracking_tab)
+                else -> pluralStringResource(
+                    MR.plurals.num_trackers,
+                    count = trackingCount,
+                    trackingCount,
+                )
             },
-            icon = if (trackingCount == 0) Icons.Outlined.Sync else Icons.Outlined.Done,
-            color = if (trackingCount == 0) defaultActionButtonColor else MaterialTheme.colorScheme.primary,
+            icon = when {
+                hasAuthority -> Icons.Outlined.Done
+                trackingCount == 0 -> Icons.Outlined.Sync
+                else -> Icons.Outlined.Done
+            },
+            color = when {
+                hasAuthority -> MaterialTheme.colorScheme.primary
+                trackingCount == 0 -> defaultActionButtonColor
+                else -> MaterialTheme.colorScheme.primary
+            },
             onClick = onTrackingClicked,
         )
         if (onWebViewClicked != null) {
