@@ -21,7 +21,9 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,10 +32,12 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -70,6 +74,7 @@ fun EditMetadataDialog(
     genres: List<String>,
     lockedFields: Long,
     hasAuthority: Boolean,
+    authorityLabel: String?,
     onSaveTitle: (String) -> Unit,
     onSaveAuthor: (String) -> Unit,
     onSaveArtist: (String) -> Unit,
@@ -101,13 +106,21 @@ fun EditMetadataDialog(
                 if (onIdentify != null) {
                     FilledTonalButton(onClick = onIdentify) {
                         Icon(
-                            imageVector = Icons.Outlined.Search,
+                            imageVector = if (hasAuthority) {
+                                Icons.Outlined.Refresh
+                            } else {
+                                Icons.Outlined.Search
+                            },
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = stringResource(MR.strings.edit_metadata_identify),
+                            text = if (hasAuthority) {
+                                stringResource(MR.strings.edit_metadata_refresh)
+                            } else {
+                                stringResource(MR.strings.edit_metadata_identify)
+                            },
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
@@ -118,6 +131,34 @@ fun EditMetadataDialog(
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
+                // Authority provider badge (Jellyfin-style: shows linked provider at top)
+                if (hasAuthority && authorityLabel != null) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Verified,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(MR.strings.edit_metadata_linked_to, authorityLabel),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 Text(
                     text = stringResource(MR.strings.edit_metadata_subtitle),
                     style = MaterialTheme.typography.bodySmall,
@@ -154,6 +195,9 @@ fun EditMetadataDialog(
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
+
+                // -- Basic info section header --
+                SectionHeader(text = stringResource(MR.strings.edit_metadata_section_basic))
 
                 // Title
                 MetadataTextField(
@@ -221,6 +265,9 @@ fun EditMetadataDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // -- Details section header --
+                SectionHeader(text = stringResource(MR.strings.edit_metadata_section_details))
+
                 // Status dropdown
                 StatusDropdown(
                     status = editStatus,
@@ -237,6 +284,9 @@ fun EditMetadataDialog(
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // -- Tags & genres section header --
+                SectionHeader(text = stringResource(MR.strings.edit_metadata_section_tags))
 
                 // Genres
                 GenreEditor(
@@ -528,6 +578,26 @@ private fun GenreEditor(
                     focusManager.clearFocus()
                 },
             ),
+        )
+    }
+}
+
+/**
+ * Jellyfin-style section header with a divider and label.
+ * Groups related metadata fields visually.
+ */
+@Composable
+private fun SectionHeader(text: String) {
+    Column {
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outlineVariant,
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 4.dp),
         )
     }
 }

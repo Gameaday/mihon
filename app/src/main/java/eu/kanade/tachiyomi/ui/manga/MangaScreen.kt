@@ -320,6 +320,9 @@ class MangaScreen(
             }
             MangaScreenModel.Dialog.EditMetadata -> {
                 val manga = successState.manga
+                val authorityLabel = remember(manga.canonicalId) {
+                    manga.canonicalId?.let { tachiyomi.domain.manga.model.CanonicalId.toLabel(it) }
+                }
                 EditMetadataDialog(
                     title = manga.title,
                     author = manga.author,
@@ -329,6 +332,7 @@ class MangaScreen(
                     genres = manga.genre ?: emptyList(),
                     lockedFields = manga.lockedFields,
                     hasAuthority = manga.canonicalId != null,
+                    authorityLabel = authorityLabel,
                     onSaveTitle = screenModel::editTitle,
                     onSaveAuthor = screenModel::editAuthor,
                     onSaveArtist = screenModel::editArtist,

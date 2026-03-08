@@ -7,6 +7,7 @@ import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import tachiyomi.core.common.util.lang.withIOContext
@@ -201,6 +202,54 @@ class JellyfinApi(
         val request = okhttp3.Request.Builder()
             .url(url)
             .method(method, if (method == "POST") ByteArray(0).toRequestBody() else null)
+            .build()
+        client.newCall(request).awaitSuccess()
+    }
+
+    /**
+     * Updates metadata fields on a Jellyfin item.
+     * Mirrors Jellyfin's "Edit Metadata" → Save workflow.
+     *
+     * Only non-null fields are included in the update payload.
+     * Reference: POST /Items/{itemId}
+     */
+    suspend fun updateItemMetadata(
+        serverUrl: String,
+        itemId: String,
+        name: String? = null,
+        overview: String? = null,
+        genres: List<String>? = null,
+        communityRating: Double? = null,
+        productionYear: Int? = null,
+    ) = withIOContext {
+        val fields = mutableMapOf<String, Any>()
+        fields["Id"] = itemId
+        if (name != null) fields["Name"] = name
+        if (overview != null) fields["Overview"] = overview
+        if (genres != null) fields["Genres"] = genres
+        if (communityRating != null) fields["CommunityRating"] = communityRating
+        if (productionYear != null) fields["ProductionYear"] = productionYear
+
+        val jsonBody = json.encodeToString(
+            kotlinx.serialization.json.JsonObject.serializer(),
+            kotlinx.serialization.json.JsonObject(
+                fields.mapValues { (_, value) ->
+                    when (value) {
+                        is String -> kotlinx.serialization.json.JsonPrimitive(value)
+                        is Int -> kotlinx.serialization.json.JsonPrimitive(value)
+                        is Double -> kotlinx.serialization.json.JsonPrimitive(value)
+                        is List<*> -> kotlinx.serialization.json.JsonArray(
+                            value.map { kotlinx.serialization.json.JsonPrimitive(it as String) },
+                        )
+                        else -> kotlinx.serialization.json.JsonPrimitive(value.toString())
+                    }
+                },
+            ),
+        )
+        val body = jsonBody.toByteArray().toRequestBody("application/json".toMediaType())
+        val request = okhttp3.Request.Builder()
+            .url("$serverUrl/Items/$itemId")
+            .post(body)
             .build()
         client.newCall(request).awaitSuccess()
     }

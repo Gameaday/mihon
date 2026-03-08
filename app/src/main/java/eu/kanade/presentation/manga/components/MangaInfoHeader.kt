@@ -660,9 +660,11 @@ private fun ColumnScope.MangaContentInfo(
             LockedField.ALL_FIELDS.count { LockedField.isLocked(lockedFields, it) }
         }
         if (authorityLabel != null) {
-            Row(
+            androidx.compose.material3.Surface(
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                shape = MaterialTheme.shapes.small,
                 modifier = Modifier
-                    .secondaryItemAlpha()
+                    .fillMaxWidth()
                     .then(
                         if (authorityUrl != null) {
                             Modifier.clickableNoIndication {
@@ -672,48 +674,52 @@ private fun ColumnScope.MangaContentInfo(
                             Modifier
                         },
                     ),
-                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Verified,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
-                    Text(
-                        text = stringResource(MR.strings.authority_linked_label),
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
+                Row(
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Verified,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary,
                     )
-                    DotSeparatorText()
-                    Text(
-                        text = authorityLabel,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        color = if (authorityUrl != null) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            LocalContentColor.current
-                        },
-                    )
-                    if (lockCount > 0) {
-                        DotSeparatorText()
-                        Icon(
-                            imageVector = Icons.Outlined.Lock,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(end = 2.dp)
-                                .size(12.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
                         Text(
-                            text = stringResource(MR.strings.authority_locked_count, lockCount),
+                            text = stringResource(MR.strings.authority_linked_label),
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
                         )
+                        DotSeparatorText()
+                        Text(
+                            text = authorityLabel,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            color = if (authorityUrl != null) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                LocalContentColor.current
+                            },
+                        )
+                        if (lockCount > 0) {
+                            DotSeparatorText()
+                            Icon(
+                                imageVector = Icons.Outlined.Lock,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(end = 2.dp)
+                                    .size(12.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = stringResource(MR.strings.authority_locked_count, lockCount),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        }
                     }
                 }
             }
