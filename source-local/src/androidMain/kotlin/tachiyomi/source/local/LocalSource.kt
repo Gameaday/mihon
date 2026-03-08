@@ -272,7 +272,6 @@ actual class LocalSource(
                     date_upload = chapterFile.lastModified()
 
                     // Try Jellyfin naming first for files that follow the convention
-                    // Try Jellyfin naming first for files that follow the convention
                     val jellyfinParsed = if (!chapterFile.isDirectory) {
                         JellyfinNaming.parseChapterFilename(chapterFile.name.orEmpty())
                     } else {

@@ -131,9 +131,11 @@ private fun determineMangaField(manga: Manga): ComicInfo.Manga? {
         ContentType.MANGA, ContentType.UNKNOWN -> {
             val mode = ReadingMode.fromPreference(manga.readingMode.toInt())
             when (mode) {
-                ReadingMode.LEFT_TO_RIGHT -> ComicInfo.Manga("Yes")
-                ReadingMode.WEBTOON, ReadingMode.CONTINUOUS_VERTICAL -> ComicInfo.Manga("Yes")
-                ReadingMode.VERTICAL -> ComicInfo.Manga("Yes")
+                ReadingMode.LEFT_TO_RIGHT,
+                ReadingMode.WEBTOON,
+                ReadingMode.CONTINUOUS_VERTICAL,
+                ReadingMode.VERTICAL,
+                -> ComicInfo.Manga("Yes")
                 // RIGHT_TO_LEFT and DEFAULT both get manga RTL
                 else -> ComicInfo.Manga("YesAndRightToLeft")
             }
