@@ -32,7 +32,7 @@ fun ChapterHeader(
                 enabled = enabled,
                 onClick = onClick,
             )
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
     ) {
         Text(
@@ -42,7 +42,7 @@ fun ChapterHeader(
                 pluralStringResource(MR.plurals.manga_num_chapters, count = chapterCount, chapterCount)
             },
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         MissingChaptersWarning(missingChapterCount)

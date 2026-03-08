@@ -81,7 +81,6 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -552,7 +551,7 @@ private fun ColumnScope.MangaContentInfo(
         }
     }
 
-    Spacer(modifier = Modifier.height(2.dp))
+    Spacer(modifier = Modifier.height(4.dp))
 
     Row(
         modifier = Modifier.secondaryItemAlpha(),
@@ -571,7 +570,7 @@ private fun ColumnScope.MangaContentInfo(
             contentDescription = null,
             modifier = Modifier
                 .padding(end = 4.dp)
-                .size(16.dp),
+                .size(18.dp),
         )
         ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
             Text(
@@ -601,7 +600,7 @@ private fun ColumnScope.MangaContentInfo(
                     contentDescription = null,
                     modifier = Modifier
                         .padding(end = 4.dp)
-                        .size(16.dp),
+                        .size(18.dp),
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
@@ -734,8 +733,8 @@ private fun FieldLockIcon(lockedFields: Long, field: Long, modifier: Modifier = 
         Icon(
             imageVector = Icons.Outlined.Lock,
             contentDescription = null,
-            modifier = modifier.size(12.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = modifier.size(14.dp),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
         )
     }
 }
@@ -915,7 +914,7 @@ private fun RowScope.MangaActionButton(
             Text(
                 text = title,
                 color = color,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
             )
         }
