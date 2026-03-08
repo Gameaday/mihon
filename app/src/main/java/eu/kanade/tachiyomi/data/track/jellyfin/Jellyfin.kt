@@ -43,6 +43,12 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         const val UNREAD = 1L
         const val READING = 2L
         const val COMPLETED = 3L
+
+        /** Regex for stripping punctuation during title normalization. */
+        private val PUNCTUATION_REGEX = Regex("[\\-–—:,!?.'\"()\\[\\]{}]")
+
+        /** Regex for collapsing multiple whitespace into a single space. */
+        private val WHITESPACE_REGEX = Regex("\\s+")
     }
 
     override val client: OkHttpClient =
@@ -240,11 +246,12 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
 
         return try {
             val results = api.searchSeries(serverUrl, userId, manga.title)
+            val normalizedMangaTitle = normalizeTitle(manga.title)
             // Exact title match preferred, then normalized match, then first result
             results.firstOrNull {
                 it.title.equals(manga.title, ignoreCase = true)
             } ?: results.firstOrNull {
-                normalizeTitle(it.title) == normalizeTitle(manga.title)
+                normalizeTitle(it.title) == normalizedMangaTitle
             } ?: results.firstOrNull()
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Jellyfin match failed for: ${manga.title}" }
@@ -256,11 +263,12 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      * Normalizes a title for matching by removing common punctuation and
      * collapsing whitespace. This improves matching between slightly different
      * title formats (e.g., "Series: Part 1" vs "Series - Part 1").
+     * Uses pre-compiled [PUNCTUATION_REGEX] and [WHITESPACE_REGEX] for performance.
      */
     private fun normalizeTitle(title: String): String {
         return title.lowercase()
-            .replace(Regex("[\\-–—:,!?.'\"()\\[\\]{}]"), " ")
-            .replace(Regex("\\s+"), " ")
+            .replace(PUNCTUATION_REGEX, " ")
+            .replace(WHITESPACE_REGEX, " ")
             .trim()
     }
 

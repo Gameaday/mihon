@@ -57,7 +57,9 @@ class JellyfinApi(
         maxWidth: Int? = null,
         quality: Int? = null,
     ): String {
-        // Determine best available image type
+        // Determine best available image type.
+        // "Backdrop/0" uses a URL path segment (Items/{id}/Images/Backdrop/0)
+        // to select the first backdrop image — this is Jellyfin's standard URL format.
         val imageType = when {
             item.imageTags?.containsKey("Primary") == true -> "Primary"
             item.imageTags?.containsKey("Thumb") == true -> "Thumb"
