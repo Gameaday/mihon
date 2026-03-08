@@ -272,7 +272,6 @@ private fun TrackInfoItem(
             } else {
                 MaterialTheme.colorScheme.surfaceContainerHighest
             },
-            tonalElevation = if (isAuthority) 2.dp else 0.dp,
         ) {
             Column {
                 Row(modifier = Modifier.height(IntrinsicSize.Min)) {

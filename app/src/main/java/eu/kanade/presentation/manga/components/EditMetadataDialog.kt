@@ -589,7 +589,7 @@ private fun GenreEditor(
 /**
  * Jellyfin-style section header with a divider and label.
  * Groups related metadata fields visually, using Material Expression
- * with primary color accent, tonal surface, and proper spacing hierarchy.
+ * with primary color accent and proper spacing hierarchy.
  */
 @Composable
 private fun SectionHeader(text: String) {
