@@ -507,7 +507,7 @@ private fun GenreEditor(
             value = newGenre,
             onValueChange = onNewGenreChange,
             label = { Text(text = stringResource(MR.strings.locked_field_genre)) },
-            placeholder = { Text(text = "Add genre…") },
+            placeholder = { Text(text = stringResource(MR.strings.edit_metadata_add_genre)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             trailingIcon = {

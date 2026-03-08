@@ -1311,93 +1311,66 @@ class MangaScreenModel(
     }
 
     /**
-     * Updates a single metadata field and auto-locks it (Jellyfin behavior:
+     * Applies a metadata field update and auto-locks the field (Jellyfin behavior:
      * manual edits are automatically protected from authority overwrite).
      */
+    private fun editFieldAndLock(
+        lockField: Long,
+        buildUpdate: (mangaId: Long, newLockedFields: Long) -> tachiyomi.domain.manga.model.MangaUpdate,
+    ) {
+        val manga = successState?.manga ?: return
+        screenModelScope.launchIO {
+            updateManga.await(
+                buildUpdate(manga.id, manga.lockedFields or lockField),
+            )
+        }
+    }
+
     fun editTitle(value: String) {
         val manga = successState?.manga ?: return
         if (value == manga.title) return
-        screenModelScope.launchIO {
-            updateManga.await(
-                tachiyomi.domain.manga.model.MangaUpdate(
-                    id = manga.id,
-                    title = value,
-                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.TITLE,
-                ),
-            )
+        editFieldAndLock(tachiyomi.domain.manga.model.LockedField.TITLE) { id, locked ->
+            tachiyomi.domain.manga.model.MangaUpdate(id = id, title = value, lockedFields = locked)
         }
     }
 
     fun editAuthor(value: String) {
         val manga = successState?.manga ?: return
-        val newValue = value.ifBlank { null }
-        if (newValue == manga.author) return
-        screenModelScope.launchIO {
-            updateManga.await(
-                tachiyomi.domain.manga.model.MangaUpdate(
-                    id = manga.id,
-                    author = newValue,
-                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.AUTHOR,
-                ),
-            )
+        if (value == (manga.author ?: "")) return
+        editFieldAndLock(tachiyomi.domain.manga.model.LockedField.AUTHOR) { id, locked ->
+            tachiyomi.domain.manga.model.MangaUpdate(id = id, author = value, lockedFields = locked)
         }
     }
 
     fun editArtist(value: String) {
         val manga = successState?.manga ?: return
-        val newValue = value.ifBlank { null }
-        if (newValue == manga.artist) return
-        screenModelScope.launchIO {
-            updateManga.await(
-                tachiyomi.domain.manga.model.MangaUpdate(
-                    id = manga.id,
-                    artist = newValue,
-                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.ARTIST,
-                ),
-            )
+        if (value == (manga.artist ?: "")) return
+        editFieldAndLock(tachiyomi.domain.manga.model.LockedField.ARTIST) { id, locked ->
+            tachiyomi.domain.manga.model.MangaUpdate(id = id, artist = value, lockedFields = locked)
         }
     }
 
     fun editDescription(value: String) {
         val manga = successState?.manga ?: return
-        val newValue = value.ifBlank { null }
-        if (newValue == manga.description) return
-        screenModelScope.launchIO {
-            updateManga.await(
-                tachiyomi.domain.manga.model.MangaUpdate(
-                    id = manga.id,
-                    description = newValue,
-                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.DESCRIPTION,
-                ),
-            )
+        if (value == (manga.description ?: "")) return
+        editFieldAndLock(tachiyomi.domain.manga.model.LockedField.DESCRIPTION) { id, locked ->
+            tachiyomi.domain.manga.model.MangaUpdate(id = id, description = value, lockedFields = locked)
         }
     }
 
     fun editStatus(value: Long) {
         val manga = successState?.manga ?: return
         if (value == manga.status) return
-        screenModelScope.launchIO {
-            updateManga.await(
-                tachiyomi.domain.manga.model.MangaUpdate(
-                    id = manga.id,
-                    status = value,
-                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.STATUS,
-                ),
-            )
+        editFieldAndLock(tachiyomi.domain.manga.model.LockedField.STATUS) { id, locked ->
+            tachiyomi.domain.manga.model.MangaUpdate(id = id, status = value, lockedFields = locked)
         }
     }
 
     fun editGenres(value: List<String>) {
         val manga = successState?.manga ?: return
         if (value == manga.genre) return
-        screenModelScope.launchIO {
-            updateManga.await(
-                tachiyomi.domain.manga.model.MangaUpdate(
-                    id = manga.id,
-                    genre = value,
-                    lockedFields = manga.lockedFields or tachiyomi.domain.manga.model.LockedField.GENRE,
-                ),
-            )
+        editFieldAndLock(tachiyomi.domain.manga.model.LockedField.GENRE) { id, locked ->
+            tachiyomi.domain.manga.model.MangaUpdate(id = id, genre = value, lockedFields = locked)
         }
     }
 
