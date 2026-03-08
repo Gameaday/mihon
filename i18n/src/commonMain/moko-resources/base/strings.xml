@@ -1211,4 +1211,6 @@
     <string name="locked_field_content_type">Content type</string>
     <string name="metadata_locks_lock_all">Lock all</string>
     <string name="metadata_locks_unlock_all">Unlock all</string>
+    <string name="action_refresh_authority">Refresh from authority</string>
+    <string name="authority_locked_count">%d locked</string>
 </resources>

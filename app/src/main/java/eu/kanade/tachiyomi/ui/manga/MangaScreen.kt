@@ -170,6 +170,9 @@ class MangaScreen(
             onResolveCanonicalClicked = screenModel::resolveCanonicalId.takeIf {
                 successState.manga.favorite && successState.manga.canonicalId == null
             },
+            onRefreshAuthorityClicked = screenModel::refreshFromAuthority.takeIf {
+                successState.manga.favorite && successState.manga.canonicalId != null
+            },
             onMetadataLocksClicked = screenModel::showMetadataLocksDialog.takeIf {
                 successState.manga.favorite && successState.manga.canonicalId != null
             },

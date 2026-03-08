@@ -420,6 +420,27 @@ class MangaScreenModel(
         }
     }
 
+    /**
+     * Refreshes metadata from the canonical authority source only, without
+     * touching the content source.  This is the Jellyfin-style "re-scan from
+     * metadata provider" action — it respects per-field locks.
+     */
+    fun refreshFromAuthority() {
+        val manga = successState?.manga ?: return
+        if (manga.canonicalId == null) return
+        screenModelScope.launchIO {
+            try {
+                val refreshCanonical: eu.kanade.domain.track.interactor.RefreshCanonicalMetadata =
+                    Injekt.get()
+                refreshCanonical.await(manga)
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) {
+                    "Authority-only refresh failed for ${manga.title}"
+                }
+            }
+        }
+    }
+
     fun toggleFavorite() {
         toggleFavorite(
             onRemoved = {

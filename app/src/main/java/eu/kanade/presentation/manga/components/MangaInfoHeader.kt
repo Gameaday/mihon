@@ -37,6 +37,7 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Schedule
@@ -98,6 +99,7 @@ import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.findChildOfType
 import tachiyomi.domain.manga.model.CanonicalId
+import tachiyomi.domain.manga.model.LockedField
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.SourceStatus
 import tachiyomi.i18n.MR
@@ -389,6 +391,7 @@ private fun MangaAndSourceTitlesLarge(
             sourceStatus = sourceStatus,
             metadataSourceName = metadataSourceName,
             canonicalId = manga.canonicalId,
+            lockedFields = manga.lockedFields,
             doSearch = doSearch,
             textAlign = TextAlign.Center,
         )
@@ -438,6 +441,7 @@ private fun MangaAndSourceTitlesSmall(
                 sourceStatus = sourceStatus,
                 metadataSourceName = metadataSourceName,
                 canonicalId = manga.canonicalId,
+                lockedFields = manga.lockedFields,
                 doSearch = doSearch,
             )
         }
@@ -455,6 +459,7 @@ private fun ColumnScope.MangaContentInfo(
     sourceStatus: Int,
     metadataSourceName: String?,
     canonicalId: String?,
+    lockedFields: Long = 0L,
     doSearch: (query: String, global: Boolean) -> Unit,
     textAlign: TextAlign? = LocalTextStyle.current.textAlign,
 ) {
@@ -506,6 +511,14 @@ private fun ColumnScope.MangaContentInfo(
                 ),
             textAlign = textAlign,
         )
+        if (LockedField.isLocked(lockedFields, LockedField.AUTHOR)) {
+            Icon(
+                imageVector = Icons.Outlined.Lock,
+                contentDescription = null,
+                modifier = Modifier.size(12.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 
     if (!artist.isNullOrBlank() && author != artist) {
@@ -529,6 +542,14 @@ private fun ColumnScope.MangaContentInfo(
                     ),
                 textAlign = textAlign,
             )
+            if (LockedField.isLocked(lockedFields, LockedField.ARTIST)) {
+                Icon(
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = null,
+                    modifier = Modifier.size(12.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 
@@ -629,6 +650,9 @@ private fun ColumnScope.MangaContentInfo(
     if (canonicalId != null) {
         val authorityLabel = remember(canonicalId) { CanonicalId.toLabel(canonicalId) }
         val authorityUrl = remember(canonicalId) { CanonicalId.toUrl(canonicalId) }
+        val lockCount = remember(lockedFields) {
+            LockedField.ALL_FIELDS.count { LockedField.isLocked(lockedFields, it) }
+        }
         if (authorityLabel != null) {
             Row(
                 modifier = Modifier
@@ -669,6 +693,22 @@ private fun ColumnScope.MangaContentInfo(
                             LocalContentColor.current
                         },
                     )
+                    if (lockCount > 0) {
+                        DotSeparatorText()
+                        Icon(
+                            imageVector = Icons.Outlined.Lock,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = 2.dp)
+                                .size(12.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = stringResource(MR.strings.authority_locked_count, lockCount),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
         }

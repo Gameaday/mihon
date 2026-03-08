@@ -115,6 +115,7 @@ fun MangaScreen(
     onEditNotesClicked: () -> Unit,
     onClearMetadataSourceClicked: (() -> Unit)?,
     onResolveCanonicalClicked: (() -> Unit)?,
+    onRefreshAuthorityClicked: (() -> Unit)?,
     onMetadataLocksClicked: (() -> Unit)?,
 
     // For bottom action menu
@@ -167,6 +168,7 @@ fun MangaScreen(
             onEditNotesClicked = onEditNotesClicked,
             onClearMetadataSourceClicked = onClearMetadataSourceClicked,
             onResolveCanonicalClicked = onResolveCanonicalClicked,
+            onRefreshAuthorityClicked = onRefreshAuthorityClicked,
             onMetadataLocksClicked = onMetadataLocksClicked,
             onMultiBookmarkClicked = onMultiBookmarkClicked,
             onMultiMarkAsReadClicked = onMultiMarkAsReadClicked,
@@ -206,6 +208,7 @@ fun MangaScreen(
             onEditNotesClicked = onEditNotesClicked,
             onClearMetadataSourceClicked = onClearMetadataSourceClicked,
             onResolveCanonicalClicked = onResolveCanonicalClicked,
+            onRefreshAuthorityClicked = onRefreshAuthorityClicked,
             onMetadataLocksClicked = onMetadataLocksClicked,
             onMultiBookmarkClicked = onMultiBookmarkClicked,
             onMultiMarkAsReadClicked = onMultiMarkAsReadClicked,
@@ -255,6 +258,7 @@ private fun MangaScreenSmallImpl(
     onEditNotesClicked: () -> Unit,
     onClearMetadataSourceClicked: (() -> Unit)?,
     onResolveCanonicalClicked: (() -> Unit)?,
+    onRefreshAuthorityClicked: (() -> Unit)?,
     onMetadataLocksClicked: (() -> Unit)?,
 
     // For bottom action menu
@@ -317,6 +321,7 @@ private fun MangaScreenSmallImpl(
                 onClickEditNotes = onEditNotesClicked,
                 onClickClearMetadataSource = onClearMetadataSourceClicked,
                 onClickResolveCanonical = onResolveCanonicalClicked,
+                onClickRefreshAuthority = onRefreshAuthorityClicked,
                 onClickMetadataLocks = onMetadataLocksClicked,
                 actionModeCounter = selectedChapterCount,
                 onCancelActionMode = { onAllChapterSelected(false) },
@@ -519,6 +524,7 @@ fun MangaScreenLargeImpl(
     onEditNotesClicked: () -> Unit,
     onClearMetadataSourceClicked: (() -> Unit)?,
     onResolveCanonicalClicked: (() -> Unit)?,
+    onRefreshAuthorityClicked: (() -> Unit)?,
     onMetadataLocksClicked: (() -> Unit)?,
 
     // For bottom action menu
@@ -574,6 +580,7 @@ fun MangaScreenLargeImpl(
                 onClickEditNotes = onEditNotesClicked,
                 onClickClearMetadataSource = onClearMetadataSourceClicked,
                 onClickResolveCanonical = onResolveCanonicalClicked,
+                onClickRefreshAuthority = onRefreshAuthorityClicked,
                 onClickMetadataLocks = onMetadataLocksClicked,
                 onCancelActionMode = { onAllChapterSelected(false) },
                 actionModeCounter = selectedChapterCount,
