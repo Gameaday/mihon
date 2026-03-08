@@ -18,12 +18,12 @@ import tachiyomi.domain.manga.repository.MangaRepository
  *
  * Parses the manga's [Manga.canonicalId] (e.g. "mu:12345", "al:21") to identify the
  * tracker, searches by title to retrieve the full [TrackSearch] result with matching
- * remote ID, and updates metadata fields that have changed.
+ * remote ID, and fills in any **missing** metadata fields.
  *
- * Unlike [MatchUnlinkedManga.enrichFromSearchResult] which only fills empty fields,
- * this refresher **overwrites** existing metadata to capture updates from the
- * authoritative source (e.g. series status changing from "Publishing" to "Completed",
- * updated descriptions, new cover art).
+ * Like [MatchUnlinkedManga.enrichFromSearchResult], this refresher only fills fields
+ * that are currently empty/blank — it never overwrites user or source data.  This
+ * reduces unnecessary writes, bandwidth, and prevents "overwrite chains" when multiple
+ * authorities are checked in sequence.
  */
 class RefreshCanonicalMetadata(
     private val mangaRepository: MangaRepository,
@@ -88,28 +88,33 @@ class RefreshCanonicalMetadata(
 
     /**
      * Applies metadata from the tracker result to the manga.
-     * Overwrites existing fields with authoritative data when the tracker provides
-     * non-blank values — this captures updates like status changes, new descriptions,
-     * and updated cover art.
+     * Only fills fields that are currently empty/blank — never overwrites existing
+     * user or source data.  This prevents "overwrite chains" when multiple
+     * authorities are consulted in sequence and reduces unnecessary writes.
      */
     private suspend fun applyMetadataUpdate(manga: Manga, result: TrackSearch): Boolean {
-        val description = result.summary.takeIf { it.isNotBlank() }
-        val author = result.authors.joinToString(", ").takeIf { it.isNotBlank() }
-        val artist = result.artists.joinToString(", ").takeIf { it.isNotBlank() }
-        val thumbnailUrl = result.cover_url.takeIf { it.isNotBlank() }
-        val status = mapTrackerStatus(result.publishing_status)
+        val description = result.summary.takeIf {
+            it.isNotBlank() && manga.description.isNullOrBlank()
+        }
+        val author = result.authors.joinToString(", ").takeIf {
+            it.isNotBlank() && manga.author.isNullOrBlank()
+        }
+        val artist = result.artists.joinToString(", ").takeIf {
+            it.isNotBlank() && manga.artist.isNullOrBlank()
+        }
+        val thumbnailUrl = result.cover_url.takeIf {
+            it.isNotBlank() && manga.thumbnailUrl.isNullOrBlank()
+        }
+        val status = mapTrackerStatus(result.publishing_status).takeIf {
+            it != null && (manga.status == 0L)
+        }
         // Infer content type from tracker's publishing_type
         val contentType = ContentType.fromPublishingType(result.publishing_type).takeIf {
-            it != ContentType.UNKNOWN
+            it != ContentType.UNKNOWN && manga.contentType == ContentType.UNKNOWN
         }
 
-        // Check if there's actually something to update
-        val hasChanges = (description != null && description != manga.description) ||
-            (author != null && author != manga.author) ||
-            (artist != null && artist != manga.artist) ||
-            (thumbnailUrl != null && thumbnailUrl != manga.thumbnailUrl) ||
-            (status != null && status != manga.status) ||
-            (contentType != null && contentType != manga.contentType)
+        val hasChanges = description != null || author != null || artist != null ||
+            thumbnailUrl != null || status != null || contentType != null
 
         if (!hasChanges) {
             // Still merge alt titles even if main metadata didn't change

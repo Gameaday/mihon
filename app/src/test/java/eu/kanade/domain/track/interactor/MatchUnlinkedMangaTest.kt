@@ -108,10 +108,10 @@ class MatchUnlinkedMangaTest {
         every { muTracker.id } returns 7L
         every { trackerManager.get(7L) } returns muTracker
 
-        // Default: "Auto" — no preferred tracker
-        val prefPref = mockk<Preference<Long>>()
-        every { prefPref.get() } returns TrackPreferences.AUTHORITY_TRACKER_AUTO
-        every { trackPreferences.preferredAuthorityTracker() } returns prefPref
+        // Default authority order: MU (7) → AniList (2) → MAL (1)
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns TrackPreferences.DEFAULT_AUTHORITY_ORDER
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
 
         matchUnlinkedManga = MatchUnlinkedManga(mangaRepository, trackerManager, getTracks, trackPreferences)
     }
@@ -902,10 +902,10 @@ class MatchUnlinkedMangaTest {
         ) shouldBe false
     }
 
-    // ========== Preferred authority tracker ==========
+    // ========== Authority tracker order ==========
 
     @Test
-    fun `uses preferred tracker when set and logged in`() = runTest {
+    fun `uses first available tracker in ordered list`() = runTest {
         val alTracker = mockk<Tracker>(relaxed = true)
         every { alTracker.id } returns 2L
         every { alTracker.isLoggedIn } returns true
@@ -914,10 +914,10 @@ class MatchUnlinkedMangaTest {
             testTrackSearch("One Piece", 21L),
         )
 
-        // Set AniList as preferred
-        val prefPref = mockk<Preference<Long>>()
-        every { prefPref.get() } returns 2L
-        every { trackPreferences.preferredAuthorityTracker() } returns prefPref
+        // Set AniList first in order
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns listOf(2L, 7L, 1L) // AniList → MU → MAL
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
 
         val manga = testManga(id = 1L, title = "One Piece")
         coEvery { mangaRepository.getFavorites() } returns listOf(manga)
@@ -934,16 +934,16 @@ class MatchUnlinkedMangaTest {
     }
 
     @Test
-    fun `falls back to auto when preferred tracker is not logged in`() = runTest {
+    fun `skips unavailable tracker and uses next in order`() = runTest {
         val alTracker = mockk<Tracker>(relaxed = true)
         every { alTracker.id } returns 2L
         every { alTracker.isLoggedIn } returns false // Not logged in
         every { trackerManager.get(2L) } returns alTracker
 
-        // Set AniList as preferred, but it's not logged in
-        val prefPref = mockk<Preference<Long>>()
-        every { prefPref.get() } returns 2L
-        every { trackPreferences.preferredAuthorityTracker() } returns prefPref
+        // AniList first but not logged in → should fall through to MangaUpdates
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns listOf(2L, 7L, 1L)
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
 
         val manga = testManga(id = 1L, title = "One Piece")
         coEvery { mangaRepository.getFavorites() } returns listOf(manga)
@@ -963,11 +963,11 @@ class MatchUnlinkedMangaTest {
     }
 
     @Test
-    fun `falls back to auto when preferred tracker id is auto`() = runTest {
-        // Preference set to AUTO (default)
-        val prefPref = mockk<Preference<Long>>()
-        every { prefPref.get() } returns TrackPreferences.AUTHORITY_TRACKER_AUTO
-        every { trackPreferences.preferredAuthorityTracker() } returns prefPref
+    fun `default order uses MangaUpdates first`() = runTest {
+        // Default order: 7 (MU) → 2 (AL) → 1 (MAL)
+        val orderPref = mockk<Preference<List<Long>>>()
+        every { orderPref.get() } returns TrackPreferences.DEFAULT_AUTHORITY_ORDER
+        every { trackPreferences.authorityTrackerOrder() } returns orderPref
 
         val manga = testManga(id = 1L, title = "One Piece")
         coEvery { mangaRepository.getFavorites() } returns listOf(manga)
@@ -982,12 +982,12 @@ class MatchUnlinkedMangaTest {
         val result = matchUnlinkedManga.await()
 
         result.matched shouldBe 1
-        // Auto → picks MangaUpdates (public search)
+        // Default → picks MangaUpdates (public search)
         updateSlot.captured.canonicalId shouldBe "mu:100"
     }
 
     @Test
-    fun `preferred tracker still checked for hasQueryableTracker`() {
+    fun `ordered list still checked for hasQueryableTracker`() {
         // With MangaUpdates always available, hasQueryableTracker should be true
         matchUnlinkedManga.hasQueryableTracker() shouldBe true
     }

@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -43,6 +46,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
+import eu.kanade.domain.track.interactor.AddTracks
 import eu.kanade.domain.track.interactor.MatchUnlinkedJob
 import eu.kanade.domain.track.interactor.TrackerListImporter
 import eu.kanade.domain.track.model.AutoTrackState
@@ -269,32 +273,116 @@ object SettingsTrackingScreen : SearchableSettings {
             if (hasAuthoritativeTracker) {
                 val isJobRunning = MatchUnlinkedJob.isRunning(context)
 
-                // Build the dynamic "Preferred tracker" entries.
-                // Only available (logged-in or public-search) trackers are selectable.
-                val preferredEntries = buildMap {
-                    put(TrackPreferences.AUTHORITY_TRACKER_AUTO, stringResource(MR.strings.pref_authority_tracker_auto))
-                    // MangaUpdates: always available (public search)
+                // --- Authority tracker order (reorderable) ---
+                val orderPref = trackPreferences.authorityTrackerOrder()
+                var currentOrder by remember { mutableStateOf(orderPref.get()) }
+
+                // Build label map for all canonical trackers
+                val trackerLabels: Map<Long, String> = buildMap {
                     put(trackerManager.mangaUpdates.id, trackerManager.mangaUpdates.name)
-                    // AniList / MAL: only if logged in
-                    if (trackerManager.aniList.isLoggedIn) {
-                        put(trackerManager.aniList.id, trackerManager.aniList.name)
-                    }
-                    if (trackerManager.myAnimeList.isLoggedIn) {
-                        put(trackerManager.myAnimeList.id, trackerManager.myAnimeList.name)
-                    }
-                }.toPersistentMap()
+                    put(trackerManager.aniList.id, trackerManager.aniList.name)
+                    put(trackerManager.myAnimeList.id, trackerManager.myAnimeList.name)
+                }
+
+                fun isAvailable(trackerId: Long): Boolean {
+                    val tracker = trackerManager.get(trackerId) ?: return false
+                    if (trackerId in AddTracks.TRACKERS_WITH_PUBLIC_SEARCH) return true
+                    return tracker.isLoggedIn
+                }
 
                 val authorityItems = buildList {
                     add(
-                        Preference.PreferenceItem.ListPreference(
-                            preference = trackPreferences.preferredAuthorityTracker(),
-                            entries = preferredEntries,
-                            title = stringResource(MR.strings.pref_authority_tracker_title),
-                            subtitle = stringResource(MR.strings.pref_authority_tracker_subtitle),
-                            subtitleProvider = { value, entries ->
-                                entries[value] ?: stringResource(MR.strings.pref_authority_tracker_auto)
-                            },
-                        ),
+                        Preference.PreferenceItem.CustomPreference(
+                            title = stringResource(MR.strings.pref_authority_order_title),
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(MR.strings.pref_authority_order_subtitle),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                currentOrder.forEachIndexed { index, trackerId ->
+                                    val label = trackerLabels[trackerId] ?: "Unknown"
+                                    val available = isAvailable(trackerId)
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    ) {
+                                        Text(
+                                            text = "${index + 1}.",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.padding(end = 4.dp),
+                                        )
+                                        Text(
+                                            text = label,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = if (available) {
+                                                MaterialTheme.colorScheme.onSurface
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        if (!available) {
+                                            Text(
+                                                text = stringResource(MR.strings.pref_authority_not_available),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                if (index > 0) {
+                                                    val newOrder = currentOrder.toMutableList()
+                                                    newOrder[index] = newOrder[index - 1].also {
+                                                        newOrder[index - 1] = newOrder[index]
+                                                    }
+                                                    currentOrder = newOrder
+                                                    orderPref.set(newOrder)
+                                                }
+                                            },
+                                            enabled = index > 0,
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.ArrowUpward,
+                                                contentDescription = null,
+                                                tint = if (index > 0) {
+                                                    MaterialTheme.colorScheme.onSurface
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                                },
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                if (index < currentOrder.lastIndex) {
+                                                    val newOrder = currentOrder.toMutableList()
+                                                    newOrder[index] = newOrder[index + 1].also {
+                                                        newOrder[index + 1] = newOrder[index]
+                                                    }
+                                                    currentOrder = newOrder
+                                                    orderPref.set(newOrder)
+                                                }
+                                            },
+                                            enabled = index < currentOrder.lastIndex,
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.ArrowDownward,
+                                                contentDescription = null,
+                                                tint = if (index < currentOrder.lastIndex) {
+                                                    MaterialTheme.colorScheme.onSurface
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                                },
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        },
                     )
                     addAll(importPreferences)
                     add(

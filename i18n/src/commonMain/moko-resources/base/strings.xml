@@ -1107,6 +1107,9 @@
 
     <!-- Authority management (import + retroactive link in one section) -->
     <string name="tracker_authority_group_title">Authority management</string>
+    <string name="pref_authority_order_title">Authority source order</string>
+    <string name="pref_authority_order_subtitle">Sources are checked in this order. Unavailable sources are skipped.</string>
+    <string name="pref_authority_not_available">Not logged in</string>
     <string name="pref_authority_tracker_title">Preferred authority source</string>
     <string name="pref_authority_tracker_subtitle">%s</string>
     <string name="pref_authority_tracker_auto">Auto (best available)</string>

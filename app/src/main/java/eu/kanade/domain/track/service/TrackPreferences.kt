@@ -6,6 +6,7 @@ import eu.kanade.tachiyomi.data.track.anilist.Anilist
 import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.preference.PreferenceStore
 import tachiyomi.core.common.preference.getEnum
+import tachiyomi.core.common.preference.getLongArray
 
 class TrackPreferences(
     private val preferenceStore: PreferenceStore,
@@ -35,14 +36,22 @@ class TrackPreferences(
     fun trackToken(tracker: Tracker) = preferenceStore.getString(Preference.privateKey("track_token_${tracker.id}"), "")
 
     /**
-     * User-preferred tracker for authority matching.
+     * Ordered list of preferred authority trackers for matching.
      *
-     * Value is a tracker ID (1=MAL, 2=AniList, 7=MangaUpdates) or 0 for "Auto"
-     * (the system picks the best available tracker automatically).
+     * The matching engine walks this list in order, trying each tracker.
+     * A tracker is skipped if it is not available (not logged in and does not support
+     * public search) or does not support the requested content type.
      *
-     * The matching engine validates at query time that the chosen tracker is still
-     * available (logged in or supports public search). If not, it falls back to
-     * the automatic selection.
+     * Default order: MangaUpdates (public, no login), AniList, MyAnimeList.
+     */
+    fun authorityTrackerOrder() = preferenceStore.getLongArray(
+        "pref_authority_tracker_order",
+        DEFAULT_AUTHORITY_ORDER,
+    )
+
+    /**
+     * Legacy single-preference accessor kept for backward compatibility.
+     * @see authorityTrackerOrder
      */
     fun preferredAuthorityTracker() = preferenceStore.getLong(
         "pref_preferred_authority_tracker",
@@ -61,5 +70,8 @@ class TrackPreferences(
     companion object {
         /** Sentinel value: let the system pick the best available tracker automatically. */
         const val AUTHORITY_TRACKER_AUTO = 0L
+
+        /** Default authority order: MangaUpdates (7, public) → AniList (2) → MAL (1). */
+        val DEFAULT_AUTHORITY_ORDER = listOf(7L, 2L, 1L)
     }
 }

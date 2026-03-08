@@ -193,40 +193,31 @@ class MatchUnlinkedManga(
     /**
      * Finds the best queryable tracker for search operations.
      *
-     * Selection priority:
-     * 1. **User preference** — if the user has set a preferred tracker and it supports
-     *    the requested [contentType] and is available (logged in or public-search), use it.
-     * 2. **Public-search trackers** — no login needed (e.g. MangaUpdates).
-     * 3. **Logged-in trackers** — any tracker with a canonical prefix that the user has
-     *    authenticated with.
+     * Walks the user's ordered authority list (Settings → Tracking → Authority order).
+     * Each tracker is checked in sequence:
+     *  - Must support the requested [contentType] (or UNKNOWN matches all).
+     *  - Must be queryable (logged in or supports public search).
+     * The first tracker passing both checks is returned.
      *
-     * This ensures the user's choice is always respected when valid, with automatic
-     * fallback when the preferred tracker becomes unavailable (logged out, auth expired).
+     * If the ordered list produces no match (all unavailable), falls back to the
+     * original automatic selection: public-search trackers first, then logged-in.
      */
     private fun findQueryableTracker(contentType: ContentType = ContentType.UNKNOWN): Tracker? {
         val validTrackerIds = AddTracks.trackersForContentType(contentType)
 
-        // Check user preference first
-        val preferredId = trackPreferences.preferredAuthorityTracker().get()
-        if (preferredId != TrackPreferences.AUTHORITY_TRACKER_AUTO && preferredId in validTrackerIds) {
-            val preferred = trackerManager.get(preferredId)
-            if (preferred != null && isTrackerQueryable(preferred)) {
-                return preferred
-            }
-            // Preferred tracker not available — fall through to automatic selection
+        // Walk the user's ordered preference list
+        val orderedIds = trackPreferences.authorityTrackerOrder().get()
+        for (trackerId in orderedIds) {
+            if (trackerId !in validTrackerIds) continue
+            val tracker = trackerManager.get(trackerId) ?: continue
+            if (isTrackerQueryable(tracker)) return tracker
         }
 
-        // Auto: first try public-search trackers that support this content type
-        val publicTracker = AddTracks.TRACKERS_WITH_PUBLIC_SEARCH
-            .filter { it in validTrackerIds }
-            .firstNotNullOfOrNull { id -> trackerManager.get(id) }
-        if (publicTracker != null) return publicTracker
-
-        // Then try any logged-in tracker with a canonical prefix that supports this type
+        // Fallback: any canonical tracker the user hasn't listed (future-proofing)
         return validTrackerIds
-            .filter { it in AddTracks.TRACKER_CANONICAL_PREFIXES }
+            .filter { it !in orderedIds && it in AddTracks.TRACKER_CANONICAL_PREFIXES }
             .firstNotNullOfOrNull { id ->
-                trackerManager.get(id)?.takeIf { it.isLoggedIn }
+                trackerManager.get(id)?.takeIf { isTrackerQueryable(it) }
             }
     }
 
