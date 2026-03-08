@@ -1218,4 +1218,16 @@
     <string name="action_refresh_authority">Refresh from authority</string>
     <string name="authority_locked_count">%d locked</string>
     <string name="action_filter_content_type_manga">Manga only</string>
+
+    <!-- Jellyfin tracker -->
+    <string name="jellyfin_server_url">Server URL</string>
+    <string name="jellyfin_server_url_hint">http://192.168.1.100:8096</string>
+    <string name="jellyfin_api_key">API Key</string>
+    <string name="jellyfin_api_key_hint">Generate in Jellyfin Dashboard → API Keys</string>
+    <string name="jellyfin_user_id">User ID</string>
+    <string name="jellyfin_user_id_hint">Jellyfin user ID for read progress sync</string>
+    <string name="jellyfin_connected">Connected to %s</string>
+    <string name="jellyfin_sync_description">Sync read progress with a Jellyfin media server. Chapters marked as read are reflected on the server.</string>
+    <string name="pref_jellyfin_sync_enabled">Jellyfin read progress sync</string>
+    <string name="pref_jellyfin_sync_enabled_summary">Sync chapter read status with Jellyfin server. Requires Jellyfin tracker to be configured.</string>
 </resources>

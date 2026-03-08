@@ -67,6 +67,15 @@ class TrackPreferences(
         AutoTrackState.ALWAYS,
     )
 
+    /**
+     * Jellyfin user ID, used for API calls that require a user context.
+     * Set during Jellyfin tracker setup when connecting to a server.
+     */
+    fun jellyfinUserId() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_user_id"),
+        "",
+    )
+
     companion object {
         /** Sentinel value: let the system pick the best available tracker automatically. */
         const val AUTHORITY_TRACKER_AUTO = 0L

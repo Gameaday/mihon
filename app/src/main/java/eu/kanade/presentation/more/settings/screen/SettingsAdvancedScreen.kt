@@ -335,6 +335,11 @@ object SettingsAdvancedScreen : SearchableSettings {
                     title = stringResource(MR.strings.pref_jellyfin_compatible_naming),
                     subtitle = stringResource(MR.strings.pref_jellyfin_compatible_naming_summary),
                 ),
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = libraryPreferences.jellyfinSyncEnabled(),
+                    title = stringResource(MR.strings.pref_jellyfin_sync_enabled),
+                    subtitle = stringResource(MR.strings.pref_jellyfin_sync_enabled_summary),
+                ),
             ),
         )
     }

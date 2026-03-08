@@ -214,6 +214,16 @@ class LibraryPreferences(
      */
     fun jellyfinCompatibleNaming() = preferenceStore.getBoolean("pref_jellyfin_compatible_naming", false)
 
+    /**
+     * When enabled, downloaded chapters are also exported/saved to a Jellyfin
+     * library path, and read progress is synced back to the Jellyfin server.
+     *
+     * Requires the Jellyfin tracker to be configured with a valid server URL
+     * and API key. When a series is matched to a Jellyfin library item, marking
+     * chapters as read in the app will mark them as played on the server.
+     */
+    fun jellyfinSyncEnabled() = preferenceStore.getBoolean("pref_jellyfin_sync_enabled", false)
+
     // endregion
 
     // region Image Format

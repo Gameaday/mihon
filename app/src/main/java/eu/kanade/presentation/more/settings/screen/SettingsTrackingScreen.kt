@@ -161,8 +161,12 @@ object SettingsTrackingScreen : SearchableSettings {
         val enhancedTrackers = trackerManager.trackers
             .filter { it is EnhancedTracker }
             .partition { service ->
-                val acceptedSources = (service as EnhancedTracker).getAcceptedSources()
-                sourceManager.getCatalogueSources().any { it::class.qualifiedName in acceptedSources }
+                val enhanced = service as EnhancedTracker
+                val acceptedSources = enhanced.getAcceptedSources()
+                // Trackers that accept all sources (empty accepted list + accept returns true)
+                // are always considered "installed"
+                acceptedSources.isEmpty() ||
+                    sourceManager.getCatalogueSources().any { it::class.qualifiedName in acceptedSources }
             }
         var enhancedTrackerInfo = stringResource(MR.strings.enhanced_tracking_info)
         if (enhancedTrackers.second.isNotEmpty()) {
