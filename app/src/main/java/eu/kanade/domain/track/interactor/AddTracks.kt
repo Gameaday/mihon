@@ -185,6 +185,7 @@ class AddTracks(
             MYANIMELIST_ID to "mal", // MyAnimeList
             TrackerManager.ANILIST to "al", // AniList
             MANGAUPDATES_ID to "mu", // MangaUpdates
+            TrackerManager.JELLYFIN to "jf", // Jellyfin
         )
 
         /**
@@ -212,6 +213,7 @@ class AddTracks(
             MYANIMELIST_ID to setOf(ContentType.MANGA, ContentType.NOVEL),
             TrackerManager.ANILIST to setOf(ContentType.MANGA, ContentType.NOVEL),
             MANGAUPDATES_ID to setOf(ContentType.MANGA, ContentType.NOVEL),
+            TrackerManager.JELLYFIN to setOf(ContentType.MANGA, ContentType.NOVEL, ContentType.BOOK),
         )
 
         /**

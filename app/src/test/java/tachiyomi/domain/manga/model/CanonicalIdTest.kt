@@ -118,7 +118,7 @@ class CanonicalIdTest {
 
     @Test
     fun `ALL_PREFIXES contains all known prefixes`() {
-        CanonicalId.ALL_PREFIXES shouldBe setOf("al", "mal", "mu")
+        CanonicalId.ALL_PREFIXES shouldBe setOf("al", "mal", "mu", "jf")
     }
 
     @Test
@@ -134,5 +134,60 @@ class CanonicalIdTest {
         val original = "al:21"
         val url = CanonicalId.toUrl(original)!!
         CanonicalId.fromUrl(url) shouldBe original
+    }
+
+    // -- Jellyfin (string-based IDs) --
+
+    @Test
+    fun `create with string ID for Jellyfin`() {
+        CanonicalId.create("jf", "abc123def456") shouldBe "jf:abc123def456"
+    }
+
+    @Test
+    fun `create with string ID returns null for unrecognized prefix`() {
+        CanonicalId.create("xyz", "abc123") shouldBe null
+    }
+
+    @Test
+    fun `create with string ID returns null for blank ID`() {
+        CanonicalId.create("jf", "") shouldBe null
+        CanonicalId.create("jf", "  ") shouldBe null
+    }
+
+    @Test
+    fun `parseString returns prefix and string ID for Jellyfin`() {
+        CanonicalId.parseString("jf:abc123def456") shouldBe ("jf" to "abc123def456")
+    }
+
+    @Test
+    fun `parseString works for numeric IDs too`() {
+        CanonicalId.parseString("al:21") shouldBe ("al" to "21")
+    }
+
+    @Test
+    fun `parseString returns null for invalid formats`() {
+        CanonicalId.parseString("") shouldBe null
+        CanonicalId.parseString("jf") shouldBe null
+        CanonicalId.parseString(":abc") shouldBe null
+        CanonicalId.parseString("jf:") shouldBe null
+    }
+
+    @Test
+    fun `toLabel returns Jellyfin for jf prefix`() {
+        CanonicalId.toLabel("jf:abc123") shouldBe "Jellyfin"
+    }
+
+    @Test
+    fun `toUrl returns null for Jellyfin (server-relative URLs)`() {
+        // Jellyfin URLs are server-relative and can't be built from prefix alone
+        CanonicalId.toUrl("jf:abc123") shouldBe null
+    }
+
+    @Test
+    fun `create and parseString round-trip for Jellyfin`() {
+        val id = CanonicalId.create("jf", "abc123def456")!!
+        val (prefix, remoteId) = CanonicalId.parseString(id)!!
+        prefix shouldBe "jf"
+        remoteId shouldBe "abc123def456"
     }
 }

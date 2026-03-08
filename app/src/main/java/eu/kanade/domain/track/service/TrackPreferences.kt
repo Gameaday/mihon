@@ -80,7 +80,7 @@ class TrackPreferences(
         /** Sentinel value: let the system pick the best available tracker automatically. */
         const val AUTHORITY_TRACKER_AUTO = 0L
 
-        /** Default authority order: MangaUpdates (7, public) → AniList (2) → MAL (1). */
-        val DEFAULT_AUTHORITY_ORDER = listOf(7L, 2L, 1L)
+        /** Default authority order: MangaUpdates (7, public) → AniList (2) → MAL (1) → Jellyfin (10). */
+        val DEFAULT_AUTHORITY_ORDER = listOf(7L, 2L, 1L, 10L)
     }
 }

@@ -286,6 +286,7 @@ object SettingsTrackingScreen : SearchableSettings {
                     put(trackerManager.mangaUpdates.id, trackerManager.mangaUpdates.name)
                     put(trackerManager.aniList.id, trackerManager.aniList.name)
                     put(trackerManager.myAnimeList.id, trackerManager.myAnimeList.name)
+                    put(trackerManager.jellyfin.id, trackerManager.jellyfin.name)
                 }
 
                 fun isAvailable(trackerId: Long): Boolean {

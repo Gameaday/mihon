@@ -12,12 +12,14 @@ object CanonicalId {
         "al" to "https://anilist.co/manga/",
         "mal" to "https://myanimelist.net/manga/",
         "mu" to "https://www.mangaupdates.com/series.html?id=",
+        "jf" to "", // Jellyfin: URL is server-relative, built dynamically
     )
 
     private val TRACKER_LABELS = mapOf(
         "al" to "AniList",
         "mal" to "MyAnimeList",
         "mu" to "MangaUpdates",
+        "jf" to "Jellyfin",
     )
 
     /** All recognized canonical ID prefixes. */
@@ -29,6 +31,16 @@ object CanonicalId {
      */
     fun create(prefix: String, remoteId: Long): String? {
         if (prefix !in TRACKER_URLS || remoteId <= 0) return null
+        return "$prefix:$remoteId"
+    }
+
+    /**
+     * Creates a canonical ID string from a prefix and a string remote ID.
+     * Used for trackers with non-numeric IDs (e.g. Jellyfin UUIDs).
+     * @return canonical ID (e.g. "jf:abc123") or null if prefix is unrecognized.
+     */
+    fun create(prefix: String, remoteId: String): String? {
+        if (prefix !in TRACKER_URLS || remoteId.isBlank()) return null
         return "$prefix:$remoteId"
     }
 
@@ -45,12 +57,27 @@ object CanonicalId {
     }
 
     /**
+     * Parses a canonical ID string into (prefix, stringRemoteId).
+     * Supports both numeric and non-numeric remote IDs (e.g. Jellyfin UUIDs).
+     * @return pair of (prefix, remoteId) or null if the format is invalid.
+     */
+    fun parseString(canonicalId: String): Pair<String, String>? {
+        val parts = canonicalId.split(":", limit = 2)
+        if (parts.size != 2) return null
+        val prefix = parts[0].takeIf { it.isNotEmpty() } ?: return null
+        val remoteId = parts[1].takeIf { it.isNotEmpty() } ?: return null
+        return prefix to remoteId
+    }
+
+    /**
      * Builds a web URL for the given canonical ID.
-     * @return URL string or null if the prefix is unrecognized.
+     * @return URL string or null if the prefix is unrecognized or has no base URL.
      */
     fun toUrl(canonicalId: String): String? {
-        val (prefix, remoteId) = parse(canonicalId) ?: return null
-        val baseUrl = TRACKER_URLS[prefix] ?: return null
+        val (prefix, remoteId) = parse(canonicalId)
+            ?: parseString(canonicalId)?.let { it.first to it.second }
+            ?: return null
+        val baseUrl = TRACKER_URLS[prefix]?.takeIf { it.isNotEmpty() } ?: return null
         return "$baseUrl$remoteId"
     }
 
@@ -59,7 +86,9 @@ object CanonicalId {
      * @return label (e.g. "AniList") or null if the prefix is unrecognized.
      */
     fun toLabel(canonicalId: String): String? {
-        val (prefix, _) = parse(canonicalId) ?: return null
+        val (prefix, _) = parse(canonicalId)
+            ?: parseString(canonicalId)
+            ?: return null
         return TRACKER_LABELS[prefix]
     }
 

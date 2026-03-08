@@ -108,7 +108,14 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return emptyList()
         return try {
-            api.searchSeries(serverUrl, userId, query)
+            // Support direct ID lookup: "id:itemId"
+            if (query.startsWith("id:")) {
+                val itemId = query.removePrefix("id:")
+                val result = api.getSeries(serverUrl, userId, itemId)
+                listOf(result)
+            } else {
+                api.searchSeries(serverUrl, userId, query)
+            }
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Jellyfin search failed" }
             emptyList()

@@ -49,7 +49,10 @@ class RefreshCanonicalMetadata(
     suspend fun await(manga: Manga, fillOnly: Boolean = false): Boolean = withIOContext {
         val canonicalId = manga.canonicalId ?: return@withIOContext false
 
-        val (prefix, remoteId) = parseCanonicalId(canonicalId) ?: return@withIOContext false
+        // Try numeric ID first, then fall back to string ID for trackers like Jellyfin
+        val numericParsed = parseCanonicalId(canonicalId)
+        val stringParsed = if (numericParsed == null) parseCanonicalIdString(canonicalId) else null
+        val prefix = numericParsed?.first ?: stringParsed?.first ?: return@withIOContext false
 
         val trackerId = CANONICAL_PREFIX_TO_TRACKER[prefix] ?: run {
             logcat(LogPriority.DEBUG) { "Unknown canonical prefix: $prefix" }
@@ -62,7 +65,11 @@ class RefreshCanonicalMetadata(
         }
 
         try {
-            val result = findByRemoteId(tracker, manga.title, remoteId) ?: return@withIOContext false
+            val result = if (numericParsed != null) {
+                findByRemoteId(tracker, manga.title, numericParsed.second)
+            } else {
+                findByStringRemoteId(tracker, manga.title, stringParsed!!.second)
+            } ?: return@withIOContext false
             applyMetadataUpdate(manga, result, fillOnly)
         } catch (e: CancellationException) {
             throw e
@@ -94,6 +101,33 @@ class RefreshCanonicalMetadata(
         // Fall back to title-based search + filter by remote ID
         val results = tracker.search(title)
         return results.firstOrNull { it.remote_id == remoteId }
+    }
+
+    /**
+     * Looks up the tracker result for a string-based remote ID (e.g. Jellyfin UUID).
+     * Uses the tracker's search("id:...") protocol, then falls back to title search.
+     */
+    private suspend fun findByStringRemoteId(
+        tracker: Tracker,
+        title: String,
+        remoteId: String,
+    ): TrackSearch? {
+        // Try direct ID lookup
+        try {
+            val directResults = tracker.search("id:$remoteId")
+            val directMatch = directResults.firstOrNull {
+                it.tracking_url.contains(remoteId)
+            }
+            if (directMatch != null) return directMatch
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) {
+                "Direct string ID lookup failed for $remoteId, falling back to title search"
+            }
+        }
+
+        // Fall back to title-based search + find by tracking URL
+        val results = tracker.search(title)
+        return results.firstOrNull { it.tracking_url.contains(remoteId) }
     }
 
     /**
@@ -243,6 +277,19 @@ class RefreshCanonicalMetadata(
             if (parts.size != 2) return null
             val prefix = parts[0].takeIf { it.isNotEmpty() } ?: return null
             val remoteId = parts[1].toLongOrNull()?.takeIf { it > 0 } ?: return null
+            return prefix to remoteId
+        }
+
+        /**
+         * Parses a canonical ID string with a non-numeric ID (e.g. "jf:abc123").
+         */
+        fun parseCanonicalIdString(canonicalId: String): Pair<String, String>? {
+            val parts = canonicalId.split(":", limit = 2)
+            if (parts.size != 2) return null
+            val prefix = parts[0].takeIf { it.isNotEmpty() } ?: return null
+            val remoteId = parts[1].takeIf { it.isNotEmpty() } ?: return null
+            // Only use this for known non-numeric prefixes
+            if (prefix !in CANONICAL_PREFIX_TO_TRACKER) return null
             return prefix to remoteId
         }
     }

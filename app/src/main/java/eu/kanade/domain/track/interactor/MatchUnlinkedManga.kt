@@ -295,15 +295,35 @@ class MatchUnlinkedManga(
         return try {
             val results = tracker.search(query)
 
+            /**
+             * Checks if a result has a valid remote identifier.
+             * Supports both numeric IDs (MAL/AniList/MU) and string IDs (Jellyfin).
+             */
+            fun hasValidId(result: TrackSearch): Boolean =
+                result.remote_id > 0 || (prefix == "jf" && result.tracking_url.contains("/Items/"))
+
+            /**
+             * Builds a canonical ID string from the result.
+             * Uses numeric remote_id for standard trackers, or extracts the
+             * Jellyfin item ID from tracking_url for Jellyfin.
+             */
+            fun buildCanonicalId(result: TrackSearch): String = if (result.remote_id > 0) {
+                "$prefix:${result.remote_id}"
+            } else {
+                // Jellyfin: extract item ID from tracking_url (format: .../Items/{id})
+                val itemId = result.tracking_url.substringAfterLast("/Items/").substringBefore("?")
+                "$prefix:$itemId"
+            }
+
             // Tier 1: Exact case-insensitive match against any known title
             // Prefer results matching the manga's content type when known
             val exactMatches = results.filter { result ->
-                result.remote_id > 0 &&
+                hasValidId(result) &&
                     allTitles.any { title -> result.title.equals(title, ignoreCase = true) }
             }
             val exactMatch = pickBestByContentType(exactMatches, contentType)
             if (exactMatch != null) {
-                return "$prefix:${exactMatch.remote_id}" to exactMatch
+                return buildCanonicalId(exactMatch) to exactMatch
             }
 
             // Tier 2: Normalized match (strip punctuation, collapse whitespace)
@@ -313,13 +333,13 @@ class MatchUnlinkedManga(
                 .toSet()
             if (normalizedTitles.isNotEmpty()) {
                 val normalizedMatches = results.filter { result ->
-                    result.remote_id > 0 && normalizeTitle(result.title).let {
+                    hasValidId(result) && normalizeTitle(result.title).let {
                         it.isNotBlank() && it in normalizedTitles
                     }
                 }
                 val normalizedMatch = pickBestByContentType(normalizedMatches, contentType)
                 if (normalizedMatch != null) {
-                    return "$prefix:${normalizedMatch.remote_id}" to normalizedMatch
+                    return buildCanonicalId(normalizedMatch) to normalizedMatch
                 }
             }
 
@@ -327,7 +347,7 @@ class MatchUnlinkedManga(
             // Authority results often list the same manga under different names
             if (normalizedTitles.isNotEmpty()) {
                 val altTitleMatches = results.filter { result ->
-                    result.remote_id > 0 &&
+                    hasValidId(result) &&
                         result.alternative_titles.any { altTitle ->
                             val norm = normalizeTitle(altTitle)
                             norm.isNotBlank() && norm in normalizedTitles
@@ -335,7 +355,7 @@ class MatchUnlinkedManga(
                 }
                 val altTitleMatch = pickBestByContentType(altTitleMatches, contentType)
                 if (altTitleMatch != null) {
-                    return "$prefix:${altTitleMatch.remote_id}" to altTitleMatch
+                    return buildCanonicalId(altTitleMatch) to altTitleMatch
                 }
             }
 
@@ -344,7 +364,7 @@ class MatchUnlinkedManga(
             // the shorter title has at least MIN_SUBSTRING_LENGTH characters
             if (normalizedTitles.isNotEmpty()) {
                 val substringMatches = results.filter { result ->
-                    result.remote_id > 0 && normalizeTitle(result.title).let { resultNorm ->
+                    hasValidId(result) && normalizeTitle(result.title).let { resultNorm ->
                         resultNorm.isNotBlank() && normalizedTitles.any { localNorm ->
                             containsSubstringMatch(localNorm, resultNorm)
                         }
@@ -352,7 +372,7 @@ class MatchUnlinkedManga(
                 }
                 val substringMatch = pickBestByContentType(substringMatches, contentType)
                 if (substringMatch != null) {
-                    return "$prefix:${substringMatch.remote_id}" to substringMatch
+                    return buildCanonicalId(substringMatch) to substringMatch
                 }
             }
 
