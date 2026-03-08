@@ -385,6 +385,84 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         return api.getItemDownloadUrl(serverUrl, childItemId)
     }
 
+    // -- Jellyfin discovery features --
+
+    /**
+     * Fetches items similar to a given series from the Jellyfin server.
+     * Jellyfin's recommendation algorithm uses genre, tags, studios, and
+     * other metadata to find related content — enabling a "More Like This"
+     * section (Jellyfin's series detail page pattern).
+     */
+    suspend fun getSimilarItems(trackingUrl: String): List<TrackSearch> {
+        if (!isLoggedIn) return emptyList()
+        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        val itemId = api.getItemIdFromUrl(trackingUrl)
+        val userId = trackPreferences.jellyfinUserId().get()
+        if (userId.isBlank()) return emptyList()
+        return try {
+            api.getSimilarItems(serverUrl, userId, itemId)
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin similar items for $trackingUrl" }
+            emptyList()
+        }
+    }
+
+    /**
+     * Fetches the user's "Continue Reading" items from the Jellyfin server.
+     * This mirrors Jellyfin's home screen "Continue Reading" row — series that
+     * the user has started but not finished.
+     */
+    suspend fun getResumeItems(): List<TrackSearch> {
+        if (!isLoggedIn) return emptyList()
+        val serverUrl = getUsername().trimEnd('/')
+        val userId = trackPreferences.jellyfinUserId().get()
+        if (userId.isBlank()) return emptyList()
+        val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
+        return try {
+            api.getResumeItems(serverUrl, userId, parentId = libraryId)
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin resume items" }
+            emptyList()
+        }
+    }
+
+    /**
+     * Fetches the latest items added to the Jellyfin server.
+     * Mirrors Jellyfin's "Latest" section — recently added content.
+     */
+    suspend fun getLatestItems(): List<TrackSearch> {
+        if (!isLoggedIn) return emptyList()
+        val serverUrl = getUsername().trimEnd('/')
+        val userId = trackPreferences.jellyfinUserId().get()
+        if (userId.isBlank()) return emptyList()
+        val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
+        return try {
+            api.getLatestItems(serverUrl, userId, parentId = libraryId)
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin latest items" }
+            emptyList()
+        }
+    }
+
+    /**
+     * Fetches the user's "Next Up" items from the Jellyfin server.
+     * Mirrors Jellyfin's "Next Up" section — the next chapter to read
+     * in each series the user is currently reading.
+     */
+    suspend fun getNextUp(): List<TrackSearch> {
+        if (!isLoggedIn) return emptyList()
+        val serverUrl = getUsername().trimEnd('/')
+        val userId = trackPreferences.jellyfinUserId().get()
+        if (userId.isBlank()) return emptyList()
+        val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
+        return try {
+            api.getNextUp(serverUrl, userId, parentId = libraryId)
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin next up items" }
+            emptyList()
+        }
+    }
+
     // -- Private helpers --
 
     /**
