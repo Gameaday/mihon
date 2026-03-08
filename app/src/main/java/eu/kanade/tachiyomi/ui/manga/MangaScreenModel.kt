@@ -430,8 +430,7 @@ class MangaScreenModel(
         if (manga.canonicalId == null) return
         screenModelScope.launchIO {
             try {
-                val refreshCanonical: eu.kanade.domain.track.interactor.RefreshCanonicalMetadata =
-                    Injekt.get()
+                val refreshCanonical = Injekt.get<eu.kanade.domain.track.interactor.RefreshCanonicalMetadata>()
                 refreshCanonical.await(manga)
             } catch (e: Exception) {
                 logcat(LogPriority.WARN, e) {

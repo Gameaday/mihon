@@ -512,12 +512,7 @@ private fun ColumnScope.MangaContentInfo(
             textAlign = textAlign,
         )
         if (LockedField.isLocked(lockedFields, LockedField.AUTHOR)) {
-            Icon(
-                imageVector = Icons.Outlined.Lock,
-                contentDescription = null,
-                modifier = Modifier.size(12.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            FieldLockIcon(lockedFields = lockedFields, field = LockedField.AUTHOR)
         }
     }
 
@@ -543,12 +538,7 @@ private fun ColumnScope.MangaContentInfo(
                 textAlign = textAlign,
             )
             if (LockedField.isLocked(lockedFields, LockedField.ARTIST)) {
-                Icon(
-                    imageVector = Icons.Outlined.Lock,
-                    contentDescription = null,
-                    modifier = Modifier.size(12.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                FieldLockIcon(lockedFields = lockedFields, field = LockedField.ARTIST)
             }
         }
     }
@@ -589,13 +579,10 @@ private fun ColumnScope.MangaContentInfo(
                 maxLines = 1,
             )
             if (LockedField.isLocked(lockedFields, LockedField.STATUS)) {
-                Icon(
-                    imageVector = Icons.Outlined.Lock,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(start = 2.dp)
-                        .size(12.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                FieldLockIcon(
+                    lockedFields = lockedFields,
+                    field = LockedField.STATUS,
+                    modifier = Modifier.padding(start = 2.dp),
                 )
             }
             DotSeparatorText()
@@ -722,6 +709,18 @@ private fun ColumnScope.MangaContentInfo(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FieldLockIcon(lockedFields: Long, field: Long, modifier: Modifier = Modifier) {
+    if (LockedField.isLocked(lockedFields, field)) {
+        Icon(
+            imageVector = Icons.Outlined.Lock,
+            contentDescription = null,
+            modifier = modifier.size(12.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
