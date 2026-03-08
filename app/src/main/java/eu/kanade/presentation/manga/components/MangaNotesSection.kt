@@ -1,12 +1,12 @@
 package eu.kanade.presentation.manga.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material3.HorizontalDivider
@@ -34,7 +34,9 @@ fun MangaNotesSection(
 ) {
     if (content.isBlank()) return
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MangaNotesDisplay(
@@ -48,7 +50,7 @@ fun MangaNotesSection(
                     containerColor = Color.Transparent,
                     contentColor = MaterialTheme.colorScheme.primary,
                 ),
-                shape = RoundedCornerShape(8.dp),
+                shape = MaterialTheme.shapes.extraSmall,
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 4.dp),
             ) {

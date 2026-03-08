@@ -340,6 +340,134 @@ class JellyfinApi(
         client.newCall(request).awaitSuccess()
     }
 
+    // -- Jellyfin discovery & recommendation endpoints --
+
+    /**
+     * Fetches items similar to the given item from the Jellyfin server.
+     * Jellyfin uses its internal algorithm to find related content based on
+     * genre, tags, studios, and other metadata.
+     *
+     * Reference: GET /Items/{itemId}/Similar
+     */
+    suspend fun getSimilarItems(
+        serverUrl: String,
+        userId: String,
+        itemId: String,
+        limit: Int = 10,
+    ): List<TrackSearch> = withIOContext {
+        val url = "$serverUrl/Items/$itemId/Similar".toHttpUrl().newBuilder()
+            .addQueryParameter("UserId", userId)
+            .addQueryParameter("Limit", limit.toString())
+            .addQueryParameter("Fields", SERIES_FIELDS)
+            .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
+            .build()
+
+        val response = client.newCall(GET(url.toString()))
+            .awaitSuccess()
+
+        with(json) {
+            response.parseAs<JellyfinItemsResponse>()
+        }.items
+            .sortedByDescending { it.hasImage() }
+            .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
+    }
+
+    /**
+     * Fetches the user's "Continue Reading" items (resume list).
+     * This is the Jellyfin equivalent of "recently read" — items the user has
+     * partially consumed and can resume. Matches Jellyfin's home screen
+     * "Continue Reading" row.
+     *
+     * Reference: GET /Users/{userId}/Items/Resume
+     */
+    suspend fun getResumeItems(
+        serverUrl: String,
+        userId: String,
+        limit: Int = 12,
+        parentId: String? = null,
+    ): List<TrackSearch> = withIOContext {
+        val url = "$serverUrl/Users/$userId/Items/Resume".toHttpUrl().newBuilder()
+            .addQueryParameter("Limit", limit.toString())
+            .addQueryParameter("Fields", SERIES_FIELDS)
+            .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
+            .addQueryParameter("IncludeItemTypes", "Series")
+            .addQueryParameter("MediaTypes", "")
+        if (!parentId.isNullOrBlank()) {
+            url.addQueryParameter("ParentId", parentId)
+        }
+
+        val response = client.newCall(GET(url.build().toString()))
+            .awaitSuccess()
+
+        with(json) {
+            response.parseAs<JellyfinItemsResponse>()
+        }.items
+            .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
+    }
+
+    /**
+     * Fetches the latest items added to the server (or a specific library).
+     * Matches Jellyfin's "Latest" section on the home screen — shows recently
+     * added content that the user may want to read.
+     *
+     * Reference: GET /Users/{userId}/Items/Latest
+     */
+    suspend fun getLatestItems(
+        serverUrl: String,
+        userId: String,
+        limit: Int = 16,
+        parentId: String? = null,
+    ): List<TrackSearch> = withIOContext {
+        val url = "$serverUrl/Users/$userId/Items/Latest".toHttpUrl().newBuilder()
+            .addQueryParameter("Limit", limit.toString())
+            .addQueryParameter("Fields", SERIES_FIELDS)
+            .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
+            .addQueryParameter("IncludeItemTypes", "Series")
+        if (!parentId.isNullOrBlank()) {
+            url.addQueryParameter("ParentId", parentId)
+        }
+
+        val response = client.newCall(GET(url.build().toString()))
+            .awaitSuccess()
+
+        with(json) {
+            response.parseAs<List<JellyfinItem>>()
+        }
+            .sortedByDescending { it.hasImage() }
+            .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
+    }
+
+    /**
+     * Fetches the user's next-up items — series that the user has started
+     * but not finished, showing the next episode/chapter to read.
+     * This is Jellyfin's primary "what to read next" recommendation.
+     *
+     * Reference: GET /Shows/NextUp
+     */
+    suspend fun getNextUp(
+        serverUrl: String,
+        userId: String,
+        limit: Int = 12,
+        parentId: String? = null,
+    ): List<TrackSearch> = withIOContext {
+        val url = "$serverUrl/Shows/NextUp".toHttpUrl().newBuilder()
+            .addQueryParameter("UserId", userId)
+            .addQueryParameter("Limit", limit.toString())
+            .addQueryParameter("Fields", SERIES_FIELDS)
+            .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
+        if (!parentId.isNullOrBlank()) {
+            url.addQueryParameter("ParentId", parentId)
+        }
+
+        val response = client.newCall(GET(url.build().toString()))
+            .awaitSuccess()
+
+        with(json) {
+            response.parseAs<JellyfinItemsResponse>()
+        }.items
+            .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
+    }
+
     companion object {
         /** Maximum cover image width for list/grid display. */
         const val COVER_MAX_WIDTH = 400

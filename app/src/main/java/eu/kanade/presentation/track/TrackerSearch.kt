@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -248,7 +247,7 @@ private fun SearchResultItem(
     val type = trackSearch.publishing_type.toLowerCase(Locale.current).capitalize(Locale.current)
     val status = trackSearch.publishing_status.toLowerCase(Locale.current).capitalize(Locale.current)
     val description = trackSearch.summary.trim()
-    val shape = RoundedCornerShape(16.dp)
+    val shape = MaterialTheme.shapes.medium
     val borderColor = if (selected) MaterialTheme.colorScheme.outline else Color.Transparent
     var dropDownMenuExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
