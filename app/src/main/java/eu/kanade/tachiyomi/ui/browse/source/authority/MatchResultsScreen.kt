@@ -251,21 +251,35 @@ private fun SummaryCard(
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Column(
             modifier = Modifier.padding(MaterialTheme.padding.medium),
         ) {
-            Text(
-                text = stringResource(MR.strings.match_results_summary, totalLinked, totalFavorites),
-                style = MaterialTheme.typography.titleMedium,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Verified,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = stringResource(MR.strings.match_results_summary, totalLinked, totalFavorites),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
             if (totalFavorites > 0) {
                 Spacer(modifier = Modifier.height(MaterialTheme.padding.small))
                 LinearProgressIndicator(
                     progress = {
                         if (totalFavorites > 0) totalLinked.toFloat() / totalFavorites else 0f
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(4.dp)),
                 )
             }
             // Content type breakdown
@@ -278,7 +292,7 @@ private fun SummaryCard(
                 if (otherCount > 0) parts.add("$otherCount other")
                 Text(
                     text = parts.joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -286,8 +300,8 @@ private fun SummaryCard(
                 Spacer(modifier = Modifier.height(MaterialTheme.padding.extraSmall))
                 Text(
                     text = stringResource(MR.strings.match_results_unlinked_count, unlinkedCount),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }
@@ -317,6 +331,7 @@ private fun UnlinkedMangaItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             modifier = Modifier
@@ -330,7 +345,7 @@ private fun UnlinkedMangaItem(
                 contentDescription = manga.title,
                 modifier = Modifier
                     .size(40.dp, 56.dp)
-                    .clip(RoundedCornerShape(4.dp)),
+                    .clip(MaterialTheme.shapes.small),
                 contentScale = ContentScale.Crop,
             )
             Column(modifier = Modifier.weight(1f)) {
@@ -350,7 +365,7 @@ private fun UnlinkedMangaItem(
                 if (contentTypeLabel != null && !hasFailed && !isMatching) {
                     Text(
                         text = contentTypeLabel,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -418,6 +433,7 @@ private fun LinkedMangaItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             modifier = Modifier
@@ -431,7 +447,7 @@ private fun LinkedMangaItem(
                 contentDescription = manga.title,
                 modifier = Modifier
                     .size(40.dp, 56.dp)
-                    .clip(RoundedCornerShape(4.dp)),
+                    .clip(MaterialTheme.shapes.small),
                 contentScale = ContentScale.Crop,
             )
             Column(modifier = Modifier.weight(1f)) {
