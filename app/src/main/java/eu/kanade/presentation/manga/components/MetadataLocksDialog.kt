@@ -15,6 +15,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import tachiyomi.domain.manga.model.LockedField
 import tachiyomi.i18n.MR
@@ -57,13 +58,13 @@ fun MetadataLocksDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onToggleField(field) }
+                            .clickable(role = Role.Checkbox) { onToggleField(field) }
                             .padding(vertical = 2.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Checkbox(
                             checked = LockedField.isLocked(lockedFields, field),
-                            onCheckedChange = { onToggleField(field) },
+                            onCheckedChange = null,
                         )
                         Text(
                             text = fieldLabel(field),

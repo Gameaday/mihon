@@ -291,7 +291,7 @@ private fun GridItemTitle(
 /**
  * Wrapper for grid items to handle selection state, click and long click.
  * Uses [ShapeTokens.card] for expressive corner radii and tonal surface
- * overlay for the selected state.
+ * overlay ([secondaryContainer]) for the selected state.
  */
 @Composable
 private fun GridItemSelectable(
