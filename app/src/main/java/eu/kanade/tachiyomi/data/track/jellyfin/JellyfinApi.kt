@@ -148,10 +148,7 @@ class JellyfinApi(
             .addQueryParameter("searchTerm", query)
             .addQueryParameter("IncludeItemTypes", "Series")
             .addQueryParameter("Recursive", "true")
-            .addQueryParameter(
-                "Fields",
-                "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount,Studios,Tags,DateCreated,SortName",
-            )
+            .addQueryParameter("Fields", SERIES_FIELDS)
             .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
             .addQueryParameter("Limit", "20")
         if (!parentId.isNullOrBlank()) {
@@ -178,10 +175,7 @@ class JellyfinApi(
         itemId: String,
     ): TrackSearch = withIOContext {
         val url = "$serverUrl/Users/$userId/Items/$itemId".toHttpUrl().newBuilder()
-            .addQueryParameter(
-                "Fields",
-                "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount,Studios,Tags,DateCreated,SortName",
-            )
+            .addQueryParameter("Fields", SERIES_FIELDS)
             .addQueryParameter("EnableImageTypes", "Primary,Thumb,Backdrop")
             .build()
 
@@ -352,6 +346,10 @@ class JellyfinApi(
 
         /** JPEG quality percentage for cover images. */
         const val COVER_QUALITY = 90
+
+        /** Fields requested from the Jellyfin API for series metadata. */
+        private const val SERIES_FIELDS =
+            "Overview,Genres,CommunityRating,ProductionYear,RecursiveItemCount,Studios,Tags,DateCreated,SortName"
 
         /**
          * Converts a [JellyfinItem] to a [TrackSearch] for the tracker system.

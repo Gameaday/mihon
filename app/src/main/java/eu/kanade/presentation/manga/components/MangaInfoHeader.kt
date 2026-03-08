@@ -659,8 +659,9 @@ private fun ColumnScope.MangaContentInfo(
         val authorityUrl = remember(canonicalId) {
             if (canonicalId.startsWith("jf:")) {
                 val trackerManager: TrackerManager = Injekt.get()
+                // Exclude "jellyfin" which is the noop login placeholder credential
                 val serverUrl = trackerManager.jellyfin.getUsername().trimEnd('/')
-                    .takeIf { it.isNotBlank() && it != "jellyfin" }
+                    .takeIf { it.isNotBlank() && it != JELLYFIN_NOOP_CREDENTIAL }
                 CanonicalId.toUrl(canonicalId, jellyfinServerUrl = serverUrl)
             } else {
                 CanonicalId.toUrl(canonicalId)
@@ -885,6 +886,9 @@ private fun MangaSummary(
 private val DefaultTagChipModifier = Modifier.padding(vertical = 4.dp)
 
 private const val AUTHORITY_BADGE_ALPHA = 0.4f
+
+/** Noop login credential used by Jellyfin tracker's [loginNoop] — not a valid server URL. */
+private const val JELLYFIN_NOOP_CREDENTIAL = "jellyfin"
 
 @Composable
 private fun TagsChip(

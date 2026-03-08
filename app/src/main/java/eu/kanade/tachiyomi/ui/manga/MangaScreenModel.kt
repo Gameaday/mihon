@@ -1371,6 +1371,11 @@ class MangaScreenModel(
      * linked to Jellyfin as its authority source. Jellyfin "favorite" maps to
      * the "in library" concept — adding to library marks favorite on server,
      * removing from library unmarks it.
+     *
+     * Checks both canonicalId ("jf:" prefix) and track existence because
+     * canonicalId may be set without a track (e.g., during initial matching)
+     * or a track may exist without canonicalId (manual Jellyfin bind).
+     * The tracking URL from the track record is needed to resolve the server URL and item ID.
      */
     private suspend fun markJellyfinFavoriteIfLinked(manga: Manga, favorite: Boolean) {
         val canonicalId = manga.canonicalId ?: return
