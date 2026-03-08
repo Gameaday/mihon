@@ -662,9 +662,10 @@ private fun ColumnScope.MangaContentInfo(
         if (authorityLabel != null) {
             androidx.compose.material3.Surface(
                 color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = AUTHORITY_BADGE_ALPHA),
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .animateContentSize()
                     .then(
                         if (authorityUrl != null) {
                             Modifier.clickableNoIndication {
@@ -676,18 +677,18 @@ private fun ColumnScope.MangaContentInfo(
                     ),
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Verified,
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(end = 4.dp)
-                            .size(16.dp),
+                            .padding(end = 8.dp)
+                            .size(18.dp),
                         tint = MaterialTheme.colorScheme.primary,
                     )
-                    ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+                    ProvideTextStyle(MaterialTheme.typography.labelLarge) {
                         Text(
                             text = stringResource(MR.strings.authority_linked_label),
                             overflow = TextOverflow.Ellipsis,

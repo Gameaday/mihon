@@ -308,12 +308,18 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      * This enables bidirectional metadata sync — edits made in the app
      * are reflected on the Jellyfin server.
      *
+     * Author and artist are mapped to Jellyfin's Studios field,
+     * following the convention for book/comic series creators. Tags are
+     * pushed as Jellyfin Tags for additional metadata context.
+     *
      * @param trackingUrl The Jellyfin tracking URL containing server URL and item ID
      * @param title Updated title (null = no change)
      * @param description Updated description (null = no change)
      * @param genres Updated genres list (null = no change)
      * @param rating Updated community rating (null = no change)
      * @param year Updated production year (null = no change)
+     * @param author Updated author name (null = no change)
+     * @param artist Updated artist name (null = no change)
      */
     suspend fun pushMetadataToServer(
         trackingUrl: String,
@@ -322,10 +328,17 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         genres: List<String>? = null,
         rating: Double? = null,
         year: Int? = null,
+        author: String? = null,
+        artist: String? = null,
     ) {
         if (!isLoggedIn || !libraryPreferences.jellyfinSyncEnabled().get()) return
         val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
         val itemId = api.getItemIdFromUrl(trackingUrl)
+        // Map author/artist to Studios (Jellyfin's creator convention for books/comics)
+        val studios = buildList {
+            if (author != null && author.isNotBlank()) add(author)
+            if (artist != null && artist.isNotBlank() && artist != author) add(artist)
+        }.takeIf { it.isNotEmpty() }
         try {
             api.updateItemMetadata(
                 serverUrl = serverUrl,
@@ -335,6 +348,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
                 genres = genres,
                 communityRating = rating,
                 productionYear = year,
+                studios = studios,
             )
             logcat(LogPriority.INFO) { "Pushed metadata to Jellyfin for item $itemId" }
         } catch (e: Exception) {

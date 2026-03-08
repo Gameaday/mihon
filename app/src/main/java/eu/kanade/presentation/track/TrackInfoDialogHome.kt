@@ -264,7 +264,7 @@ private fun TrackInfoItem(
                 .clip(MaterialTheme.shapes.medium)
                 .background(
                     if (isAuthority) {
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
                     } else {
                         MaterialTheme.colorScheme.surfaceContainerHighest
                     },

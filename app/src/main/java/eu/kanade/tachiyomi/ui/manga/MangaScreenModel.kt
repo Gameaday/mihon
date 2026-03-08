@@ -1355,6 +1355,8 @@ class MangaScreenModel(
             title = updated.title,
             description = updated.description,
             genres = updated.genre,
+            author = updated.author,
+            artist = updated.artist,
         )
     }
 

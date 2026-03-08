@@ -1,5 +1,6 @@
 package eu.kanade.presentation.manga.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -129,34 +130,36 @@ fun EditMetadataDialog(
         },
         text = {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .animateContentSize(),
             ) {
                 // Authority provider badge shown when linked to a metadata provider
                 if (hasAuthority && authorityLabel != null) {
                     Surface(
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = MaterialTheme.shapes.small,
+                        shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Verified,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(18.dp),
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = stringResource(MR.strings.edit_metadata_linked_to, authorityLabel),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
                 Text(
@@ -584,20 +587,21 @@ private fun GenreEditor(
 
 /**
  * Jellyfin-style section header with a divider and label.
- * Groups related metadata fields visually.
+ * Groups related metadata fields visually, using Material Expression
+ * with primary color accent and proper spacing hierarchy.
  */
 @Composable
 private fun SectionHeader(text: String) {
-    Column {
+    Column(modifier = Modifier.padding(top = 4.dp)) {
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 4.dp),
             color = MaterialTheme.colorScheme.outlineVariant,
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = 4.dp, top = 2.dp),
         )
     }
 }

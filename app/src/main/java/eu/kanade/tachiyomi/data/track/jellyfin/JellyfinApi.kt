@@ -280,6 +280,8 @@ class JellyfinApi(
      * Mirrors Jellyfin's "Edit Metadata" → Save workflow.
      *
      * Only non-null fields are included in the update payload.
+     * Supports Jellyfin's Studios field for author/artist metadata (mapped as
+     * studio entries — Jellyfin's convention for book/comic series creators).
      * Reference: POST /Items/{itemId}
      */
     suspend fun updateItemMetadata(
@@ -290,6 +292,8 @@ class JellyfinApi(
         genres: List<String>? = null,
         communityRating: Double? = null,
         productionYear: Int? = null,
+        studios: List<String>? = null,
+        tags: List<String>? = null,
     ) = withIOContext {
         val fields = mutableMapOf<String, Any>()
         fields["Id"] = itemId
@@ -298,6 +302,8 @@ class JellyfinApi(
         if (genres != null) fields["Genres"] = genres
         if (communityRating != null) fields["CommunityRating"] = communityRating
         if (productionYear != null) fields["ProductionYear"] = productionYear
+        if (studios != null) fields["Studios"] = studios
+        if (tags != null) fields["Tags"] = tags
 
         val jsonBody = json.encodeToString(
             kotlinx.serialization.json.JsonObject.serializer(),
