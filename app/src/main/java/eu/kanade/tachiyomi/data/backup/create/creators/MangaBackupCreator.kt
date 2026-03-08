@@ -111,4 +111,6 @@ private fun Manga.toBackupManga() =
         canonicalId = this.canonicalId,
         sourceStatus = this.sourceStatus,
         deadSince = this.deadSince,
+        contentType = this.contentType.value,
+        lockedFields = this.lockedFields,
     )

@@ -588,6 +588,16 @@ private fun ColumnScope.MangaContentInfo(
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )
+            if (LockedField.isLocked(lockedFields, LockedField.STATUS)) {
+                Icon(
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(start = 2.dp)
+                        .size(12.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             DotSeparatorText()
             if (isStubSource) {
                 Icon(
