@@ -130,3 +130,17 @@ data class JellyfinExternalUrl(
     @SerialName("Name") val name: String,
     @SerialName("Url") val url: String,
 )
+
+/**
+ * Response from Jellyfin's `/Users/AuthenticateByName` endpoint.
+ * Contains the access token for subsequent API calls and the authenticated
+ * user's profile information.
+ *
+ * Reference: POST /Users/AuthenticateByName
+ */
+@Serializable
+data class JellyfinAuthByNameResponse(
+    @SerialName("AccessToken") val accessToken: String,
+    @SerialName("ServerId") val serverId: String,
+    @SerialName("User") val user: JellyfinUser,
+)

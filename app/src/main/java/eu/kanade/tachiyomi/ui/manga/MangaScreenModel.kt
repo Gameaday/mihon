@@ -1046,8 +1046,7 @@ class MangaScreenModel(
         val jellyfin = trackerManager.jellyfin
         if (!jellyfin.isLoggedIn) return
         try {
-            // Jellyfin tracker stores the server URL in the username field
-            val serverUrl = jellyfin.getUsername().trimEnd('/')
+            val serverUrl = jellyfin.getServerUrl()
             jellyfin.api.triggerLibraryScan(serverUrl)
             logcat(LogPriority.INFO) { "Triggered Jellyfin library scan after sync" }
         } catch (e: Exception) {
@@ -1520,7 +1519,7 @@ class MangaScreenModel(
         } ?: return
 
         try {
-            val serverUrl = jellyfin.api.getServerUrlFromTrackUrl(jellyfinTrack.remoteUrl)
+            val serverUrl = jellyfin.resolveServerUrl(jellyfinTrack.remoteUrl)
             val itemId = jellyfin.api.getItemIdFromUrl(jellyfinTrack.remoteUrl)
             val userId = trackPreferences.jellyfinUserId().get()
             if (userId.isNotBlank()) {

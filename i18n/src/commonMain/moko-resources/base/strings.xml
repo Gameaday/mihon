@@ -1249,5 +1249,11 @@
     <string name="jellyfin_user_selected">User: %s</string>
     <string name="jellyfin_server_url">Server URL</string>
     <string name="jellyfin_api_key">API key</string>
+    <string name="jellyfin_username">Username</string>
+    <string name="jellyfin_password">Password</string>
+    <string name="jellyfin_update_server_url">Update server address</string>
+    <string name="jellyfin_update_server_url_summary">Change the server URL when your Jellyfin server moves to a new address. Existing tracking data is preserved.</string>
+    <string name="jellyfin_server_updated">Server URL updated successfully</string>
+    <string name="jellyfin_server_mismatch">This is a different Jellyfin server — please log in again</string>
     <string name="tracking_linked">Linked</string>
 </resources>

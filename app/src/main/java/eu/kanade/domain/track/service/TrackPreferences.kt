@@ -76,6 +76,35 @@ class TrackPreferences(
         "",
     )
 
+    /**
+     * Jellyfin server URL. Stored separately from tracker credentials so it can
+     * be updated independently when the server moves to a new address (dynamic IP,
+     * domain change). All API calls resolve the server URL from this preference
+     * rather than extracting it from tracking URLs.
+     */
+    fun jellyfinServerUrl() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_server_url"),
+        "",
+    )
+
+    /**
+     * Jellyfin server ID (stable across address changes). Used to verify that
+     * a new server URL points to the same Jellyfin instance when migrating.
+     */
+    fun jellyfinServerId() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_server_id"),
+        "",
+    )
+
+    /**
+     * Jellyfin display username — the human-readable name of the authenticated user.
+     * Shown in the settings UI and used for diagnostics.
+     */
+    fun jellyfinUsername() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_username"),
+        "",
+    )
+
     companion object {
         /** Sentinel value: let the system pick the best available tracker automatically. */
         const val AUTHORITY_TRACKER_AUTO = 0L

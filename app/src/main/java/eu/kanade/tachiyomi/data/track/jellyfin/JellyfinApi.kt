@@ -93,6 +93,46 @@ class JellyfinApi(
     }
 
     /**
+     * Authenticates a user by name and password using Jellyfin's
+     * `/Users/AuthenticateByName` endpoint. Returns an access token that
+     * can be used for subsequent API calls instead of a global API key.
+     *
+     * This is the preferred login method because:
+     * 1. It authenticates as a specific user (not an admin-level API key)
+     * 2. The access token is scoped to that user's permissions
+     * 3. The server returns the user ID and server ID alongside the token
+     *
+     * The caller must add an `X-Emby-Authorization` header with client info
+     * since the user is not yet authenticated at this point.
+     *
+     * Reference: POST /Users/AuthenticateByName
+     */
+    suspend fun authenticateByName(
+        serverUrl: String,
+        username: String,
+        password: String,
+    ): JellyfinAuthByNameResponse = withIOContext {
+        val body = json.encodeToString(
+            kotlinx.serialization.json.JsonObject.serializer(),
+            kotlinx.serialization.json.JsonObject(
+                mapOf(
+                    "Username" to kotlinx.serialization.json.JsonPrimitive(username),
+                    "Pw" to kotlinx.serialization.json.JsonPrimitive(password),
+                ),
+            ),
+        ).toByteArray().toRequestBody("application/json".toMediaType())
+
+        val request = okhttp3.Request.Builder()
+            .url("$serverUrl/Users/AuthenticateByName")
+            .post(body)
+            .build()
+
+        client.newCall(request)
+            .awaitSuccess()
+            .let { with(json) { it.parseAs<JellyfinAuthByNameResponse>() } }
+    }
+
+    /**
      * Returns libraries ("views") visible to the authenticated user.
      */
     suspend fun getLibraries(serverUrl: String, userId: String): List<JellyfinLibrary> =
@@ -206,17 +246,32 @@ class JellyfinApi(
     /**
      * Extracts the Jellyfin item ID from a tracking URL.
      *
-     * Tracking URLs have the format: `{serverUrl}/Items/{itemId}`
+     * Tracking URLs have two formats:
+     * - Legacy: `{serverUrl}/Items/{itemId}` (contains full server URL)
+     * - New: bare item ID string (server URL resolved from preferences)
      */
     fun getItemIdFromUrl(trackingUrl: String): String {
-        return trackingUrl.substringAfterLast("/Items/").substringBefore("?")
+        return if (trackingUrl.contains("/Items/")) {
+            trackingUrl.substringAfterLast("/Items/").substringBefore("?")
+        } else {
+            // New format: tracking URL IS the item ID
+            trackingUrl.substringBefore("?")
+        }
     }
 
     /**
      * Extracts the server URL from a tracking URL.
+     *
+     * For legacy tracking URLs that embed the server URL (`{serverUrl}/Items/{itemId}`),
+     * this extracts the server portion. For new-style bare item ID URLs, this returns
+     * null — callers should fall back to the stored server URL preference.
      */
-    fun getServerUrlFromTrackUrl(trackingUrl: String): String {
-        return trackingUrl.substringBefore("/Items/")
+    fun getServerUrlFromTrackUrl(trackingUrl: String): String? {
+        return if (trackingUrl.contains("/Items/")) {
+            trackingUrl.substringBefore("/Items/")
+        } else {
+            null
+        }
     }
 
     /**

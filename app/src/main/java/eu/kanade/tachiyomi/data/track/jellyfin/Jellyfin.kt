@@ -31,9 +31,17 @@ import tachiyomi.domain.track.model.Track as DomainTrack
  * chapters read in the app are reflected on the server.
  *
  * Configuration:
- * - Username field stores the server URL (e.g., `http://192.168.1.100:8096`)
- * - Password field stores the API key (generated in Jellyfin → Dashboard → API Keys)
- * - User ID is stored in `jellyfinUserId` preference
+ * - Server URL stored in `jellyfinServerUrl` preference
+ * - Access token stored in tracker password field (from AuthenticateByName)
+ * - Jellyfin user ID stored in `jellyfinUserId` preference
+ * - Jellyfin server ID stored in `jellyfinServerId` preference (stable across moves)
+ * - Jellyfin display username stored in `jellyfinUsername` preference
+ * - Tracker username field stores server URL for BaseTracker.isLoggedIn compatibility
+ *
+ * Server migration: When the server moves to a new address (dynamic IP, domain change),
+ * use [updateServerUrl] to update. Tracking URLs store only item IDs, so they survive
+ * server address changes without migration. The server ID is verified to prevent
+ * accidentally pointing to a different Jellyfin instance.
  *
  * Jellyfin Bookshelf plugin compatibility:
  * - Recognizes series organized in Jellyfin hierarchy
@@ -133,7 +141,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
 
     override suspend fun search(query: String): List<TrackSearch> {
         if (!isLoggedIn) return emptyList()
-        val serverUrl = getUsername().trimEnd('/')
+        val serverUrl = getServerUrl()
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return emptyList()
         val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
@@ -153,7 +161,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
     }
 
     override suspend fun refresh(track: Track): Track {
-        val serverUrl = api.getServerUrlFromTrackUrl(track.tracking_url)
+        val serverUrl = resolveServerUrl(track.tracking_url)
         val itemId = api.getItemIdFromUrl(track.tracking_url)
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return track
@@ -186,50 +194,168 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
     }
 
     // -- Authentication --
-    // Username = server URL, Password = API key
+    // Server URL = jellyfinServerUrl preference
+    // Access token = password field (from AuthenticateByName)
+    // User info = jellyfinUserId, jellyfinUsername, jellyfinServerId preferences
+
+    /**
+     * Returns the stored Jellyfin server URL, falling back to the username field
+     * for backward compatibility with pre-migration credentials.
+     */
+    fun getServerUrl(): String {
+        val stored = trackPreferences.jellyfinServerUrl().get()
+        if (stored.isNotBlank()) return stored.trimEnd('/')
+        // Legacy fallback: server URL was stored in the username field
+        val legacy = getUsername()
+        if (legacy.isNotBlank() && legacy != "jellyfin" && legacy.startsWith("http")) {
+            return legacy.trimEnd('/')
+        }
+        return ""
+    }
+
+    /**
+     * Resolves the server URL for a given tracking URL.
+     *
+     * New-style tracking URLs are bare item IDs — the server URL comes from
+     * the [jellyfinServerUrl] preference. Legacy tracking URLs embed the server
+     * URL and are parsed directly, falling back to the preference if parsing fails.
+     */
+    fun resolveServerUrl(trackingUrl: String): String {
+        // Try to extract from legacy URL format first
+        val fromUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        if (fromUrl != null) return fromUrl
+        // New format: resolve from stored preference
+        return getServerUrl()
+    }
 
     override suspend fun login(username: String, password: String) {
         val serverUrl = username.trimEnd('/')
-        // Validate the connection using the API key
-        try {
-            // Create a temporary client with the key for validation
-            val tempClient = networkService.client.newBuilder()
-                .dns(Dns.SYSTEM)
-                .addInterceptor { chain ->
-                    chain.proceed(
-                        chain.request().newBuilder()
-                            .header("X-Emby-Token", password)
-                            .build(),
-                    )
-                }
-                .build()
+        // Validate the connection by fetching public system info
+        val tempClient = networkService.client.newBuilder()
+            .dns(Dns.SYSTEM)
+            .addInterceptor { chain ->
+                chain.proceed(
+                    chain.request().newBuilder()
+                        .header(
+                            "X-Emby-Authorization",
+                            "MediaBrowser Client=\"Ephyra\", Device=\"Android\", DeviceId=\"ephyra\", Version=\"1.0\"",
+                        )
+                        .build(),
+                )
+            }
+            .build()
 
-            val tempApi = JellyfinApi(id, tempClient)
+        val tempApi = JellyfinApi(id, tempClient)
+
+        try {
             val info = tempApi.getSystemInfo(serverUrl)
             logcat(LogPriority.INFO) { "Connected to Jellyfin: ${info.serverName} v${info.version}" }
 
-            // Auto-populate user ID from the API key's user list
-            if (trackPreferences.jellyfinUserId().get().isBlank()) {
-                try {
-                    val users = tempApi.getUsers(serverUrl)
-                    if (users.isNotEmpty()) {
-                        trackPreferences.jellyfinUserId().set(users.first().id)
-                        logcat(LogPriority.INFO) { "Auto-selected Jellyfin user: ${users.first().name}" }
-                    }
-                } catch (e: Exception) {
-                    logcat(LogPriority.WARN, e) { "Could not auto-populate Jellyfin user ID" }
-                }
-            }
+            // Authenticate with username/password to get an access token
+            val authResponse = tempApi.authenticateByName(
+                serverUrl,
+                password.substringBefore("\n"),
+                password.substringAfter("\n", ""),
+            )
 
-            saveCredentials(serverUrl, password)
+            // Store all credentials
+            trackPreferences.jellyfinServerUrl().set(serverUrl)
+            trackPreferences.jellyfinServerId().set(info.id)
+            trackPreferences.jellyfinUserId().set(authResponse.user.id)
+            trackPreferences.jellyfinUsername().set(authResponse.user.name)
+
+            // Store: username field = server URL (for BaseTracker.isLoggedIn),
+            // password field = access token
+            saveCredentials(serverUrl, authResponse.accessToken)
+            logcat(LogPriority.INFO) { "Authenticated as Jellyfin user: ${authResponse.user.name}" }
         } catch (e: Exception) {
             logcat(LogPriority.ERROR, e) { "Jellyfin login failed" }
             throw e
         }
     }
 
+    /**
+     * Login with server URL, Jellyfin username, and Jellyfin password as separate parameters.
+     * This is the primary login method called from the 3-field login dialog.
+     */
+    suspend fun loginWithCredentials(serverUrl: String, jellyfinUser: String, jellyfinPassword: String) {
+        val cleanUrl = serverUrl.trimEnd('/')
+        val tempClient = networkService.client.newBuilder()
+            .dns(Dns.SYSTEM)
+            .addInterceptor { chain ->
+                chain.proceed(
+                    chain.request().newBuilder()
+                        .header(
+                            "X-Emby-Authorization",
+                            "MediaBrowser Client=\"Ephyra\", Device=\"Android\", DeviceId=\"ephyra\", Version=\"1.0\"",
+                        )
+                        .build(),
+                )
+            }
+            .build()
+
+        val tempApi = JellyfinApi(id, tempClient)
+
+        try {
+            // Validate server connectivity
+            val info = tempApi.getSystemInfo(cleanUrl)
+            logcat(LogPriority.INFO) { "Connected to Jellyfin: ${info.serverName} v${info.version}" }
+
+            // Authenticate by username/password
+            val authResponse = tempApi.authenticateByName(cleanUrl, jellyfinUser, jellyfinPassword)
+
+            // Persist all Jellyfin-specific preferences
+            trackPreferences.jellyfinServerUrl().set(cleanUrl)
+            trackPreferences.jellyfinServerId().set(info.id)
+            trackPreferences.jellyfinUserId().set(authResponse.user.id)
+            trackPreferences.jellyfinUsername().set(authResponse.user.name)
+
+            // BaseTracker credentials: server URL in username, access token in password
+            saveCredentials(cleanUrl, authResponse.accessToken)
+            logcat(LogPriority.INFO) { "Authenticated as Jellyfin user: ${authResponse.user.name}" }
+        } catch (e: Exception) {
+            logcat(LogPriority.ERROR, e) { "Jellyfin login failed" }
+            throw e
+        }
+    }
+
+    /**
+     * Updates the Jellyfin server URL when the server moves to a new address.
+     * Verifies that the new URL points to the same Jellyfin instance by comparing
+     * server IDs, preventing accidental connection to a different server.
+     *
+     * @param newServerUrl The new server URL (e.g., after dynamic IP change)
+     * @throws IllegalStateException if the new URL points to a different server
+     */
+    suspend fun updateServerUrl(newServerUrl: String) {
+        val cleanUrl = newServerUrl.trimEnd('/')
+        val info = api.getSystemInfo(cleanUrl)
+        val storedServerId = trackPreferences.jellyfinServerId().get()
+
+        if (storedServerId.isNotBlank() && info.id != storedServerId) {
+            throw IllegalStateException(
+                "Server ID mismatch: expected $storedServerId but got ${info.id}. " +
+                    "This appears to be a different Jellyfin server.",
+            )
+        }
+
+        trackPreferences.jellyfinServerUrl().set(cleanUrl)
+        // Update the username field too (used by BaseTracker.isLoggedIn)
+        saveCredentials(cleanUrl, getPassword())
+        logcat(LogPriority.INFO) { "Updated Jellyfin server URL to: $cleanUrl" }
+    }
+
     override fun loginNoop() {
         saveCredentials("jellyfin", "jellyfin")
+    }
+
+    override fun logout() {
+        super.logout()
+        // Clear Jellyfin-specific preferences
+        trackPreferences.jellyfinServerUrl().set("")
+        trackPreferences.jellyfinServerId().set("")
+        trackPreferences.jellyfinUserId().set("")
+        trackPreferences.jellyfinUsername().set("")
     }
 
     // -- EnhancedTracker: auto-binding --
@@ -243,7 +369,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
 
     override suspend fun match(manga: Manga): TrackSearch? {
         if (!isLoggedIn) return null
-        val serverUrl = getUsername().trimEnd('/')
+        val serverUrl = getServerUrl()
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return null
         val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
@@ -321,7 +447,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      */
     suspend fun getServerInfo(): JellyfinSystemInfo? {
         if (!isLoggedIn) return null
-        val serverUrl = getUsername().trimEnd('/')
+        val serverUrl = getServerUrl()
         return try {
             api.getSystemInfo(serverUrl)
         } catch (e: Exception) {
@@ -359,7 +485,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         artist: String? = null,
     ) {
         if (!isLoggedIn || !libraryPreferences.jellyfinSyncEnabled().get()) return
-        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        val serverUrl = resolveServerUrl(trackingUrl)
         val itemId = api.getItemIdFromUrl(trackingUrl)
         // Map author/artist to Studios (Jellyfin's creator convention for books/comics)
         val studios = buildList {
@@ -389,7 +515,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      */
     suspend fun getChaptersFromServer(trackingUrl: String): List<JellyfinItem> {
         if (!isLoggedIn) return emptyList()
-        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        val serverUrl = resolveServerUrl(trackingUrl)
         val itemId = api.getItemIdFromUrl(trackingUrl)
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return emptyList()
@@ -406,7 +532,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      * The URL can be used with the authenticated client to download the file.
      */
     fun getChapterDownloadUrl(trackingUrl: String, childItemId: String): String {
-        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        val serverUrl = resolveServerUrl(trackingUrl)
         return api.getItemDownloadUrl(serverUrl, childItemId)
     }
 
@@ -420,7 +546,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      */
     suspend fun getSimilarItems(trackingUrl: String): List<TrackSearch> {
         if (!isLoggedIn) return emptyList()
-        val serverUrl = api.getServerUrlFromTrackUrl(trackingUrl)
+        val serverUrl = resolveServerUrl(trackingUrl)
         val itemId = api.getItemIdFromUrl(trackingUrl)
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return emptyList()
@@ -439,7 +565,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      */
     suspend fun getResumeItems(): List<TrackSearch> {
         if (!isLoggedIn) return emptyList()
-        val serverUrl = getUsername().trimEnd('/')
+        val serverUrl = getServerUrl()
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return emptyList()
         val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
@@ -457,7 +583,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      */
     suspend fun getLatestItems(): List<TrackSearch> {
         if (!isLoggedIn) return emptyList()
-        val serverUrl = getUsername().trimEnd('/')
+        val serverUrl = getServerUrl()
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return emptyList()
         val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
@@ -476,7 +602,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      */
     suspend fun getNextUp(): List<TrackSearch> {
         if (!isLoggedIn) return emptyList()
-        val serverUrl = getUsername().trimEnd('/')
+        val serverUrl = getServerUrl()
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return emptyList()
         val libraryId = libraryPreferences.jellyfinLibraryId().get().takeIf { it.isNotBlank() }
@@ -496,7 +622,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      * bandwidth to LAN server is cheap, but reducing round-trips improves responsiveness).
      */
     private suspend fun syncReadProgressToServer(track: Track) {
-        val serverUrl = api.getServerUrlFromTrackUrl(track.tracking_url)
+        val serverUrl = resolveServerUrl(track.tracking_url)
         val itemId = api.getItemIdFromUrl(track.tracking_url)
         val userId = trackPreferences.jellyfinUserId().get()
         if (userId.isBlank()) return
@@ -525,7 +651,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      */
     private suspend fun pullRemoteProgress(track: Track, remoteTrack: TrackSearch? = null) {
         val remote = remoteTrack ?: run {
-            val serverUrl = api.getServerUrlFromTrackUrl(track.tracking_url)
+            val serverUrl = resolveServerUrl(track.tracking_url)
             val itemId = api.getItemIdFromUrl(track.tracking_url)
             val userId = trackPreferences.jellyfinUserId().get()
             if (userId.isBlank()) return
