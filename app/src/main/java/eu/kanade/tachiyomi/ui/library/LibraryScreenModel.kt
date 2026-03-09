@@ -536,6 +536,12 @@ class LibraryScreenModel(
             DownloadAction.NEXT_25_CHAPTERS -> downloadNextChapters(25)
             DownloadAction.UNREAD_CHAPTERS -> downloadNextChapters(null)
             DownloadAction.BOOKMARKED_CHAPTERS -> downloadBookmarkedChapters()
+            // Jellyfin sync actions are handled at the manga screen level,
+            // not the library level — no-op here for safety
+            DownloadAction.SYNC_TO_JELLYFIN,
+            DownloadAction.SYNC_READ_TO_JELLYFIN,
+            DownloadAction.SYNC_ALL_TO_JELLYFIN,
+            -> { /* no-op at library level */ }
         }
         clearSelection()
     }

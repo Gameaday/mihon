@@ -52,10 +52,7 @@ import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.icons.CustomIcons
 import tachiyomi.presentation.core.icons.Discord
-import tachiyomi.presentation.core.icons.Facebook
 import tachiyomi.presentation.core.icons.Github
-import tachiyomi.presentation.core.icons.Reddit
-import tachiyomi.presentation.core.icons.X
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.time.Instant
@@ -158,7 +155,9 @@ object AboutScreen : Screen() {
                 item {
                     TextPreferenceWidget(
                         title = stringResource(MR.strings.privacy_policy),
-                        onPreferenceClick = { uriHandler.openUri("https://mihon.app/privacy/") },
+                        onPreferenceClick = {
+                            uriHandler.openUri("https://github.com/Gameaday/Ephyra/blob/main/PRIVACY.md")
+                        },
                     )
                 }
 
@@ -172,7 +171,7 @@ object AboutScreen : Screen() {
                         LinkIcon(
                             label = stringResource(MR.strings.website),
                             icon = Icons.Outlined.Public,
-                            url = "https://mihon.app",
+                            url = "https://github.com/Gameaday/Ephyra",
                         )
                         LinkIcon(
                             label = "Discord",
@@ -180,24 +179,9 @@ object AboutScreen : Screen() {
                             url = "https://discord.gg/mihon",
                         )
                         LinkIcon(
-                            label = "X",
-                            icon = CustomIcons.X,
-                            url = "https://x.com/mihonapp",
-                        )
-                        LinkIcon(
-                            label = "Facebook",
-                            icon = CustomIcons.Facebook,
-                            url = "https://facebook.com/mihonapp",
-                        )
-                        LinkIcon(
-                            label = "Reddit",
-                            icon = CustomIcons.Reddit,
-                            url = "https://www.reddit.com/r/mihonapp",
-                        )
-                        LinkIcon(
                             label = "GitHub",
                             icon = CustomIcons.Github,
-                            url = "https://github.com/mihonapp",
+                            url = "https://github.com/Gameaday/Ephyra",
                         )
                     }
                 }
@@ -257,7 +241,7 @@ object AboutScreen : Screen() {
                 }
             }
             isNightlyBuildType -> {
-                "Nightly ${BuildConfig.VERSION_NAME}".let {
+                "Ephyra ${BuildConfig.VERSION_NAME}".let {
                     if (withBuildDate) {
                         "$it (${BuildConfig.COMMIT_SHA}, ${getFormattedBuildTime()})"
                     } else {

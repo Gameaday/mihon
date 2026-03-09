@@ -58,7 +58,7 @@ jobs:
             -keyalg RSA \
             -keysize 2048 \
             -validity 3650 \
-            -dname "CN=Mihon Nightly,O=Mihon,C=US"
+            -dname "CN=Ephyra,O=Ephyra,C=US"
 
           # Locate apksigner from the Android SDK (installed by the Gradle build step)
           APKSIGNER="${ANDROID_HOME}/build-tools/36.0.0/apksigner"

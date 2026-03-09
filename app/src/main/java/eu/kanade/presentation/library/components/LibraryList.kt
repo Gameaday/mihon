@@ -62,7 +62,7 @@ internal fun LibraryList(
                         isLocal = libraryItem.isLocal,
                         sourceLanguage = libraryItem.sourceLanguage,
                     )
-                    AuthorityBadge(hasCanonicalId = manga.canonicalId != null)
+                    AuthorityBadge(hasCanonicalId = manga.canonicalId != null, canonicalId = manga.canonicalId)
                 },
                 onLongClick = { onLongClick(libraryItem.libraryManga) },
                 onClick = { onClick(libraryItem.libraryManga) },

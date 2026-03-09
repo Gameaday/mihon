@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import eu.kanade.presentation.theme.TachiyomiPreviewTheme
 import tachiyomi.domain.manga.model.SourceStatus
@@ -73,16 +74,23 @@ internal fun SourceHealthBadge(sourceStatus: Int) {
 }
 
 @Composable
-internal fun AuthorityBadge(hasCanonicalId: Boolean) {
+internal fun AuthorityBadge(hasCanonicalId: Boolean, canonicalId: String? = null) {
     if (hasCanonicalId) {
+        val isJellyfin = canonicalId?.startsWith(JELLYFIN_CANONICAL_PREFIX) == true
         Badge(
             imageVector = Icons.Outlined.Verified,
-            color = MaterialTheme.colorScheme.primary,
-            iconColor = MaterialTheme.colorScheme.onPrimary,
+            color = if (isJellyfin) JellyfinBadgeColor else MaterialTheme.colorScheme.primary,
+            iconColor = if (isJellyfin) Color.White else MaterialTheme.colorScheme.onPrimary,
             contentDescription = stringResource(MR.strings.authority_badge_description),
         )
     }
 }
+
+/** Canonical ID prefix for Jellyfin authority tracker. */
+private const val JELLYFIN_CANONICAL_PREFIX = "jf:"
+
+/** Jellyfin brand color (#00A4DC). */
+private val JellyfinBadgeColor = Color(0xFF00A4DC)
 
 @PreviewLightDark
 @Composable

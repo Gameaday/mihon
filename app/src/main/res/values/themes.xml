@@ -524,6 +524,105 @@
         <item name="colorSurfaceContainerHighest">@color/monochrome_surfaceContainerHighest</item>
     </style>
 
+    <!--== Ephyra Theme ==-->
+    <style name="Theme.Tachiyomi.Ephyra">
+        <!-- Theme Colors -->
+        <item name="colorPrimary">@color/ephyra_primary</item>
+        <item name="colorOnPrimary">@color/ephyra_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/ephyra_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/ephyra_onPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/ephyra_inversePrimary</item>
+        <item name="colorSecondary">@color/ephyra_secondary</item>
+        <item name="colorOnSecondary">@color/ephyra_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/ephyra_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/ephyra_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/ephyra_tertiary</item>
+        <item name="colorOnTertiary">@color/ephyra_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/ephyra_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/ephyra_onTertiaryContainer</item>
+        <item name="android:colorBackground">@color/ephyra_background</item>
+        <item name="colorOnBackground">@color/ephyra_onBackground</item>
+        <item name="colorSurface">@color/ephyra_surface</item>
+        <item name="colorOnSurface">@color/ephyra_onSurface</item>
+        <item name="colorSurfaceVariant">@color/ephyra_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/ephyra_onSurfaceVariant</item>
+        <item name="elevationOverlayColor">@color/ephyra_surfaceTint</item>
+        <item name="colorSurfaceInverse">@color/ephyra_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">@color/ephyra_inverseOnSurface</item>
+        <item name="colorOutline">@color/ephyra_outline</item>
+        <item name="colorSurfaceContainer">@color/ephyra_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/ephyra_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/ephyra_surfaceContainerHighest</item>
+        <item name="colorSurfaceContainerLow">@color/ephyra_surfaceContainerLow</item>
+        <item name="colorSurfaceContainerLowest">@color/ephyra_surfaceContainerLowest</item>
+    </style>
+
+    <!--== Nagare Theme ==-->
+    <style name="Theme.Tachiyomi.Nagare">
+        <!-- Theme Colors -->
+        <item name="colorPrimary">@color/nagare_primary</item>
+        <item name="colorOnPrimary">@color/nagare_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/nagare_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/nagare_onPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/nagare_inversePrimary</item>
+        <item name="colorSecondary">@color/nagare_secondary</item>
+        <item name="colorOnSecondary">@color/nagare_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/nagare_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/nagare_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/nagare_tertiary</item>
+        <item name="colorOnTertiary">@color/nagare_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/nagare_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/nagare_onTertiaryContainer</item>
+        <item name="android:colorBackground">@color/nagare_background</item>
+        <item name="colorOnBackground">@color/nagare_onBackground</item>
+        <item name="colorSurface">@color/nagare_surface</item>
+        <item name="colorOnSurface">@color/nagare_onSurface</item>
+        <item name="colorSurfaceVariant">@color/nagare_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/nagare_onSurfaceVariant</item>
+        <item name="elevationOverlayColor">@color/nagare_surfaceTint</item>
+        <item name="colorSurfaceInverse">@color/nagare_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">@color/nagare_inverseOnSurface</item>
+        <item name="colorOutline">@color/nagare_outline</item>
+        <item name="colorSurfaceContainer">@color/nagare_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/nagare_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/nagare_surfaceContainerHighest</item>
+        <item name="colorSurfaceContainerLow">@color/nagare_surfaceContainerLow</item>
+        <item name="colorSurfaceContainerLowest">@color/nagare_surfaceContainerLowest</item>
+    </style>
+
+    <!--== Atolla Theme ==-->
+    <style name="Theme.Tachiyomi.Atolla">
+        <!-- Theme Colors -->
+        <item name="colorPrimary">@color/atolla_primary</item>
+        <item name="colorOnPrimary">@color/atolla_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/atolla_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/atolla_onPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/atolla_inversePrimary</item>
+        <item name="colorSecondary">@color/atolla_secondary</item>
+        <item name="colorOnSecondary">@color/atolla_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/atolla_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/atolla_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/atolla_tertiary</item>
+        <item name="colorOnTertiary">@color/atolla_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/atolla_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/atolla_onTertiaryContainer</item>
+        <item name="android:colorBackground">@color/atolla_background</item>
+        <item name="colorOnBackground">@color/atolla_onBackground</item>
+        <item name="colorSurface">@color/atolla_surface</item>
+        <item name="colorOnSurface">@color/atolla_onSurface</item>
+        <item name="colorSurfaceVariant">@color/atolla_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/atolla_onSurfaceVariant</item>
+        <item name="elevationOverlayColor">@color/atolla_surfaceTint</item>
+        <item name="colorSurfaceInverse">@color/atolla_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">@color/atolla_inverseOnSurface</item>
+        <item name="colorOutline">@color/atolla_outline</item>
+        <item name="colorSurfaceContainer">@color/atolla_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/atolla_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/atolla_surfaceContainerHighest</item>
+        <item name="colorSurfaceContainerLow">@color/atolla_surfaceContainerLow</item>
+        <item name="colorSurfaceContainerLowest">@color/atolla_surfaceContainerLowest</item>
+    </style>
+
     <!--== AMOLED Mode Overlay ==-->
     <style name="ThemeOverlay.Tachiyomi.Amoled" parent="" />
 

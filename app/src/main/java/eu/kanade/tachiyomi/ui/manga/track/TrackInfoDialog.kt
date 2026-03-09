@@ -257,9 +257,17 @@ data class TrackInfoDialogHomeScreen(
         }
 
         private fun List<Track>.mapToTrackItem(): List<TrackItem> {
-            val loggedInTrackers = Injekt.get<TrackerManager>().loggedInTrackers()
+            val trackerManager = Injekt.get<TrackerManager>()
+            val loggedInTrackers = trackerManager.loggedInTrackers()
             val source = Injekt.get<SourceManager>().getOrStub(sourceId)
-            return loggedInTrackers
+            // Include Jellyfin even when not logged in so users can discover it
+            val jellyfin = trackerManager.jellyfin
+            val visibleTrackers = if (jellyfin.isLoggedIn) {
+                loggedInTrackers
+            } else {
+                loggedInTrackers + jellyfin
+            }
+            return visibleTrackers
                 // Map to TrackItem
                 .map { service -> TrackItem(find { it.trackerId == service.id }, service) }
                 // Show only if the service supports this manga's source

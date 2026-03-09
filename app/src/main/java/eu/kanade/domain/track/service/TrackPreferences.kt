@@ -76,6 +76,58 @@ class TrackPreferences(
         "",
     )
 
+    /**
+     * Jellyfin server URL. Stored separately from tracker credentials so it can
+     * be updated independently when the server moves to a new address (dynamic IP,
+     * domain change). All API calls resolve the server URL from this preference
+     * rather than extracting it from tracking URLs.
+     */
+    fun jellyfinServerUrl() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_server_url"),
+        "",
+    )
+
+    /**
+     * Jellyfin server ID (stable across address changes). Used to verify that
+     * a new server URL points to the same Jellyfin instance when migrating.
+     */
+    fun jellyfinServerId() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_server_id"),
+        "",
+    )
+
+    /**
+     * Jellyfin display username — the human-readable name of the authenticated user.
+     * Shown in the settings UI and used for diagnostics.
+     */
+    fun jellyfinUsername() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_username"),
+        "",
+    )
+
+    /**
+     * Jellyfin server name — the display name of the connected Jellyfin server.
+     * Stored during login from the SystemInfo response. Shown in the settings UI
+     * alongside the server URL for user clarity.
+     */
+    fun jellyfinServerName() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_server_name"),
+        "",
+    )
+
+    /**
+     * Whether the authenticated Jellyfin user has administrator privileges.
+     * Cached at login time from the user's Policy.IsAdministrator field.
+     *
+     * Admin users can trigger library scans (POST /Library/Refresh) — non-admin
+     * users cannot. This flag gates the library scan step in chapter sync and
+     * allows the UI to show appropriate messages.
+     */
+    fun jellyfinIsAdmin() = preferenceStore.getBoolean(
+        Preference.privateKey("jellyfin_is_admin"),
+        false,
+    )
+
     companion object {
         /** Sentinel value: let the system pick the best available tracker automatically. */
         const val AUTHORITY_TRACKER_AUTO = 0L

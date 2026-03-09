@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Colors for Nagare theme (light)
+  ~ Minimalist Zen aesthetic — Charcoal & Mint
+  ~
+  ~ Key colors:
+  ~ Primary #059669 (Emerald)
+  ~ Secondary #059669 (Emerald)
+  ~ Tertiary #6B7280 (Gray)
+  ~ Neutral #F9FAFB
+-->
+<resources>
+    <color name="nagare_primary">#059669</color>
+    <color name="nagare_onPrimary">#FFFFFF</color>
+    <color name="nagare_primaryContainer">#A7F3D0</color>
+    <color name="nagare_onPrimaryContainer">#064E3B</color>
+    <color name="nagare_inversePrimary">#6EE7B7</color>
+    <color name="nagare_secondary">#059669</color>
+    <color name="nagare_onSecondary">#FFFFFF</color>
+    <color name="nagare_secondaryContainer">#A7F3D0</color>
+    <color name="nagare_onSecondaryContainer">#064E3B</color>
+    <color name="nagare_tertiary">#6B7280</color>
+    <color name="nagare_onTertiary">#FFFFFF</color>
+    <color name="nagare_tertiaryContainer">#E5E7EB</color>
+    <color name="nagare_onTertiaryContainer">#1F2937</color>
+    <color name="nagare_background">#F9FAFB</color>
+    <color name="nagare_onBackground">#111827</color>
+    <color name="nagare_surface">#F9FAFB</color>
+    <color name="nagare_onSurface">#111827</color>
+    <color name="nagare_surfaceVariant">#F0F2F4</color>
+    <color name="nagare_onSurfaceVariant">#374151</color>
+    <color name="nagare_surfaceTint">#059669</color>
+    <color name="nagare_inverseSurface">#1F2937</color>
+    <color name="nagare_inverseOnSurface">#F9FAFB</color>
+    <color name="nagare_outline">#D1D5DB</color>
+    <color name="nagare_surfaceContainerLowest">#ECEEEF</color>
+    <color name="nagare_surfaceContainerLow">#F0F1F3</color>
+    <color name="nagare_surfaceContainer">#F3F4F6</color>
+    <color name="nagare_surfaceContainerHigh">#F7F8F9</color>
+    <color name="nagare_surfaceContainerHighest">#FCFCFD</color>
+</resources>

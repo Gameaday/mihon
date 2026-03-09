@@ -13,39 +13,42 @@ val Typography.header: TextStyle
     @Composable
     get() = bodyMedium.copy(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = LocalBrandedTheme.current.headingWeight,
     )
 
 // --- Expressive extensions ---
 
 /**
  * Bold display style for hero sections and splash content.
+ * Respects the branded theme's heading weight for consistent visual identity.
  */
 val Typography.displayEmphasis: TextStyle
     @Composable
     get() = displaySmall.copy(
-        fontWeight = FontWeight.Bold,
+        fontWeight = LocalBrandedTheme.current.headingWeight,
         letterSpacing = (-0.5).sp,
     )
 
 /**
  * Prominent title style for screen headers and key section headings.
+ * Respects the branded theme's heading weight for consistent visual identity.
  */
 val Typography.titleEmphasis: TextStyle
     @Composable
     get() = titleLarge.copy(
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = LocalBrandedTheme.current.headingWeight,
         letterSpacing = (-0.25).sp,
     )
 
 /**
  * Compact section label for category dividers and grouped content.
+ * Respects the branded theme's heading weight for consistent visual identity.
  */
 val Typography.sectionLabel: TextStyle
     @Composable
     get() = labelLarge.copy(
         color = MaterialTheme.colorScheme.primary,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = LocalBrandedTheme.current.headingWeight,
         letterSpacing = 0.5.sp,
     )
 

@@ -159,8 +159,11 @@ private val AUTHORITY_PREFIX_TO_TRACKER = mapOf(
     "al" to 2L, // AniList
     "mal" to 1L, // MyAnimeList
     "mu" to 7L, // MangaUpdates
-    "jf" to 10L, // Jellyfin
+    "jf" to JELLYFIN_TRACKER_ID, // Jellyfin
 )
+
+/** Jellyfin tracker ID — must match [eu.kanade.tachiyomi.data.track.TrackerManager.JELLYFIN]. */
+private const val JELLYFIN_TRACKER_ID = 10L
 
 @Composable
 private fun TrackInfoItem(
@@ -192,9 +195,18 @@ private fun TrackInfoItem(
             BadgedBox(
                 badge = {
                     if (isAuthority) {
+                        val isJellyfinAuthority = tracker.id == JELLYFIN_TRACKER_ID
                         Badge(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = if (isJellyfinAuthority) {
+                                JellyfinBadgeColor
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            },
+                            contentColor = if (isJellyfinAuthority) {
+                                androidx.compose.ui.graphics.Color.White
+                            } else {
+                                MaterialTheme.colorScheme.onPrimary
+                            },
                             modifier = Modifier.absoluteOffset(x = (-5).dp),
                         ) {
                             Icon(
@@ -246,10 +258,11 @@ private fun TrackInfoItem(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     if (isAuthority) {
+                        val isJellyfinAuth = tracker.id == JELLYFIN_TRACKER_ID
                         Text(
                             text = stringResource(MR.strings.authority_linked_label),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = if (isJellyfinAuth) JellyfinBadgeColor else MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -268,7 +281,12 @@ private fun TrackInfoItem(
             modifier = Modifier.padding(top = 12.dp),
             shape = MaterialTheme.shapes.medium,
             color = if (isAuthority) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = AUTHORITY_SURFACE_ALPHA)
+                val isJellyfinAuth = tracker.id == JELLYFIN_TRACKER_ID
+                if (isJellyfinAuth) {
+                    JellyfinBadgeColor.copy(alpha = AUTHORITY_SURFACE_ALPHA)
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = AUTHORITY_SURFACE_ALPHA)
+                }
             } else {
                 MaterialTheme.colorScheme.surfaceContainerHighest
             },
@@ -324,6 +342,9 @@ private const val UNSET_TEXT_ALPHA = 0.5F
 
 /** Alpha applied to tonal authority badge surfaces — shared across all authority UI. */
 private const val AUTHORITY_SURFACE_ALPHA = 0.4f
+
+/** Jellyfin brand color (#00A4DC). */
+private val JellyfinBadgeColor = androidx.compose.ui.graphics.Color(0xFF00A4DC)
 
 @Composable
 private fun TrackDetailsItem(

@@ -5,14 +5,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 /**
- * Expressive shape system for Mihon.
+ * Default expressive shape system for Mihon.
  *
  * Uses larger, more organic corner radii than Material 3 defaults to create
- * a softer, more distinctive visual identity. These shapes are applied globally
- * via [MaterialTheme.shapes].
+ * a softer, more distinctive visual identity. Branded themes (Ephyra, Nagare,
+ * Atolla) override the global shapes via [BrandedThemeConfig.toShapes].
  */
 val MihonShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
@@ -24,23 +25,46 @@ val MihonShapes = Shapes(
 
 /**
  * Extended shape tokens for components that need non-standard corner radii.
+ *
+ * When a branded theme is active, the card / coverImage / sheet / dialog
+ * shapes are derived from [LocalBrandedTheme] so each theme can express a
+ * unique visual identity (e.g., sharp rectangles for Atolla, soft rounds
+ * for Ephyra, clean moderate radii for Nagare).
  */
 object ShapeTokens {
 
     /** Pill shape for chips, badges, and status indicators. */
     val pill = RoundedCornerShape(percent = 50)
 
-    /** Card shape for library items and manga covers. */
-    val card get() = MihonShapes.medium
+    /** Card shape — delegates to the branded theme config. */
+    val card: Shape
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBrandedTheme.current.cardShape
 
-    /** Sheet shape for bottom sheets and modal surfaces. */
-    val sheet = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+    /** Sheet shape — delegates to the branded theme config. */
+    val sheet: Shape
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBrandedTheme.current.sheetShape
 
-    /** Dialog shape for alert dialogs and confirmation popups. */
-    val dialog get() = MihonShapes.extraLarge
+    /** Dialog shape — delegates to the branded theme config. */
+    val dialog: Shape
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBrandedTheme.current.dialogShape
 
-    /** Image shape for cover thumbnails. */
-    val coverImage get() = MihonShapes.small
+    /** Image shape for cover thumbnails — delegates to the branded theme config. */
+    val coverImage: Shape
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBrandedTheme.current.coverImageShape
+
+    /** Badge shape — delegates to the branded theme config. */
+    val badge: Shape
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBrandedTheme.current.badgeShape
 }
 
 /**

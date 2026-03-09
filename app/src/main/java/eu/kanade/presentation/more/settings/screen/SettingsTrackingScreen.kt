@@ -83,7 +83,7 @@ object SettingsTrackingScreen : SearchableSettings {
     @Composable
     override fun RowScope.AppBarAction() {
         val uriHandler = LocalUriHandler.current
-        IconButton(onClick = { uriHandler.openUri("https://mihon.app/docs/guides/tracking") }) {
+        IconButton(onClick = { uriHandler.openUri("https://github.com/Gameaday/Ephyra#about-this-fork") }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
                 contentDescription = stringResource(MR.strings.tracking_guide),
@@ -153,6 +153,12 @@ object SettingsTrackingScreen : SearchableSettings {
                                 }
                             }
                         },
+                        onDismissRequest = { dialog = null },
+                    )
+                }
+                is JellyfinLogin -> {
+                    JellyfinLoginDialog(
+                        tracker = tracker,
                         onDismissRequest = { dialog = null },
                     )
                 }
@@ -434,8 +440,39 @@ object SettingsTrackingScreen : SearchableSettings {
                             subtitle = stringResource(MR.strings.pref_jellyfin_sync_enabled_summary),
                         ),
                     )
-                    // Show connection test when Jellyfin is logged in
+                    // Show connection info & settings when Jellyfin is logged in
                     if (trackerManager.jellyfin.isLoggedIn) {
+                        var showUpdateServerUrlDialog by remember { mutableStateOf(false) }
+                        if (showUpdateServerUrlDialog) {
+                            JellyfinUpdateServerUrlDialog(
+                                jellyfin = trackerManager.jellyfin,
+                                onDismissRequest = { showUpdateServerUrlDialog = false },
+                            )
+                        }
+
+                        // Server info display
+                        val serverName = trackPreferences.jellyfinServerName().get()
+                        val jellyfinUser = trackPreferences.jellyfinUsername().get()
+                        if (serverName.isNotBlank() || jellyfinUser.isNotBlank()) {
+                            add(
+                                Preference.PreferenceItem.TextPreference(
+                                    title = stringResource(MR.strings.jellyfin_server_info),
+                                    subtitle = buildString {
+                                        if (serverName.isNotBlank()) append(serverName)
+                                        if (jellyfinUser.isNotBlank()) {
+                                            if (isNotEmpty()) append(" — ")
+                                            append(
+                                                context.stringResource(
+                                                    MR.strings.jellyfin_user_selected,
+                                                    jellyfinUser,
+                                                ),
+                                            )
+                                        }
+                                    },
+                                ),
+                            )
+                        }
+
                         // Jellyfin library selection
                         var jellyfinLibraryName by remember { mutableStateOf<String?>(null) }
                         val currentLibraryId = libraryPreferences.jellyfinLibraryId().get()
@@ -444,7 +481,7 @@ object SettingsTrackingScreen : SearchableSettings {
                         if (currentLibraryId.isNotBlank()) {
                             androidx.compose.runtime.LaunchedEffect(currentLibraryId) {
                                 try {
-                                    val serverUrl = trackerManager.jellyfin.getUsername().trimEnd('/')
+                                    val serverUrl = trackerManager.jellyfin.getServerUrl()
                                     val userId = trackPreferences.jellyfinUserId().get()
                                     if (userId.isNotBlank()) {
                                         val libs = trackerManager.jellyfin.api.getLibraries(serverUrl, userId)
@@ -467,7 +504,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                     scope.launchIO {
                                         try {
                                             val serverUrl =
-                                                trackerManager.jellyfin.getUsername().trimEnd('/')
+                                                trackerManager.jellyfin.getServerUrl()
                                             val userId = trackPreferences.jellyfinUserId().get()
                                             if (userId.isNotBlank()) {
                                                 val libs = trackerManager.jellyfin.api.getLibraries(
@@ -512,57 +549,16 @@ object SettingsTrackingScreen : SearchableSettings {
                         )
                         add(
                             Preference.PreferenceItem.TextPreference(
-                                title = stringResource(MR.strings.jellyfin_user_id),
-                                subtitle = trackPreferences.jellyfinUserId().get()
-                                    .takeIf { it.isNotBlank() }
-                                    ?: stringResource(MR.strings.jellyfin_user_id_hint),
-                                onClick = {
-                                    scope.launchIO {
-                                        try {
-                                            val serverUrl =
-                                                trackerManager.jellyfin.getUsername().trimEnd('/')
-                                            val users =
-                                                trackerManager.jellyfin.api.getUsers(serverUrl)
-                                            val currentUserId =
-                                                trackPreferences.jellyfinUserId().get()
-                                            val currentIdx = users.indexOfFirst {
-                                                it.id == currentUserId
-                                            }
-                                            val nextUser = if (currentIdx < users.lastIndex) {
-                                                users[currentIdx + 1]
-                                            } else {
-                                                users.firstOrNull()
-                                            }
-                                            if (nextUser != null) {
-                                                trackPreferences.jellyfinUserId().set(nextUser.id)
-                                                withUIContext {
-                                                    context.toast(
-                                                        context.stringResource(
-                                                            MR.strings.jellyfin_user_selected,
-                                                            nextUser.name,
-                                                        ),
-                                                    )
-                                                }
-                                            }
-                                        } catch (e: Exception) {
-                                            withUIContext {
-                                                context.toast(MR.strings.jellyfin_test_failed)
-                                            }
-                                        }
-                                    }
-                                },
-                            ),
-                        )
-                        add(
-                            Preference.PreferenceItem.TextPreference(
                                 title = stringResource(MR.strings.jellyfin_test_connection),
                                 subtitle = stringResource(MR.strings.jellyfin_test_connection_summary),
                                 onClick = {
                                     scope.launchIO {
                                         try {
                                             val info = trackerManager.jellyfin.api.getSystemInfo(
-                                                trackerManager.jellyfin.getUsername().trimEnd('/'),
+                                                trackerManager.jellyfin.getServerUrl(),
                                             )
+                                            // Refresh stored server name on successful test
+                                            trackPreferences.jellyfinServerName().set(info.serverName)
                                             withUIContext {
                                                 context.toast(
                                                     context.stringResource(
@@ -578,6 +574,15 @@ object SettingsTrackingScreen : SearchableSettings {
                                             }
                                         }
                                     }
+                                },
+                            ),
+                        )
+                        add(
+                            Preference.PreferenceItem.TextPreference(
+                                title = stringResource(MR.strings.jellyfin_update_server_url),
+                                subtitle = stringResource(MR.strings.jellyfin_update_server_url_summary),
+                                onClick = {
+                                    showUpdateServerUrlDialog = true
                                 },
                             ),
                         )
@@ -605,7 +610,13 @@ object SettingsTrackingScreen : SearchableSettings {
                             .map { service ->
                                 Preference.PreferenceItem.TrackerPreference(
                                     tracker = service,
-                                    login = { (service as EnhancedTracker).loginNoop() },
+                                    login = {
+                                        if (service is eu.kanade.tachiyomi.data.track.jellyfin.Jellyfin) {
+                                            dialog = JellyfinLogin(service)
+                                        } else {
+                                            (service as EnhancedTracker).loginNoop()
+                                        }
+                                    },
                                     logout = service::logout,
                                 )
                             } + listOf(Preference.PreferenceItem.InfoPreference(enhancedTrackerInfo))
@@ -737,6 +748,204 @@ object SettingsTrackingScreen : SearchableSettings {
     }
 
     @Composable
+    private fun JellyfinLoginDialog(
+        tracker: Tracker,
+        onDismissRequest: () -> Unit,
+    ) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val jellyfin = tracker as eu.kanade.tachiyomi.data.track.jellyfin.Jellyfin
+        val jfTrackPreferences = remember { Injekt.get<eu.kanade.domain.track.service.TrackPreferences>() }
+
+        var serverUrl by remember { mutableStateOf(TextFieldValue(jellyfin.getServerUrl())) }
+        var jellyfinUsername by remember { mutableStateOf(TextFieldValue(jfTrackPreferences.jellyfinUsername().get())) }
+        var jellyfinPassword by remember { mutableStateOf(TextFieldValue()) }
+        var processing by remember { mutableStateOf(false) }
+        var inputError by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(MR.strings.login_title, tracker.name),
+                        modifier = Modifier.weight(1f),
+                    )
+                    IconButton(onClick = onDismissRequest) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = stringResource(MR.strings.action_close),
+                        )
+                    }
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = serverUrl,
+                        onValueChange = { serverUrl = it },
+                        label = { Text(text = stringResource(MR.strings.jellyfin_server_url)) },
+                        placeholder = { Text(text = "http://192.168.1.100:8096") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Uri,
+                            imeAction = ImeAction.Next,
+                        ),
+                        singleLine = true,
+                        isError = inputError && !processing,
+                    )
+
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = jellyfinUsername,
+                        onValueChange = { jellyfinUsername = it },
+                        label = { Text(text = stringResource(MR.strings.jellyfin_username)) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next,
+                        ),
+                        singleLine = true,
+                        isError = inputError && !processing,
+                    )
+
+                    var hidePassword by remember { mutableStateOf(true) }
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = jellyfinPassword,
+                        onValueChange = { jellyfinPassword = it },
+                        label = { Text(text = stringResource(MR.strings.jellyfin_password)) },
+                        trailingIcon = {
+                            IconButton(onClick = { hidePassword = !hidePassword }) {
+                                Icon(
+                                    imageVector = if (hidePassword) {
+                                        Icons.Filled.Visibility
+                                    } else {
+                                        Icons.Filled.VisibilityOff
+                                    },
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        visualTransformation = if (hidePassword) {
+                            PasswordVisualTransformation()
+                        } else {
+                            VisualTransformation.None
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done,
+                        ),
+                        singleLine = true,
+                        isError = inputError && !processing,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !processing &&
+                        serverUrl.text.isNotBlank() &&
+                        jellyfinUsername.text.isNotBlank(),
+                    onClick = {
+                        scope.launchIO {
+                            processing = true
+                            val result = try {
+                                jellyfin.loginWithCredentials(
+                                    serverUrl = serverUrl.text,
+                                    jellyfinUser = jellyfinUsername.text,
+                                    jellyfinPassword = jellyfinPassword.text,
+                                )
+                                withUIContext { context.toast(MR.strings.login_success) }
+                                true
+                            } catch (e: Throwable) {
+                                jellyfin.logout()
+                                withUIContext { context.toast(e.message.toString()) }
+                                false
+                            }
+                            inputError = !result
+                            if (result) onDismissRequest()
+                            processing = false
+                        }
+                    },
+                ) {
+                    val id = if (processing) MR.strings.logging_in else MR.strings.login
+                    Text(text = stringResource(id))
+                }
+            },
+        )
+    }
+
+    @Composable
+    private fun JellyfinUpdateServerUrlDialog(
+        jellyfin: eu.kanade.tachiyomi.data.track.jellyfin.Jellyfin,
+        onDismissRequest: () -> Unit,
+    ) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+
+        var newServerUrl by remember { mutableStateOf(TextFieldValue(jellyfin.getServerUrl())) }
+        var processing by remember { mutableStateOf(false) }
+        var inputError by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
+            title = {
+                Text(text = stringResource(MR.strings.jellyfin_update_server_url))
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(text = stringResource(MR.strings.jellyfin_update_server_url_summary))
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = newServerUrl,
+                        onValueChange = { newServerUrl = it },
+                        label = { Text(text = stringResource(MR.strings.jellyfin_server_url)) },
+                        placeholder = { Text(text = "http://192.168.1.100:8096") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Uri,
+                            imeAction = ImeAction.Done,
+                        ),
+                        singleLine = true,
+                        isError = inputError && !processing,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !processing && newServerUrl.text.isNotBlank(),
+                    onClick = {
+                        scope.launchIO {
+                            processing = true
+                            try {
+                                jellyfin.updateServerUrl(newServerUrl.text)
+                                withUIContext {
+                                    context.toast(MR.strings.jellyfin_server_updated)
+                                }
+                                onDismissRequest()
+                            } catch (e: IllegalStateException) {
+                                inputError = true
+                                withUIContext {
+                                    context.toast(MR.strings.jellyfin_server_mismatch)
+                                }
+                            } catch (e: Exception) {
+                                inputError = true
+                                withUIContext {
+                                    context.toast(MR.strings.jellyfin_test_failed)
+                                }
+                            }
+                            processing = false
+                        }
+                    },
+                ) {
+                    val id = if (processing) MR.strings.logging_in else MR.strings.login
+                    Text(text = stringResource(id))
+                }
+            },
+        )
+    }
+
+    @Composable
     private fun TrackingLogoutDialog(
         tracker: Tracker,
         onDismissRequest: () -> Unit,
@@ -829,4 +1038,8 @@ private data class LogoutDialog(
 
 private data class ImportConfirmDialog(
     val trackerName: String,
+)
+
+private data class JellyfinLogin(
+    val tracker: Tracker,
 )

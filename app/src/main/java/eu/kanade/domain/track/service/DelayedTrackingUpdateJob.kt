@@ -11,6 +11,7 @@ import androidx.work.WorkerParameters
 import eu.kanade.domain.track.interactor.TrackChapter
 import eu.kanade.domain.track.store.DelayedTrackingStore
 import eu.kanade.tachiyomi.util.system.workManager
+import kotlinx.coroutines.delay
 import logcat.LogPriority
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.logcat
@@ -33,7 +34,7 @@ class DelayedTrackingUpdateJob(private val context: Context, workerParams: Worke
         val delayedTrackingStore = Injekt.get<DelayedTrackingStore>()
 
         withIOContext {
-            delayedTrackingStore.getItems()
+            val items = delayedTrackingStore.getItems()
                 .mapNotNull {
                     val track = getTracks.awaitOne(it.trackId)
                     if (track == null) {
@@ -41,12 +42,17 @@ class DelayedTrackingUpdateJob(private val context: Context, workerParams: Worke
                     }
                     track?.copy(lastChapterRead = it.lastChapterRead.toDouble())
                 }
-                .forEach { track ->
-                    logcat(LogPriority.DEBUG) {
-                        "Updating delayed track item: ${track.mangaId}, last chapter read: ${track.lastChapterRead}"
-                    }
-                    trackChapter.await(context, track.mangaId, track.lastChapterRead, setupJobOnFailure = false)
+
+            items.forEachIndexed { index, track ->
+                logcat(LogPriority.DEBUG) {
+                    "Updating delayed track item: ${track.mangaId}, last chapter read: ${track.lastChapterRead}"
                 }
+                trackChapter.await(context, track.mangaId, track.lastChapterRead, setupJobOnFailure = false)
+                // Stagger updates to reduce burst load on tracker servers
+                if (index < items.lastIndex) {
+                    delay(STAGGER_DELAY_MS)
+                }
+            }
         }
 
         return if (delayedTrackingStore.getItems().isEmpty()) Result.success() else Result.retry()
@@ -54,6 +60,12 @@ class DelayedTrackingUpdateJob(private val context: Context, workerParams: Worke
 
     companion object {
         private const val TAG = "DelayedTrackingUpdate"
+
+        /**
+         * Delay between queued tracker updates to stagger API requests
+         * and reduce burst load on tracker servers.
+         */
+        private const val STAGGER_DELAY_MS = 500L
 
         fun setupTask(context: Context) {
             val constraints = Constraints(

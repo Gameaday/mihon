@@ -13,6 +13,7 @@ import eu.kanade.tachiyomi.network.DELETE
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.interceptor.rateLimit
 import eu.kanade.tachiyomi.network.jsonMime
 import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
@@ -24,6 +25,7 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import tachiyomi.core.common.util.lang.withIOContext
 import uy.kohesive.injekt.injectLazy
+import kotlin.time.Duration.Companion.seconds
 import tachiyomi.domain.track.model.Track as DomainTrack
 
 class ShikimoriApi(
@@ -34,7 +36,11 @@ class ShikimoriApi(
 
     private val json: Json by injectLazy()
 
-    private val authClient = client.newBuilder().addInterceptor(interceptor).build()
+    private val authClient = client.newBuilder()
+        .addInterceptor(interceptor)
+        // Shikimori documents 5rps + 90rpm; staying ≥20% under → 1/s (60rpm, well under 72rpm cap)
+        .rateLimit(permits = 1, period = 1.seconds)
+        .build()
 
     suspend fun addLibManga(track: Track, userId: String): Track {
         return withIOContext {

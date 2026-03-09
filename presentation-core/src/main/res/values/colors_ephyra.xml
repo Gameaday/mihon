@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Colors for Ephyra theme (light)
+  ~ Glassmorphic aesthetic — Electric Indigo & Cyan
+  ~
+  ~ Key colors:
+  ~ Primary #4F46E5 (Electric Indigo)
+  ~ Secondary #0891B2 (Cyan)
+  ~ Tertiary #7C3AED (Violet)
+  ~ Neutral #F5F3FF
+-->
+<resources>
+    <color name="ephyra_primary">#4F46E5</color>
+    <color name="ephyra_onPrimary">#FFFFFF</color>
+    <color name="ephyra_primaryContainer">#C7D2FE</color>
+    <color name="ephyra_onPrimaryContainer">#1E1B4B</color>
+    <color name="ephyra_inversePrimary">#A5B4FC</color>
+    <color name="ephyra_secondary">#0891B2</color>
+    <color name="ephyra_onSecondary">#FFFFFF</color>
+    <color name="ephyra_secondaryContainer">#A5F3FC</color>
+    <color name="ephyra_onSecondaryContainer">#083344</color>
+    <color name="ephyra_tertiary">#7C3AED</color>
+    <color name="ephyra_onTertiary">#FFFFFF</color>
+    <color name="ephyra_tertiaryContainer">#DDD6FE</color>
+    <color name="ephyra_onTertiaryContainer">#2E1065</color>
+    <color name="ephyra_background">#F5F3FF</color>
+    <color name="ephyra_onBackground">#1E1B4B</color>
+    <color name="ephyra_surface">#F5F3FF</color>
+    <color name="ephyra_onSurface">#1E1B4B</color>
+    <color name="ephyra_surfaceVariant">#EEF2FF</color>
+    <color name="ephyra_onSurfaceVariant">#3730A3</color>
+    <color name="ephyra_surfaceTint">#4F46E5</color>
+    <color name="ephyra_inverseSurface">#1E1B4B</color>
+    <color name="ephyra_inverseOnSurface">#E0E7FF</color>
+    <color name="ephyra_outline">#818CF8</color>
+    <color name="ephyra_surfaceContainerLowest">#E8E5F8</color>
+    <color name="ephyra_surfaceContainerLow">#ECEAFA</color>
+    <color name="ephyra_surfaceContainer">#EEF2FF</color>
+    <color name="ephyra_surfaceContainerHigh">#F1F0FF</color>
+    <color name="ephyra_surfaceContainerHighest">#F8F7FF</color>
+</resources>

@@ -93,6 +93,46 @@ class JellyfinApi(
     }
 
     /**
+     * Authenticates a user by name and password using Jellyfin's
+     * `/Users/AuthenticateByName` endpoint. Returns an access token that
+     * can be used for subsequent API calls instead of a global API key.
+     *
+     * This is the preferred login method because:
+     * 1. It authenticates as a specific user (not an admin-level API key)
+     * 2. The access token is scoped to that user's permissions
+     * 3. The server returns the user ID and server ID alongside the token
+     *
+     * The caller must add an `X-Emby-Authorization` header with client info
+     * since the user is not yet authenticated at this point.
+     *
+     * Reference: POST /Users/AuthenticateByName
+     */
+    suspend fun authenticateByName(
+        serverUrl: String,
+        username: String,
+        password: String,
+    ): JellyfinAuthByNameResponse = withIOContext {
+        val body = json.encodeToString(
+            kotlinx.serialization.json.JsonObject.serializer(),
+            kotlinx.serialization.json.JsonObject(
+                mapOf(
+                    "Username" to kotlinx.serialization.json.JsonPrimitive(username),
+                    "Pw" to kotlinx.serialization.json.JsonPrimitive(password),
+                ),
+            ),
+        ).toByteArray().toRequestBody("application/json".toMediaType())
+
+        val request = okhttp3.Request.Builder()
+            .url("$serverUrl/Users/AuthenticateByName")
+            .post(body)
+            .build()
+
+        client.newCall(request)
+            .awaitSuccess()
+            .let { with(json) { it.parseAs<JellyfinAuthByNameResponse>() } }
+    }
+
+    /**
      * Returns libraries ("views") visible to the authenticated user.
      */
     suspend fun getLibraries(serverUrl: String, userId: String): List<JellyfinLibrary> =
@@ -206,27 +246,32 @@ class JellyfinApi(
     /**
      * Extracts the Jellyfin item ID from a tracking URL.
      *
-     * Tracking URLs have the format: `{serverUrl}/Items/{itemId}`
+     * Tracking URLs have two formats:
+     * - Legacy: `{serverUrl}/Items/{itemId}` (contains full server URL)
+     * - New: bare item ID string (server URL resolved from preferences)
      */
     fun getItemIdFromUrl(trackingUrl: String): String {
-        return trackingUrl.substringAfterLast("/Items/").substringBefore("?")
+        return if (trackingUrl.contains("/Items/")) {
+            trackingUrl.substringAfterLast("/Items/").substringBefore("?")
+        } else {
+            // New format: tracking URL IS the item ID
+            trackingUrl.substringBefore("?")
+        }
     }
 
     /**
      * Extracts the server URL from a tracking URL.
+     *
+     * For legacy tracking URLs that embed the server URL (`{serverUrl}/Items/{itemId}`),
+     * this extracts the server portion. For new-style bare item ID URLs, this returns
+     * null — callers should fall back to the stored server URL preference.
      */
-    fun getServerUrlFromTrackUrl(trackingUrl: String): String {
-        return trackingUrl.substringBefore("/Items/")
-    }
-
-    /**
-     * Returns the list of users on the server. Requires admin-level API key.
-     * Used during login to auto-populate the user ID preference.
-     */
-    suspend fun getUsers(serverUrl: String): List<JellyfinUser> = withIOContext {
-        val response = client.newCall(GET("$serverUrl/Users"))
-            .awaitSuccess()
-        with(json) { response.parseAs<List<JellyfinUser>>() }
+    fun getServerUrlFromTrackUrl(trackingUrl: String): String? {
+        return if (trackingUrl.contains("/Items/")) {
+            trackingUrl.substringBefore("/Items/")
+        } else {
+            null
+        }
     }
 
     /**
@@ -444,6 +489,69 @@ class JellyfinApi(
         }.items
             .distinctBy { it.id }
             .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
+    }
+
+    /**
+     * Lightweight pre-flight check to verify the Jellyfin server is reachable.
+     * Uses the public system info endpoint (no auth required, minimal payload).
+     *
+     * Returns `true` if the server responds successfully, `false` on any error.
+     * This should be called before starting expensive sync operations to
+     * fail fast with a clear "server unreachable" message.
+     */
+    suspend fun checkServerReachable(serverUrl: String): Boolean = withIOContext {
+        try {
+            client.newCall(GET("$serverUrl/System/Info/Public"))
+                .awaitSuccess()
+                .close()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Triggers a Jellyfin library scan so newly downloaded files are discovered.
+     *
+     * Uses the `/Library/Refresh` endpoint which initiates a scan of all libraries.
+     * Requires administrator privileges to succeed.
+     *
+     * Returns a [LibraryScanResult] indicating success, permission failure (403),
+     * or other errors — so callers can show appropriate user-facing messages.
+     *
+     * Reference: POST /Library/Refresh
+     */
+    suspend fun triggerLibraryScan(serverUrl: String): LibraryScanResult = withIOContext {
+        try {
+            val request = okhttp3.Request.Builder()
+                .url("$serverUrl/Library/Refresh")
+                .post(ByteArray(0).toRequestBody())
+                .build()
+            val response = client.newCall(request).execute()
+            when {
+                response.isSuccessful -> LibraryScanResult.Success
+                response.code == 401 || response.code == 403 -> {
+                    response.close()
+                    LibraryScanResult.Forbidden
+                }
+                else -> {
+                    val msg = "HTTP ${response.code}"
+                    response.close()
+                    LibraryScanResult.Error(msg)
+                }
+            }
+        } catch (e: java.io.IOException) {
+            LibraryScanResult.Error(e.message ?: "Network error")
+        }
+    }
+
+    /**
+     * Result of a Jellyfin library scan trigger.
+     */
+    sealed class LibraryScanResult {
+        data object Success : LibraryScanResult()
+        data object Forbidden : LibraryScanResult()
+        data class Error(val message: String) : LibraryScanResult()
     }
 
     companion object {

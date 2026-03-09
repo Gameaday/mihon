@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mihon</string>
+    <string name="app_name" translatable="false">Ephyra</string>
 
     <!-- Generic strings -->
     <string name="on">On</string>
@@ -250,6 +250,9 @@
     <string name="theme_yinyang">Yin &amp; Yang</string>
     <string name="theme_yotsuba">Yotsuba</string>
     <string name="theme_tidalwave">Tidal Wave</string>
+    <string name="theme_ephyra">Ephyra</string>
+    <string name="theme_nagare">Nagare</string>
+    <string name="theme_atolla">Atolla</string>
     <string name="pref_dark_theme_pure_black">Pure black dark mode</string>
     <string name="pref_relative_format">Relative timestamps</string>
     <!-- "Today" instead of "2023-12-31" -->
@@ -775,6 +778,17 @@
     <string name="manga_download">Download</string>
     <string name="download_unread">Unread</string>
     <string name="download_bookmarked">Bookmarked</string>
+    <string name="download_sync_to_jellyfin">Sync to Jellyfin</string>
+    <string name="download_sync_read_to_jellyfin">Sync read chapters missing from Jellyfin</string>
+    <string name="download_sync_all_to_jellyfin">Sync ALL chapters missing from Jellyfin</string>
+    <string name="jellyfin_sync_started">Syncing %d chapter(s) to Jellyfin…</string>
+    <string name="jellyfin_sync_up_to_date">Jellyfin library is up to date</string>
+    <string name="jellyfin_sync_not_logged_in">Not logged in to Jellyfin — configure in Settings → Tracking</string>
+    <string name="jellyfin_sync_not_linked">This manga is not linked to a Jellyfin library item</string>
+    <string name="jellyfin_sync_server_unreachable">Cannot reach Jellyfin server — check your connection and server URL</string>
+    <string name="jellyfin_sync_error">Jellyfin sync failed: %s</string>
+    <string name="jellyfin_scan_requires_admin">Chapters synced, but library scan requires admin privileges. Ask your server admin to refresh the library.</string>
+    <string name="jellyfin_scan_failed">Library scan failed: %s</string>
     <string name="custom_cover">Custom cover</string>
     <string name="manga_cover">Cover</string>
     <string name="cover_saved">Cover saved</string>
@@ -1227,17 +1241,23 @@
     <string name="action_filter_content_type_manga">Manga only</string>
 
     <!-- Jellyfin tracker -->
-    <string name="jellyfin_user_id">User ID</string>
-    <string name="jellyfin_user_id_hint">Jellyfin user ID for read progress sync</string>
+    <string name="jellyfin_server_info">Server info</string>
     <string name="pref_jellyfin_sync_enabled">Jellyfin bidirectional sync</string>
     <string name="pref_jellyfin_sync_enabled_summary">Sync read progress and metadata edits with Jellyfin server. Chapters read in the app are marked as played on the server, and metadata edits are pushed back.</string>
     <string name="jellyfin_test_connection">Test connection</string>
     <string name="jellyfin_test_connection_summary">Verify connectivity with the configured Jellyfin server</string>
     <string name="jellyfin_test_success">Connected to %1$s (v%2$s)</string>
-    <string name="jellyfin_test_failed">Connection failed — check server URL and API key</string>
+    <string name="jellyfin_test_failed">Connection failed — check server URL and credentials</string>
     <string name="jellyfin_library">Jellyfin library</string>
     <string name="jellyfin_library_all">All libraries</string>
     <string name="jellyfin_library_selected">Library: %s</string>
     <string name="jellyfin_user_selected">User: %s</string>
+    <string name="jellyfin_server_url">Server URL</string>
+    <string name="jellyfin_username">Username</string>
+    <string name="jellyfin_password">Password</string>
+    <string name="jellyfin_update_server_url">Update server address</string>
+    <string name="jellyfin_update_server_url_summary">Change the server URL when your Jellyfin server moves to a new address. Existing tracking data is preserved.</string>
+    <string name="jellyfin_server_updated">Server URL updated successfully</string>
+    <string name="jellyfin_server_mismatch">This is a different Jellyfin server — please log in again</string>
     <string name="tracking_linked">Linked</string>
 </resources>

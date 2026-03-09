@@ -37,7 +37,8 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)
-        .rateLimit(permits = 85, period = 1.minutes)
+        // AniList documents 90 req/min; 80% safety margin → 72/min
+        .rateLimit(permits = 72, period = 1.minutes)
         .build()
 
     suspend fun addLibManga(track: Track): Track {

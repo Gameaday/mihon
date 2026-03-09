@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Colors for Atolla theme (light)
+  ~ System Hub aesthetic — Deep Sea Blue & Amber
+  ~
+  ~ Key colors:
+  ~ Primary #1D4ED8 (Blue)
+  ~ Secondary #D97706 (Amber)
+  ~ Tertiary #EA580C (Orange)
+  ~ Neutral #F8FAFC
+-->
+<resources>
+    <color name="atolla_primary">#1D4ED8</color>
+    <color name="atolla_onPrimary">#FFFFFF</color>
+    <color name="atolla_primaryContainer">#BFDBFE</color>
+    <color name="atolla_onPrimaryContainer">#1E3A5F</color>
+    <color name="atolla_inversePrimary">#93C5FD</color>
+    <color name="atolla_secondary">#D97706</color>
+    <color name="atolla_onSecondary">#FFFFFF</color>
+    <color name="atolla_secondaryContainer">#FDE68A</color>
+    <color name="atolla_onSecondaryContainer">#451A03</color>
+    <color name="atolla_tertiary">#EA580C</color>
+    <color name="atolla_onTertiary">#FFFFFF</color>
+    <color name="atolla_tertiaryContainer">#FED7AA</color>
+    <color name="atolla_onTertiaryContainer">#431407</color>
+    <color name="atolla_background">#F1F5F9</color>
+    <color name="atolla_onBackground">#0F172A</color>
+    <color name="atolla_surface">#F1F5F9</color>
+    <color name="atolla_onSurface">#0F172A</color>
+    <color name="atolla_surfaceVariant">#E2E8F0</color>
+    <color name="atolla_onSurfaceVariant">#334155</color>
+    <color name="atolla_surfaceTint">#1D4ED8</color>
+    <color name="atolla_inverseSurface">#1E293B</color>
+    <color name="atolla_inverseOnSurface">#F1F5F9</color>
+    <color name="atolla_outline">#94A3B8</color>
+    <color name="atolla_surfaceContainerLowest">#DDE3EA</color>
+    <color name="atolla_surfaceContainerLow">#E5EBF1</color>
+    <color name="atolla_surfaceContainer">#EBF0F5</color>
+    <color name="atolla_surfaceContainerHigh">#F1F5F9</color>
+    <color name="atolla_surfaceContainerHighest">#F8FAFC</color>
+</resources>

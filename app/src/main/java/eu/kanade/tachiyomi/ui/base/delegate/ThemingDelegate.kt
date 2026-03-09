@@ -25,6 +25,9 @@ interface ThemingDelegate {
             AppTheme.YINYANG to R.style.Theme_Tachiyomi_YinYang,
             AppTheme.YOTSUBA to R.style.Theme_Tachiyomi_Yotsuba,
             AppTheme.TIDAL_WAVE to R.style.Theme_Tachiyomi_TidalWave,
+            AppTheme.EPHYRA to R.style.Theme_Tachiyomi_Ephyra,
+            AppTheme.NAGARE to R.style.Theme_Tachiyomi_Nagare,
+            AppTheme.ATOLLA to R.style.Theme_Tachiyomi_Atolla,
         )
 
         fun getThemeResIds(appTheme: AppTheme, isAmoled: Boolean): List<Int> {

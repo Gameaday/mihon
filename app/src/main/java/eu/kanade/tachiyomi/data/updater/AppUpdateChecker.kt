@@ -41,7 +41,7 @@ class AppUpdateChecker {
 val GITHUB_REPO: String by lazy {
     when {
         isPreviewBuildType -> "mihonapp/mihon-preview"
-        isNightlyBuildType -> "Gameaday/mihon"
+        isNightlyBuildType -> "Gameaday/Ephyra"
         else -> "mihonapp/mihon"
     }
 }

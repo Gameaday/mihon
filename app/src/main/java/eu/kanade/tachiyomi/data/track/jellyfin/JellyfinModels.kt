@@ -130,3 +130,48 @@ data class JellyfinExternalUrl(
     @SerialName("Name") val name: String,
     @SerialName("Url") val url: String,
 )
+
+/**
+ * Response from Jellyfin's `/Users/AuthenticateByName` endpoint.
+ * Contains the access token for subsequent API calls and the authenticated
+ * user's profile information.
+ *
+ * Reference: POST /Users/AuthenticateByName
+ */
+@Serializable
+data class JellyfinAuthByNameResponse(
+    @SerialName("AccessToken") val accessToken: String,
+    @SerialName("ServerId") val serverId: String,
+    @SerialName("User") val user: JellyfinAuthUser,
+)
+
+/**
+ * User object returned inside the AuthenticateByName response.
+ * Includes the user's policy (permissions) which we need to determine
+ * whether features like library scan are available.
+ *
+ * Reference: POST /Users/AuthenticateByName → User field
+ */
+@Serializable
+data class JellyfinAuthUser(
+    @SerialName("Id") val id: String,
+    @SerialName("Name") val name: String,
+    @SerialName("Policy") val policy: JellyfinUserPolicy? = null,
+)
+
+/**
+ * Jellyfin user policy DTO — defines what the authenticated user is allowed to do.
+ * We use this at login time to determine:
+ * - Whether the user can trigger library scans (`IsAdministrator`)
+ * - Whether content upload/management features should be available
+ *
+ * Reference: Jellyfin API `UserPolicy` object
+ */
+@Serializable
+data class JellyfinUserPolicy(
+    @SerialName("IsAdministrator") val isAdministrator: Boolean = false,
+    @SerialName("IsDisabled") val isDisabled: Boolean = false,
+    @SerialName("EnableContentDeletion") val enableContentDeletion: Boolean = false,
+    @SerialName("EnableAllFolders") val enableAllFolders: Boolean = true,
+    @SerialName("EnableMediaPlayback") val enableMediaPlayback: Boolean = true,
+)

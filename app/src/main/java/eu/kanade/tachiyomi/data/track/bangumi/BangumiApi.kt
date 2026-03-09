@@ -12,6 +12,7 @@ import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.interceptor.rateLimit
 import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.add
@@ -27,6 +28,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import tachiyomi.core.common.util.lang.withIOContext
 import uy.kohesive.injekt.injectLazy
+import kotlin.time.Duration.Companion.seconds
 
 class BangumiApi(
     private val trackId: Long,
@@ -36,7 +38,11 @@ class BangumiApi(
 
     private val json: Json by injectLazy()
 
-    private val authClient = client.newBuilder().addInterceptor(interceptor).build()
+    private val authClient = client.newBuilder()
+        .addInterceptor(interceptor)
+        // Bangumi rate limit not publicly documented; conservative 1 req/s default
+        .rateLimit(permits = 1, period = 1.seconds)
+        .build()
 
     suspend fun addLibManga(track: Track): Track {
         return withIOContext {
