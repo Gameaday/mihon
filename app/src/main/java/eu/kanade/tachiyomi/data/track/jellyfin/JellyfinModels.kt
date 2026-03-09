@@ -175,27 +175,3 @@ data class JellyfinUserPolicy(
     @SerialName("EnableAllFolders") val enableAllFolders: Boolean = true,
     @SerialName("EnableMediaPlayback") val enableMediaPlayback: Boolean = true,
 )
-
-/**
- * Result of a Jellyfin sync operation.
- * Provides typed outcomes so callers can show appropriate UI messages.
- */
-sealed class JellyfinSyncResult {
-    /** Sync completed successfully, all chapters synced and scan triggered. */
-    data class Success(val chapterCount: Int) : JellyfinSyncResult()
-
-    /** Sync completed but library scan failed (e.g., non-admin user). */
-    data class SyncedButScanFailed(val chapterCount: Int, val scanError: String) : JellyfinSyncResult()
-
-    /** All chapters already present — nothing to sync. */
-    data object UpToDate : JellyfinSyncResult()
-
-    /** User is not logged in to Jellyfin. */
-    data object NotLoggedIn : JellyfinSyncResult()
-
-    /** Manga is not linked to a Jellyfin library item. */
-    data object NotLinked : JellyfinSyncResult()
-
-    /** A server or network error occurred during sync. */
-    data class Error(val message: String) : JellyfinSyncResult()
-}
