@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.Color
  *
  * Key colors:
  * Primary Electric Indigo #4F46E5
- * Secondary Cyan #06B6D4
- * Tertiary Violet #8B5CF6
+ * Secondary Cyan #0891B2
+ * Tertiary Violet #7C3AED
  * Neutral #1E1B4B (dark) / #EEF2FF (light)
  */
 internal object EphyraColorScheme : BaseColorScheme() {
