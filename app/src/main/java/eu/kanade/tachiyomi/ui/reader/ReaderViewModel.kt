@@ -71,6 +71,7 @@ import tachiyomi.domain.history.interactor.UpsertHistory
 import tachiyomi.domain.history.model.HistoryUpdate
 import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.domain.manga.interactor.GetManga
+import tachiyomi.domain.manga.model.ContentType
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.source.local.isLocal
@@ -791,12 +792,23 @@ class ReaderViewModel @JvmOverloads constructor(
 
     /**
      * Returns the viewer position used by this manga or the default one.
+     * When reading mode is DEFAULT, auto-detects webtoon content from
+     * genre keywords and publishing type to suggest continuous vertical
+     * scrolling — matching Jellyfin's content-aware reader behaviour.
      */
     fun getMangaReadingMode(resolveDefault: Boolean = true): Int {
         val default = readerPreferences.defaultReadingMode().get()
         val readingMode = ReadingMode.fromPreference(manga?.readingMode?.toInt())
         return when {
-            resolveDefault && readingMode == ReadingMode.DEFAULT -> default
+            resolveDefault && readingMode == ReadingMode.DEFAULT -> {
+                // Content-type-aware default: auto-detect webtoon from metadata
+                val currentManga = manga
+                if (currentManga != null && ContentType.isLikelyWebtoon(currentManga.genre)) {
+                    ReadingMode.WEBTOON.flagValue
+                } else {
+                    default
+                }
+            }
             else -> manga?.readingMode?.toInt() ?: default
         }
     }

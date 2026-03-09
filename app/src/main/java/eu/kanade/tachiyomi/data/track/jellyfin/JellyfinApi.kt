@@ -161,6 +161,7 @@ class JellyfinApi(
         with(json) {
             response.parseAs<JellyfinItemsResponse>()
         }.items
+            .distinctBy { it.id } // Deduplicate items that appear in multiple libraries
             .sortedByDescending { it.hasImage() } // Items with covers first
             .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
     }
@@ -368,6 +369,7 @@ class JellyfinApi(
         with(json) {
             response.parseAs<JellyfinItemsResponse>()
         }.items
+            .distinctBy { it.id }
             .sortedByDescending { it.hasImage() }
             .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
     }
@@ -402,6 +404,7 @@ class JellyfinApi(
         with(json) {
             response.parseAs<JellyfinItemsResponse>()
         }.items
+            .distinctBy { it.id }
             .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
     }
 
@@ -433,6 +436,7 @@ class JellyfinApi(
         with(json) {
             response.parseAs<List<JellyfinItem>>()
         }
+            .distinctBy { it.id }
             .sortedByDescending { it.hasImage() }
             .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
     }
@@ -465,6 +469,7 @@ class JellyfinApi(
         with(json) {
             response.parseAs<JellyfinItemsResponse>()
         }.items
+            .distinctBy { it.id }
             .map { item -> item.toTrackSearch(trackId, serverUrl, this@JellyfinApi) }
     }
 

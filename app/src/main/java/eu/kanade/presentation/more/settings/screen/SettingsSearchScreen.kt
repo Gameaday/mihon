@@ -1,7 +1,10 @@
 package eu.kanade.presentation.more.settings.screen
 
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -214,12 +217,21 @@ private fun SearchResult(
             .toList()
     }
 
-    Crossfade(
+    AnimatedContent(
         targetState = result,
-        animationSpec = tween(
-            durationMillis = MotionTokens.DURATION_MEDIUM,
-            easing = MotionTokens.EasingStandard,
-        ),
+        transitionSpec = {
+            fadeIn(
+                animationSpec = tween(
+                    durationMillis = MotionTokens.DURATION_MEDIUM,
+                    easing = MotionTokens.EasingDecelerate,
+                ),
+            ) togetherWith fadeOut(
+                animationSpec = tween(
+                    durationMillis = MotionTokens.DURATION_SHORT,
+                    easing = MotionTokens.EasingAccelerate,
+                ),
+            )
+        },
         label = "results",
     ) {
         when {

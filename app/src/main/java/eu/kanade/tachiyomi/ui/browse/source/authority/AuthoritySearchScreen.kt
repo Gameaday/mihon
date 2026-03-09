@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -232,7 +231,7 @@ private fun DiscoverContent(
                 }
             },
             singleLine = true,
-            shape = RoundedCornerShape(28.dp),
+            shape = MaterialTheme.shapes.extraLarge,
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             ),
@@ -462,7 +461,7 @@ private fun DiscoverResultCard(
                 contentDescription = result.title,
                 modifier = Modifier
                     .size(56.dp, 80.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(MaterialTheme.shapes.extraSmall),
                 contentScale = ContentScale.Crop,
             )
             Column(modifier = Modifier.weight(1f)) {
@@ -567,7 +566,7 @@ private fun DiscoverDetailSheet(
                     contentDescription = result.title,
                     modifier = Modifier
                         .size(120.dp, 170.dp)
-                        .clip(RoundedCornerShape(12.dp)),
+                        .clip(MaterialTheme.shapes.small),
                     contentScale = ContentScale.Crop,
                 )
                 Column(
@@ -740,7 +739,7 @@ private fun MergeWithExistingDialog(
                                     contentDescription = candidate.manga.title,
                                     modifier = Modifier
                                         .size(40.dp, 56.dp)
-                                        .clip(RoundedCornerShape(4.dp)),
+                                        .clip(MaterialTheme.shapes.extraSmall),
                                     contentScale = ContentScale.Crop,
                                 )
                                 Column(modifier = Modifier.weight(1f)) {

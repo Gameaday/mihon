@@ -60,5 +60,43 @@ enum class ContentType(val value: Int) {
                 else -> UNKNOWN
             }
         }
+
+        /**
+         * Genre keywords that indicate webtoon-style long-strip content,
+         * suggesting a continuous vertical reader mode.
+         */
+        val WEBTOON_GENRE_KEYWORDS = setOf(
+            "webtoon",
+            "long strip",
+            "long-strip",
+            "longstrip",
+            "full color",
+            "full colour",
+            "manhwa",
+            "manhua",
+        )
+
+        /**
+         * Checks whether [genres] contain any keyword that suggests
+         * webtoon-style content (continuous vertical scrolling).
+         */
+        fun isLikelyWebtoon(genres: List<String>?): Boolean {
+            if (genres.isNullOrEmpty()) return false
+            return genres.any { genre ->
+                WEBTOON_GENRE_KEYWORDS.any { keyword ->
+                    genre.lowercase().contains(keyword)
+                }
+            }
+        }
+
+        /**
+         * Checks whether a [publishingType] string indicates webtoon format.
+         */
+        fun isWebtoonPublishingType(publishingType: String): Boolean {
+            return when (publishingType.lowercase().trim()) {
+                "webtoon", "manhwa", "manhua" -> true
+                else -> false
+            }
+        }
     }
 }
