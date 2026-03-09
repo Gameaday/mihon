@@ -53,6 +53,13 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         const val READING = 2L
         const val COMPLETED = 3L
 
+        /** Placeholder credential used by [loginNoop] — not a valid server URL. */
+        const val NOOP_CREDENTIAL = "jellyfin"
+
+        /** Client identification header sent during AuthenticateByName (pre-auth requests). */
+        private const val AUTH_HEADER =
+            "MediaBrowser Client=\"Ephyra\", Device=\"Android\", DeviceId=\"ephyra\", Version=\"1.0\""
+
         /** Regex for stripping punctuation during title normalization. */
         private val PUNCTUATION_REGEX = Regex("[\\-–—:,!?.'\"()\\[\\]{}]")
 
@@ -207,7 +214,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         if (stored.isNotBlank()) return stored.trimEnd('/')
         // Legacy fallback: server URL was stored in the username field
         val legacy = getUsername()
-        if (legacy.isNotBlank() && legacy != "jellyfin" && legacy.startsWith("http")) {
+        if (legacy.isNotBlank() && legacy != NOOP_CREDENTIAL && legacy.startsWith("http")) {
             return legacy.trimEnd('/')
         }
         return ""
@@ -228,72 +235,53 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         return getServerUrl()
     }
 
-    override suspend fun login(username: String, password: String) {
-        val serverUrl = username.trimEnd('/')
-        // Validate the connection by fetching public system info
-        val tempClient = networkService.client.newBuilder()
+    /**
+     * Creates a temporary OkHttp client with the Jellyfin auth header for pre-login requests.
+     * This client is used during AuthenticateByName since the user doesn't have an access token yet.
+     */
+    private fun buildPreAuthClient(): OkHttpClient {
+        return networkService.client.newBuilder()
             .dns(Dns.SYSTEM)
             .addInterceptor { chain ->
                 chain.proceed(
                     chain.request().newBuilder()
-                        .header(
-                            "X-Emby-Authorization",
-                            "MediaBrowser Client=\"Ephyra\", Device=\"Android\", DeviceId=\"ephyra\", Version=\"1.0\"",
-                        )
+                        .header("X-Emby-Authorization", AUTH_HEADER)
                         .build(),
                 )
             }
             .build()
+    }
 
-        val tempApi = JellyfinApi(id, tempClient)
-
-        try {
-            val info = tempApi.getSystemInfo(serverUrl)
-            logcat(LogPriority.INFO) { "Connected to Jellyfin: ${info.serverName} v${info.version}" }
-
-            // Authenticate with username/password to get an access token
-            val authResponse = tempApi.authenticateByName(
-                serverUrl,
-                password.substringBefore("\n"),
-                password.substringAfter("\n", ""),
-            )
-
-            // Store all credentials
-            trackPreferences.jellyfinServerUrl().set(serverUrl)
-            trackPreferences.jellyfinServerId().set(info.id)
-            trackPreferences.jellyfinUserId().set(authResponse.user.id)
-            trackPreferences.jellyfinUsername().set(authResponse.user.name)
-
-            // Store: username field = server URL (for BaseTracker.isLoggedIn),
-            // password field = access token
-            saveCredentials(serverUrl, authResponse.accessToken)
-            logcat(LogPriority.INFO) { "Authenticated as Jellyfin user: ${authResponse.user.name}" }
-        } catch (e: Exception) {
-            logcat(LogPriority.ERROR, e) { "Jellyfin login failed" }
-            throw e
-        }
+    /**
+     * BaseTracker login interface. Delegates to [loginWithCredentials].
+     * The [username] parameter is the server URL, [password] is unused
+     * since the actual Jellyfin username/password come from the 3-field dialog.
+     */
+    override suspend fun login(username: String, password: String) {
+        // Not directly callable for proper auth — use loginWithCredentials instead
+        loginWithCredentials(username, "", "")
     }
 
     /**
      * Login with server URL, Jellyfin username, and Jellyfin password as separate parameters.
      * This is the primary login method called from the 3-field login dialog.
+     *
+     * Flow:
+     * 1. Validate server connectivity via public system info endpoint
+     * 2. Authenticate by username/password via Jellyfin's AuthenticateByName endpoint
+     * 3. Store access token, server URL, server ID, user ID, and display username
+     *
+     * @param serverUrl The Jellyfin server URL (e.g., `http://192.168.1.100:8096`)
+     * @param jellyfinUser The Jellyfin username to authenticate as
+     * @param jellyfinPassword The Jellyfin password for that user
      */
-    suspend fun loginWithCredentials(serverUrl: String, jellyfinUser: String, jellyfinPassword: String) {
+    suspend fun loginWithCredentials(
+        serverUrl: String,
+        jellyfinUser: String,
+        jellyfinPassword: String,
+    ) {
         val cleanUrl = serverUrl.trimEnd('/')
-        val tempClient = networkService.client.newBuilder()
-            .dns(Dns.SYSTEM)
-            .addInterceptor { chain ->
-                chain.proceed(
-                    chain.request().newBuilder()
-                        .header(
-                            "X-Emby-Authorization",
-                            "MediaBrowser Client=\"Ephyra\", Device=\"Android\", DeviceId=\"ephyra\", Version=\"1.0\"",
-                        )
-                        .build(),
-                )
-            }
-            .build()
-
+        val tempClient = buildPreAuthClient()
         val tempApi = JellyfinApi(id, tempClient)
 
         try {
@@ -346,7 +334,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
     }
 
     override fun loginNoop() {
-        saveCredentials("jellyfin", "jellyfin")
+        saveCredentials(NOOP_CREDENTIAL, NOOP_CREDENTIAL)
     }
 
     override fun logout() {
