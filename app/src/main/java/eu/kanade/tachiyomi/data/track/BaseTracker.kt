@@ -6,6 +6,7 @@ import eu.kanade.domain.track.interactor.AddTracks
 import eu.kanade.domain.track.model.toDomainTrack
 import eu.kanade.domain.track.service.TrackPreferences
 import eu.kanade.tachiyomi.data.database.models.Track
+import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.util.system.toast
 import kotlinx.coroutines.flow.Flow
@@ -79,7 +80,11 @@ abstract class BaseTracker(
         try {
             addTracks.bind(this, item, mangaId)
         } catch (e: Throwable) {
-            withUIContext { Injekt.get<Application>().toast(e.message) }
+            val errorDetail = when (e) {
+                is HttpException -> "$name: HTTP ${e.code}"
+                else -> "$name: ${e.message}"
+            }
+            withUIContext { Injekt.get<Application>().toast(errorDetail) }
         }
     }
 
@@ -134,8 +139,12 @@ abstract class BaseTracker(
                 insertTrack.await(it)
             }
         } catch (e: Exception) {
-            logcat(LogPriority.ERROR, e) { "Failed to update remote track data id=$id" }
-            withUIContext { Injekt.get<Application>().toast(e.message) }
+            val errorDetail = when (e) {
+                is HttpException -> "$name: HTTP ${e.code}"
+                else -> "$name: ${e.message}"
+            }
+            logcat(LogPriority.ERROR, e) { "Failed to update remote track data id=$id ($errorDetail)" }
+            withUIContext { Injekt.get<Application>().toast(errorDetail) }
         }
     }
 }

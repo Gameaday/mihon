@@ -14,6 +14,7 @@ import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.PUT
 import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.interceptor.rateLimit
 import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.add
@@ -26,6 +27,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import uy.kohesive.injekt.injectLazy
+import kotlin.time.Duration.Companion.seconds
 import tachiyomi.domain.track.model.Track as DomainTrack
 
 class MangaUpdatesApi(
@@ -37,6 +39,7 @@ class MangaUpdatesApi(
     private val authClient by lazy {
         client.newBuilder()
             .addInterceptor(interceptor)
+            .rateLimit(permits = 3, period = 1.seconds)
             .build()
     }
 

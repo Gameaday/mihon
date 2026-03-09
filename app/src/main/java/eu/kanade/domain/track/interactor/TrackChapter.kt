@@ -8,6 +8,7 @@ import eu.kanade.domain.track.store.DelayedTrackingStore
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import logcat.LogPriority
 import tachiyomi.core.common.util.lang.withNonCancellableContext
 import tachiyomi.core.common.util.system.logcat
@@ -34,6 +35,8 @@ class TrackChapter(
 
                 async {
                     runCatching {
+                        // Stagger concurrent tracker updates to reduce burst API load
+                        delay(track.trackerId * STAGGER_DELAY_PER_TRACKER_MS)
                         try {
                             val updatedTrack = service.refresh(track.toDbTrack())
                                 .toDomainTrack(idRequired = true)!!
@@ -42,6 +45,9 @@ class TrackChapter(
                             insertTrack.await(updatedTrack)
                             delayedTrackingStore.remove(track.id)
                         } catch (e: Exception) {
+                            logcat(LogPriority.WARN, e) {
+                                "Failed to update ${service.name} for manga $mangaId, queuing for retry"
+                            }
                             delayedTrackingStore.add(track.id, chapterNumber)
                             if (setupJobOnFailure) {
                                 DelayedTrackingUpdateJob.setupTask(context)
@@ -55,5 +61,13 @@ class TrackChapter(
                 .mapNotNull { it.exceptionOrNull() }
                 .forEach { logcat(LogPriority.WARN, it) }
         }
+    }
+
+    companion object {
+        /**
+         * Per-tracker stagger delay (multiplied by tracker ID) to spread concurrent
+         * updates across different tracker APIs and avoid burst requests.
+         */
+        private const val STAGGER_DELAY_PER_TRACKER_MS = 100L
     }
 }

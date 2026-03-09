@@ -4,9 +4,13 @@ import eu.kanade.domain.track.model.toDbTrack
 import eu.kanade.domain.track.model.toDomainTrack
 import eu.kanade.tachiyomi.data.track.Tracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
+import eu.kanade.tachiyomi.network.HttpException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.supervisorScope
+import logcat.LogPriority
+import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.track.interactor.GetTracks
 import tachiyomi.domain.track.interactor.InsertTrack
 
@@ -30,9 +34,7 @@ class RefreshTracks(
                 .map { (track, service) ->
                     async {
                         return@async try {
-                            val updatedTrack = service!!.refresh(track.toDbTrack()).toDomainTrack()!!
-                            insertTrack.await(updatedTrack)
-                            syncChapterProgressWithTrack.await(mangaId, updatedTrack, service)
+                            refreshWithRetry(service!!, track, mangaId)
                             null
                         } catch (e: Throwable) {
                             service to e
@@ -42,5 +44,51 @@ class RefreshTracks(
                 .awaitAll()
                 .filterNotNull()
         }
+    }
+
+    /**
+     * Refreshes a single tracker with retry on transient failures (5xx, timeouts).
+     */
+    private suspend fun refreshWithRetry(
+        service: Tracker,
+        track: tachiyomi.domain.track.model.Track,
+        mangaId: Long,
+        maxRetries: Int = MAX_RETRIES,
+    ) {
+        var lastException: Throwable? = null
+        repeat(maxRetries) { attempt ->
+            try {
+                val updatedTrack = service.refresh(track.toDbTrack()).toDomainTrack()!!
+                insertTrack.await(updatedTrack)
+                syncChapterProgressWithTrack.await(mangaId, updatedTrack, service)
+                return
+            } catch (e: Throwable) {
+                lastException = e
+                if (!isRetryable(e) || attempt >= maxRetries - 1) {
+                    throw e
+                }
+                val backoffMs = INITIAL_BACKOFF_MS * (1L shl attempt)
+                logcat(LogPriority.WARN) {
+                    "${service.name}: refresh attempt ${attempt + 1} failed, retrying in ${backoffMs}ms"
+                }
+                delay(backoffMs)
+            }
+        }
+        throw lastException ?: IllegalStateException("Refresh failed")
+    }
+
+    private fun isRetryable(e: Throwable): Boolean {
+        return when (e) {
+            is HttpException -> e.code in 500..599 || e.code == 429
+            is java.net.SocketTimeoutException -> true
+            is java.net.UnknownHostException -> false
+            is java.io.IOException -> true
+            else -> false
+        }
+    }
+
+    companion object {
+        private const val MAX_RETRIES = 3
+        private const val INITIAL_BACKOFF_MS = 1000L
     }
 }
