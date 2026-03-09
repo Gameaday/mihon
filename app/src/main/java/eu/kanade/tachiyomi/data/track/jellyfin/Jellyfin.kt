@@ -11,6 +11,8 @@ import eu.kanade.tachiyomi.network.interceptor.rateLimit
 import eu.kanade.tachiyomi.source.Source
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority
 import okhttp3.Dns
 import okhttp3.OkHttpClient
@@ -77,6 +79,13 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
     val api by lazy { JellyfinApi(id, client) }
 
     private val libraryPreferences: LibraryPreferences by lazy { Injekt.get() }
+
+    /**
+     * Mutex to prevent concurrent sync operations from corrupting read progress.
+     * Guards [syncReadProgressToServer] and [pullRemoteProgress] so that
+     * only one sync operation runs at a time per Jellyfin tracker instance.
+     */
+    private val syncMutex = Mutex()
 
     // -- Branding --
 
@@ -295,6 +304,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
             // Persist all Jellyfin-specific preferences
             trackPreferences.jellyfinServerUrl().set(cleanUrl)
             trackPreferences.jellyfinServerId().set(info.id)
+            trackPreferences.jellyfinServerName().set(info.serverName)
             trackPreferences.jellyfinUserId().set(authResponse.user.id)
             trackPreferences.jellyfinUsername().set(authResponse.user.name)
 
@@ -328,6 +338,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         }
 
         trackPreferences.jellyfinServerUrl().set(cleanUrl)
+        trackPreferences.jellyfinServerName().set(info.serverName)
         // Update the username field too (used by BaseTracker.isLoggedIn)
         saveCredentials(cleanUrl, getPassword())
         logcat(LogPriority.INFO) { "Updated Jellyfin server URL to: $cleanUrl" }
@@ -342,6 +353,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         // Clear Jellyfin-specific preferences
         trackPreferences.jellyfinServerUrl().set("")
         trackPreferences.jellyfinServerId().set("")
+        trackPreferences.jellyfinServerName().set("")
         trackPreferences.jellyfinUserId().set("")
         trackPreferences.jellyfinUsername().set("")
     }
@@ -608,12 +620,15 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      * Syncs read progress back to Jellyfin by marking children as played/unplayed.
      * Only syncs items that have changed to minimize API calls (Jellyfin-friendly:
      * bandwidth to LAN server is cheap, but reducing round-trips improves responsiveness).
+     *
+     * Protected by [syncMutex] to prevent concurrent syncs from interleaving
+     * mark-played calls, which could result in incorrect progress state.
      */
-    private suspend fun syncReadProgressToServer(track: Track) {
+    private suspend fun syncReadProgressToServer(track: Track) = syncMutex.withLock {
         val serverUrl = resolveServerUrl(track.tracking_url)
         val itemId = api.getItemIdFromUrl(track.tracking_url)
         val userId = trackPreferences.jellyfinUserId().get()
-        if (userId.isBlank()) return
+        if (userId.isBlank()) return@withLock
 
         val children = api.getSeriesChildren(serverUrl, userId, itemId)
         val lastRead = track.last_chapter_read.toInt()
@@ -636,18 +651,21 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
      * Used by both [bind] (initial link) and [refresh] (periodic updates).
      *
      * When [remoteTrack] is null, fetches the series from the server first.
+     *
+     * Protected by [syncMutex] to prevent concurrent pulls from racing with
+     * pushes in [syncReadProgressToServer].
      */
-    private suspend fun pullRemoteProgress(track: Track, remoteTrack: TrackSearch? = null) {
+    private suspend fun pullRemoteProgress(track: Track, remoteTrack: TrackSearch? = null) = syncMutex.withLock {
         val remote = remoteTrack ?: run {
             val serverUrl = resolveServerUrl(track.tracking_url)
             val itemId = api.getItemIdFromUrl(track.tracking_url)
             val userId = trackPreferences.jellyfinUserId().get()
-            if (userId.isBlank()) return
+            if (userId.isBlank()) return@withLock
             try {
                 api.getSeries(serverUrl, userId, itemId)
             } catch (e: Exception) {
                 logcat(LogPriority.WARN, e) { "Failed to pull Jellyfin progress" }
-                return
+                return@withLock
             }
         }
 

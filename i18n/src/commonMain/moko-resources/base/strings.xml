@@ -1235,20 +1235,18 @@
     <string name="action_filter_content_type_manga">Manga only</string>
 
     <!-- Jellyfin tracker -->
-    <string name="jellyfin_user_id">User ID</string>
-    <string name="jellyfin_user_id_hint">Jellyfin user ID for read progress sync</string>
+    <string name="jellyfin_server_info">Server info</string>
     <string name="pref_jellyfin_sync_enabled">Jellyfin bidirectional sync</string>
     <string name="pref_jellyfin_sync_enabled_summary">Sync read progress and metadata edits with Jellyfin server. Chapters read in the app are marked as played on the server, and metadata edits are pushed back.</string>
     <string name="jellyfin_test_connection">Test connection</string>
     <string name="jellyfin_test_connection_summary">Verify connectivity with the configured Jellyfin server</string>
     <string name="jellyfin_test_success">Connected to %1$s (v%2$s)</string>
-    <string name="jellyfin_test_failed">Connection failed — check server URL and API key</string>
+    <string name="jellyfin_test_failed">Connection failed — check server URL and credentials</string>
     <string name="jellyfin_library">Jellyfin library</string>
     <string name="jellyfin_library_all">All libraries</string>
     <string name="jellyfin_library_selected">Library: %s</string>
     <string name="jellyfin_user_selected">User: %s</string>
     <string name="jellyfin_server_url">Server URL</string>
-    <string name="jellyfin_api_key">API key</string>
     <string name="jellyfin_username">Username</string>
     <string name="jellyfin_password">Password</string>
     <string name="jellyfin_update_server_url">Update server address</string>

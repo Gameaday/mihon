@@ -440,13 +440,36 @@ object SettingsTrackingScreen : SearchableSettings {
                             subtitle = stringResource(MR.strings.pref_jellyfin_sync_enabled_summary),
                         ),
                     )
-                    // Show connection test when Jellyfin is logged in
+                    // Show connection info & settings when Jellyfin is logged in
                     if (trackerManager.jellyfin.isLoggedIn) {
                         var showUpdateServerUrlDialog by remember { mutableStateOf(false) }
                         if (showUpdateServerUrlDialog) {
                             JellyfinUpdateServerUrlDialog(
                                 jellyfin = trackerManager.jellyfin,
                                 onDismissRequest = { showUpdateServerUrlDialog = false },
+                            )
+                        }
+
+                        // Server info display
+                        val serverName = trackPreferences.jellyfinServerName().get()
+                        val jellyfinUser = trackPreferences.jellyfinUsername().get()
+                        if (serverName.isNotBlank() || jellyfinUser.isNotBlank()) {
+                            add(
+                                Preference.PreferenceItem.TextPreference(
+                                    title = stringResource(MR.strings.jellyfin_server_info),
+                                    subtitle = buildString {
+                                        if (serverName.isNotBlank()) append(serverName)
+                                        if (jellyfinUser.isNotBlank()) {
+                                            if (isNotEmpty()) append(" — ")
+                                            append(
+                                                context.stringResource(
+                                                    MR.strings.jellyfin_user_selected,
+                                                    jellyfinUser,
+                                                ),
+                                            )
+                                        }
+                                    },
+                                ),
                             )
                         }
 
@@ -526,49 +549,6 @@ object SettingsTrackingScreen : SearchableSettings {
                         )
                         add(
                             Preference.PreferenceItem.TextPreference(
-                                title = stringResource(MR.strings.jellyfin_user_id),
-                                subtitle = trackPreferences.jellyfinUserId().get()
-                                    .takeIf { it.isNotBlank() }
-                                    ?: stringResource(MR.strings.jellyfin_user_id_hint),
-                                onClick = {
-                                    scope.launchIO {
-                                        try {
-                                            val serverUrl =
-                                                trackerManager.jellyfin.getServerUrl()
-                                            val users =
-                                                trackerManager.jellyfin.api.getUsers(serverUrl)
-                                            val currentUserId =
-                                                trackPreferences.jellyfinUserId().get()
-                                            val currentIdx = users.indexOfFirst {
-                                                it.id == currentUserId
-                                            }
-                                            val nextUser = if (currentIdx < users.lastIndex) {
-                                                users[currentIdx + 1]
-                                            } else {
-                                                users.firstOrNull()
-                                            }
-                                            if (nextUser != null) {
-                                                trackPreferences.jellyfinUserId().set(nextUser.id)
-                                                withUIContext {
-                                                    context.toast(
-                                                        context.stringResource(
-                                                            MR.strings.jellyfin_user_selected,
-                                                            nextUser.name,
-                                                        ),
-                                                    )
-                                                }
-                                            }
-                                        } catch (e: Exception) {
-                                            withUIContext {
-                                                context.toast(MR.strings.jellyfin_test_failed)
-                                            }
-                                        }
-                                    }
-                                },
-                            ),
-                        )
-                        add(
-                            Preference.PreferenceItem.TextPreference(
                                 title = stringResource(MR.strings.jellyfin_test_connection),
                                 subtitle = stringResource(MR.strings.jellyfin_test_connection_summary),
                                 onClick = {
@@ -577,6 +557,8 @@ object SettingsTrackingScreen : SearchableSettings {
                                             val info = trackerManager.jellyfin.api.getSystemInfo(
                                                 trackerManager.jellyfin.getServerUrl(),
                                             )
+                                            // Refresh stored server name on successful test
+                                            trackPreferences.jellyfinServerName().set(info.serverName)
                                             withUIContext {
                                                 context.toast(
                                                     context.stringResource(

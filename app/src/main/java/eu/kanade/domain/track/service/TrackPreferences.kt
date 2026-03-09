@@ -105,6 +105,16 @@ class TrackPreferences(
         "",
     )
 
+    /**
+     * Jellyfin server name — the display name of the connected Jellyfin server.
+     * Stored during login from the SystemInfo response. Shown in the settings UI
+     * alongside the server URL for user clarity.
+     */
+    fun jellyfinServerName() = preferenceStore.getString(
+        Preference.privateKey("jellyfin_server_name"),
+        "",
+    )
+
     companion object {
         /** Sentinel value: let the system pick the best available tracker automatically. */
         const val AUTHORITY_TRACKER_AUTO = 0L

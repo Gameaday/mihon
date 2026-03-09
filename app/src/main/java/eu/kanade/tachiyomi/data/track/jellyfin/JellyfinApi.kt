@@ -275,16 +275,6 @@ class JellyfinApi(
     }
 
     /**
-     * Returns the list of users on the server. Requires admin-level API key.
-     * Used during login to auto-populate the user ID preference.
-     */
-    suspend fun getUsers(serverUrl: String): List<JellyfinUser> = withIOContext {
-        val response = client.newCall(GET("$serverUrl/Users"))
-            .awaitSuccess()
-        with(json) { response.parseAs<List<JellyfinUser>>() }
-    }
-
-    /**
      * Marks or unmarks an item as a favorite on the Jellyfin server.
      * Favorites in Jellyfin map to the "in library" concept in the app.
      */
