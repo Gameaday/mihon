@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   get_tag:
-    if: github.repository == 'Gameaday/mihon'
+    if: github.repository == 'Gameaday/Ephyra'
     name: Extract tag name
     runs-on: 'ubuntu-24.04'
     permissions: {}
@@ -23,7 +23,7 @@ jobs:
         run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
   build:
-    if: github.repository == 'Gameaday/mihon'
+    if: github.repository == 'Gameaday/Ephyra'
     name: Build
     runs-on: 'ubuntu-24.04'
     permissions:
@@ -61,25 +61,25 @@ jobs:
         run: |
           set -e
 
-          mv app/build/outputs/apk/release/app-universal-release-unsigned-signed.apk mihon-${{ needs.get_tag.outputs.tag }}.apk
-          mv app/build/outputs/apk/release/app-arm64-v8a-release-unsigned-signed.apk mihon-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk
-          mv app/build/outputs/apk/release/app-armeabi-v7a-release-unsigned-signed.apk mihon-armeabi-v7a-${{ needs.get_tag.outputs.tag }}.apk
-          mv app/build/outputs/apk/release/app-x86-release-unsigned-signed.apk mihon-x86-${{ needs.get_tag.outputs.tag }}.apk
-          mv app/build/outputs/apk/release/app-x86_64-release-unsigned-signed.apk mihon-x86_64-${{ needs.get_tag.outputs.tag }}.apk
+          mv app/build/outputs/apk/release/app-universal-release-unsigned-signed.apk ephyra-${{ needs.get_tag.outputs.tag }}.apk
+          mv app/build/outputs/apk/release/app-arm64-v8a-release-unsigned-signed.apk ephyra-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk
+          mv app/build/outputs/apk/release/app-armeabi-v7a-release-unsigned-signed.apk ephyra-armeabi-v7a-${{ needs.get_tag.outputs.tag }}.apk
+          mv app/build/outputs/apk/release/app-x86-release-unsigned-signed.apk ephyra-x86-${{ needs.get_tag.outputs.tag }}.apk
+          mv app/build/outputs/apk/release/app-x86_64-release-unsigned-signed.apk ephyra-x86_64-${{ needs.get_tag.outputs.tag }}.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          name: mihon
+          name: ephyra
           path: |
-            mihon-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-armeabi-v7a-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-x86-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-x86_64-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-armeabi-v7a-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-x86-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-x86_64-${{ needs.get_tag.outputs.tag }}.apk
 
   build_foss:
-    if: github.repository == 'Gameaday/mihon'
+    if: github.repository == 'Gameaday/Ephyra'
     name: Build (FOSS)
     runs-on: ubuntu-24.04
     permissions:
@@ -119,16 +119,16 @@ jobs:
         run: |
           set -e
 
-          mv app/build/outputs/apk/foss/app-universal-foss-unsigned-signed.apk mihon-${{ needs.get_tag.outputs.tag }}-foss.apk
+          mv app/build/outputs/apk/foss/app-universal-foss-unsigned-signed.apk ephyra-${{ needs.get_tag.outputs.tag }}-foss.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          name: mihon-foss
-          path: mihon-${{ needs.get_tag.outputs.tag }}-foss.apk
+          name: ephyra-foss
+          path: ephyra-${{ needs.get_tag.outputs.tag }}-foss.apk
 
   release:
-    if: github.repository == 'Gameaday/mihon'
+    if: github.repository == 'Gameaday/Ephyra'
     name: Create GitHub Release
     runs-on: ubuntu-24.04
     permissions:
@@ -146,16 +146,16 @@ jobs:
         with:
           failOnError: false
           name: |
-            mihon
-            mihon-foss
+            ephyra
+            ephyra-foss
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
           tag_name: ${{ needs.get_tag.outputs.tag }}
-          name: Mihon ${{ needs.get_tag.outputs.tag }}
+          name: Ephyra ${{ needs.get_tag.outputs.tag }}
           body: |
-            Check out the [past release notes](https://github.com/Gameaday/mihon/releases) if you're upgrading from an earlier version.
+            Check out the [past release notes](https://github.com/Gameaday/Ephyra/releases) if you're upgrading from an earlier version.
 
             <!-->
 
@@ -165,16 +165,16 @@ jobs:
 
             > [!TIP]
             >
-            > ### If you are unsure which version to download then go with `mihon-${{ needs.get_tag.outputs.tag }}.apk`
+            > ### If you are unsure which version to download then go with `ephyra-${{ needs.get_tag.outputs.tag }}.apk`
             >
-            > **Samsung Galaxy S24 series (ARMv9.2-A / Snapdragon 8 Gen 3 · Exynos 2400):** use `mihon-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk` for the best experience. The `arm64-v8a` ABI covers all 64-bit ARM devices including ARMv9.2-A.
+            > **Samsung Galaxy S24 series (ARMv9.2-A / Snapdragon 8 Gen 3 · Exynos 2400):** use `ephyra-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk` for the best experience. The `arm64-v8a` ABI covers all 64-bit ARM devices including ARMv9.2-A.
           files: |
-            mihon-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-${{ needs.get_tag.outputs.tag }}-foss.apk
-            mihon-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-armeabi-v7a-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-x86-${{ needs.get_tag.outputs.tag }}.apk
-            mihon-x86_64-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-${{ needs.get_tag.outputs.tag }}-foss.apk
+            ephyra-arm64-v8a-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-armeabi-v7a-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-x86-${{ needs.get_tag.outputs.tag }}.apk
+            ephyra-x86_64-${{ needs.get_tag.outputs.tag }}.apk
           draft: true
           prerelease: false
           token: ${{ secrets.MIHON_BOT_TOKEN }}

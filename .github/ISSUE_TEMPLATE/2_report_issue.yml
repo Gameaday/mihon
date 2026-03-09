@@ -93,9 +93,9 @@ body:
           required: true
         - label: I have written a short but informative title.
           required: true
-        - label: I have checked the already opened [issues](https://github.com/Gameaday/mihon/issues) for duplicates.
+        - label: I have checked the already opened [issues](https://github.com/Gameaday/Ephyra/issues) for duplicates.
           required: true
-        - label: I have updated the app to version **[latest](https://github.com/Gameaday/mihon/releases/latest)**.
+        - label: I have updated the app to version **[latest](https://github.com/Gameaday/Ephyra/releases/latest)**.
           required: true
         - label: I have filled out all of the requested information in this form, including specific version numbers.
           required: true

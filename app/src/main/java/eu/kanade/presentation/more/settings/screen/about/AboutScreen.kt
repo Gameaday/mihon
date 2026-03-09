@@ -156,7 +156,7 @@ object AboutScreen : Screen() {
                     TextPreferenceWidget(
                         title = stringResource(MR.strings.privacy_policy),
                         onPreferenceClick = {
-                            uriHandler.openUri("https://github.com/Gameaday/mihon/blob/main/PRIVACY.md")
+                            uriHandler.openUri("https://github.com/Gameaday/Ephyra/blob/main/PRIVACY.md")
                         },
                     )
                 }
@@ -171,7 +171,7 @@ object AboutScreen : Screen() {
                         LinkIcon(
                             label = stringResource(MR.strings.website),
                             icon = Icons.Outlined.Public,
-                            url = "https://github.com/Gameaday/mihon",
+                            url = "https://github.com/Gameaday/Ephyra",
                         )
                         LinkIcon(
                             label = "Discord",
@@ -181,7 +181,7 @@ object AboutScreen : Screen() {
                         LinkIcon(
                             label = "GitHub",
                             icon = CustomIcons.Github,
-                            url = "https://github.com/Gameaday/mihon",
+                            url = "https://github.com/Gameaday/Ephyra",
                         )
                     }
                 }

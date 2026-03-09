@@ -3,6 +3,6 @@ contact_links:
   - name: ❌ Help with Extensions
     url: https://github.com/mihonapp/mihon/wiki
     about: For extension-related questions/issues, refer to the upstream Mihon wiki
-  - name: 📦 Mihon Nightly Releases
-    url: https://github.com/Gameaday/mihon/releases
-    about: Download the latest Mihon Nightly release
+  - name: 📦 Ephyra Releases
+    url: https://github.com/Gameaday/Ephyra/releases
+    about: Download the latest Ephyra release

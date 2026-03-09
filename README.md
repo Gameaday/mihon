@@ -9,14 +9,14 @@ Discover and read manga, webtoons, comics, and more – with Jellyfin server syn
 
 > **⚠️ This is an unofficial fork. It is not affiliated with, endorsed by, or connected to the [mihonapp/mihon](https://github.com/mihonapp/mihon) project or its team.**
 
-[![GitHub downloads](https://img.shields.io/github/downloads/Gameaday/mihon/total?label=downloads&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://github.com/Gameaday/mihon/releases)
+[![GitHub downloads](https://img.shields.io/github/downloads/Gameaday/Ephyra/total?label=downloads&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://github.com/Gameaday/Ephyra/releases)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/Gameaday/mihon/build_push.yml?labelColor=27303D)](https://github.com/Gameaday/mihon/actions/workflows/build_push.yml)
-[![License: Apache-2.0](https://img.shields.io/github/license/Gameaday/mihon?labelColor=27303D&color=0877d2)](/LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/Gameaday/Ephyra/build_push.yml?labelColor=27303D)](https://github.com/Gameaday/Ephyra/actions/workflows/build_push.yml)
+[![License: Apache-2.0](https://img.shields.io/github/license/Gameaday/Ephyra?labelColor=27303D&color=0877d2)](/LICENSE)
 
 ## Download
 
-[![Ephyra](https://img.shields.io/github/release/Gameaday/mihon.svg?maxAge=3600&label=Ephyra&labelColor=2c2c47&color=1c1c39&include_prereleases)](https://github.com/Gameaday/mihon/releases/tag/nightly)
+[![Ephyra](https://img.shields.io/github/release/Gameaday/Ephyra.svg?maxAge=3600&label=Ephyra&labelColor=2c2c47&color=1c1c39&include_prereleases)](https://github.com/Gameaday/Ephyra/releases/tag/nightly)
 
 *Requires Android 8.0 or higher.*
 
@@ -27,7 +27,7 @@ Ephyra (formerly Mihon Nightly) is a Jellyfin-integrated build of [Mihon](https:
 **This fork:**
 - Is not affiliated with the upstream Mihon team or project.
 - Does not include upstream donation links.
-- Routes its in-app updater to [Gameaday/mihon](https://github.com/Gameaday/mihon) releases.
+- Routes its in-app updater to [Gameaday/Ephyra](https://github.com/Gameaday/Ephyra) releases.
 - Adds Jellyfin tracker integration with server URL + API key login.
 - Supports bidirectional read-progress sync with Jellyfin servers.
 
@@ -66,7 +66,7 @@ The following changes have been made on top of the base Mihon project:
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Before reporting a new issue, take a look at the already opened [issues](https://github.com/Gameaday/mihon/issues).
+Before reporting a new issue, take a look at the already opened [issues](https://github.com/Gameaday/Ephyra/issues).
 
 ### Credits
 
