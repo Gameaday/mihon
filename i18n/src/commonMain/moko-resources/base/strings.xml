@@ -1112,9 +1112,6 @@
     <string name="pref_authority_order_title">Authority source order</string>
     <string name="pref_authority_order_subtitle">Sources are checked in this order. Unavailable sources are skipped.</string>
     <string name="pref_authority_not_available">Not logged in</string>
-    <string name="pref_authority_tracker_title">Preferred authority source</string>
-    <string name="pref_authority_tracker_subtitle">%s</string>
-    <string name="pref_authority_tracker_auto">Auto (best available)</string>
     <string name="tracker_link_action">Link tracked manga</string>
     <string name="tracker_link_subtitle">Set authority IDs for manga that already have trackers</string>
     <string name="tracker_link_success">Linked %d manga to authority</string>
@@ -1187,7 +1184,6 @@
     <string name="authority_badge_description">Linked to authority</string>
     <string name="authority_linked_label">Authority</string>
     <string name="authority_source_name">Authority</string>
-    <string name="authority_refresh_from_authority">Refresh from authority</string>
 
     <!-- Authority match results screen -->
     <string name="match_results_title">Authority Matching Results</string>
@@ -1199,7 +1195,6 @@
     <string name="match_results_retry_single">Retry</string>
     <string name="match_results_matching">Matching…</string>
     <string name="match_results_no_match">No match found</string>
-    <string name="match_results_linked_badge">Linked</string>
     <string name="match_results_retry_all">Retry all unlinked</string>
 
     <!-- Metadata editing & field locking (Jellyfin-style) -->
@@ -1214,34 +1209,24 @@
     <string name="locked_field_description">Description</string>
     <string name="locked_field_author">Author</string>
     <string name="locked_field_artist">Artist</string>
-    <string name="locked_field_cover">Cover</string>
     <string name="locked_field_status">Status</string>
-    <string name="locked_field_content_type">Content type</string>
     <string name="locked_field_genre">Genre</string>
     <string name="locked_field_title">Title</string>
     <string name="edit_metadata_add_genre">Add genre</string>
     <string name="metadata_locks_lock_all">Lock all</string>
     <string name="metadata_locks_unlock_all">Unlock all</string>
-    <string name="action_refresh_authority">Refresh from authority</string>
     <string name="authority_locked_count">%d locked</string>
     <string name="action_filter_content_type_manga">Manga only</string>
 
     <!-- Jellyfin tracker -->
-    <string name="jellyfin_server_url">Server URL</string>
-    <string name="jellyfin_server_url_hint">http://192.168.1.100:8096</string>
-    <string name="jellyfin_api_key">API Key</string>
-    <string name="jellyfin_api_key_hint">Generate in Jellyfin Dashboard → API Keys</string>
     <string name="jellyfin_user_id">User ID</string>
     <string name="jellyfin_user_id_hint">Jellyfin user ID for read progress sync</string>
-    <string name="jellyfin_connected">Connected to %s</string>
-    <string name="jellyfin_sync_description">Sync read progress with a Jellyfin media server. Chapters marked as read are reflected on the server.</string>
     <string name="pref_jellyfin_sync_enabled">Jellyfin bidirectional sync</string>
     <string name="pref_jellyfin_sync_enabled_summary">Sync read progress and metadata edits with Jellyfin server. Chapters read in the app are marked as played on the server, and metadata edits are pushed back.</string>
     <string name="jellyfin_test_connection">Test connection</string>
     <string name="jellyfin_test_connection_summary">Verify connectivity with the configured Jellyfin server</string>
     <string name="jellyfin_test_success">Connected to %1$s (v%2$s)</string>
     <string name="jellyfin_test_failed">Connection failed — check server URL and API key</string>
-    <string name="jellyfin_metadata_pushed">Metadata synced to Jellyfin</string>
     <string name="jellyfin_library">Jellyfin library</string>
     <string name="jellyfin_library_all">All libraries</string>
     <string name="jellyfin_library_selected">Library: %s</string>
