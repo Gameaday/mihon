@@ -40,7 +40,8 @@ class MyAnimeListApi(
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)
-        .rateLimit(permits = 3, period = 1.seconds)
+        // MAL rate limit not publicly documented; conservative 1 req/s default
+        .rateLimit(permits = 1, period = 1.seconds)
         .build()
 
     suspend fun getAccessToken(authCode: String): MALOAuth {

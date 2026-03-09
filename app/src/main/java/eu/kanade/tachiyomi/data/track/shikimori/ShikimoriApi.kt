@@ -38,7 +38,8 @@ class ShikimoriApi(
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)
-        .rateLimit(permits = 5, period = 1.seconds)
+        // Shikimori documents 5rps + 90rpm; 80% of 90rpm = 72rpm; 1/s = 60rpm safely under both
+        .rateLimit(permits = 1, period = 1.seconds)
         .build()
 
     suspend fun addLibManga(track: Track, userId: String): Track {

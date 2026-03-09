@@ -73,7 +73,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
         networkService.client.newBuilder()
             .dns(Dns.SYSTEM) // don't use DNS over HTTPS — Jellyfin is typically on LAN
             .addInterceptor(JellyfinInterceptor(this))
-            .rateLimit(permits = 10, period = 1.seconds)
+            .rateLimit(permits = 10, period = 1.seconds) // self-hosted; generous for LAN use
             .build()
 
     val api by lazy { JellyfinApi(id, client) }

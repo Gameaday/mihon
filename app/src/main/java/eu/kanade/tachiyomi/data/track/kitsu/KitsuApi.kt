@@ -40,7 +40,8 @@ class KitsuApi(private val client: OkHttpClient, interceptor: KitsuInterceptor) 
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)
-        .rateLimit(permits = 5, period = 1.seconds)
+        // Kitsu rate limit not publicly documented; conservative 1 req/s default
+        .rateLimit(permits = 1, period = 1.seconds)
         .build()
 
     suspend fun addLibManga(track: Track, userId: String): Track {

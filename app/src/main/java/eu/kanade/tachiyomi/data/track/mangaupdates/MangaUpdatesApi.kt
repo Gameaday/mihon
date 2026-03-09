@@ -39,7 +39,8 @@ class MangaUpdatesApi(
     private val authClient by lazy {
         client.newBuilder()
             .addInterceptor(interceptor)
-            .rateLimit(permits = 3, period = 1.seconds)
+            // MangaUpdates asks for "reasonable spacing"; no specific limit documented; 1 req/s default
+            .rateLimit(permits = 1, period = 1.seconds)
             .build()
     }
 
