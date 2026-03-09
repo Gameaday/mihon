@@ -1075,7 +1075,7 @@ class MangaScreenModel(
 
         return try {
             trackerManager.jellyfin.getChaptersFromServer(jellyfinTrack.remoteUrl)
-                .map { it.name.lowercase() }
+                .map { it.name.lowercase(java.util.Locale.ROOT) }
                 .toSet()
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Failed to get Jellyfin chapter list" }
@@ -1123,14 +1123,14 @@ class MangaScreenModel(
         // Format the chapter number the way Jellyfin-compatible naming produces it
         val chapterNum = chapter.chapterNumber
         val formattedNum = if (chapterNum == kotlin.math.floor(chapterNum)) {
-            String.format("%03d", chapterNum.toInt())
+            String.format(java.util.Locale.ROOT, "%03d", chapterNum.toInt())
         } else {
-            String.format("%06.2f", chapterNum)
+            String.format(java.util.Locale.ROOT, "%06.2f", chapterNum)
         }
 
         // Check if any server chapter name contains this chapter number pattern
-        val chPattern = "ch. $formattedNum".lowercase()
-        val chPatternAlt = "ch.$formattedNum".lowercase()
+        val chPattern = "ch. $formattedNum".lowercase(java.util.Locale.ROOT)
+        val chPatternAlt = "ch.$formattedNum".lowercase(java.util.Locale.ROOT)
         return serverChapterNames.any { name ->
             name.contains(chPattern) || name.contains(chPatternAlt)
         }
