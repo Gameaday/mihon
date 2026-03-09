@@ -1207,13 +1207,10 @@
     <string name="edit_metadata_subtitle">Edit fields and toggle locks. Locked fields are preserved during authority refresh.</string>
     <string name="edit_metadata_identify">Identify</string>
     <string name="edit_metadata_refresh">Refresh</string>
-    <string name="edit_metadata_identify_hint">Search metadata providers</string>
     <string name="edit_metadata_section_basic">Basic info</string>
     <string name="edit_metadata_section_details">Details</string>
     <string name="edit_metadata_section_tags">Tags &amp; genres</string>
     <string name="edit_metadata_linked_to">Linked to %s</string>
-    <string name="metadata_locks_title">Metadata locks</string>
-    <string name="metadata_locks_subtitle">Locked fields are preserved during authority refresh</string>
     <string name="locked_field_description">Description</string>
     <string name="locked_field_author">Author</string>
     <string name="locked_field_artist">Artist</string>

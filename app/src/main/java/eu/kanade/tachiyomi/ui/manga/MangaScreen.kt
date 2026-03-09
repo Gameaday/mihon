@@ -36,7 +36,6 @@ import eu.kanade.presentation.manga.components.CoverSearchDialog
 import eu.kanade.presentation.manga.components.DeleteChaptersDialog
 import eu.kanade.presentation.manga.components.EditMetadataDialog
 import eu.kanade.presentation.manga.components.MangaCoverDialog
-import eu.kanade.presentation.manga.components.MetadataLocksDialog
 import eu.kanade.presentation.manga.components.ScanlatorFilterDialog
 import eu.kanade.presentation.manga.components.SetIntervalDialog
 import eu.kanade.presentation.util.AssistContentScreen
@@ -308,14 +307,6 @@ class MangaScreen(
                     onDismissRequest = onDismissRequest,
                     onValueChanged = { interval: Int -> screenModel.setFetchInterval(dialog.manga, interval) }
                         .takeIf { screenModel.isUpdateIntervalEnabled },
-                )
-            }
-            MangaScreenModel.Dialog.MetadataLocks -> {
-                MetadataLocksDialog(
-                    lockedFields = successState.manga.lockedFields,
-                    onToggleField = screenModel::toggleLockedField,
-                    onSetAllFields = screenModel::setLockedFields,
-                    onDismissRequest = onDismissRequest,
                 )
             }
             MangaScreenModel.Dialog.EditMetadata -> {

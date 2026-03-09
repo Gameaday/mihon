@@ -1284,7 +1284,6 @@ class MangaScreenModel(
         data object SettingsSheet : Dialog
         data object TrackSheet : Dialog
         data object FullCover : Dialog
-        data object MetadataLocks : Dialog
         data object EditMetadata : Dialog
     }
 
@@ -1306,10 +1305,6 @@ class MangaScreenModel(
 
     fun showCoverDialog() {
         updateSuccessState { it.copy(dialog = Dialog.FullCover) }
-    }
-
-    fun showMetadataLocksDialog() {
-        updateSuccessState { it.copy(dialog = Dialog.MetadataLocks) }
     }
 
     fun showEditMetadataDialog() {
