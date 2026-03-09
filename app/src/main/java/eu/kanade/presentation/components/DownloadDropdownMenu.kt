@@ -1,6 +1,7 @@
 package eu.kanade.presentation.components
 
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ fun DownloadDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onDownloadClicked: (DownloadAction) -> Unit,
+    isJellyfinLinked: Boolean = false,
     offset: DpOffset? = null,
 ) {
     if (offset != null) {
@@ -29,6 +31,7 @@ fun DownloadDropdownMenu(
                 DownloadDropdownMenuItems(
                     onDismissRequest = onDismissRequest,
                     onDownloadClicked = onDownloadClicked,
+                    isJellyfinLinked = isJellyfinLinked,
                 )
             },
         )
@@ -41,6 +44,7 @@ fun DownloadDropdownMenu(
                 DownloadDropdownMenuItems(
                     onDismissRequest = onDismissRequest,
                     onDownloadClicked = onDownloadClicked,
+                    isJellyfinLinked = isJellyfinLinked,
                 )
             },
         )
@@ -51,7 +55,20 @@ fun DownloadDropdownMenu(
 private fun DownloadDropdownMenuItems(
     onDismissRequest: () -> Unit,
     onDownloadClicked: (DownloadAction) -> Unit,
+    isJellyfinLinked: Boolean = false,
 ) {
+    // Show "Sync to Jellyfin" at the top when the series is linked to Jellyfin
+    if (isJellyfinLinked) {
+        DropdownMenuItem(
+            text = { Text(text = stringResource(MR.strings.download_sync_to_jellyfin)) },
+            onClick = {
+                onDownloadClicked(DownloadAction.SYNC_TO_JELLYFIN)
+                onDismissRequest()
+            },
+        )
+        HorizontalDivider()
+    }
+
     val options = persistentListOf(
         DownloadAction.NEXT_1_CHAPTER to pluralStringResource(MR.plurals.download_amount, 1, 1),
         DownloadAction.NEXT_5_CHAPTERS to pluralStringResource(MR.plurals.download_amount, 5, 5),

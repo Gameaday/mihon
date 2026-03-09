@@ -1,6 +1,7 @@
 package eu.kanade.presentation.manga.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.FlipToBack
@@ -39,6 +40,7 @@ fun MangaToolbar(
     onClickMigrate: (() -> Unit)?,
     onClickEditNotes: () -> Unit,
     onClickEditMetadata: (() -> Unit)?,
+    isJellyfinLinked: Boolean = false,
 
     // For action mode
     actionModeCounter: Int,
@@ -72,6 +74,7 @@ fun MangaToolbar(
                     expanded = downloadExpanded,
                     onDismissRequest = onDismissRequest,
                     onDownloadClicked = onClickDownload,
+                    isJellyfinLinked = isJellyfinLinked,
                 )
             }
 
@@ -98,8 +101,16 @@ fun MangaToolbar(
                     if (onClickDownload != null) {
                         add(
                             AppBar.Action(
-                                title = stringResource(MR.strings.manga_download),
-                                icon = Icons.Outlined.Download,
+                                title = if (isJellyfinLinked) {
+                                    stringResource(MR.strings.download_sync_to_jellyfin)
+                                } else {
+                                    stringResource(MR.strings.manga_download)
+                                },
+                                icon = if (isJellyfinLinked) {
+                                    Icons.Outlined.CloudUpload
+                                } else {
+                                    Icons.Outlined.Download
+                                },
                                 onClick = { downloadExpanded = !downloadExpanded },
                             ),
                         )

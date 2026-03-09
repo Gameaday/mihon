@@ -7,6 +7,7 @@ enum class DownloadAction {
     NEXT_25_CHAPTERS,
     UNREAD_CHAPTERS,
     BOOKMARKED_CHAPTERS,
+    SYNC_TO_JELLYFIN,
 }
 
 enum class EditCoverAction {
