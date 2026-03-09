@@ -492,6 +492,25 @@ class JellyfinApi(
     }
 
     /**
+     * Lightweight pre-flight check to verify the Jellyfin server is reachable.
+     * Uses the public system info endpoint (no auth required, minimal payload).
+     *
+     * Returns `true` if the server responds successfully, `false` on any error.
+     * This should be called before starting expensive sync operations to
+     * fail fast with a clear "server unreachable" message.
+     */
+    suspend fun checkServerReachable(serverUrl: String): Boolean = withIOContext {
+        try {
+            client.newCall(GET("$serverUrl/System/Info/Public"))
+                .awaitSuccess()
+                .close()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /**
      * Triggers a Jellyfin library scan so newly downloaded files are discovered.
      *
      * Uses the `/Library/Refresh` endpoint which initiates a scan of all libraries.

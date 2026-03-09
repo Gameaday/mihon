@@ -936,11 +936,17 @@ class MangaScreenModel(
      * philosophy: content is downloaded from any source, named for Jellyfin compatibility,
      * and a library scan makes it available on all devices.
      *
+     * Pre-flight checks (fail fast with clear messages):
+     * 1. User must be logged in to Jellyfin
+     * 2. Manga must be linked to a Jellyfin library item
+     * 3. Server must be reachable (connectivity check before starting expensive work)
+     *
      * Error handling:
      * - Not logged in → toast with login prompt
      * - Manga not linked to Jellyfin → toast with explanation
      * - Server unreachable → toast with connectivity message
-     * - Library scan fails (non-admin) → toast explaining scan requires admin, sync still succeeds
+     * - Library scan not attempted for non-admin users (proactive gating)
+     * - Library scan fails → toast explaining the issue, sync still succeeds
      *
      * @param action determines which chapters to sync:
      *   - [DownloadAction.SYNC_TO_JELLYFIN]: unread chapters missing from JF
@@ -973,31 +979,40 @@ class MangaScreenModel(
         }
 
         screenModelScope.launchIO {
+            // Pre-flight: verify server is reachable before starting expensive work
+            val serverUrl = trackerManager.jellyfin.getServerUrl()
+            if (serverUrl.isBlank() || !trackerManager.jellyfin.api.checkServerReachable(serverUrl)) {
+                withUIContext {
+                    context.toast(context.stringResource(MR.strings.jellyfin_sync_server_unreachable))
+                }
+                return@launchIO
+            }
+
             // Temporarily enable Jellyfin-compatible naming for the sync download,
             // then restore the original setting afterward.
             val wasJellyfinNamingEnabled = libraryPreferences.jellyfinCompatibleNaming().get()
             libraryPreferences.jellyfinCompatibleNaming().set(true)
 
             try {
-                // Get the count of chapters already in Jellyfin
-                val jellyfinChapterCount = getJellyfinChapterCount(manga)
+                // Get the actual chapter items from Jellyfin for accurate comparison
+                val jellyfinChapters = getJellyfinChapterNames(manga)
 
                 // Select chapters to sync based on the action
                 val allChapterItems = allChapters.orEmpty()
                 val chaptersToSync = when (action) {
                     DownloadAction.SYNC_READ_TO_JELLYFIN -> allChapterItems.filter { item ->
                         val ch = item.chapter
-                        ch.read && !isChapterInJellyfin(ch, jellyfinChapterCount) &&
+                        ch.read && !isChapterOnServer(ch, jellyfinChapters) &&
                             item.downloadState == Download.State.NOT_DOWNLOADED
                     }
                     DownloadAction.SYNC_ALL_TO_JELLYFIN -> allChapterItems.filter { item ->
                         val ch = item.chapter
-                        !isChapterInJellyfin(ch, jellyfinChapterCount) &&
+                        !isChapterOnServer(ch, jellyfinChapters) &&
                             item.downloadState == Download.State.NOT_DOWNLOADED
                     }
                     else -> allChapterItems.filter { item ->
                         val ch = item.chapter
-                        !ch.read && !isChapterInJellyfin(ch, jellyfinChapterCount) &&
+                        !ch.read && !isChapterOnServer(ch, jellyfinChapters) &&
                             item.downloadState == Download.State.NOT_DOWNLOADED
                     }
                 }.map { it.chapter }
@@ -1018,7 +1033,9 @@ class MangaScreenModel(
                     }
                 }
 
-                // Trigger a Jellyfin library scan so the server discovers the new files
+                // Trigger a Jellyfin library scan so the server discovers the new files.
+                // Proactively skip for non-admin users (cached at login) to avoid a
+                // round-trip that will just 403 — give instant feedback instead.
                 val scanResult = triggerJellyfinLibraryScan()
                 if (scanResult != null && chaptersToSync.isNotEmpty()) {
                     withUIContext {
@@ -1036,6 +1053,33 @@ class MangaScreenModel(
                 // Restore the original Jellyfin naming preference
                 libraryPreferences.jellyfinCompatibleNaming().set(wasJellyfinNamingEnabled)
             }
+        }
+    }
+
+    /**
+     * Returns the names of chapters that already exist in the Jellyfin library
+     * for the manga linked to this screen. Returns an empty set if the manga
+     * is not linked to Jellyfin or if the query fails.
+     *
+     * Uses actual item names from the server for accurate comparison instead
+     * of relying on sequential count, which breaks for series with chapter gaps.
+     */
+    private suspend fun getJellyfinChapterNames(manga: Manga): Set<String> {
+        val canonicalId = manga.canonicalId ?: return emptySet()
+        if (!canonicalId.startsWith("jf:")) return emptySet()
+
+        val tracks = getTracks.await(manga.id)
+        val jellyfinTrack = tracks.firstOrNull {
+            it.trackerId == trackerManager.jellyfin.id
+        } ?: return emptySet()
+
+        return try {
+            trackerManager.jellyfin.getChaptersFromServer(jellyfinTrack.remoteUrl)
+                .map { it.name.lowercase() }
+                .toSet()
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin chapter list" }
+            emptySet()
         }
     }
 
@@ -1065,26 +1109,43 @@ class MangaScreenModel(
     }
 
     /**
-     * Checks if a chapter already exists in the Jellyfin library by comparing
-     * its chapter number against the total count of children in Jellyfin.
+     * Checks if a chapter already exists on the Jellyfin server by comparing
+     * against the set of chapter names returned from the server.
      *
-     * Jellyfin orders children sequentially (by SortName), so a chapter is
-     * "in Jellyfin" when its number falls within the existing child range.
-     * This correctly handles decimal chapter numbers (e.g., 5.5 → 5).
+     * Falls back to count-based comparison if the name set is empty
+     * (e.g., if server names don't match local chapter format).
+     * The name comparison is case-insensitive and checks if the server-side
+     * name contains the chapter number to handle different naming conventions.
      */
-    private fun isChapterInJellyfin(chapter: Chapter, jellyfinChapterCount: Int): Boolean {
-        if (jellyfinChapterCount <= 0) return false
-        // Use floor to handle decimal chapters like 5.5 → 5
-        val chapterNum = kotlin.math.floor(chapter.chapterNumber).toInt()
-        return chapterNum in 1..jellyfinChapterCount
+    private fun isChapterOnServer(chapter: Chapter, serverChapterNames: Set<String>): Boolean {
+        if (serverChapterNames.isEmpty()) return false
+
+        // Format the chapter number the way Jellyfin-compatible naming produces it
+        val chapterNum = chapter.chapterNumber
+        val formattedNum = if (chapterNum == kotlin.math.floor(chapterNum)) {
+            String.format("%03d", chapterNum.toInt())
+        } else {
+            String.format("%06.2f", chapterNum)
+        }
+
+        // Check if any server chapter name contains this chapter number pattern
+        val chPattern = "ch. $formattedNum".lowercase()
+        val chPatternAlt = "ch.$formattedNum".lowercase()
+        return serverChapterNames.any { name ->
+            name.contains(chPattern) || name.contains(chPatternAlt)
+        }
     }
 
     /**
      * Triggers a Jellyfin library scan after syncing content. This makes newly
      * downloaded files appear in the Jellyfin library without manual intervention.
      *
-     * Returns a user-facing warning message if the scan failed, or null on success.
-     * Non-admin users (403) get a specific message; other errors get a generic one.
+     * Proactively checks cached admin status before making the network request.
+     * Non-admin users get instant feedback instead of waiting for a 403 response.
+     * The admin status is cached during login from the user's Policy.IsAdministrator.
+     *
+     * Returns a user-facing warning message if the scan failed or was skipped,
+     * or null on success.
      */
     private suspend fun triggerJellyfinLibraryScan(): String? {
         val jellyfin = trackerManager.jellyfin
@@ -1092,13 +1153,23 @@ class MangaScreenModel(
         val serverUrl = jellyfin.getServerUrl()
         if (serverUrl.isBlank()) return null
 
+        // Proactive admin gating: skip the network request entirely for non-admin users.
+        // The admin status was cached at login from AuthenticateByName → User.Policy.IsAdministrator.
+        val isAdmin = trackPreferences.jellyfinIsAdmin().get()
+        if (!isAdmin) {
+            logcat(LogPriority.INFO) { "Skipping library scan — user is not admin (cached)" }
+            return context.stringResource(MR.strings.jellyfin_scan_requires_admin)
+        }
+
         return when (val result = jellyfin.api.triggerLibraryScan(serverUrl)) {
             is JellyfinApi.LibraryScanResult.Success -> {
                 logcat(LogPriority.INFO) { "Triggered Jellyfin library scan after sync" }
                 null
             }
             is JellyfinApi.LibraryScanResult.Forbidden -> {
-                logcat(LogPriority.WARN) { "Library scan denied — user is not admin" }
+                // Admin status may have changed since login — update cache
+                trackPreferences.jellyfinIsAdmin().set(false)
+                logcat(LogPriority.WARN) { "Library scan denied — user is not admin (updated cache)" }
                 context.stringResource(MR.strings.jellyfin_scan_requires_admin)
             }
             is JellyfinApi.LibraryScanResult.Error -> {

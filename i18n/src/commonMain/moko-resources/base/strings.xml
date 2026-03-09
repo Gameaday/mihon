@@ -785,6 +785,7 @@
     <string name="jellyfin_sync_up_to_date">Jellyfin library is up to date</string>
     <string name="jellyfin_sync_not_logged_in">Not logged in to Jellyfin — configure in Settings → Tracking</string>
     <string name="jellyfin_sync_not_linked">This manga is not linked to a Jellyfin library item</string>
+    <string name="jellyfin_sync_server_unreachable">Cannot reach Jellyfin server — check your connection and server URL</string>
     <string name="jellyfin_sync_error">Jellyfin sync failed: %s</string>
     <string name="jellyfin_scan_requires_admin">Chapters synced, but library scan requires admin privileges. Ask your server admin to refresh the library.</string>
     <string name="jellyfin_scan_failed">Library scan failed: %s</string>
