@@ -38,7 +38,7 @@ class ShikimoriApi(
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)
-        // Shikimori documents 5rps + 90rpm; 80% of 90rpm = 72rpm; 1/s = 60rpm safely under both
+        // Shikimori documents 5rps + 90rpm; staying ≥20% under → 1/s (60rpm, well under 72rpm cap)
         .rateLimit(permits = 1, period = 1.seconds)
         .build()
 
