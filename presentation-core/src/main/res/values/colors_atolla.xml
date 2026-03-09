@@ -24,19 +24,19 @@
     <color name="atolla_onTertiary">#FFFFFF</color>
     <color name="atolla_tertiaryContainer">#FED7AA</color>
     <color name="atolla_onTertiaryContainer">#431407</color>
-    <color name="atolla_background">#F8FAFC</color>
+    <color name="atolla_background">#F1F5F9</color>
     <color name="atolla_onBackground">#0F172A</color>
-    <color name="atolla_surface">#F8FAFC</color>
+    <color name="atolla_surface">#F1F5F9</color>
     <color name="atolla_onSurface">#0F172A</color>
-    <color name="atolla_surfaceVariant">#F1F5F9</color>
+    <color name="atolla_surfaceVariant">#E2E8F0</color>
     <color name="atolla_onSurfaceVariant">#334155</color>
     <color name="atolla_surfaceTint">#1D4ED8</color>
     <color name="atolla_inverseSurface">#1E293B</color>
     <color name="atolla_inverseOnSurface">#F1F5F9</color>
     <color name="atolla_outline">#94A3B8</color>
-    <color name="atolla_surfaceContainerLowest">#E4E9EE</color>
-    <color name="atolla_surfaceContainerLow">#EAEEF2</color>
-    <color name="atolla_surfaceContainer">#F1F5F9</color>
-    <color name="atolla_surfaceContainerHigh">#F5F8FB</color>
-    <color name="atolla_surfaceContainerHighest">#FCFDFE</color>
+    <color name="atolla_surfaceContainerLowest">#DDE3EA</color>
+    <color name="atolla_surfaceContainerLow">#E5EBF1</color>
+    <color name="atolla_surfaceContainer">#EBF0F5</color>
+    <color name="atolla_surfaceContainerHigh">#F1F5F9</color>
+    <color name="atolla_surfaceContainerHighest">#F8FAFC</color>
 </resources>

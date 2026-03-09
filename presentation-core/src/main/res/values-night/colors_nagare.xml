@@ -7,7 +7,7 @@
   ~ Primary #6EE7B7 (Mint)
   ~ Secondary #6EE7B7 (Mint)
   ~ Tertiary #9CA3AF (Gray)
-  ~ Neutral #111827
+  ~ Neutral #0F1419
 -->
 <resources>
     <color name="nagare_primary">#6EE7B7</color>
@@ -23,19 +23,19 @@
     <color name="nagare_onTertiary">#1F2937</color>
     <color name="nagare_tertiaryContainer">#374151</color>
     <color name="nagare_onTertiaryContainer">#F3F4F6</color>
-    <color name="nagare_background">#111827</color>
+    <color name="nagare_background">#0F1419</color>
     <color name="nagare_onBackground">#F3F4F6</color>
-    <color name="nagare_surface">#111827</color>
+    <color name="nagare_surface">#0F1419</color>
     <color name="nagare_onSurface">#F3F4F6</color>
-    <color name="nagare_surfaceVariant">#1F2937</color>
+    <color name="nagare_surfaceVariant">#1C2430</color>
     <color name="nagare_onSurfaceVariant">#D1D5DB</color>
     <color name="nagare_surfaceTint">#6EE7B7</color>
     <color name="nagare_inverseSurface">#F3F4F6</color>
     <color name="nagare_inverseOnSurface">#111827</color>
-    <color name="nagare_outline">#4B5563</color>
-    <color name="nagare_surfaceContainerLowest">#0D1117</color>
-    <color name="nagare_surfaceContainerLow">#0F1520</color>
-    <color name="nagare_surfaceContainer">#1F2937</color>
-    <color name="nagare_surfaceContainerHigh">#283545</color>
-    <color name="nagare_surfaceContainerHighest">#374151</color>
+    <color name="nagare_outline">#3D4B5C</color>
+    <color name="nagare_surfaceContainerLowest">#0B0F14</color>
+    <color name="nagare_surfaceContainerLow">#121821</color>
+    <color name="nagare_surfaceContainer">#1C2430</color>
+    <color name="nagare_surfaceContainerHigh">#242E3C</color>
+    <color name="nagare_surfaceContainerHighest">#2E3A4A</color>
 </resources>

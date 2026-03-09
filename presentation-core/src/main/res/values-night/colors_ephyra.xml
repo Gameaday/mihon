@@ -7,7 +7,7 @@
   ~ Primary #A5B4FC (Indigo light)
   ~ Secondary #67E8F9 (Cyan light)
   ~ Tertiary #C4B5FD (Violet light)
-  ~ Neutral #0F0D23
+  ~ Neutral #0C0A1F
 -->
 <resources>
     <color name="ephyra_primary">#A5B4FC</color>
@@ -23,9 +23,9 @@
     <color name="ephyra_onTertiary">#2E1065</color>
     <color name="ephyra_tertiaryContainer">#5B21B6</color>
     <color name="ephyra_onTertiaryContainer">#EDE9FE</color>
-    <color name="ephyra_background">#0F0D23</color>
+    <color name="ephyra_background">#0C0A1F</color>
     <color name="ephyra_onBackground">#E0E7FF</color>
-    <color name="ephyra_surface">#0F0D23</color>
+    <color name="ephyra_surface">#0C0A1F</color>
     <color name="ephyra_onSurface">#E0E7FF</color>
     <color name="ephyra_surfaceVariant">#1A1744</color>
     <color name="ephyra_onSurfaceVariant">#C7D2FE</color>
@@ -33,9 +33,9 @@
     <color name="ephyra_inverseSurface">#E0E7FF</color>
     <color name="ephyra_inverseOnSurface">#1E1B4B</color>
     <color name="ephyra_outline">#6366F1</color>
-    <color name="ephyra_surfaceContainerLowest">#0C0A1D</color>
-    <color name="ephyra_surfaceContainerLow">#110F28</color>
-    <color name="ephyra_surfaceContainer">#1A1744</color>
-    <color name="ephyra_surfaceContainerHigh">#211E50</color>
-    <color name="ephyra_surfaceContainerHighest">#28255C</color>
+    <color name="ephyra_surfaceContainerLowest">#080619</color>
+    <color name="ephyra_surfaceContainerLow">#0F0D23</color>
+    <color name="ephyra_surfaceContainer">#181540</color>
+    <color name="ephyra_surfaceContainerHigh">#221F56</color>
+    <color name="ephyra_surfaceContainerHighest">#2D296C</color>
 </resources>

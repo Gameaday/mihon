@@ -142,6 +142,25 @@ button or sync symbol). Represents a "Central Hub."
 
 ---
 
+## Token Wiring
+
+The following tokens are **automatically applied** by the theme engine
+(in `TachiyomiTheme.kt`) — component authors don't need to read them manually:
+
+| Token | Wired Into | Effect |
+|-------|-----------|--------|
+| `surfaceAlpha` | `ColorScheme.surface`, `surfaceVariant` | Translucent surface backgrounds |
+| `containerAlpha` | `ColorScheme.surfaceContainer*` (all 5 levels) | Translucent container backgrounds |
+| `headingWeight` | `Typography` display/headline/title styles | Per-theme heading weight |
+| `bodyWeight` | `Typography` body/label styles | Per-theme body text weight |
+
+The Typography extension functions (`header`, `titleEmphasis`, `displayEmphasis`,
+`sectionLabel`) also read `headingWeight` from `LocalBrandedTheme` to stay
+consistent with the branded typography.
+
+Shape tokens (`ShapeTokens.card`, `ShapeTokens.coverImage`, etc.) delegate to
+`LocalBrandedTheme`, so M3 components automatically use per-theme shapes.
+
 ## For Developers
 
 To read the current branded theme config in any `@Composable`:
@@ -151,17 +170,17 @@ val config = LocalBrandedTheme.current
 // Shape tokens
 config.cardCornerRadius
 config.coverImageCornerRadius
-// Surface transparency (use with .copy(alpha = ...))
+// Surface transparency (applied automatically to ColorScheme)
 config.surfaceAlpha
 config.containerAlpha
-// Typography
+// Typography (applied automatically to MaterialTheme.typography)
 config.headingWeight  // FontWeight for titles
 config.bodyWeight     // FontWeight for body text
-// Spacing & elevation
+// Spacing & elevation (for custom card components)
 config.cardElevation
 config.cardBorderWidth
 config.cardContentPadding
 ```
 
-Shape tokens (`ShapeTokens.card`, `ShapeTokens.coverImage`, etc.) already
-delegate to the branded config, so most components adapt automatically.
+For custom card-like components that need borders/elevation, read
+`config.cardElevation` and `config.cardBorderWidth` directly:
