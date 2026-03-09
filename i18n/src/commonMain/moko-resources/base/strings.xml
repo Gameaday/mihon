@@ -1196,6 +1196,12 @@
     <string name="match_results_matching">Matching…</string>
     <string name="match_results_no_match">No match found</string>
     <string name="match_results_retry_all">Retry all unlinked</string>
+    <string name="match_results_count_manga">%d manga</string>
+    <string name="match_results_count_novels">%d novels</string>
+    <string name="match_results_count_other">%d other</string>
+    <string name="content_type_manga">Manga</string>
+    <string name="content_type_novel">Novel</string>
+    <string name="content_type_book">Book</string>
 
     <!-- Metadata editing & field locking (Jellyfin-style) -->
     <string name="edit_metadata_title">Edit metadata</string>

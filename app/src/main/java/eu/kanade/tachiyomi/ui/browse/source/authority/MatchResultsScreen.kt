@@ -285,12 +285,12 @@ private fun SummaryCard(
             if (mangaCount > 0 || novelCount > 0) {
                 Spacer(modifier = Modifier.height(MaterialTheme.padding.extraSmall))
                 val parts = mutableListOf<String>()
-                if (mangaCount > 0) parts.add("$mangaCount manga")
-                if (novelCount > 0) parts.add("$novelCount novels")
+                if (mangaCount > 0) parts.add(stringResource(MR.strings.match_results_count_manga, mangaCount))
+                if (novelCount > 0) parts.add(stringResource(MR.strings.match_results_count_novels, novelCount))
                 val otherCount = totalFavorites - mangaCount - novelCount
-                if (otherCount > 0) parts.add("$otherCount other")
+                if (otherCount > 0) parts.add(stringResource(MR.strings.match_results_count_other, otherCount))
                 Text(
-                    text = parts.joinToString(" · "),
+                    text = parts.joinToString(" • "),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -356,9 +356,9 @@ private fun UnlinkedMangaItem(
                 )
                 // Show content type when known
                 val contentTypeLabel = when (manga.contentType) {
-                    tachiyomi.domain.manga.model.ContentType.MANGA -> "Manga"
-                    tachiyomi.domain.manga.model.ContentType.NOVEL -> "Novel"
-                    tachiyomi.domain.manga.model.ContentType.BOOK -> "Book"
+                    tachiyomi.domain.manga.model.ContentType.MANGA -> stringResource(MR.strings.content_type_manga)
+                    tachiyomi.domain.manga.model.ContentType.NOVEL -> stringResource(MR.strings.content_type_novel)
+                    tachiyomi.domain.manga.model.ContentType.BOOK -> stringResource(MR.strings.content_type_book)
                     else -> null
                 }
                 if (contentTypeLabel != null && !hasFailed && !isMatching) {
