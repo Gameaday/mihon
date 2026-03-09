@@ -55,7 +55,6 @@ class RefreshTracks(
         mangaId: Long,
         maxRetries: Int = MAX_RETRIES,
     ) {
-        var lastException: Throwable? = null
         repeat(maxRetries) { attempt ->
             try {
                 val updatedTrack = service.refresh(track.toDbTrack()).toDomainTrack()!!
@@ -63,7 +62,6 @@ class RefreshTracks(
                 syncChapterProgressWithTrack.await(mangaId, updatedTrack, service)
                 return
             } catch (e: Throwable) {
-                lastException = e
                 if (!isRetryable(e) || attempt >= maxRetries - 1) {
                     throw e
                 }
@@ -74,7 +72,6 @@ class RefreshTracks(
                 delay(backoffMs)
             }
         }
-        throw lastException ?: IllegalStateException("Refresh failed")
     }
 
     private fun isRetryable(e: Throwable): Boolean {
