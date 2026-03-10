@@ -278,6 +278,11 @@ UPDATE mangas
 SET metadata_source = NULL, metadata_url = NULL
 WHERE _id = :mangaId;
 
+clearCanonicalId:
+UPDATE mangas
+SET canonical_id = NULL, locked_fields = 0
+WHERE _id = :mangaId;
+
 selectLastInsertedRowId:
 SELECT last_insert_rowid();
 

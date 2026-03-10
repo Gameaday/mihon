@@ -1775,6 +1775,26 @@ class MangaScreenModel(
         }
     }
 
+    /**
+     * Removes the authority link (canonicalId) from this manga, clears all per-field
+     * locks, and refreshes the UI state. After unlinking, the user can re-identify
+     * via the "Identify" button in the metadata editor.
+     */
+    fun unlinkAuthority() {
+        val manga = successState?.manga ?: return
+        if (manga.canonicalId == null) return
+        screenModelScope.launchIO {
+            mangaRepository.clearCanonicalId(manga.id)
+            // Refresh in-memory state so the UI reflects the change
+            try {
+                val updatedManga = mangaRepository.getMangaById(mangaId)
+                updateSuccessState { it.copy(manga = updatedManga) }
+            } catch (e: Exception) {
+                logcat(LogPriority.DEBUG, e) { "Failed to refresh manga state after unlinking" }
+            }
+        }
+    }
+
     sealed interface State {
         @Immutable
         data object Loading : State

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.LinkOff
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.Refresh
@@ -85,6 +87,7 @@ fun EditMetadataDialog(
     onToggleLock: (Long) -> Unit,
     onSetAllLocks: (Long) -> Unit,
     onIdentify: (() -> Unit)?,
+    onUnlinkAuthority: (() -> Unit)? = null,
     onDismissRequest: () -> Unit,
 ) {
     var editTitle by remember { mutableStateOf(title) }
@@ -160,7 +163,25 @@ fun EditMetadataDialog(
                                 text = stringResource(MR.strings.edit_metadata_linked_to, authorityLabel),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.weight(1f),
                             )
+                            if (onUnlinkAuthority != null) {
+                                TextButton(
+                                    onClick = onUnlinkAuthority,
+                                    contentPadding = PaddingValues(horizontal = 8.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.LinkOff,
+                                        contentDescription = stringResource(MR.strings.edit_metadata_unlink),
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = stringResource(MR.strings.edit_metadata_unlink),
+                                        style = MaterialTheme.typography.labelMedium,
+                                    )
+                                }
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(12.dp))

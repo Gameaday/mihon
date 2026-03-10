@@ -1226,6 +1226,7 @@
     <string name="edit_metadata_section_details">Details</string>
     <string name="edit_metadata_section_tags">Tags &amp; genres</string>
     <string name="edit_metadata_linked_to">Linked to %s</string>
+    <string name="edit_metadata_unlink">Unlink</string>
     <string name="locked_field_description">Description</string>
     <string name="locked_field_author">Author</string>
     <string name="locked_field_artist">Artist</string>

@@ -343,6 +343,14 @@ class MangaScreen(
                             screenModel.refreshFromAuthority()
                         }
                     },
+                    onUnlinkAuthority = if (manga.canonicalId != null) {
+                        {
+                            screenModel.dismissDialog()
+                            screenModel.unlinkAuthority()
+                        }
+                    } else {
+                        null
+                    },
                     onDismissRequest = onDismissRequest,
                 )
             }

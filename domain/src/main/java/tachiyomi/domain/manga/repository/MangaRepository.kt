@@ -44,5 +44,7 @@ interface MangaRepository {
 
     suspend fun clearMetadataSource(mangaId: Long): Boolean
 
+    suspend fun clearCanonicalId(mangaId: Long): Boolean
+
     suspend fun insertNetworkManga(manga: List<Manga>): List<Manga>
 }
