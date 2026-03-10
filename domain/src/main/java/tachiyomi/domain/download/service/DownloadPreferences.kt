@@ -51,6 +51,14 @@ class DownloadPreferences(
      */
     fun jellyfinUploadScope() = preferenceStore.getInt("jellyfin_upload_scope", 0)
 
+    /**
+     * URI of the Jellyfin library folder (e.g. a network share or NAS mount).
+     * When set, completed Jellyfin-named downloads are copied to this folder
+     * so the Jellyfin server can discover them via library scan.
+     * Empty string = not set (downloads stay in the default location only).
+     */
+    fun jellyfinLibraryFolder() = preferenceStore.getString("jellyfin_library_folder", "")
+
     companion object {
         private const val REMOVE_EXCLUDE_CATEGORIES_PREF_KEY = "remove_exclude_categories"
         private const val DOWNLOAD_NEW_CATEGORIES_PREF_KEY = "download_new_categories"

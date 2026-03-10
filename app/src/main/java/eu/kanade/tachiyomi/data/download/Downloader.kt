@@ -436,6 +436,14 @@ class Downloader(
             } else {
                 tmpDir.renameTo(chapterDirname)
             }
+
+            // Copy CBZ to Jellyfin library folder if configured and using Jellyfin naming
+            if (downloadPreferences.saveChaptersAsCBZ().get() &&
+                libraryPreferences.jellyfinCompatibleNaming().get()
+            ) {
+                copyToJellyfinLibrary(mangaDir, chapterDirname, download.manga.title)
+            }
+
             cache.addChapter(chapterDirname, mangaDir, download.manga)
 
             DiskUtil.createNoMediaFile(tmpDir, context)
@@ -742,6 +750,65 @@ class Downloader(
         }
         zip.renameTo("$dirname.cbz")
         tmpDir.delete()
+    }
+
+    /**
+     * Copies a completed CBZ file to the configured Jellyfin library folder.
+     * The folder structure is: {jellyfinFolder}/{mangaTitle}/{chapter}.cbz
+     * This allows Jellyfin to discover the files via a library scan, even when
+     * the app's download directory is not directly accessible to the server
+     * (e.g., the Jellyfin folder is an SMB/NFS network share on a NAS).
+     */
+    private fun copyToJellyfinLibrary(
+        mangaDir: UniFile,
+        dirname: String,
+        mangaTitle: String,
+    ) {
+        val folderUri = downloadPreferences.jellyfinLibraryFolder().get()
+        if (folderUri.isBlank()) return
+
+        try {
+            val jellyfinRoot = UniFile.fromUri(context, android.net.Uri.parse(folderUri))
+                ?: run {
+                    logcat(LogPriority.WARN) { "Jellyfin library folder is not accessible: $folderUri" }
+                    return
+                }
+
+            // Create series subdirectory: {jellyfinFolder}/{mangaTitle}/
+            val seriesDir = jellyfinRoot.createDirectory(
+                DiskUtil.buildValidFilename(mangaTitle),
+            ) ?: run {
+                logcat(LogPriority.WARN) { "Failed to create series directory in Jellyfin library folder" }
+                return
+            }
+
+            val cbzFile = mangaDir.findFile("$dirname.cbz") ?: run {
+                logcat(LogPriority.WARN) { "CBZ file not found for copy: $dirname.cbz" }
+                return
+            }
+
+            // Skip if the file already exists in the Jellyfin folder
+            val destFile = seriesDir.findFile("$dirname.cbz")
+            if (destFile != null && destFile.length() > 0) {
+                logcat(LogPriority.DEBUG) { "CBZ already exists in Jellyfin folder: $dirname.cbz" }
+                return
+            }
+
+            val newFile = seriesDir.createFile("$dirname.cbz") ?: run {
+                logcat(LogPriority.WARN) { "Failed to create CBZ in Jellyfin library folder" }
+                return
+            }
+
+            cbzFile.openInputStream().use { input ->
+                newFile.openOutputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            logcat(LogPriority.INFO) { "Copied $dirname.cbz to Jellyfin library folder" }
+        } catch (e: Exception) {
+            logcat(LogPriority.ERROR, e) { "Failed to copy CBZ to Jellyfin library folder" }
+        }
     }
 
     /**

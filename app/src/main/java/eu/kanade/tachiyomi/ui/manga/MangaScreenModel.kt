@@ -34,6 +34,7 @@ import eu.kanade.presentation.manga.components.ChapterDownloadAction
 import eu.kanade.presentation.util.formattedMessage
 import eu.kanade.tachiyomi.data.download.DownloadCache
 import eu.kanade.tachiyomi.data.download.DownloadManager
+import eu.kanade.tachiyomi.data.download.DownloadProvider
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.data.track.EnhancedTracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
@@ -79,6 +80,7 @@ import tachiyomi.domain.chapter.model.ChapterUpdate
 import tachiyomi.domain.chapter.model.NoChaptersException
 import tachiyomi.domain.chapter.service.calculateChapterGap
 import tachiyomi.domain.chapter.service.getChapterSort
+import tachiyomi.domain.download.service.DownloadPreferences
 import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.domain.manga.interactor.GetDuplicateLibraryManga
 import tachiyomi.domain.manga.interactor.GetMangaWithChapters
@@ -108,6 +110,8 @@ class MangaScreenModel(
     private val trackChapter: TrackChapter = Injekt.get(),
     private val downloadManager: DownloadManager = Injekt.get(),
     private val downloadCache: DownloadCache = Injekt.get(),
+    private val downloadPreferences: DownloadPreferences = Injekt.get(),
+    private val downloadProvider: DownloadProvider = Injekt.get(),
     private val getMangaAndChapters: GetMangaWithChapters = Injekt.get(),
     private val getDuplicateLibraryManga: GetDuplicateLibraryManga = Injekt.get(),
     private val getAvailableScanlators: GetAvailableScanlators = Injekt.get(),
@@ -1005,12 +1009,22 @@ class MangaScreenModel(
                 val needsDownload = missingFromServer
                     .filter { it.downloadState == Download.State.NOT_DOWNLOADED }
                     .map { it.chapter }
-                val alreadyDownloaded = missingFromServer
+                val alreadyDownloadedItems = missingFromServer
                     .filter { it.downloadState == Download.State.DOWNLOADED }
-                    .size
+                val alreadyDownloaded = alreadyDownloadedItems.size
 
                 if (needsDownload.isNotEmpty()) {
                     downloadChapters(needsDownload)
+                }
+
+                // Copy already-downloaded chapters to Jellyfin library folder if configured
+                val jellyfinFolder = downloadPreferences.jellyfinLibraryFolder().get()
+                if (jellyfinFolder.isNotBlank() && alreadyDownloadedItems.isNotEmpty()) {
+                    copyChaptersToJellyfinFolder(
+                        manga,
+                        alreadyDownloadedItems.map { it.chapter },
+                        jellyfinFolder,
+                    )
                 }
 
                 val totalSynced = needsDownload.size + alreadyDownloaded
@@ -1051,6 +1065,87 @@ class MangaScreenModel(
                 // Restore the original Jellyfin naming preference
                 libraryPreferences.jellyfinCompatibleNaming().set(wasJellyfinNamingEnabled)
             }
+        }
+    }
+
+    /**
+     * Copies already-downloaded chapter CBZ files to the configured Jellyfin library folder.
+     * This makes locally-downloaded content discoverable by the Jellyfin server via library scan,
+     * even when the app's download directory is not directly accessible to the server (e.g., the
+     * Jellyfin folder is an SMB/NFS network share on a NAS).
+     */
+    private fun copyChaptersToJellyfinFolder(
+        manga: Manga,
+        chapters: List<Chapter>,
+        jellyfinFolderUri: String,
+    ) {
+        try {
+            val jellyfinRoot = com.hippo.unifile.UniFile.fromUri(
+                context,
+                android.net.Uri.parse(jellyfinFolderUri),
+            ) ?: run {
+                logcat(LogPriority.WARN) { "Jellyfin library folder not accessible" }
+                return
+            }
+
+            val seriesDir = jellyfinRoot.createDirectory(
+                eu.kanade.tachiyomi.util.storage.DiskUtil.buildValidFilename(manga.title),
+            ) ?: run {
+                logcat(LogPriority.WARN) { "Failed to create series dir in Jellyfin folder" }
+                return
+            }
+
+            val source = Injekt.get<SourceManager>().getOrStub(manga.source)
+            val mangaDirResult = downloadProvider.getMangaDir(manga.title, source)
+            val mangaDir = mangaDirResult.getOrNull() ?: run {
+                logcat(LogPriority.WARN) { "Could not resolve manga download directory" }
+                return
+            }
+
+            var copied = 0
+            for (chapter in chapters) {
+                val jellyfinName = downloadProvider.getJellyfinChapterDirName(
+                    manga.title,
+                    chapter.chapterNumber,
+                    chapter.name,
+                )
+                val cbzName = "$jellyfinName.cbz"
+
+                // Skip if already in the Jellyfin folder
+                val existing = seriesDir.findFile(cbzName)
+                if (existing != null && existing.length() > 0) continue
+
+                // Try Jellyfin-named CBZ first, then fall back to standard naming
+                val sourceCbz = mangaDir.findFile(cbzName)
+                    ?: mangaDir.findFile(
+                        downloadProvider.getChapterDirName(
+                            chapter.name,
+                            chapter.scanlator,
+                            chapter.url,
+                        ) + ".cbz",
+                    )
+
+                if (sourceCbz == null || !sourceCbz.exists()) continue
+
+                val destFile = seriesDir.createFile(cbzName) ?: continue
+                try {
+                    sourceCbz.openInputStream().use { input ->
+                        destFile.openOutputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    copied++
+                } catch (e: Exception) {
+                    logcat(LogPriority.WARN, e) { "Failed to copy $cbzName to Jellyfin folder" }
+                    destFile.delete()
+                }
+            }
+
+            if (copied > 0) {
+                logcat(LogPriority.INFO) { "Copied $copied chapter(s) to Jellyfin library folder" }
+            }
+        } catch (e: Exception) {
+            logcat(LogPriority.ERROR, e) { "Failed to copy chapters to Jellyfin folder" }
         }
     }
 

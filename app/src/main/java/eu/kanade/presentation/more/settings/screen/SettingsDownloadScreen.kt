@@ -1,5 +1,9 @@
 package eu.kanade.presentation.more.settings.screen
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
@@ -8,16 +12,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.fastMap
+import androidx.core.net.toUri
+import com.hippo.unifile.UniFile
 import eu.kanade.domain.track.service.TrackPreferences
 import eu.kanade.presentation.category.visualName
 import eu.kanade.presentation.more.settings.Preference
 import eu.kanade.presentation.more.settings.widget.TriStateListDialog
 import eu.kanade.tachiyomi.data.track.TrackerManager
+import eu.kanade.tachiyomi.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import logcat.LogPriority
+import tachiyomi.core.common.storage.displayablePath
+import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.category.interactor.GetCategories
 import tachiyomi.domain.category.model.Category
 import tachiyomi.domain.download.service.DownloadPreferences
@@ -221,12 +232,43 @@ object SettingsDownloadScreen : SearchableSettings {
     private fun getJellyfinSyncGroup(
         downloadPreferences: DownloadPreferences,
     ): Preference.PreferenceGroup {
+        val context = LocalContext.current
         val trackerManager = remember { Injekt.get<TrackerManager>() }
         val trackPreferences = remember { Injekt.get<TrackPreferences>() }
         val libraryPreferences = remember { Injekt.get<LibraryPreferences>() }
         val isLoggedIn = trackerManager.jellyfin.isLoggedIn
         val isAdmin by trackPreferences.jellyfinIsAdmin().collectAsState()
         val autoSync by downloadPreferences.autoSyncToJellyfin().collectAsState()
+
+        // Jellyfin library folder picker (SAF — supports network shares via third-party providers)
+        val jellyfinFolderPref = downloadPreferences.jellyfinLibraryFolder()
+        val jellyfinFolder by jellyfinFolderPref.collectAsState()
+        val pickJellyfinFolder = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocumentTree(),
+        ) { uri ->
+            if (uri != null) {
+                val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                try {
+                    context.contentResolver.takePersistableUriPermission(uri, flags)
+                } catch (e: SecurityException) {
+                    logcat(LogPriority.ERROR, e)
+                    context.toast(MR.strings.file_picker_uri_permission_unsupported)
+                }
+                UniFile.fromUri(context, uri)?.let {
+                    jellyfinFolderPref.set(it.uri.toString())
+                }
+            }
+        }
+
+        val jellyfinFolderSubtitle = if (jellyfinFolder.isBlank()) {
+            stringResource(MR.strings.pref_jellyfin_library_folder_not_set)
+        } else {
+            val path = remember(jellyfinFolder) {
+                UniFile.fromUri(context, jellyfinFolder.toUri())?.displayablePath
+            } ?: jellyfinFolder
+            stringResource(MR.strings.pref_jellyfin_library_folder_set, path)
+        }
 
         val items = buildList<Preference.PreferenceItem<out Any, out Any>> {
             if (!isLoggedIn) {
@@ -254,6 +296,34 @@ object SettingsDownloadScreen : SearchableSettings {
                     enabled = isLoggedIn && autoSync,
                 ),
             )
+
+            add(
+                Preference.PreferenceItem.TextPreference(
+                    title = stringResource(MR.strings.pref_jellyfin_library_folder),
+                    subtitle = jellyfinFolderSubtitle,
+                    enabled = isLoggedIn && autoSync,
+                    onClick = {
+                        if (jellyfinFolder.isNotBlank()) {
+                            // Clear the folder if already set (tap to remove)
+                            jellyfinFolderPref.set("")
+                        } else {
+                            try {
+                                pickJellyfinFolder.launch(null)
+                            } catch (e: ActivityNotFoundException) {
+                                context.toast(MR.strings.file_picker_error)
+                            }
+                        }
+                    },
+                ),
+            )
+
+            if (jellyfinFolder.isBlank() && isLoggedIn && autoSync) {
+                add(
+                    Preference.PreferenceItem.InfoPreference(
+                        stringResource(MR.strings.pref_jellyfin_library_folder_hint),
+                    ),
+                )
+            }
 
             add(
                 Preference.PreferenceItem.ListPreference(

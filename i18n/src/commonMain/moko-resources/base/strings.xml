@@ -350,6 +350,11 @@
     <string name="jellyfin_scope_all">All chapters (skip existing on server)</string>
     <string name="jellyfin_scope_read">Previously read chapters</string>
     <string name="jellyfin_scope_downloaded">Already downloaded chapters</string>
+    <string name="pref_jellyfin_library_folder">Jellyfin library folder</string>
+    <string name="pref_jellyfin_library_folder_summary">Network or local folder where Jellyfin looks for media. Downloaded chapters are copied here so the server can discover them.</string>
+    <string name="pref_jellyfin_library_folder_not_set">Tap to choose a folder (local or network share)</string>
+    <string name="pref_jellyfin_library_folder_set">%s\nTap to remove</string>
+    <string name="pref_jellyfin_library_folder_hint">Tip: Install a file manager that supports SMB/NFS (e.g. Solid Explorer, CX File Explorer) to pick network shares from the folder picker</string>
 
       <!-- Extension section -->
     <string name="multi_lang">Multi</string>
