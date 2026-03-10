@@ -842,6 +842,27 @@ private fun FindSourceDialog(
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
                                         )
+                                        val chapterText = when {
+                                            match.chapterCount > 0 -> stringResource(
+                                                MR.strings.discover_find_source_chapters,
+                                                match.chapterCount,
+                                            )
+                                            match.chapterCount == 0 -> stringResource(
+                                                MR.strings.discover_find_source_no_chapters,
+                                            )
+                                            else -> null
+                                        }
+                                        if (chapterText != null) {
+                                            Text(
+                                                text = chapterText,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = if (match.chapterCount > 0) {
+                                                    MaterialTheme.colorScheme.primary
+                                                } else {
+                                                    MaterialTheme.colorScheme.error
+                                                },
+                                            )
+                                        }
                                     }
                                     val confidencePercent = (match.confidence * 100).toInt()
                                     Text(

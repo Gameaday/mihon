@@ -28,8 +28,11 @@ import tachiyomi.domain.source.service.SourceManager
  * 1. **Canonical ID** — free local DB lookup, 0 API calls.
  * 2. **Smart title search** — tiered: primary title → alt titles → near-match → optional deep search.
  *
- * Results are returned ranked by confidence (1.0 = canonical ID match, 0.0–1.0 = title similarity).
- * Only the top result per source is included.
+ * Post-processing pipeline:
+ * 1. **URL deduplication** — same manga URL across provider variants (e.g. MangaDex EN/JP) → keep best.
+ * 2. **Provider diversity** — limit results per provider to avoid same-source dominance.
+ * 3. **Chapter count enrichment** — fetch chapter counts to surface sources with actual content.
+ * 4. **Ranking** — sources with chapters first, then by confidence, then by chapter count.
  */
 class FindContentSource(
     private val sourceManager: SourceManager,
@@ -37,10 +40,11 @@ class FindContentSource(
 ) {
 
     /**
-     * A content source match with confidence score.
+     * A content source match with confidence score and content availability.
      * @param manga The manga as it exists on the matched source.
      * @param source The catalogue source that hosts this manga.
      * @param confidence Match confidence: 1.0 = canonical ID, 0.4–0.9 = title similarity.
+     * @param chapterCount Number of chapters available on this source, or -1 if unknown.
      */
     data class SourceMatch(
         val manga: SManga,
@@ -48,6 +52,7 @@ class FindContentSource(
         val sourceId: Long,
         val sourceName: String,
         val confidence: Double,
+        val chapterCount: Int = CHAPTER_COUNT_UNKNOWN,
     )
 
     /**
@@ -57,7 +62,7 @@ class FindContentSource(
      * @param maxResults Maximum number of source matches to return (default 5).
      * @param deepSearch Whether to use deep search fallback (more API calls, better recall).
      * @param onProgress Optional callback: (sourcesSearched, totalSources).
-     * @return List of [SourceMatch] sorted by confidence descending.
+     * @return List of [SourceMatch] sorted by content availability and confidence.
      */
     suspend fun findSources(
         manga: Manga,
@@ -93,9 +98,11 @@ class FindContentSource(
             }.awaitAll().filterNotNull()
         }
 
-        results
-            .sortedByDescending { it.confidence }
-            .take(maxResults)
+        // Post-processing pipeline: dedup → diversity → enrich → rank
+        val deduped = deduplicateByUrl(results)
+        val diverse = diversifyByProvider(deduped, maxResults * 2)
+        val enriched = enrichWithChapterCounts(diverse)
+        rankResults(enriched, maxResults)
     }
 
     /**
@@ -180,11 +187,103 @@ class FindContentSource(
         }
     }
 
+    // ── Post-processing helpers ──────────────────────────────────────────
+
+    /**
+     * Deduplicates results that share the same manga URL.
+     * Multiple language variants of the same provider (e.g. MangaDex EN/JP/ES) return the same
+     * manga URL; keeping only the highest-confidence hit avoids showing identical entries.
+     */
+    internal fun deduplicateByUrl(results: List<SourceMatch>): List<SourceMatch> {
+        return results
+            .groupBy { it.manga.url }
+            .map { (_, matches) -> matches.maxByOrNull { it.confidence }!! }
+    }
+
+    /**
+     * Ensures diverse results across different content providers.
+     * First picks the best match per provider (grouped by [CatalogueSource.name]),
+     * then fills remaining slots with next-best results from any provider.
+     */
+    internal fun diversifyByProvider(results: List<SourceMatch>, limit: Int): List<SourceMatch> {
+        if (results.size <= limit) return results
+
+        val sorted = results.sortedByDescending { it.confidence }
+        val selected = mutableListOf<SourceMatch>()
+        val seenProviders = mutableSetOf<String>()
+
+        // First pass: one per provider
+        for (match in sorted) {
+            val provider = match.source.name.lowercase()
+            if (provider !in seenProviders) {
+                selected.add(match)
+                seenProviders.add(provider)
+                if (selected.size >= limit) return selected
+            }
+        }
+
+        // Second pass: fill remaining slots with best remaining
+        for (match in sorted) {
+            if (match !in selected) {
+                selected.add(match)
+                if (selected.size >= limit) break
+            }
+        }
+
+        return selected
+    }
+
+    /**
+     * Fetches chapter counts for each match to surface sources with actual content.
+     * Uses concurrent requests with a semaphore to avoid overwhelming sources.
+     * Failures gracefully leave the chapter count as [CHAPTER_COUNT_UNKNOWN].
+     */
+    private suspend fun enrichWithChapterCounts(
+        results: List<SourceMatch>,
+    ): List<SourceMatch> {
+        if (results.isEmpty()) return results
+        val semaphore = Semaphore(MAX_CONCURRENT_SEARCHES)
+        return supervisorScope {
+            results.map { match ->
+                async {
+                    semaphore.withPermit {
+                        try {
+                            val chapters = match.source.getChapterList(match.manga)
+                            match.copy(chapterCount = chapters.size)
+                        } catch (e: Exception) {
+                            logcat(LogPriority.DEBUG, e) {
+                                "Chapter count fetch failed: ${match.sourceName}"
+                            }
+                            match
+                        }
+                    }
+                }
+            }.awaitAll()
+        }
+    }
+
+    /**
+     * Final ranking: sources with chapters first, then by confidence, then chapter count.
+     * Sources with 0 chapters (dead/degraded) are pushed to the bottom.
+     */
+    internal fun rankResults(results: List<SourceMatch>, maxResults: Int): List<SourceMatch> {
+        return results
+            .sortedWith(
+                compareByDescending<SourceMatch> { it.chapterCount > 0 }
+                    .thenByDescending { it.confidence }
+                    .thenByDescending { it.chapterCount },
+            )
+            .take(maxResults)
+    }
+
     companion object {
         /** Maximum concurrent source searches to avoid overwhelming network. */
         private const val MAX_CONCURRENT_SEARCHES = 5
 
         /** Default maximum results to return. */
         private const val MAX_RESULTS = 5
+
+        /** Sentinel value indicating chapter count has not been fetched. */
+        const val CHAPTER_COUNT_UNKNOWN = -1
     }
 }
