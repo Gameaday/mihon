@@ -9,15 +9,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.fastMap
+import eu.kanade.domain.track.service.TrackPreferences
 import eu.kanade.presentation.category.visualName
 import eu.kanade.presentation.more.settings.Preference
 import eu.kanade.presentation.more.settings.widget.TriStateListDialog
+import eu.kanade.tachiyomi.data.track.TrackerManager
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import tachiyomi.domain.category.interactor.GetCategories
 import tachiyomi.domain.category.model.Category
 import tachiyomi.domain.download.service.DownloadPreferences
+import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.pluralStringResource
 import tachiyomi.presentation.core.i18n.stringResource
@@ -75,6 +79,7 @@ object SettingsDownloadScreen : SearchableSettings {
                 allCategories = allCategories,
             ),
             getDownloadAheadGroup(downloadPreferences = downloadPreferences),
+            getJellyfinSyncGroup(downloadPreferences = downloadPreferences),
         )
     }
 
@@ -209,6 +214,64 @@ object SettingsDownloadScreen : SearchableSettings {
                 ),
                 Preference.PreferenceItem.InfoPreference(stringResource(MR.strings.download_ahead_info)),
             ),
+        )
+    }
+
+    @Composable
+    private fun getJellyfinSyncGroup(
+        downloadPreferences: DownloadPreferences,
+    ): Preference.PreferenceGroup {
+        val trackerManager = remember { Injekt.get<TrackerManager>() }
+        val trackPreferences = remember { Injekt.get<TrackPreferences>() }
+        val libraryPreferences = remember { Injekt.get<LibraryPreferences>() }
+        val isLoggedIn = trackerManager.jellyfin.isLoggedIn
+        val isAdmin by trackPreferences.jellyfinIsAdmin().collectAsState()
+        val autoSync by downloadPreferences.autoSyncToJellyfin().collectAsState()
+
+        val items = buildList<Preference.PreferenceItem<out Any, out Any>> {
+            if (!isLoggedIn) {
+                add(
+                    Preference.PreferenceItem.InfoPreference(
+                        stringResource(MR.strings.pref_jellyfin_not_logged_in),
+                    ),
+                )
+            }
+
+            add(
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = downloadPreferences.autoSyncToJellyfin(),
+                    title = stringResource(MR.strings.pref_auto_sync_to_jellyfin),
+                    subtitle = stringResource(MR.strings.pref_auto_sync_to_jellyfin_summary),
+                    enabled = isLoggedIn,
+                ),
+            )
+
+            add(
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = libraryPreferences.jellyfinCompatibleNaming(),
+                    title = stringResource(MR.strings.pref_jellyfin_compatible_naming),
+                    subtitle = stringResource(MR.strings.pref_jellyfin_compatible_naming_summary),
+                    enabled = isLoggedIn && autoSync,
+                ),
+            )
+
+            add(
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = downloadPreferences.jellyfinScanAfterSync(),
+                    title = stringResource(MR.strings.pref_jellyfin_scan_after_sync),
+                    subtitle = if (!isAdmin && isLoggedIn) {
+                        stringResource(MR.strings.pref_jellyfin_not_admin_hint)
+                    } else {
+                        stringResource(MR.strings.pref_jellyfin_scan_after_sync_summary)
+                    },
+                    enabled = isLoggedIn && autoSync,
+                ),
+            )
+        }
+
+        return Preference.PreferenceGroup(
+            title = stringResource(MR.strings.pref_category_jellyfin_sync),
+            preferenceItems = items.toImmutableList(),
         )
     }
 }

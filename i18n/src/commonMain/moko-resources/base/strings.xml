@@ -337,6 +337,15 @@
     <string name="pref_jellyfin_compatible_naming">Jellyfin-compatible download naming</string>
     <string name="pref_jellyfin_compatible_naming_summary">Name downloaded CBZ files using Jellyfin Bookshelf plugin conventions (Series Name Ch. 001.cbz). Content can be directly served by a Jellyfin media server without renaming.</string>
 
+    <!-- Jellyfin sync download settings -->
+    <string name="pref_category_jellyfin_sync">Jellyfin sync</string>
+    <string name="pref_auto_sync_to_jellyfin">Auto-sync downloads to Jellyfin</string>
+    <string name="pref_auto_sync_to_jellyfin_summary">Automatically use Jellyfin-compatible naming for linked series so new downloads appear in your Jellyfin library</string>
+    <string name="pref_jellyfin_scan_after_sync">Trigger library scan after sync</string>
+    <string name="pref_jellyfin_scan_after_sync_summary">Request Jellyfin to rescan the library after syncing chapters. Requires admin privileges on the server.</string>
+    <string name="pref_jellyfin_not_logged_in">Log in to Jellyfin in Settings → Tracking to enable sync features</string>
+    <string name="pref_jellyfin_not_admin_hint">Library scan requires admin privileges. Downloads will still use Jellyfin naming, but a server admin must trigger the scan manually.</string>
+
       <!-- Extension section -->
     <string name="multi_lang">Multi</string>
     <string name="ext_updates_pending">Updates pending</string>

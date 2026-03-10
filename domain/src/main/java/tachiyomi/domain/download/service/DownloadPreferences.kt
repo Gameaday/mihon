@@ -41,6 +41,10 @@ class DownloadPreferences(
 
     fun parallelPageLimit() = preferenceStore.getInt("download_parallel_page_limit", 5)
 
+    fun autoSyncToJellyfin() = preferenceStore.getBoolean("auto_sync_to_jellyfin", false)
+
+    fun jellyfinScanAfterSync() = preferenceStore.getBoolean("jellyfin_scan_after_sync", true)
+
     companion object {
         private const val REMOVE_EXCLUDE_CATEGORIES_PREF_KEY = "remove_exclude_categories"
         private const val DOWNLOAD_NEW_CATEGORIES_PREF_KEY = "download_new_categories"
