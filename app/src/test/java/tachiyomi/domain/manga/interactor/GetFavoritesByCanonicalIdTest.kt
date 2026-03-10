@@ -46,6 +46,7 @@ class GetFavoritesByCanonicalIdTest {
             mangaUpdates: List<tachiyomi.domain.manga.model.MangaUpdate>,
         ) = throw NotImplementedError()
         override suspend fun clearMetadataSource(mangaId: Long) = throw NotImplementedError()
+        override suspend fun clearCanonicalId(mangaId: Long) = throw NotImplementedError()
         override suspend fun insertNetworkManga(manga: List<Manga>) = throw NotImplementedError()
     }
 

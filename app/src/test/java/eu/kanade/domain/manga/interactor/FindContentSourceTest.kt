@@ -312,5 +312,6 @@ private class FakeMangaRepository : MangaRepository {
     override suspend fun update(update: MangaUpdate) = false
     override suspend fun updateAll(mangaUpdates: List<MangaUpdate>) = false
     override suspend fun clearMetadataSource(mangaId: Long) = false
+    override suspend fun clearCanonicalId(mangaId: Long) = false
     override suspend fun insertNetworkManga(manga: List<Manga>) = emptyList<Manga>()
 }
