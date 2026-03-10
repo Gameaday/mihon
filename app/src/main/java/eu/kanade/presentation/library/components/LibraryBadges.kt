@@ -76,21 +76,33 @@ internal fun SourceHealthBadge(sourceStatus: Int) {
 @Composable
 internal fun AuthorityBadge(hasCanonicalId: Boolean, canonicalId: String? = null) {
     if (hasCanonicalId) {
-        val isJellyfin = canonicalId?.startsWith(JELLYFIN_CANONICAL_PREFIX) == true
+        val brandColor = authorityBrandColor(canonicalId)
         Badge(
             imageVector = Icons.Outlined.Verified,
-            color = if (isJellyfin) JellyfinBadgeColor else MaterialTheme.colorScheme.primary,
-            iconColor = if (isJellyfin) Color.White else MaterialTheme.colorScheme.onPrimary,
+            color = brandColor ?: MaterialTheme.colorScheme.primary,
+            iconColor = if (brandColor != null) Color.White else MaterialTheme.colorScheme.onPrimary,
             contentDescription = stringResource(MR.strings.authority_badge_description),
         )
     }
 }
 
-/** Canonical ID prefix for Jellyfin authority tracker. */
-private const val JELLYFIN_CANONICAL_PREFIX = "jf:"
+/**
+ * Returns the brand color for a known authority, or null for unknown prefixes.
+ * Used by both library badges and the series detail page authority badge.
+ */
+internal fun authorityBrandColor(canonicalId: String?): Color? {
+    if (canonicalId == null) return null
+    val prefix = canonicalId.substringBefore(":", "")
+    return AUTHORITY_BRAND_COLORS[prefix]
+}
 
-/** Jellyfin brand color (#00A4DC). */
-private val JellyfinBadgeColor = Color(0xFF00A4DC)
+/** Brand colors for known authority trackers. */
+private val AUTHORITY_BRAND_COLORS = mapOf(
+    "al" to Color(0xFF02A9FF), // AniList blue
+    "mal" to Color(0xFF2E51A2), // MyAnimeList blue
+    "mu" to Color(0xFFFF6740), // MangaUpdates orange
+    "jf" to Color(0xFF00A4DC), // Jellyfin blue
+)
 
 @PreviewLightDark
 @Composable

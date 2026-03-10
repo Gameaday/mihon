@@ -90,6 +90,7 @@ import com.mikepenz.markdown.model.markdownAnnotatorConfig
 import com.mikepenz.markdown.utils.getUnescapedTextInNode
 import eu.kanade.domain.ui.UiPreferences
 import eu.kanade.presentation.components.DropdownMenu
+import eu.kanade.presentation.library.components.authorityBrandColor
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import eu.kanade.tachiyomi.source.model.SManga
@@ -670,9 +671,11 @@ private fun ColumnScope.MangaContentInfo(
         val lockCount = remember(lockedFields) {
             LockedField.ALL_FIELDS.count { LockedField.isLocked(lockedFields, it) }
         }
+        val brandColor = authorityBrandColor(canonicalId)
         if (authorityLabel != null) {
             androidx.compose.material3.Surface(
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = AUTHORITY_BADGE_ALPHA),
+                color = (brandColor ?: MaterialTheme.colorScheme.primaryContainer)
+                    .copy(alpha = AUTHORITY_BADGE_ALPHA),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -697,21 +700,15 @@ private fun ColumnScope.MangaContentInfo(
                         modifier = Modifier
                             .padding(end = 10.dp)
                             .size(20.dp),
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = brandColor ?: MaterialTheme.colorScheme.primary,
                     )
                     ProvideTextStyle(MaterialTheme.typography.labelLarge) {
-                        Text(
-                            text = stringResource(MR.strings.authority_linked_label),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
-                        DotSeparatorText()
                         Text(
                             text = authorityLabel,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
                             color = if (authorityUrl != null) {
-                                MaterialTheme.colorScheme.primary
+                                brandColor ?: MaterialTheme.colorScheme.primary
                             } else {
                                 LocalContentColor.current
                             },
