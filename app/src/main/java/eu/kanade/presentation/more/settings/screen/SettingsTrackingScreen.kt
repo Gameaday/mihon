@@ -617,7 +617,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                             (service as EnhancedTracker).loginNoop()
                                         }
                                     },
-                                    logout = service::logout,
+                                    logout = { dialog = LogoutDialog(service) },
                                 )
                             } + listOf(Preference.PreferenceItem.InfoPreference(enhancedTrackerInfo))
                         ).toImmutableList(),

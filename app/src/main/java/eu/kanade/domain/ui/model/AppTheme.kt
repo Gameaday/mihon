@@ -6,6 +6,9 @@ import tachiyomi.i18n.MR
 enum class AppTheme(val titleRes: StringResource?) {
     DEFAULT(MR.strings.label_default),
     MONET(MR.strings.theme_monet),
+    EPHYRA(MR.strings.theme_ephyra),
+    NAGARE(MR.strings.theme_nagare),
+    ATOLLA(MR.strings.theme_atolla),
     CATPPUCCIN(MR.strings.theme_catppuccin),
     GREEN_APPLE(MR.strings.theme_greenapple),
     LAVENDER(MR.strings.theme_lavender),
@@ -18,9 +21,6 @@ enum class AppTheme(val titleRes: StringResource?) {
     YINYANG(MR.strings.theme_yinyang),
     YOTSUBA(MR.strings.theme_yotsuba),
     MONOCHROME(MR.strings.theme_monochrome),
-    EPHYRA(MR.strings.theme_ephyra),
-    NAGARE(MR.strings.theme_nagare),
-    ATOLLA(MR.strings.theme_atolla),
 
     // Deprecated
     DARK_BLUE(null),
