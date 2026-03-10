@@ -165,7 +165,7 @@ class MangaScreen(
             }.takeIf { successState.manga.favorite },
             onEditNotesClicked = { navigator.push(MangaNotesScreen(manga = successState.manga)) },
             onEditMetadataClicked = screenModel::showEditMetadataDialog.takeIf {
-                successState.manga.favorite
+                successState.manga.favorite || successState.manga.canonicalId != null
             },
             onMultiBookmarkClicked = screenModel::bookmarkChapters,
             onMultiMarkAsReadClicked = screenModel::markChaptersRead,

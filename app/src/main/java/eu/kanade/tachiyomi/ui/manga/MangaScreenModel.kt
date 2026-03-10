@@ -444,17 +444,29 @@ class MangaScreenModel(
     }
 
     fun toggleFavorite() {
+        val hasAuthority = successState?.manga?.canonicalId != null
         toggleFavorite(
             onRemoved = {
                 screenModelScope.launch {
-                    if (!hasDownloads()) return@launch
-                    val result = snackbarHostState.showSnackbar(
-                        message = context.stringResource(MR.strings.delete_downloads_for_manga),
-                        actionLabel = context.stringResource(MR.strings.action_delete),
-                        withDismissAction = true,
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        deleteDownloads()
+                    if (hasDownloads()) {
+                        val result = snackbarHostState.showSnackbar(
+                            message = context.stringResource(MR.strings.delete_downloads_for_manga),
+                            actionLabel = context.stringResource(MR.strings.action_delete),
+                            withDismissAction = true,
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            deleteDownloads()
+                        }
+                    }
+                    if (hasAuthority) {
+                        val result = snackbarHostState.showSnackbar(
+                            message = context.stringResource(MR.strings.unlink_authority_on_remove),
+                            actionLabel = context.stringResource(MR.strings.edit_metadata_unlink),
+                            withDismissAction = true,
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            unlinkAuthority()
+                        }
                     }
                 }
             },
