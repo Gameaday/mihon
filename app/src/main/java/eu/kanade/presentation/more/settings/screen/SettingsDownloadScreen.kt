@@ -256,6 +256,33 @@ object SettingsDownloadScreen : SearchableSettings {
             )
 
             add(
+                Preference.PreferenceItem.ListPreference(
+                    preference = downloadPreferences.jellyfinUploadScope(),
+                    entries = persistentMapOf(
+                        0 to stringResource(MR.strings.jellyfin_scope_all),
+                        1 to stringResource(MR.strings.jellyfin_scope_read),
+                        2 to stringResource(MR.strings.jellyfin_scope_downloaded),
+                    ),
+                    title = stringResource(MR.strings.pref_jellyfin_upload_scope),
+                    subtitle = stringResource(MR.strings.pref_jellyfin_upload_scope_summary),
+                    enabled = isLoggedIn && autoSync,
+                ),
+            )
+
+            add(
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = downloadPreferences.jellyfinAutoUploadAfterDownload(),
+                    title = stringResource(MR.strings.pref_jellyfin_auto_upload),
+                    subtitle = if (!isAdmin && isLoggedIn) {
+                        stringResource(MR.strings.pref_jellyfin_auto_upload_not_admin)
+                    } else {
+                        stringResource(MR.strings.pref_jellyfin_auto_upload_summary)
+                    },
+                    enabled = isLoggedIn && autoSync && isAdmin,
+                ),
+            )
+
+            add(
                 Preference.PreferenceItem.SwitchPreference(
                     preference = downloadPreferences.jellyfinScanAfterSync(),
                     title = stringResource(MR.strings.pref_jellyfin_scan_after_sync),

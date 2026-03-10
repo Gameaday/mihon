@@ -345,6 +345,14 @@
     <string name="pref_jellyfin_scan_after_sync_summary">Request Jellyfin to rescan the library after syncing chapters. Requires admin privileges on the server.</string>
     <string name="pref_jellyfin_not_logged_in">Log in to Jellyfin in Settings → Tracking to enable sync features</string>
     <string name="pref_jellyfin_not_admin_hint">Library scan requires admin privileges. Downloads will still use Jellyfin naming, but a server admin must trigger the scan manually.</string>
+    <string name="pref_jellyfin_upload_scope">Upload scope</string>
+    <string name="pref_jellyfin_upload_scope_summary">Which chapters to include when syncing content to Jellyfin</string>
+    <string name="jellyfin_scope_all">All chapters (skip existing)</string>
+    <string name="jellyfin_scope_read">Read chapters only</string>
+    <string name="jellyfin_scope_downloaded">Downloaded chapters only</string>
+    <string name="pref_jellyfin_auto_upload">Auto-upload after download</string>
+    <string name="pref_jellyfin_auto_upload_summary">Automatically trigger a Jellyfin library scan when downloads complete for linked manga. Ensures new content is immediately discoverable on the server.</string>
+    <string name="pref_jellyfin_auto_upload_not_admin">Auto-upload requires admin privileges to trigger the library scan</string>
 
       <!-- Extension section -->
     <string name="multi_lang">Multi</string>
