@@ -264,7 +264,7 @@ object SettingsDownloadScreen : SearchableSettings {
                     } else {
                         stringResource(MR.strings.pref_jellyfin_scan_after_sync_summary)
                     },
-                    enabled = isLoggedIn && autoSync,
+                    enabled = isLoggedIn && autoSync && isAdmin,
                 ),
             )
         }

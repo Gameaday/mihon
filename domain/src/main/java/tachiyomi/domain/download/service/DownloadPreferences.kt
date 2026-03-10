@@ -43,7 +43,7 @@ class DownloadPreferences(
 
     fun autoSyncToJellyfin() = preferenceStore.getBoolean("auto_sync_to_jellyfin", false)
 
-    fun jellyfinScanAfterSync() = preferenceStore.getBoolean("jellyfin_scan_after_sync", true)
+    fun jellyfinScanAfterSync() = preferenceStore.getBoolean("jellyfin_scan_after_sync", false)
 
     companion object {
         private const val REMOVE_EXCLUDE_CATEGORIES_PREF_KEY = "remove_exclude_categories"
