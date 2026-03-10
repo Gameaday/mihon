@@ -1790,7 +1790,7 @@ class MangaScreenModel(
                 val updatedManga = mangaRepository.getMangaById(mangaId)
                 updateSuccessState { it.copy(manga = updatedManga) }
             } catch (e: Exception) {
-                logcat(LogPriority.DEBUG, e) { "Failed to refresh manga state after unlinking" }
+                logcat(LogPriority.DEBUG, e) { "Failed to reload manga after unlinking authority" }
             }
         }
     }
