@@ -108,7 +108,10 @@ class CoverCache(private val context: Context) {
     }
 
     /**
-     * Removes cached cover files that haven't been accessed within [maxAgeMs].
+     * Removes cached cover files whose [java.io.File.lastModified] timestamp is older
+     * than [maxAgeMs]. This effectively prunes covers that haven't been downloaded or
+     * updated recently, based on their last write time rather than last read/access.
+     *
      * Custom covers are never pruned — only auto-downloaded covers from browsing.
      * Files whose names appear in [protectedNames] are always kept (e.g. covers
      * of favorited manga so offline viewing still looks good after a long break).
@@ -117,7 +120,7 @@ class CoverCache(private val context: Context) {
      * consumed by covers of manga the user is no longer interacting with.
      *
      * @param protectedNames set of filenames (MD5 hashes) to keep regardless of age.
-     * @param maxAgeMs maximum age in milliseconds since last access. Default: 30 days.
+     * @param maxAgeMs maximum age in milliseconds since last modification. Default: 30 days.
      * @return number of files deleted.
      */
     fun pruneOldCovers(
