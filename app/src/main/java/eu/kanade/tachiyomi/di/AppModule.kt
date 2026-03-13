@@ -93,13 +93,17 @@ class AppModule(val app: Application) : InjektModule {
                         // and optimize can be slow on large databases but are safe to
                         // run concurrently under WAL mode.
                         Thread {
-                            // Flush any leftover WAL frames from a previous unclean
-                            // shutdown into the main database file.
-                            setPragma(db, "wal_checkpoint(TRUNCATE)")
-                            // Let SQLite re-analyze tables whose stats are stale,
-                            // keeping query plans optimal as the library grows.
-                            setPragma(db, "optimize")
-                        }.start()
+                            try {
+                                // Flush any leftover WAL frames from a previous unclean
+                                // shutdown into the main database file.
+                                setPragma(db, "wal_checkpoint(TRUNCATE)")
+                                // Let SQLite re-analyze tables whose stats are stale,
+                                // keeping query plans optimal as the library grows.
+                                setPragma(db, "optimize")
+                            } catch (_: Exception) {
+                                // Non-critical maintenance — swallow failures silently.
+                            }
+                        }.apply { name = "db-maintenance" }.start()
                     }
                     private fun setPragma(db: SupportSQLiteDatabase, pragma: String) {
                         val cursor = db.query("PRAGMA $pragma")
