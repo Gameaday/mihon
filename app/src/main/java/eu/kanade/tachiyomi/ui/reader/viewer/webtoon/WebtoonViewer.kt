@@ -265,7 +265,13 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
         val position = adapter.items.indexOf(page)
         if (position != -1) {
             if (config.sliderNavMode == ReaderPreferences.SLIDER_NAV_SMOOTH) {
-                recycler.smoothScrollToPosition(position)
+                // Use a custom smooth scroller that always snaps to START so the
+                // target page aligns to the top, regardless of scroll direction.
+                val scroller = object : androidx.recyclerview.widget.LinearSmoothScroller(recycler.context) {
+                    override fun getVerticalSnapPreference(): Int = SNAP_TO_START
+                }
+                scroller.targetPosition = position
+                layoutManager.startSmoothScroll(scroller)
             } else {
                 layoutManager.scrollToPositionWithOffset(position, 0)
             }

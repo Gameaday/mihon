@@ -1260,6 +1260,8 @@
     <string name="locked_field_status">Status</string>
     <string name="locked_field_genre">Genre</string>
     <string name="locked_field_title">Title</string>
+    <string name="locked_field_cover">Cover</string>
+    <string name="locked_field_content_type">Content type</string>
     <string name="edit_metadata_add_genre">Add genre</string>
     <string name="metadata_locks_lock_all">Lock all</string>
     <string name="metadata_locks_unlock_all">Unlock all</string>

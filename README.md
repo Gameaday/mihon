@@ -28,7 +28,7 @@ Ephyra is built for people who own their content. Whether your collection lives 
 
 ### 📖 Powerful Reading Experience
 - **Multiple reading modes** — right-to-left, left-to-right, vertical scroll, and continuous webtoon modes with configurable tap zones and navigation.
-- **Smooth page transitions** — choose between instant, smooth scroll, or no animation when navigating with the page slider.
+- **Smooth page transitions** — choose between instant jump or smooth scroll when navigating with the page slider.
 - **Smart page combine** — automatically merges short watermark or credit stubs with the preceding page for an uninterrupted reading flow.
 - **Device-adaptive performance** — preload windows and download workers scale based on available RAM, keeping low-end devices responsive and high-end devices aggressive.
 - **Bandwidth-isolated preloading** — adjacent chapters download in the background without competing with your active chapter, with opportunistic cross-chapter prefetch and automatic retry on failures.

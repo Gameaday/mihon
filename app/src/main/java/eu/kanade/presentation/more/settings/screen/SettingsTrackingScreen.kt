@@ -430,7 +430,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                     modifier = Modifier.padding(bottom = 8.dp),
                                 )
                                 tachiyomi.domain.manga.model.LockedField.ALL_FIELDS.forEach { field ->
-                                    val fieldLabel = tachiyomi.domain.manga.model.LockedField.label(field)
+                                    val fieldLabel = lockedFieldLabel(field)
                                     val prefersContent = tachiyomi.domain.manga.model.LockedField.isLocked(
                                         csPriorityMask,
                                         field,
@@ -1114,3 +1114,18 @@ private data class ImportConfirmDialog(
 private data class JellyfinLogin(
     val tracker: Tracker,
 )
+
+/** Returns a localized label for a [LockedField] constant. */
+@Composable
+@ReadOnlyComposable
+private fun lockedFieldLabel(field: Long): String = when (field) {
+    tachiyomi.domain.manga.model.LockedField.TITLE -> stringResource(MR.strings.locked_field_title)
+    tachiyomi.domain.manga.model.LockedField.DESCRIPTION -> stringResource(MR.strings.locked_field_description)
+    tachiyomi.domain.manga.model.LockedField.AUTHOR -> stringResource(MR.strings.locked_field_author)
+    tachiyomi.domain.manga.model.LockedField.ARTIST -> stringResource(MR.strings.locked_field_artist)
+    tachiyomi.domain.manga.model.LockedField.COVER -> stringResource(MR.strings.locked_field_cover)
+    tachiyomi.domain.manga.model.LockedField.STATUS -> stringResource(MR.strings.locked_field_status)
+    tachiyomi.domain.manga.model.LockedField.CONTENT_TYPE -> stringResource(MR.strings.locked_field_content_type)
+    tachiyomi.domain.manga.model.LockedField.GENRE -> stringResource(MR.strings.locked_field_genre)
+    else -> ""
+}
