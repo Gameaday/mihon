@@ -66,6 +66,8 @@ import uy.kohesive.injekt.api.get
 import java.io.File
 import java.io.IOException
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.min
 
 /**
  * This class is the one in charge of downloading chapters.
@@ -418,14 +420,10 @@ class Downloader(
                 return
             }
 
-            // Remove known scanlation credit / intro / outro pages before archiving.
-            // Runs after the success check so it doesn't interfere with page-count verification.
-            filterBlockedPages(tmpDir)
-
-            // Merge consecutive stub pages (narrow watermark strips) into the preceding page
-            // using the same smart-combine logic as the reader.  Runs after the success check
-            // so the file count verification is done on the original (unmerged) page set.
-            mergeStubPagesInDownload(tmpDir)
+            // Unified post-processing: blocklist filtering + stub-page merging in a single
+            // ordered pass. Lists files once, applies position-aware credit page detection
+            // with aspect-ratio pre-filter, then merges consecutive stub pages.
+            postProcessPages(tmpDir)
 
             createComicInfoFile(
                 tmpDir,
@@ -617,43 +615,105 @@ class Downloader(
     }
 
     /**
-     * Removes known scanlation group credit / intro / outro pages from [tmpDir] using
-     * perceptual hash (dHash) matching against [DownloadPreferences.blockedPageHashes].
+     * Unified post-download processing pass that runs **after** page-count verification
+     * and **before** ComicInfo creation / CBZ archiving.  Combines two concerns into one
+     * ordered pipeline so that the temporary directory is listed only once:
      *
-     * This runs **after** the download-success verification and **before** stub-page merging
-     * and CBZ archiving, so:
-     * - The full page set is already on disk and verified.
-     * - Deleted pages simply don't make it into the final chapter directory / archive.
-     * - The reader never sees them.
+     * 1. **Credit-page filtering** — removes known scanlation intro/outro/credits pages by
+     *    comparing their perceptual hash (dHash) against
+     *    [DownloadPreferences.blockedPageHashes].  Uses two optimizations to avoid
+     *    computing dHash for every page:
+     *    • *Position-aware*: credit pages are almost always at chapter boundaries, so only
+     *      the first and last [BOUNDARY_PAGES] pages are checked by default.
+     *    • *Aspect-ratio pre-filter*: the "dominant" page dimensions (median width × height)
+     *      are computed from headers only; pages whose aspect ratio is within 5% of the
+     *      dominant are assumed to be real content and skipped (credit pages often have a
+     *      visually different aspect ratio, e.g. a landscape banner in a portrait manga).
      *
-     * dHash is robust to JPEG recompression, rescaling, and minor colour shifts, so a
-     * single blocklist entry covers all visual variants of the same credit page.  When the
-     * blocklist is empty the function returns immediately (zero overhead).
+     * 2. **Stub-page merging** — merges narrow watermark strips into the preceding page
+     *    when [ReaderPreferences.smartCombinePaged] is enabled. Uses header-only decoding
+     *    for the stub check, so the non-stub case is inexpensive.
      *
-     * @param tmpDir the temporary chapter directory containing downloaded page images.
+     * @param tmpDir the temporary chapter directory.
      */
-    private fun filterBlockedPages(tmpDir: UniFile) {
+    private fun postProcessPages(tmpDir: UniFile) {
+        // ── Phase 1: Credit-page filtering ──────────────────────────────
         val blockedHexes = downloadPreferences.blockedPageHashes().get()
-        if (blockedHexes.isEmpty()) return
-
-        val blockedDHashes = blockedHexes.mapNotNull { hex ->
-            runCatching { ImageUtil.hexToDHash(hex) }.getOrNull()
+        if (blockedHexes.isNotEmpty()) {
+            val blockedDHashes = blockedHexes.mapNotNull { hex ->
+                runCatching { ImageUtil.hexToDHash(hex) }.getOrNull()
+            }
+            if (blockedDHashes.isNotEmpty()) {
+                filterBlockedPagesImpl(tmpDir, blockedDHashes)
+            }
         }
-        if (blockedDHashes.isEmpty()) return
 
+        // ── Phase 2: Stub-page merging ──────────────────────────────────
+        if (readerPreferences.smartCombinePaged().get()) {
+            mergeStubPagesImpl(tmpDir)
+        }
+    }
+
+    /**
+     * Removes credit/intro/outro pages using position-aware, aspect-ratio-gated dHash matching.
+     *
+     * Only pages near chapter boundaries (first/last [BOUNDARY_PAGES]) are candidates.
+     * Among those, pages whose aspect ratio closely matches the chapter's dominant aspect ratio
+     * are assumed to be real content and skipped — the expensive dHash decode is reserved for
+     * pages that *look* structurally different from the majority.
+     */
+    private fun filterBlockedPagesImpl(tmpDir: UniFile, blockedDHashes: List<Long>) {
         val threshold = DownloadPreferences.BLOCKED_PAGE_DHASH_THRESHOLD
 
-        val pageFiles = tmpDir.listFiles()
+        val allFiles = tmpDir.listFiles()
             ?.filter { file ->
                 val name = file.name.orEmpty()
                 !name.endsWith(".tmp") &&
                     name !in listOf(COMIC_INFO_FILE, NOMEDIA_FILE) &&
                     ImageUtil.isImage(name)
             }
+            ?.sortedBy { it.name }
             ?: return
 
-        for (file in pageFiles) {
+        if (allFiles.isEmpty()) return
+
+        // Determine the dominant (median) aspect ratio from header-only dimension reads.
+        // Cache per-file aspect ratios so we don't re-read headers in the candidate loop.
+        val fileAspectRatios = FloatArray(allFiles.size) { -1f }
+        val validRatios = mutableListOf<Float>()
+        for ((idx, file) in allFiles.withIndex()) {
             try {
+                val dims = file.openInputStream().use { ImageUtil.getImageDimensions(it) }
+                if (dims != null && dims.second > 0) {
+                    val ar = dims.first.toFloat() / dims.second
+                    fileAspectRatios[idx] = ar
+                    validRatios.add(ar)
+                }
+            } catch (_: Exception) { /* skip */ }
+        }
+        val dominantAR = if (validRatios.isNotEmpty()) {
+            validRatios.sort()
+            validRatios[validRatios.size / 2]
+        } else {
+            null
+        }
+
+        // Select candidate pages: first/last BOUNDARY_PAGES of the chapter
+        val candidateIndices = buildSet {
+            for (i in 0 until min(BOUNDARY_PAGES, allFiles.size)) add(i)
+            for (i in (allFiles.size - BOUNDARY_PAGES).coerceAtLeast(0) until allFiles.size) add(i)
+        }
+
+        for (idx in candidateIndices) {
+            val file = allFiles[idx]
+            try {
+                // Aspect-ratio pre-filter: skip pages matching the dominant ratio within 5 %
+                // Uses cached ratio from the dimension scan above — no additional I/O.
+                if (dominantAR != null && fileAspectRatios[idx] > 0f) {
+                    if (abs(fileAspectRatios[idx] - dominantAR) / dominantAR <= ASPECT_RATIO_TOLERANCE) continue
+                }
+
+                // Expensive: compute dHash (uses inSampleSize for reduced-resolution decode)
                 val hash = file.openInputStream().use { ImageUtil.computeDHash(it) } ?: continue
                 val matched = blockedDHashes.any { blocked ->
                     ImageUtil.dHashDistance(hash, blocked) <= threshold
@@ -667,27 +727,17 @@ class Downloader(
                 }
             } catch (e: Exception) {
                 logcat(LogPriority.WARN, e) {
-                    "Failed to compute dHash for ${file.name}, skipping blocklist check"
+                    "Failed to process ${file.name} for blocklist check, skipping"
                 }
             }
         }
     }
 
     /**
-     * After all pages are downloaded and verified, merges consecutive stub pages (narrow
-     * watermark strips) into the preceding page using the same smart-combine logic as the
-     * reader. The merged result uses the user's preferred [ImageFormat]; the
-     * stub file is deleted so the saved chapter has the correct final page count immediately.
-     *
-     * Only runs when [ReaderPreferences.smartCombinePaged] is enabled. Stub detection uses
-     * [ImageUtil.isSmallPage] with header-only decoding (cheap — reads only image dimensions)
-     * so the non-stub case (the vast majority of consecutive page pairs) is inexpensive.
-     *
-     * @param tmpDir the temporary directory where the downloaded chapter pages are stored.
+     * Merges consecutive stub pages (narrow watermark strips) into the preceding page
+     * using the same smart-combine logic as the reader.
      */
-    private fun mergeStubPagesInDownload(tmpDir: UniFile) {
-        if (!readerPreferences.smartCombinePaged().get()) return
-
+    private fun mergeStubPagesImpl(tmpDir: UniFile) {
         val (encoder, ext) = derivedImageEncoder()
 
         // Build a sorted mutable list of primary page image files, excluding:
@@ -997,5 +1047,11 @@ class Downloader(
 
         // Arbitrary minimum required space to start a download: 200 MB
         const val MIN_DISK_SPACE = 200L * 1024 * 1024
+
+        /** Number of pages at each end of the chapter to check for credit pages. */
+        private const val BOUNDARY_PAGES = 3
+
+        /** Aspect-ratio tolerance for credit page pre-filter (5 %). */
+        private const val ASPECT_RATIO_TOLERANCE = 0.05f
     }
 }

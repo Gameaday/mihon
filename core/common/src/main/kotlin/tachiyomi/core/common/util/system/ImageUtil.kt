@@ -833,12 +833,35 @@ object ImageUtil {
      * recompression, rescaling, and minor colour shifts** — ideal for
      * recognising reused scanlation credit / intro / outro pages.
      *
+     * Uses [BitmapFactory.Options.inSampleSize] to decode only a coarse
+     * version of the image before scaling to 9×8, avoiding a full-resolution
+     * bitmap allocation for large images.
+     *
      * @return The dHash as a [Long], or `null` if the image cannot be decoded.
      */
     fun computeDHash(imageStream: InputStream): Long? {
-        val bitmap = BitmapFactory.decodeStream(imageStream) ?: return null
-        val scaled = Bitmap.createScaledBitmap(bitmap, DHASH_WIDTH, DHASH_HEIGHT, true)
-        if (scaled !== bitmap) bitmap.recycle()
+        // Wrap in a BufferedInputStream so we can mark/reset for the two-pass decode.
+        // Pass 1: header-only bounds check to compute inSampleSize.
+        // Pass 2: coarse decode at reduced resolution.
+        val buffered = if (imageStream.markSupported()) imageStream else imageStream.buffered()
+        buffered.mark(Int.MAX_VALUE)
+
+        val boundsOpts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeStream(buffered, null, boundsOpts)
+        if (boundsOpts.outWidth <= 0 || boundsOpts.outHeight <= 0) return null
+
+        // Compute the smallest power-of-2 sample size that still yields ≥ 9×8 pixels.
+        val sampleSize = min(boundsOpts.outWidth / DHASH_WIDTH, boundsOpts.outHeight / DHASH_HEIGHT)
+            .coerceAtLeast(1)
+
+        buffered.reset()
+
+        val decodeOpts = BitmapFactory.Options().apply {
+            inSampleSize = Integer.highestOneBit(sampleSize)
+        }
+        val coarse = BitmapFactory.decodeStream(buffered, null, decodeOpts) ?: return null
+        val scaled = Bitmap.createScaledBitmap(coarse, DHASH_WIDTH, DHASH_HEIGHT, true)
+        if (scaled !== coarse) coarse.recycle()
 
         var hash = 0L
         for (y in 0 until DHASH_HEIGHT) {
@@ -852,6 +875,17 @@ object ImageUtil {
         }
         scaled.recycle()
         return hash
+    }
+
+    /**
+     * Returns the image dimensions *without* decoding pixel data. Uses header-only decode.
+     *
+     * @return Pair(width, height), or `null` if the image cannot be decoded.
+     */
+    fun getImageDimensions(imageStream: InputStream): Pair<Int, Int>? {
+        val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeStream(imageStream, null, opts)
+        return if (opts.outWidth > 0 && opts.outHeight > 0) opts.outWidth to opts.outHeight else null
     }
 
     /**
