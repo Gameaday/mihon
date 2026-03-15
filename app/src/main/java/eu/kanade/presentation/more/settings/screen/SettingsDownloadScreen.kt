@@ -280,19 +280,19 @@ object SettingsDownloadScreen : SearchableSettings {
             )
         }
 
-        if (hashToRemove != null) {
+        val currentHashToRemove = hashToRemove
+        if (currentHashToRemove != null) {
             AlertDialog(
                 onDismissRequest = { hashToRemove = null },
                 text = {
-                    Text(stringResource(MR.strings.pref_remove_blocked_page_confirm, hashToRemove!!))
+                    Text(stringResource(MR.strings.pref_remove_blocked_page_confirm, currentHashToRemove))
                 },
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            val hex = hashToRemove!!
                             val pref = downloadPreferences.blockedPageHashes()
                             val current = pref.get().toMutableSet()
-                            current.remove(hex)
+                            current.remove(currentHashToRemove)
                             pref.set(current)
                             hashToRemove = null
                             context.toast(MR.strings.page_unblocked)

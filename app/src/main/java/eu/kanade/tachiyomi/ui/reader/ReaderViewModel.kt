@@ -1090,11 +1090,15 @@ class ReaderViewModel @JvmOverloads constructor(
      * Used to undo an accidental block or to selectively unblock a page.
      */
     fun unblockPage(hex: String) {
-        val pref = downloadPreferences.blockedPageHashes()
-        val current = pref.get().toMutableSet()
-        if (current.remove(hex)) {
-            pref.set(current)
-            logcat(LogPriority.INFO) { "Unblocked page dHash=$hex" }
+        viewModelScope.launchNonCancellable {
+            withIOContext {
+                val pref = downloadPreferences.blockedPageHashes()
+                val current = pref.get().toMutableSet()
+                if (current.remove(hex)) {
+                    pref.set(current)
+                    logcat(LogPriority.INFO) { "Unblocked page dHash=$hex" }
+                }
+            }
         }
     }
 
