@@ -345,6 +345,13 @@ class ReaderViewModel @JvmOverloads constructor(
     ): ViewerChapters {
         loader.loadChapter(chapter)
 
+        // When the pre-processor blocks a page during online loading (after the image
+        // arrives), the adapter must rebuild its item list to exclude the newly hidden
+        // page. Wire up the callback so the viewer refreshes automatically.
+        chapter.pageLoader?.onPageFiltered = {
+            eventChannel.trySend(Event.ReloadViewerChapters)
+        }
+
         // Queue every page at the lowest background priority so the smart-combine pre-scan
         // can process the entire chapter without waiting for the user to scroll to each page.
         // Priority is kept below the nearby-page preload (0) and current-page load (1) so
