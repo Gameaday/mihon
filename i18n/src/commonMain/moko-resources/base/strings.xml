@@ -568,21 +568,21 @@
     <!-- Page filtering -->
     <string name="action_block_page">Block page</string>
     <string name="action_unblock_page">Unblock page</string>
-    <string name="confirm_block_page">Block this page from all future downloads? Its visual fingerprint will be matched even if the image is recompressed or slightly resized.</string>
-    <string name="confirm_unblock_page">Unblock this page? It will no longer be filtered from future downloads.</string>
-    <string name="page_blocked">Page blocked — will be removed from future downloads</string>
+    <string name="confirm_block_page">This page will be removed from all future downloads. It will be matched even if the image is recompressed or resized.</string>
+    <string name="confirm_unblock_page">This page will no longer be removed from future downloads.</string>
+    <string name="page_blocked">Page blocked</string>
     <string name="page_unblocked">Page unblocked</string>
-    <string name="page_block_error">Failed to compute page fingerprint</string>
+    <string name="page_block_error">Could not block page</string>
     <string name="pref_page_filter_group">Page filtering</string>
     <string name="pref_blocked_pages">Blocked pages</string>
-    <string name="pref_blocked_pages_summary">%d page fingerprint(s) registered</string>
+    <string name="pref_blocked_pages_summary">%d blocked page(s)</string>
     <string name="pref_blocked_pages_empty">No blocked pages</string>
     <string name="pref_manage_blocked_pages">Manage blocked pages</string>
-    <string name="pref_manage_blocked_pages_subtitle">Tap to view and remove individual entries</string>
-    <string name="pref_remove_blocked_page_confirm">Remove blocked page fingerprint %s? This page will no longer be filtered from future downloads.</string>
+    <string name="pref_manage_blocked_pages_subtitle">View and remove individual entries</string>
+    <string name="pref_remove_blocked_page_confirm">Remove this blocked page entry? It will no longer be filtered from downloads.</string>
     <string name="pref_clear_blocked_pages">Clear all blocked pages</string>
-    <string name="pref_clear_blocked_pages_confirm">Remove all %d blocked page fingerprints? Blocked pages will no longer be filtered from future downloads.</string>
-    <string name="blocked_pages_cleared">Blocked pages cleared</string>
+    <string name="pref_clear_blocked_pages_confirm">Remove all %d blocked pages? They will no longer be filtered from downloads.</string>
+    <string name="blocked_pages_cleared">All blocked pages cleared</string>
 
     <!-- Tracking section -->
     <string name="tracking_guide">Tracking guide</string>

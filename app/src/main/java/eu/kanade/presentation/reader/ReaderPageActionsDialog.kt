@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.components.AdaptiveSheet
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.ActionButton
@@ -44,7 +43,6 @@ fun ReaderPageActionsDialog(
     var matchingHash by remember { mutableStateOf<String?>(null) }
     var checkComplete by remember { mutableStateOf(false) }
 
-    // Check if the page is already blocked when the dialog opens
     LaunchedEffect(Unit) {
         matchingHash = findMatchingBlockedHash()
         checkComplete = true
@@ -52,7 +50,7 @@ fun ReaderPageActionsDialog(
 
     AdaptiveSheet(onDismissRequest = onDismissRequest) {
         Row(
-            modifier = Modifier.padding(vertical = 16.dp),
+            modifier = Modifier.padding(vertical = MaterialTheme.padding.medium),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
         ) {
             ActionButton(
@@ -168,6 +166,10 @@ private fun BlockPageDialog(
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(MR.strings.action_block_page))
+        },
         text = {
             Text(stringResource(MR.strings.confirm_block_page))
         },
@@ -181,7 +183,6 @@ private fun BlockPageDialog(
                 Text(stringResource(MR.strings.action_cancel))
             }
         },
-        onDismissRequest = onDismiss,
     )
 }
 
@@ -191,6 +192,10 @@ private fun UnblockPageDialog(
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(MR.strings.action_unblock_page))
+        },
         text = {
             Text(stringResource(MR.strings.confirm_unblock_page))
         },
@@ -204,6 +209,5 @@ private fun UnblockPageDialog(
                 Text(stringResource(MR.strings.action_cancel))
             }
         },
-        onDismissRequest = onDismiss,
     )
 }
