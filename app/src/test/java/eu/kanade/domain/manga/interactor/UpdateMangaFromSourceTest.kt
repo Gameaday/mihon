@@ -290,7 +290,7 @@ class UpdateMangaFromSourceTest {
         coVerify { mangaRepository.update(capture(updateSlot)) }
         val update = updateSlot.captured
         update.thumbnailUrl shouldBe "https://example.com/new-cover.jpg"
-        update.coverLastModified shouldBe update.coverLastModified // non-null
+        (update.coverLastModified != null) shouldBe true
     }
 
     @Test
