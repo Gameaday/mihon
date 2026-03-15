@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Photo
 import androidx.compose.material.icons.outlined.Save
@@ -31,8 +32,10 @@ fun ReaderPageActionsDialog(
     onSetAsCover: () -> Unit,
     onShare: (Boolean) -> Unit,
     onSave: () -> Unit,
+    onBlockPage: () -> Unit,
 ) {
     var showSetCoverDialog by remember { mutableStateOf(false) }
+    var showBlockPageDialog by remember { mutableStateOf(false) }
 
     AdaptiveSheet(onDismissRequest = onDismissRequest) {
         Row(
@@ -72,6 +75,12 @@ fun ReaderPageActionsDialog(
                     onDismissRequest()
                 },
             )
+            ActionButton(
+                modifier = Modifier.weight(1f),
+                title = stringResource(MR.strings.action_block_page),
+                icon = Icons.Outlined.Block,
+                onClick = { showBlockPageDialog = true },
+            )
         }
     }
 
@@ -84,6 +93,17 @@ fun ReaderPageActionsDialog(
             onDismiss = { showSetCoverDialog = false },
         )
     }
+
+    if (showBlockPageDialog) {
+        BlockPageDialog(
+            onConfirm = {
+                onBlockPage()
+                showBlockPageDialog = false
+                onDismissRequest()
+            },
+            onDismiss = { showBlockPageDialog = false },
+        )
+    }
 }
 
 @Composable
@@ -94,6 +114,29 @@ private fun SetCoverDialog(
     AlertDialog(
         text = {
             Text(stringResource(MR.strings.confirm_set_image_as_cover))
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(MR.strings.action_ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(MR.strings.action_cancel))
+            }
+        },
+        onDismissRequest = onDismiss,
+    )
+}
+
+@Composable
+private fun BlockPageDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        text = {
+            Text(stringResource(MR.strings.confirm_block_page))
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {

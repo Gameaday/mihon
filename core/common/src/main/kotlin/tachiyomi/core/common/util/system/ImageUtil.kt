@@ -833,33 +833,19 @@ object ImageUtil {
      * recompression, rescaling, and minor colour shifts** — ideal for
      * recognising reused scanlation credit / intro / outro pages.
      *
-     * Uses [BitmapFactory.Options.inSampleSize] to decode only a coarse
-     * version of the image before scaling to 9×8, avoiding a full-resolution
-     * bitmap allocation for large images.
+     * Uses [BitmapFactory.Options.inSampleSize] with a fixed conservative value
+     * to decode only a coarse version of the image in a single pass, avoiding both
+     * full-resolution bitmap allocation and the need for `mark()/reset()`.
      *
      * @return The dHash as a [Long], or `null` if the image cannot be decoded.
      */
     fun computeDHash(imageStream: InputStream): Long? {
-        // Wrap in a BufferedInputStream so we can mark/reset for the two-pass decode.
-        // Pass 1: header-only bounds check to compute inSampleSize.
-        // Pass 2: coarse decode at reduced resolution.
-        val buffered = if (imageStream.markSupported()) imageStream else imageStream.buffered()
-        buffered.mark(Int.MAX_VALUE)
-
-        val boundsOpts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeStream(buffered, null, boundsOpts)
-        if (boundsOpts.outWidth <= 0 || boundsOpts.outHeight <= 0) return null
-
-        // Compute the smallest power-of-2 sample size that still yields ≥ 9×8 pixels.
-        val sampleSize = min(boundsOpts.outWidth / DHASH_WIDTH, boundsOpts.outHeight / DHASH_HEIGHT)
-            .coerceAtLeast(1)
-
-        buffered.reset()
-
-        val decodeOpts = BitmapFactory.Options().apply {
-            inSampleSize = Integer.highestOneBit(sampleSize)
-        }
-        val coarse = BitmapFactory.decodeStream(buffered, null, decodeOpts) ?: return null
+        // Single-pass decode with a fixed conservative inSampleSize.
+        // Manga pages are typically ≥800×1000, so inSampleSize=32 yields ≥25×31 –
+        // well above the 9×8 target.  For small images BitmapFactory silently
+        // caps the subsample so we never get a 0×0 result.
+        val decodeOpts = BitmapFactory.Options().apply { inSampleSize = DHASH_SAMPLE_SIZE }
+        val coarse = BitmapFactory.decodeStream(imageStream, null, decodeOpts) ?: return null
         val scaled = Bitmap.createScaledBitmap(coarse, DHASH_WIDTH, DHASH_HEIGHT, true)
         if (scaled !== coarse) coarse.recycle()
 
@@ -920,6 +906,13 @@ object ImageUtil {
 
     /** dHash thumbnail height (8 rows → 64-bit hash). */
     private const val DHASH_HEIGHT = 8
+
+    /**
+     * Fixed subsample factor for the single-pass dHash decode.
+     * At 32×, a typical 2000×3000 page decodes as ~62×93 — well above the 9×8 target.
+     * For images smaller than ~288×256, BitmapFactory silently caps the subsample.
+     */
+    private const val DHASH_SAMPLE_SIZE = 32
 }
 
 val getDisplayMaxHeightInPx: Int

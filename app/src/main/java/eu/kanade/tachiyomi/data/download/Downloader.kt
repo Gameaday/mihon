@@ -617,7 +617,7 @@ class Downloader(
     /**
      * Unified post-download processing pass that runs **after** page-count verification
      * and **before** ComicInfo creation / CBZ archiving.  Combines two concerns into one
-     * ordered pipeline so that the temporary directory is listed only once:
+     * ordered pipeline:
      *
      * 1. **Credit-page filtering** — removes known scanlation intro/outro/credits pages by
      *    comparing their perceptual hash (dHash) against
@@ -625,9 +625,9 @@ class Downloader(
      *    computing dHash for every page:
      *    • *Position-aware*: credit pages are almost always at chapter boundaries, so only
      *      the first and last [BOUNDARY_PAGES] pages are checked by default.
-     *    • *Aspect-ratio pre-filter*: the "dominant" page dimensions (median width × height)
-     *      are computed from headers only; pages whose aspect ratio is within 5% of the
-     *      dominant are assumed to be real content and skipped (credit pages often have a
+     *    • *Aspect-ratio pre-filter*: the dominant (median) aspect ratio is computed from
+     *      header-only reads; pages whose aspect ratio is within 5% of the dominant are
+     *      assumed to be real content and skipped (credit pages often have a
      *      visually different aspect ratio, e.g. a landscape banner in a portrait manga).
      *
      * 2. **Stub-page merging** — merges narrow watermark strips into the preceding page

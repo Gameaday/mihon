@@ -235,6 +235,9 @@ class ReaderActivity : BaseActivity() {
                     is ReaderViewModel.Event.SetCoverResult -> {
                         onSetAsCoverResult(event.result)
                     }
+                    is ReaderViewModel.Event.BlockPageResult -> {
+                        onBlockPageResult(event.result)
+                    }
                 }
             }
             .launchIn(lifecycleScope)
@@ -320,6 +323,7 @@ class ReaderActivity : BaseActivity() {
                     onSetAsCover = viewModel::setAsCover,
                     onShare = viewModel::shareImage,
                     onSave = viewModel::saveImage,
+                    onBlockPage = viewModel::blockPage,
                 )
             }
             null -> {}
@@ -753,6 +757,15 @@ class ReaderActivity : BaseActivity() {
                 Success -> MR.strings.cover_updated
                 AddToLibraryFirst -> MR.strings.notification_first_add_to_library
                 Error -> MR.strings.notification_cover_update_failed
+            },
+        )
+    }
+
+    private fun onBlockPageResult(result: ReaderViewModel.BlockPageResult) {
+        toast(
+            when (result) {
+                ReaderViewModel.BlockPageResult.Success -> MR.strings.page_blocked
+                ReaderViewModel.BlockPageResult.Error -> MR.strings.page_block_error
             },
         )
     }

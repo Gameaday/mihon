@@ -90,6 +90,7 @@ object SettingsDownloadScreen : SearchableSettings {
                 allCategories = allCategories,
             ),
             getDownloadAheadGroup(downloadPreferences = downloadPreferences),
+            getPageFilterGroup(downloadPreferences = downloadPreferences),
             getJellyfinSyncGroup(downloadPreferences = downloadPreferences),
         )
     }
@@ -224,6 +225,63 @@ object SettingsDownloadScreen : SearchableSettings {
                     title = stringResource(MR.strings.auto_download_while_reading),
                 ),
                 Preference.PreferenceItem.InfoPreference(stringResource(MR.strings.download_ahead_info)),
+            ),
+        )
+    }
+
+    @Composable
+    private fun getPageFilterGroup(
+        downloadPreferences: DownloadPreferences,
+    ): Preference.PreferenceGroup {
+        val context = LocalContext.current
+        val blockedHashes by downloadPreferences.blockedPageHashes().collectAsState()
+        val count = blockedHashes.size
+        var showClearDialog by rememberSaveable { mutableStateOf(false) }
+
+        if (showClearDialog && count > 0) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showClearDialog = false },
+                text = {
+                    androidx.compose.material3.Text(
+                        stringResource(MR.strings.pref_clear_blocked_pages_confirm, count),
+                    )
+                },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = {
+                            downloadPreferences.blockedPageHashes().set(emptySet())
+                            showClearDialog = false
+                            context.toast(MR.strings.blocked_pages_cleared)
+                        },
+                    ) {
+                        androidx.compose.material3.Text(stringResource(MR.strings.action_ok))
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(onClick = { showClearDialog = false }) {
+                        androidx.compose.material3.Text(stringResource(MR.strings.action_cancel))
+                    }
+                },
+            )
+        }
+
+        return Preference.PreferenceGroup(
+            title = stringResource(MR.strings.pref_page_filter_group),
+            preferenceItems = persistentListOf(
+                Preference.PreferenceItem.TextPreference(
+                    title = stringResource(MR.strings.pref_blocked_pages),
+                    subtitle = if (count > 0) {
+                        stringResource(MR.strings.pref_blocked_pages_summary, count)
+                    } else {
+                        stringResource(MR.strings.pref_blocked_pages_empty)
+                    },
+                    onClick = null,
+                ),
+                Preference.PreferenceItem.TextPreference(
+                    title = stringResource(MR.strings.pref_clear_blocked_pages),
+                    enabled = count > 0,
+                    onClick = { showClearDialog = true },
+                ),
             ),
         )
     }

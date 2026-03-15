@@ -60,6 +60,7 @@ import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.core.common.util.lang.launchNonCancellable
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.lang.withUIContext
+import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.chapter.interactor.UpdateChapter
@@ -1053,9 +1054,43 @@ class ReaderViewModel @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Computes the perceptual hash (dHash) of the selected page and adds it to the
+     * blocked-pages preference set.  Future downloads will silently skip any page
+     * whose dHash is within the configured Hamming distance threshold.
+     */
+    fun blockPage() {
+        val page = (state.value.dialog as? Dialog.PageActions)?.page
+        if (page?.status != Page.State.Ready) return
+
+        viewModelScope.launchNonCancellable {
+            val result = try {
+                val stream = page.stream ?: error("No page stream")
+                val hash = withIOContext { stream().use { ImageUtil.computeDHash(it) } }
+                    ?: error("Could not compute dHash")
+                val hex = ImageUtil.dHashToHex(hash)
+                val pref = downloadPreferences.blockedPageHashes()
+                val current = pref.get().toMutableSet()
+                current.add(hex)
+                pref.set(current)
+                logcat(LogPriority.INFO) { "Blocked page dHash=$hex" }
+                BlockPageResult.Success
+            } catch (e: Exception) {
+                logcat(LogPriority.ERROR, e) { "Failed to block page" }
+                BlockPageResult.Error
+            }
+            eventChannel.send(Event.BlockPageResult(result))
+        }
+    }
+
     enum class SetAsCoverResult {
         Success,
         AddToLibraryFirst,
+        Error,
+    }
+
+    enum class BlockPageResult {
+        Success,
         Error,
     }
 
@@ -1142,6 +1177,7 @@ class ReaderViewModel @JvmOverloads constructor(
         data object PageChanged : Event
         data class SetOrientation(val orientation: Int) : Event
         data class SetCoverResult(val result: SetAsCoverResult) : Event
+        data class BlockPageResult(val result: ReaderViewModel.BlockPageResult) : Event
 
         data class SavedImage(val result: SaveImageResult) : Event
         data class ShareImage(val uri: Uri, val page: ReaderPage) : Event
