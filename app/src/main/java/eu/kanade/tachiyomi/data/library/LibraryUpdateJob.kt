@@ -501,6 +501,8 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         // Refresh canonical metadata from the authoritative tracker source.
         // This captures updates like series status changes, new descriptions, and cover art
         // from the canonical source (MAL/AniList/MangaUpdates). Throttled to every 7 days.
+        // Re-read the manga from DB so the authority refresh sees the latest values
+        // (after the content source update) and avoids stale comparisons.
         if (autoUpdateMetadata && manga.canonicalId != null) {
             val lastUpdate = manga.lastUpdate
             val daysSinceUpdate = if (lastUpdate > 0) {
@@ -512,7 +514,8 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
             }
             if (daysSinceUpdate >= METADATA_REFRESH_INTERVAL_DAYS) {
                 try {
-                    refreshCanonicalMetadata.await(manga)
+                    val freshManga = getManga.await(manga.id) ?: manga
+                    refreshCanonicalMetadata.await(freshManga)
                 } catch (e: Exception) {
                     logcat(LogPriority.DEBUG, e) {
                         "Canonical metadata refresh failed for ${manga.title}"
