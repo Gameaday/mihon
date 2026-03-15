@@ -119,15 +119,17 @@ class UpdateManga(
             remoteManga.description == localManga.description -> null
             else -> remoteManga.description
         }
+        val remoteGenres = remoteManga.getGenres()
         val genre = when {
             shouldPreserve(LockedField.GENRE, !localManga.genre.isNullOrEmpty()) -> null
-            remoteManga.getGenres() == localManga.genre -> null
-            else -> remoteManga.getGenres()
+            remoteGenres == localManga.genre -> null
+            else -> remoteGenres
         }
+        val remoteStatus = remoteManga.status.toLong()
         val status = when {
             shouldPreserve(LockedField.STATUS, localManga.status != 0L) -> null
-            remoteManga.status.toLong() == localManga.status -> null
-            else -> remoteManga.status.toLong()
+            remoteStatus == localManga.status -> null
+            else -> remoteStatus
         }
         val updateStrategy = remoteManga.update_strategy.takeIf { it != localManga.updateStrategy }
         val initialized = true.takeIf { !localManga.initialized }

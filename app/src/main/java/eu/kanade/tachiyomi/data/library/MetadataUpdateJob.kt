@@ -117,16 +117,12 @@ class MetadataUpdateJob(private val context: Context, workerParams: WorkerParame
                                 ) {
                                     try {
                                         val networkManga = source.getMangaDetails(manga.toSManga())
-                                        try {
-                                            updateManga.awaitUpdateFromSource(
-                                                manga,
-                                                networkManga,
-                                                manualFetch = true,
-                                                coverCache = coverCache,
-                                            )
-                                        } catch (e: Exception) {
-                                            logcat(LogPriority.ERROR) { "Manga doesn't exist anymore" }
-                                        }
+                                        updateManga.awaitUpdateFromSource(
+                                            manga,
+                                            networkManga,
+                                            manualFetch = true,
+                                            coverCache = coverCache,
+                                        )
                                     } catch (e: Throwable) {
                                         // Ignore errors and continue
                                         logcat(LogPriority.ERROR, e)
