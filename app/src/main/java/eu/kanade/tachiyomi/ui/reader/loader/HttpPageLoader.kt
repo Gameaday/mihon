@@ -434,10 +434,16 @@ internal class HttpPageLoader(
                 page.stream = { chapterCache.getImageFile(imageUrl).inputStream() }
 
                 // Run pre-processor check on boundary pages. If the page matches a
-                // blocked hash, it is marked and the viewer is notified to refresh.
+                // blocked hash, it is marked hidden and the viewer is notified to
+                // rebuild its adapter list *without* this page. Crucially, we must
+                // NOT transition to Ready for blocked pages — doing so would cause
+                // the page holder's statusFlow collector to call setImage() and
+                // briefly render the blocked content before the adapter rebuild
+                // removes the holder.
                 val totalPages = chapter.pages?.size ?: 0
                 if (preProcessor?.checkPageOnLoad(page, totalPages) == true) {
                     onPageFiltered?.invoke()
+                    return
                 }
 
                 page.status = Page.State.Ready

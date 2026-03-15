@@ -191,6 +191,11 @@ class WebtoonPageHolder(
      *   Coil-based decode in webtoon mode.
      */
     private suspend fun setImage() {
+        // Defense-in-depth: if the page was marked hidden by the pre-processor
+        // (blocked by filter or absorbed by smart combine), skip rendering.
+        // The adapter rebuild will remove this holder shortly.
+        if (page?.isHidden == true) return
+
         progressIndicator.setProgress(0)
 
         val streamFn = page?.stream ?: return

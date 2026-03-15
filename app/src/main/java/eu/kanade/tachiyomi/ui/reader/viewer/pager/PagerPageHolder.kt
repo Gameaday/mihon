@@ -190,6 +190,13 @@ class PagerPageHolder(
      *   which uses [BitmapRegionDecoder] for efficient tiled display.
      */
     private suspend fun setImage() {
+        // Defense-in-depth: if the page was marked hidden by the pre-processor
+        // (blocked by filter or absorbed by smart combine) between the time the
+        // adapter was built and now, skip rendering entirely. The adapter rebuild
+        // event will remove this holder shortly; this guard prevents any flash of
+        // filtered content in the interim.
+        if (page.isHidden) return
+
         progressIndicator?.setProgress(0)
 
         // Fast path: if this page was already merged with its stub, use the cached bitmap
