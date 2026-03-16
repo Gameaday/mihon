@@ -1,6 +1,7 @@
 package eu.kanade.domain.track.interactor
 
 import eu.kanade.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.data.cache.CoverCache
 import eu.kanade.tachiyomi.data.track.Tracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
@@ -14,6 +15,7 @@ import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MangaUpdate
 import tachiyomi.domain.manga.model.mergedAlternativeTitles
 import tachiyomi.domain.manga.repository.MangaRepository
+import java.time.Instant
 
 /**
  * Refreshes authoritative metadata for a manga from its canonical tracker source.
@@ -38,6 +40,7 @@ class RefreshCanonicalMetadata(
     private val mangaRepository: MangaRepository,
     private val trackerManager: TrackerManager,
     private val trackPreferences: TrackPreferences,
+    private val coverCache: CoverCache,
 ) {
 
     /**
@@ -220,6 +223,17 @@ class RefreshCanonicalMetadata(
             return false
         }
 
+        // When the canonical source provides a new cover URL, invalidate the stale cover
+        // cache so Coil fetches the new image rather than serving the old file. This mirrors
+        // the behaviour in UpdateManga.awaitUpdateFromSource and prevents cover flickering
+        // caused by an outdated CoverCache entry surviving alongside a changed thumbnailUrl.
+        val coverLastModified = if (thumbnailUrl != null) {
+            coverCache.deleteFromCache(manga, false)
+            Instant.now().toEpochMilli()
+        } else {
+            null
+        }
+
         mangaRepository.update(
             MangaUpdate(
                 id = manga.id,
@@ -228,6 +242,7 @@ class RefreshCanonicalMetadata(
                 author = author,
                 artist = artist,
                 thumbnailUrl = thumbnailUrl,
+                coverLastModified = coverLastModified,
                 status = status,
                 contentType = contentType,
                 genre = genre,

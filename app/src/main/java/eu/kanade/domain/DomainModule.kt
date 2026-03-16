@@ -168,7 +168,7 @@ class DomainModule : InjektModule {
         addFactory { TrackerListImporter(get(), get(), get(), get()) }
         addFactory { LinkTrackedMangaToAuthority(get(), get()) }
         addFactory { MatchUnlinkedManga(get(), get(), get(), get()) }
-        addFactory { RefreshCanonicalMetadata(get(), get(), get()) }
+        addFactory { RefreshCanonicalMetadata(get(), get(), get(), get()) }
 
         addSingletonFactory<ChapterRepository> { ChapterRepositoryImpl(get()) }
         addFactory { GetChapter(get()) }

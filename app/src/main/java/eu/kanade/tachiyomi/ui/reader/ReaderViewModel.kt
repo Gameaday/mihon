@@ -667,28 +667,34 @@ class ReaderViewModel @JvmOverloads constructor(
         chapterPageIndex = pageIndex
 
         if (!incognitoMode && page.status !is Page.State.Error) {
+            val prevLastPageRead = readerChapter.chapter.last_page_read
+            val prevRead = readerChapter.chapter.read
+
             readerChapter.chapter.last_page_read = pageIndex
 
-            // A page is the effective last page either when it literally is the last page
-            // in the chapter's page list, or when it is a merged page (mergedBitmap != null)
-            // and all subsequent pages in the list are hidden. This ensures the chapter is
-            // marked as read even when the final page(s) are stubs or blocked credit pages.
+            // A page is the effective last page when it literally is the last page in the
+            // chapter's page list, OR when all subsequent pages are hidden (absorbed stubs
+            // or blocked credit pages). This covers both the merged-bitmap stub case and the
+            // plain-visible-page case where trailing blocked pages are skipped by the reader.
             val isEffectivelyLastPage = pageIndex == chapterPages?.lastIndex ||
-                (
-                    (page as? ReaderPage)?.mergedBitmap != null &&
-                        chapterPages?.drop(pageIndex + 1)?.all { it.isHidden } == true
-                    )
+                chapterPages?.drop(pageIndex + 1)?.all { it.isHidden } == true
             if (isEffectivelyLastPage) {
                 updateChapterProgressOnComplete(readerChapter)
             }
 
-            updateChapter.await(
-                ChapterUpdate(
-                    id = readerChapter.chapter.id!!,
-                    read = readerChapter.chapter.read,
-                    lastPageRead = readerChapter.chapter.last_page_read.toLong(),
-                ),
-            )
+            // Skip the DB write when neither lastPageRead nor read changed — a memory
+            // equality check is cheaper than a SQL UPDATE and avoids unnecessary I/O.
+            if (readerChapter.chapter.last_page_read != prevLastPageRead ||
+                readerChapter.chapter.read != prevRead
+            ) {
+                updateChapter.await(
+                    ChapterUpdate(
+                        id = readerChapter.chapter.id!!,
+                        read = readerChapter.chapter.read,
+                        lastPageRead = readerChapter.chapter.last_page_read.toLong(),
+                    ),
+                )
+            }
         }
     }
 
