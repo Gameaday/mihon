@@ -1,6 +1,7 @@
 package eu.kanade.domain.track.interactor
 
 import eu.kanade.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.data.cache.CoverCache
 import eu.kanade.tachiyomi.data.track.Tracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
@@ -28,6 +29,7 @@ class RefreshCanonicalMetadataTest {
     private lateinit var mangaRepository: MangaRepository
     private lateinit var trackerManager: TrackerManager
     private lateinit var trackPreferences: TrackPreferences
+    private lateinit var coverCache: CoverCache
     private lateinit var refreshCanonicalMetadata: RefreshCanonicalMetadata
     private lateinit var muTracker: Tracker
 
@@ -85,6 +87,7 @@ class RefreshCanonicalMetadataTest {
         mangaRepository = mockk(relaxed = true)
         trackerManager = mockk(relaxed = true)
         trackPreferences = mockk(relaxed = true)
+        coverCache = mockk(relaxed = true)
         muTracker = mockk(relaxed = true)
 
         // Default: no content source priority fields (all fields prefer authority)
@@ -97,7 +100,7 @@ class RefreshCanonicalMetadataTest {
         every { muTracker.isLoggedIn } returns false
         every { trackerManager.get(7L) } returns muTracker
 
-        refreshCanonicalMetadata = RefreshCanonicalMetadata(mangaRepository, trackerManager, trackPreferences)
+        refreshCanonicalMetadata = RefreshCanonicalMetadata(mangaRepository, trackerManager, trackPreferences, coverCache)
     }
 
     @Test
@@ -437,7 +440,8 @@ class RefreshCanonicalMetadataTest {
             every { csPref.get() } returns 0L
             every { tp.contentSourcePriorityFields() } returns csPref
 
-            val refresh = RefreshCanonicalMetadata(repo, tm, tp)
+            val cc = mockk<eu.kanade.tachiyomi.data.cache.CoverCache>(relaxed = true)
+            val refresh = RefreshCanonicalMetadata(repo, tm, tp, cc)
 
             val manga = testManga(
                 title = "Test Manga",
@@ -794,5 +798,67 @@ class RefreshCanonicalMetadataTest {
 
         val result = refreshCanonicalMetadata.await(manga)
         result shouldBe false // No changes detected — values are identical
+    }
+
+    @Test
+    fun `invalidates cover cache and sets coverLastModified when thumbnail URL changes`() = runTest {
+        val manga = testManga(
+            title = "Test Manga",
+            canonicalId = "mu:12345",
+            thumbnailUrl = "https://old.example.com/cover.jpg",
+        )
+
+        every { coverCache.deleteFromCache(any<Manga>(), any()) } returns 1
+
+        coEvery { muTracker.search("Test Manga") } returns listOf(
+            testTrackSearch(
+                title = "Test Manga",
+                remoteId = 12345L,
+                coverUrl = "https://new.example.com/cover.jpg",
+            ),
+        )
+
+        val result = refreshCanonicalMetadata.await(manga)
+        result shouldBe true
+
+        // Cover cache should be cleared for the old cover
+        coVerify { coverCache.deleteFromCache(any<Manga>(), any()) }
+
+        val updateSlot = slot<MangaUpdate>()
+        coVerify { mangaRepository.update(capture(updateSlot)) }
+        val update = updateSlot.captured
+        update.thumbnailUrl shouldBe "https://new.example.com/cover.jpg"
+        // coverLastModified must be set to a positive timestamp so Coil invalidates its cache
+        (update.coverLastModified != null && update.coverLastModified!! > 0) shouldBe true
+    }
+
+    @Test
+    fun `does not touch cover cache when thumbnail URL is unchanged`() = runTest {
+        val manga = testManga(
+            title = "Test Manga",
+            canonicalId = "mu:12345",
+            thumbnailUrl = "https://example.com/cover.jpg",
+        )
+
+        coEvery { muTracker.search("Test Manga") } returns listOf(
+            testTrackSearch(
+                title = "Test Manga",
+                remoteId = 12345L,
+                summary = "New description",
+                coverUrl = "https://example.com/cover.jpg", // same URL
+            ),
+        )
+
+        val result = refreshCanonicalMetadata.await(manga)
+        result shouldBe true
+
+        // Cover cache must NOT be touched when the URL is the same
+        coVerify(exactly = 0) { coverCache.deleteFromCache(any<Manga>(), any()) }
+
+        val updateSlot = slot<MangaUpdate>()
+        coVerify { mangaRepository.update(capture(updateSlot)) }
+        val update = updateSlot.captured
+        update.thumbnailUrl shouldBe null // no URL change → null in update
+        update.coverLastModified shouldBe null
     }
 }
