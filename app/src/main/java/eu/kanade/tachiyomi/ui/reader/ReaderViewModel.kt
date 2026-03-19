@@ -105,6 +105,10 @@ class ReaderViewModel @JvmOverloads constructor(
     private val getIncognitoState: GetIncognitoState = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
 ) : ViewModel() {
+    private companion object {
+        const val FALLBACK_LAST_PAGE_INDEX = Int.MAX_VALUE
+    }
+
 
     private val mutableState = MutableStateFlow(State())
     val state = mutableState.asStateFlow()
@@ -271,7 +275,9 @@ class ReaderViewModel @JvmOverloads constructor(
                     currentChapter.requestedPage = chapterPageIndex
                     // The saved state index is only valid for the first restored chapter.
                     // Reset it so adjacent chapter loads don't inherit the previous chapter's
-                    // page index and accidentally open near the end.
+                    // page index and start at an arbitrary restored position instead of the
+                    // intended transition target (start for next, end for previous). A new
+                    // process restore will repopulate chapterPageIndex from SavedStateHandle.
                     chapterPageIndex = -1
                 } else if (!currentChapter.chapter.read) {
                     currentChapter.requestedPage = currentChapter.chapter.last_page_read
@@ -425,7 +431,13 @@ class ReaderViewModel @JvmOverloads constructor(
         // - Next chapter should start at the beginning.
         // - Previous chapter should start at the end so readers can quickly refresh context.
         // The activity then snaps to the first/last visible page, excluding hidden pages.
-        chapter.requestedPage = if (startFromEnd) Int.MAX_VALUE else 0
+        chapter.requestedPage = if (startFromEnd) {
+            // Best effort explicit end target when pages are already known (e.g., preloaded).
+            // Otherwise use a large index which is clamped to lastIndex by the viewers.
+            chapter.pages?.lastIndex ?: FALLBACK_LAST_PAGE_INDEX
+        } else {
+            0
+        }
 
         mutableState.update { it.copy(isLoadingAdjacentChapter = true) }
         try {
@@ -766,9 +778,14 @@ class ReaderViewModel @JvmOverloads constructor(
     /**
      * Called from the activity to load and set the previous chapter as active.
      */
-    suspend fun loadPreviousChapter() {
-        val prevChapter = state.value.viewerChapters?.prevChapter ?: return
+    suspend fun loadPreviousChapter(): Int? {
+        val prevChapter = state.value.viewerChapters?.prevChapter ?: return null
         loadAdjacent(prevChapter, startFromEnd = true)
+        // loadAdjacent() completes after loadChapter() returns, so the target chapter's page
+        // list has been initialized (or load failed). Return null when a visible index can't be
+        // derived (null/empty/all-hidden pages; indexOfLast returns -1 for empty/all-hidden)
+        // so the caller can choose an explicit fallback.
+        return prevChapter.lastVisiblePageIndex()
     }
 
     /**
@@ -776,6 +793,12 @@ class ReaderViewModel @JvmOverloads constructor(
      */
     private fun getCurrentChapter(): ReaderChapter? {
         return state.value.currentChapter
+    }
+
+    private fun ReaderChapter.lastVisiblePageIndex(): Int? {
+        return pages
+            ?.indexOfLast { !it.isHidden }
+            ?.takeIf { it >= 0 }
     }
 
     fun getSource() = manga?.source?.let { sourceManager.getOrStub(it) } as? HttpSource
