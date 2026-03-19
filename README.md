@@ -72,7 +72,7 @@ Thank you to all the people who have contributed!
     <img src="https://contrib.rocks/image?repo=Gameaday/Ephyra" alt="Ephyra contributors" title="Ephyra contributors" width="800"/>
 </a>
 
-Ephyra is built upon the work of the [Mihon](https://github.com/mihonapp/mihon) open source project and its contributors.
+Ephyra builds on upstream open source reader technology and the work of many contributors.
 
 ### Disclaimer
 
@@ -82,7 +82,7 @@ The developer(s) of this application do not have any affiliation with the conten
 
 <pre>
 Copyright © 2015 Javier Tomás
-Copyright © 2024 Mihon Open Source Project
+Copyright © 2024 Ephyra Open Source Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

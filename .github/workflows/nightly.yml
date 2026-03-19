@@ -51,7 +51,7 @@ jobs:
           set -e
           # Generate a temporary keystore so the APK is always installable
           keytool -genkeypair -v \
-            -keystore /tmp/mihon-nightly.keystore \
+            -keystore /tmp/ephyra-nightly.keystore \
             -storepass android \
             -alias nightlykey \
             -keypass android \
@@ -75,7 +75,7 @@ jobs:
             [ -f "$apk" ] || continue
             signed="${apk%-unsigned.apk}-unsigned-signed.apk"
             "$APKSIGNER" sign \
-              --ks /tmp/mihon-nightly.keystore \
+              --ks /tmp/ephyra-nightly.keystore \
               --ks-pass pass:android \
               --key-pass pass:android \
               --ks-key-alias nightlykey \

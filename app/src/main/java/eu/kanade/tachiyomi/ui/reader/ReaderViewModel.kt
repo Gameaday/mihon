@@ -105,6 +105,10 @@ class ReaderViewModel @JvmOverloads constructor(
     private val getIncognitoState: GetIncognitoState = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
 ) : ViewModel() {
+    private companion object {
+        const val FALLBACK_LAST_PAGE_INDEX = Int.MAX_VALUE
+    }
+
 
     private val mutableState = MutableStateFlow(State())
     val state = mutableState.asStateFlow()
@@ -147,6 +151,7 @@ class ReaderViewModel @JvmOverloads constructor(
             savedState["page_index"] = value
             field = value
         }
+    private var hasAppliedSavedPageIndex = false
 
     /**
      * The chapter loader for the loaded manga. It'll be null until [manga] is set.
@@ -266,9 +271,12 @@ class ReaderViewModel @JvmOverloads constructor(
             .distinctUntilChanged()
             .filterNotNull()
             .onEach { currentChapter ->
-                if (chapterPageIndex >= 0) {
+                if (!hasAppliedSavedPageIndex && chapterPageIndex >= 0) {
                     // Restore from SavedState
                     currentChapter.requestedPage = chapterPageIndex
+                    // Apply the saved page index only once on restore, then keep the persisted
+                    // value in sync with real progress via onPageSelected().
+                    hasAppliedSavedPageIndex = true
                 } else if (!currentChapter.chapter.read) {
                     currentChapter.requestedPage = currentChapter.chapter.last_page_read
                 }
@@ -409,10 +417,25 @@ class ReaderViewModel @JvmOverloads constructor(
     /**
      * Called when the user is going to load the prev/next chapter through the toolbar buttons.
      */
-    private suspend fun loadAdjacent(chapter: ReaderChapter) {
+    private suspend fun loadAdjacent(
+        chapter: ReaderChapter,
+        startFromEnd: Boolean,
+    ) {
         val loader = loader ?: return
 
         logcat { "Loading adjacent ${chapter.chapter.url}" }
+
+        // Direction-aware start for toolbar transitions:
+        // - Next chapter should start at the beginning.
+        // - Previous chapter should start at the end so readers can quickly refresh context.
+        // The activity then snaps to the first/last visible page, excluding hidden pages.
+        chapter.requestedPage = if (startFromEnd) {
+            // Best effort explicit end target when pages are already known (e.g., preloaded).
+            // Otherwise use a large index which is clamped to lastIndex by the viewers.
+            chapter.pages?.lastIndex ?: FALLBACK_LAST_PAGE_INDEX
+        } else {
+            0
+        }
 
         mutableState.update { it.copy(isLoadingAdjacentChapter = true) }
         try {
@@ -747,15 +770,20 @@ class ReaderViewModel @JvmOverloads constructor(
      */
     suspend fun loadNextChapter() {
         val nextChapter = state.value.viewerChapters?.nextChapter ?: return
-        loadAdjacent(nextChapter)
+        loadAdjacent(nextChapter, startFromEnd = false)
     }
 
     /**
      * Called from the activity to load and set the previous chapter as active.
      */
-    suspend fun loadPreviousChapter() {
-        val prevChapter = state.value.viewerChapters?.prevChapter ?: return
-        loadAdjacent(prevChapter)
+    suspend fun loadPreviousChapter(): Int? {
+        val prevChapter = state.value.viewerChapters?.prevChapter ?: return null
+        loadAdjacent(prevChapter, startFromEnd = true)
+        // loadAdjacent() completes after loadChapter() returns, so the target chapter's page
+        // list has been initialized (or load failed). Return null when a visible index can't be
+        // derived (null/empty/all-hidden pages; indexOfLast returns -1 for empty/all-hidden)
+        // so the caller can choose an explicit fallback.
+        return prevChapter.lastVisiblePageIndex()
     }
 
     /**
@@ -763,6 +791,11 @@ class ReaderViewModel @JvmOverloads constructor(
      */
     private fun getCurrentChapter(): ReaderChapter? {
         return state.value.currentChapter
+    }
+
+    private fun ReaderChapter.lastVisiblePageIndex(): Int? {
+        val visibleCount = pages?.count { !it.isHidden } ?: 0
+        return (visibleCount - 1).takeIf { it >= 0 }
     }
 
     fun getSource() = manga?.source?.let { sourceManager.getOrStub(it) } as? HttpSource

@@ -661,8 +661,13 @@ class ReaderActivity : BaseActivity() {
      */
     private fun loadPreviousChapter() {
         lifecycleScope.launch {
-            viewModel.loadPreviousChapter()
-            moveToPageIndex(0)
+            val lastVisibleIndex = viewModel.loadPreviousChapter()
+            if (lastVisibleIndex != null) {
+                moveToPageIndex(lastVisibleIndex)
+            } else {
+                logcat { "Previous chapter has no visible pages; fallback to display index 0" }
+                moveToPageIndex(0)
+            }
         }
     }
 

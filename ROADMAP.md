@@ -1,6 +1,6 @@
-# Mihon Fork — Authority-First Manga Management
+# Ephyra Roadmap — Authority-First Manga Management
 
-This fork adds an **authority-first identity system** on top of Mihon's source-based model. Every manga can have a canonical identity from MAL, AniList, or MangaUpdates that persists across sources, enabling use cases beyond just reading online.
+Ephyra adds an **authority-first identity system** on top of a source-based reading model. Every manga can have a canonical identity from MAL, AniList, or MangaUpdates that persists across sources, enabling use cases beyond just reading online.
 
 ## User Stories
 
