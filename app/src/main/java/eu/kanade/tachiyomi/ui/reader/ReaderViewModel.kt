@@ -413,15 +413,19 @@ class ReaderViewModel @JvmOverloads constructor(
     /**
      * Called when the user is going to load the prev/next chapter through the toolbar buttons.
      */
-    private suspend fun loadAdjacent(chapter: ReaderChapter) {
+    private suspend fun loadAdjacent(
+        chapter: ReaderChapter,
+        startFromEnd: Boolean,
+    ) {
         val loader = loader ?: return
 
         logcat { "Loading adjacent ${chapter.chapter.url}" }
 
-        // Toolbar next/previous chapter actions should always start from the beginning
-        // of the destination chapter. This avoids carrying stale positions that can
-        // accidentally jump readers near chapter ends.
-        chapter.requestedPage = 0
+        // Direction-aware start for toolbar transitions:
+        // - Next chapter should start at the beginning.
+        // - Previous chapter should start at the end so readers can quickly refresh context.
+        // The activity then snaps to the first/last visible page, excluding hidden pages.
+        chapter.requestedPage = if (startFromEnd) Int.MAX_VALUE else 0
 
         mutableState.update { it.copy(isLoadingAdjacentChapter = true) }
         try {
@@ -756,7 +760,7 @@ class ReaderViewModel @JvmOverloads constructor(
      */
     suspend fun loadNextChapter() {
         val nextChapter = state.value.viewerChapters?.nextChapter ?: return
-        loadAdjacent(nextChapter)
+        loadAdjacent(nextChapter, startFromEnd = false)
     }
 
     /**
@@ -764,7 +768,7 @@ class ReaderViewModel @JvmOverloads constructor(
      */
     suspend fun loadPreviousChapter() {
         val prevChapter = state.value.viewerChapters?.prevChapter ?: return
-        loadAdjacent(prevChapter)
+        loadAdjacent(prevChapter, startFromEnd = true)
     }
 
     /**
