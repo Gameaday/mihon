@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import ephyra.core.common.i18n.stringResource
 import ephyra.domain.source.model.StubSource
 import ephyra.domain.source.repository.StubSourceRepository
@@ -86,9 +85,28 @@ class AndroidSourceManager(
     }
 
     override fun getOrStub(sourceKey: Long): Source {
-        return sourcesMapFlow.value[sourceKey] ?: stubSourcesMap.getOrPut(sourceKey) {
-            runBlocking { createStubSource(sourceKey) }
+        sourcesMapFlow.value[sourceKey]?.let { return it }
+        stubSourcesMap[sourceKey]?.let { return it }
+
+        if (sourceKey == ephyra.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID) {
+            val authorityStub = StubSource(
+                id = sourceKey,
+                lang = "all",
+                name = context.stringResource(ephyra.i18n.MR.strings.authority_source_name),
+            )
+            stubSourcesMap[sourceKey] = authorityStub
+            return authorityStub
         }
+
+        val fallback = StubSource(id = sourceKey, lang = "", name = "")
+        stubSourcesMap[sourceKey] = fallback
+        scope.launch {
+            val actualStub = createStubSource(sourceKey)
+            if (actualStub != fallback) {
+                stubSourcesMap[sourceKey] = actualStub
+            }
+        }
+        return fallback
     }
 
     override fun getOnlineSources() = sourcesMapFlow.value.values.filterIsInstance<HttpSource>()
@@ -112,15 +130,6 @@ class AndroidSourceManager(
     }
 
     private suspend fun createStubSource(id: Long): StubSource {
-        // Authority-only manga (no content source) — return a named stub
-        // so the UI shows "No content provider" instead of "-1".
-        if (id == ephyra.domain.track.interactor.TrackerListImporter.AUTHORITY_SOURCE_ID) {
-            return StubSource(
-                id = id,
-                lang = "all",
-                name = context.stringResource(ephyra.i18n.MR.strings.authority_source_name),
-            )
-        }
         sourceRepository.getStubSource(id)?.let {
             return it
         }

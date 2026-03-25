@@ -4,11 +4,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+val AppCoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
 /**
  * Think twice before using this. This is a delicate API. It is easy to accidentally create resource or memory leaks when GlobalScope is used.
@@ -19,7 +20,7 @@ import kotlinx.coroutines.withContext
  */
 @DelicateCoroutinesApi
 fun launchUI(block: suspend CoroutineScope.() -> Unit): Job =
-    GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, block)
+    AppCoroutineScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, block)
 
 /**
  * Think twice before using this. This is a delicate API. It is easy to accidentally create resource or memory leaks when GlobalScope is used.
@@ -30,7 +31,7 @@ fun launchUI(block: suspend CoroutineScope.() -> Unit): Job =
  */
 @DelicateCoroutinesApi
 fun launchIO(block: suspend CoroutineScope.() -> Unit): Job =
-    GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, block)
+    AppCoroutineScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, block)
 
 /**
  * Think twice before using this. This is a delicate API. It is easy to accidentally create resource or memory leaks when GlobalScope is used.
@@ -41,7 +42,7 @@ fun launchIO(block: suspend CoroutineScope.() -> Unit): Job =
  */
 @DelicateCoroutinesApi
 fun launchNow(block: suspend CoroutineScope.() -> Unit): Job =
-    GlobalScope.launch(Dispatchers.Main, CoroutineStart.UNDISPATCHED, block)
+    AppCoroutineScope.launch(Dispatchers.Main, CoroutineStart.UNDISPATCHED, block)
 
 fun CoroutineScope.launchUI(block: suspend CoroutineScope.() -> Unit): Job =
     launch(Dispatchers.Main, block = block)
