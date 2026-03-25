@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "eu.kanade.tachiyomi.core.common"
+    namespace = "ephyra.app.core.common"
 }
 
 kotlin {

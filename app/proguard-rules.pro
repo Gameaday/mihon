@@ -1,8 +1,8 @@
 -dontobfuscate
 
 -keep,allowoptimization class eu.kanade.**
--keep,allowoptimization class tachiyomi.**
--keep,allowoptimization class mihon.**
+-keep,allowoptimization class ephyra.**
+-keep,allowoptimization class ephyra.**
 
 # Keep common dependencies used in extensions
 -keep,allowoptimization class androidx.preference.** { public protected *; }
@@ -18,12 +18,12 @@
 -keep,allowoptimization class uy.kohesive.injekt.** { public protected *; }
 
 # From extensions-lib
--keep,allowoptimization class eu.kanade.tachiyomi.network.interceptor.RateLimitInterceptorKt { public protected *; }
--keep,allowoptimization class eu.kanade.tachiyomi.network.interceptor.SpecificHostRateLimitInterceptorKt { public protected *; }
--keep,allowoptimization class eu.kanade.tachiyomi.network.NetworkHelper { public protected *; }
--keep,allowoptimization class eu.kanade.tachiyomi.network.OkHttpExtensionsKt { public protected *; }
--keep,allowoptimization class eu.kanade.tachiyomi.network.RequestsKt { public protected *; }
--keep,allowoptimization class eu.kanade.tachiyomi.AppInfo { public protected *; }
+-keep,allowoptimization class eu.kanade.ephyra.network.interceptor.RateLimitInterceptorKt { public protected *; }
+-keep,allowoptimization class eu.kanade.ephyra.network.interceptor.SpecificHostRateLimitInterceptorKt { public protected *; }
+-keep,allowoptimization class eu.kanade.ephyra.network.NetworkHelper { public protected *; }
+-keep,allowoptimization class eu.kanade.ephyra.network.OkHttpExtensionsKt { public protected *; }
+-keep,allowoptimization class eu.kanade.ephyra.network.RequestsKt { public protected *; }
+-keep,allowoptimization class ephyra.app.AppInfo { public protected *; }
 
 ##---------------Begin: proguard configuration for RxJava 1.x  ----------
 -dontwarn sun.misc.**

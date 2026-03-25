@@ -1,0 +1,20 @@
+package ephyra.domain.upcoming.interactor
+
+import eu.kanade.ephyra.source.model.SManga
+import kotlinx.coroutines.flow.Flow
+import ephyra.domain.manga.model.Manga
+import ephyra.domain.manga.repository.MangaRepository
+
+class GetUpcomingManga(
+    private val mangaRepository: MangaRepository,
+) {
+
+    private val includedStatuses = setOf(
+        SManga.ONGOING.toLong(),
+        SManga.PUBLISHING_FINISHED.toLong(),
+    )
+
+    suspend fun subscribe(): Flow<List<Manga>> {
+        return mangaRepository.getUpcomingManga(includedStatuses)
+    }
+}

@@ -1,6 +1,6 @@
-import mihon.buildlogic.AndroidConfig
-import mihon.buildlogic.configureAndroid
-import mihon.buildlogic.configureTest
+import ephyra.buildlogic.AndroidConfig
+import ephyra.buildlogic.configureAndroid
+import ephyra.buildlogic.configureTest
 
 plugins {
     id("com.android.application")

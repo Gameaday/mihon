@@ -122,7 +122,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="eu.kanade.tachiyomi.SEARCH" />
+                <action android:name="ephyra.app.SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>

@@ -1,5 +1,5 @@
-import mihon.buildlogic.configureAndroid
-import mihon.buildlogic.configureTest
+import ephyra.buildlogic.configureAndroid
+import ephyra.buildlogic.configureTest
 
 plugins {
     id("com.android.library")

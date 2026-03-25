@@ -1,0 +1,72 @@
+package ephyra.app.ui.deeplink
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import ephyra.presentation.components.AppBar
+import ephyra.presentation.util.Screen
+import ephyra.app.ui.browse.source.globalsearch.GlobalSearchScreen
+import ephyra.app.ui.manga.MangaScreen
+import ephyra.app.ui.reader.ReaderActivity
+import ephyra.i18n.MR
+import ephyra.presentation.core.components.material.Scaffold
+import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.screens.LoadingScreen
+
+class DeepLinkScreen(
+    val query: String = "",
+) : Screen() {
+
+    @Composable
+    override fun Content() {
+        val context = LocalContext.current
+        val navigator = LocalNavigator.currentOrThrow
+
+        val screenModel = rememberScreenModel {
+            DeepLinkScreenModel(query = query)
+        }
+        val state by screenModel.state.collectAsStateWithLifecycle()
+        Scaffold(
+            topBar = { scrollBehavior ->
+                AppBar(
+                    title = stringResource(MR.strings.action_search_hint),
+                    navigateUp = navigator::pop,
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+        ) { contentPadding ->
+            when (state) {
+                is DeepLinkScreenModel.State.Loading -> {
+                    LoadingScreen(Modifier.padding(contentPadding))
+                }
+                is DeepLinkScreenModel.State.NoResults -> {
+                    navigator.replace(GlobalSearchScreen(query))
+                }
+                is DeepLinkScreenModel.State.Result -> {
+                    val resultState = state as DeepLinkScreenModel.State.Result
+                    if (resultState.chapterId == null) {
+                        navigator.replace(
+                            MangaScreen(
+                                resultState.manga.id,
+                                true,
+                            ),
+                        )
+                    } else {
+                        navigator.pop()
+                        ReaderActivity.newIntent(
+                            context,
+                            resultState.manga.id,
+                            resultState.chapterId,
+                        ).also(context::startActivity)
+                    }
+                }
+            }
+        }
+    }
+}

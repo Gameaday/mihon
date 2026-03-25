@@ -12,6 +12,7 @@ firebase-bom = "34.10.0"
 markdown = "0.39.2"
 junit = "6.0.3"
 materialKolor = "5.0.0-alpha07"
+koin = "3.5.3"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.1.5"
@@ -35,6 +36,9 @@ sqlite-android = "com.github.requery:sqlite-android:3.49.0"
 preferencektx = "androidx.preference:preference-ktx:1.2.1"
 
 injekt = "com.github.mihonapp:injekt:91edab2317"
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
 coil-bom = { module = "io.coil-kt.coil3:coil-bom", version = "3.4.0" }
 coil-core = { module = "io.coil-kt.coil3:coil" }
@@ -81,6 +85,7 @@ voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
 
 spotless-gradle = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint-core" }
@@ -106,6 +111,7 @@ sqlite = ["sqlite-framework", "sqlite-ktx", "sqlite-android"]
 coil = ["coil-core", "coil-gif", "coil-compose", "coil-network-okhttp"]
 shizuku = ["shizuku-api", "shizuku-provider"]
 sqldelight = ["sqldelight-android-driver", "sqldelight-coroutines", "sqldelight-android-paging"]
-voyager = ["voyager-navigator", "voyager-screenmodel", "voyager-tab-navigator", "voyager-transitions"]
+voyager = ["voyager-navigator", "voyager-screenmodel", "voyager-tab-navigator", "voyager-transitions", "voyager-koin"]
 test = ["junit-jupiter", "kotest-assertions", "mockk"]
 markdown = ["markdown-core", "markdown-coil"]
+koin = ["koin-core", "koin-android", "koin-androidx-compose"]

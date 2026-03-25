@@ -1,1 +1,19 @@
+# Build files
+.gradle
+.kotlin
+build
+
+# IDE files
+*.iml
+.idea/*
+!.idea/icon.svg
+/captures
+
+# Configuration files
+local.properties
+
+# macOS specific files
+.DS_Store
+
+# User addition
 .idx/dev.nix

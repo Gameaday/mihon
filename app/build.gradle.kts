@@ -1,7 +1,7 @@
-import mihon.buildlogic.Config
-import mihon.buildlogic.getBuildTime
-import mihon.buildlogic.getCommitCount
-import mihon.buildlogic.getGitSha
+import ephyra.buildlogic.Config
+import ephyra.buildlogic.getBuildTime
+import ephyra.buildlogic.getCommitCount
+import ephyra.buildlogic.getGitSha
 
 plugins {
     id("mihon.android.application")
@@ -18,7 +18,7 @@ if (Config.includeTelemetry) {
 }
 
 android {
-    namespace = "eu.kanade.tachiyomi"
+    namespace = "ephyra.app"
 
     // NDK r29+ is required for ARMv9.2-A (arm64-v8a with SVE2/SME) support used by
     // devices such as the Samsung Galaxy S24 series (Snapdragon 8 Gen 3 / Exynos 2400).
@@ -255,6 +255,7 @@ dependencies {
 
     // Dependency injection
     implementation(libs.injekt)
+    implementation(libs.bundles.koin)
 
     // Image loading
     implementation(platform(libs.coil.bom))

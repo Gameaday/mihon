@@ -1,4 +1,4 @@
-import mihon.buildlogic.configureCompose
+import ephyra.buildlogic.configureCompose
 
 plugins {
     id("com.android.library")

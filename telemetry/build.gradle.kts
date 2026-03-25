@@ -1,4 +1,4 @@
-import mihon.buildlogic.Config
+import ephyra.buildlogic.Config
 
 plugins {
     id("mihon.library")

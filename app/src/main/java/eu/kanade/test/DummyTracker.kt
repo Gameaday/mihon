@@ -1,16 +1,16 @@
 package eu.kanade.test
 
 import dev.icerock.moko.resources.StringResource
-import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.data.track.Tracker
-import eu.kanade.tachiyomi.data.track.model.TrackSearch
+import ephyra.app.R
+import ephyra.app.data.track.Tracker
+import ephyra.app.data.track.model.TrackSearch
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import okhttp3.OkHttpClient
-import tachiyomi.domain.track.model.Track
-import tachiyomi.i18n.MR
+import ephyra.domain.track.model.Track
+import ephyra.i18n.MR
 
 data class DummyTracker(
     override val id: Long,
@@ -62,20 +62,20 @@ data class DummyTracker(
         track.score.toString()
 
     override suspend fun update(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         didReadChapter: Boolean,
-    ): eu.kanade.tachiyomi.data.database.models.Track = track
+    ): ephyra.app.data.database.models.Track = track
 
     override suspend fun bind(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         hasReadChapters: Boolean,
-    ): eu.kanade.tachiyomi.data.database.models.Track = track
+    ): ephyra.app.data.database.models.Track = track
 
     override suspend fun search(query: String): List<TrackSearch> = valSearchResults
 
     override suspend fun refresh(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
-    ): eu.kanade.tachiyomi.data.database.models.Track = track
+        track: ephyra.app.data.database.models.Track,
+    ): ephyra.app.data.database.models.Track = track
 
     override suspend fun login(username: String, password: String) = Unit
 
@@ -88,37 +88,37 @@ data class DummyTracker(
     override fun saveCredentials(username: String, password: String) = Unit
 
     override suspend fun register(
-        item: eu.kanade.tachiyomi.data.database.models.Track,
+        item: ephyra.app.data.database.models.Track,
         mangaId: Long,
     ) = Unit
 
     override suspend fun setRemoteStatus(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         status: Long,
     ) = Unit
 
     override suspend fun setRemoteLastChapterRead(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         chapterNumber: Int,
     ) = Unit
 
     override suspend fun setRemoteScore(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         scoreString: String,
     ) = Unit
 
     override suspend fun setRemoteStartDate(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         epochMillis: Long,
     ) = Unit
 
     override suspend fun setRemoteFinishDate(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         epochMillis: Long,
     ) = Unit
 
     override suspend fun setRemotePrivate(
-        track: eu.kanade.tachiyomi.data.database.models.Track,
+        track: ephyra.app.data.database.models.Track,
         private: Boolean,
     ) = Unit
 }

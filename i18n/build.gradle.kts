@@ -1,5 +1,5 @@
-import mihon.buildlogic.generatedBuildDir
-import mihon.buildlogic.tasks.getLocalesConfigTask
+import ephyra.buildlogic.generatedBuildDir
+import ephyra.buildlogic.tasks.getLocalesConfigTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
