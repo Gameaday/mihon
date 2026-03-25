@@ -56,7 +56,7 @@ class GetApplicationRelease(
         val newVersion = versionTag.replace(NON_DIGIT_REGEX, "")
         return when {
             isPreview -> {
-                // Preview builds: based on releases in "mihonapp/mihon-preview" repo
+                // Preview builds: based on releases in "Gameaday/Ephyra-preview" repo
                 // tagged as something like "r1234"
                 newVersion.toInt() > commitCount
             }
@@ -66,7 +66,7 @@ class GetApplicationRelease(
                 versionTag.isNotBlank() && versionTag != commitSha
             }
             else -> {
-                // Release builds: based on releases in "mihonapp/mihon" repo
+                // Release builds: based on releases in "Gameaday/Ephyra" repo
                 // tagged as something like "v0.1.2"
                 val oldVersion = versionName.replace(NON_DIGIT_REGEX, "")
 

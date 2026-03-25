@@ -8,7 +8,7 @@ import ephyra.domain.base.BasePreferences
 import ephyra.app.extension.installer.Installer
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.InstallStep
-import eu.kanade.ephyra.network.NetworkHelper
+import eu.kanade.tachiyomi.network.NetworkHelper
 import ephyra.app.util.storage.getUriCompat
 import ephyra.app.util.system.isPackageInstalled
 import kotlinx.coroutines.CoroutineScope

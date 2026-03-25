@@ -1,7 +1,7 @@
 package ephyra.app.data.track.myanimelist
 
 import ephyra.app.data.track.myanimelist.dto.MALOAuth
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.Response

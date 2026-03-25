@@ -29,8 +29,6 @@ import ephyra.domain.manga.interactor.GetFavorites
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.repository.MangaRepository
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -39,21 +37,20 @@ import java.util.Locale
 
 class BackupCreator(
     private val context: Context,
-    private val isAutoBackup: Boolean,
 
-    private val parser: ProtoBuf = Injekt.get(),
-    private val getFavorites: GetFavorites = Injekt.get(),
-    private val backupPreferences: BackupPreferences = Injekt.get(),
-    private val mangaRepository: MangaRepository = Injekt.get(),
+    private val parser: ProtoBuf,
+    private val getFavorites: GetFavorites,
+    private val backupPreferences: BackupPreferences,
+    private val mangaRepository: MangaRepository,
 
-    private val categoriesBackupCreator: CategoriesBackupCreator = CategoriesBackupCreator(),
-    private val mangaBackupCreator: MangaBackupCreator = MangaBackupCreator(),
-    private val preferenceBackupCreator: PreferenceBackupCreator = PreferenceBackupCreator(),
-    private val extensionRepoBackupCreator: ExtensionRepoBackupCreator = ExtensionRepoBackupCreator(),
-    private val sourcesBackupCreator: SourcesBackupCreator = SourcesBackupCreator(),
+    private val categoriesBackupCreator: CategoriesBackupCreator,
+    private val mangaBackupCreator: MangaBackupCreator,
+    private val preferenceBackupCreator: PreferenceBackupCreator,
+    private val extensionRepoBackupCreator: ExtensionRepoBackupCreator,
+    private val sourcesBackupCreator: SourcesBackupCreator,
 ) {
 
-    suspend fun backup(uri: Uri, options: BackupOptions): String {
+    suspend fun backup(uri: Uri, options: BackupOptions, isAutoBackup: Boolean): String {
         var file: UniFile? = null
         try {
             file = if (isAutoBackup) {

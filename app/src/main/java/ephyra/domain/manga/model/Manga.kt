@@ -2,7 +2,7 @@ package ephyra.domain.manga.model
 
 import ephyra.domain.base.BasePreferences
 import ephyra.app.data.cache.CoverCache
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.model.SManga
 import ephyra.app.ui.reader.setting.ReaderOrientation
 import ephyra.app.ui.reader.setting.ReadingMode
 import ephyra.core.common.preference.TriState
@@ -11,8 +11,6 @@ import ephyra.core.metadata.comicinfo.ComicInfoPublishingStatus
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 // TODO: move these into the domain model
 val Manga.readingMode: Long
@@ -21,18 +19,17 @@ val Manga.readingMode: Long
 val Manga.readerOrientation: Long
     get() = viewerFlags and ReaderOrientation.MASK.toLong()
 
-val Manga.downloadedFilter: TriState
-    get() {
-        if (Injekt.get<BasePreferences>().downloadedOnly().get()) return TriState.ENABLED_IS
-        return when (downloadedFilterRaw) {
-            Manga.CHAPTER_SHOW_DOWNLOADED -> TriState.ENABLED_IS
-            Manga.CHAPTER_SHOW_NOT_DOWNLOADED -> TriState.ENABLED_NOT
-            else -> TriState.DISABLED
-        }
+fun Manga.downloadedFilter(basePreferences: BasePreferences): TriState {
+    if (basePreferences.downloadedOnly().get()) return TriState.ENABLED_IS
+    return when (downloadedFilterRaw) {
+        Manga.CHAPTER_SHOW_DOWNLOADED -> TriState.ENABLED_IS
+        Manga.CHAPTER_SHOW_NOT_DOWNLOADED -> TriState.ENABLED_NOT
+        else -> TriState.DISABLED
     }
-fun Manga.chaptersFiltered(): Boolean {
+}
+fun Manga.chaptersFiltered(basePreferences: BasePreferences): Boolean {
     return unreadFilter != TriState.DISABLED ||
-        downloadedFilter != TriState.DISABLED ||
+        downloadedFilter(basePreferences) != TriState.DISABLED ||
         bookmarkedFilter != TriState.DISABLED
 }
 
@@ -70,7 +67,7 @@ fun Manga.copyFrom(other: SManga): Manga {
     )
 }
 
-fun Manga.hasCustomCover(coverCache: CoverCache = Injekt.get()): Boolean {
+fun Manga.hasCustomCover(coverCache: CoverCache): Boolean {
     return coverCache.getCustomCoverFile(id).exists()
 }
 

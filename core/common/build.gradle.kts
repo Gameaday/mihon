@@ -39,6 +39,7 @@ dependencies {
     api(kotlinx.serialization.json.okio)
 
     api(libs.preferencektx)
+    api(libs.datastore)
 
     implementation(libs.jsoup)
 

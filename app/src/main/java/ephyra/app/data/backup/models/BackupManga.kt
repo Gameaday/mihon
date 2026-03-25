@@ -1,6 +1,6 @@
 package ephyra.app.data.backup.models
 
-import eu.kanade.ephyra.source.model.UpdateStrategy
+import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import ephyra.domain.manga.model.ContentType

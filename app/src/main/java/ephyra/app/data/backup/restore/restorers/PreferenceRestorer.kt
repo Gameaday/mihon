@@ -13,7 +13,7 @@ import ephyra.app.data.backup.models.LongPreferenceValue
 import ephyra.app.data.backup.models.StringPreferenceValue
 import ephyra.app.data.backup.models.StringSetPreferenceValue
 import ephyra.app.data.library.LibraryUpdateJob
-import eu.kanade.ephyra.source.sourcePreferences
+import eu.kanade.tachiyomi.source.sourcePreferences
 import ephyra.core.common.preference.AndroidPreferenceStore
 import ephyra.core.common.preference.PreferenceStore
 import ephyra.core.common.preference.plusAssign
@@ -21,13 +21,10 @@ import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.model.Category
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.library.service.LibraryPreferences
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
 class PreferenceRestorer(
     private val context: Context,
-    private val getCategories: GetCategories = Injekt.get(),
-    private val preferenceStore: PreferenceStore = Injekt.get(),
+    private val getCategories: GetCategories,
+    private val preferenceStore: PreferenceStore,
 ) {
     suspend fun restoreApp(
         preferences: List<BackupPreference>,

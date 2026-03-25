@@ -1,6 +1,6 @@
 package ephyra.domain.manga.model
 
-import eu.kanade.ephyra.source.model.UpdateStrategy
+import eu.kanade.tachiyomi.source.model.UpdateStrategy
 
 data class MangaUpdate(
     val id: Long,

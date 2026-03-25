@@ -1,7 +1,7 @@
 package ephyra.domain.manga.interactor
 
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.model.SManga
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope

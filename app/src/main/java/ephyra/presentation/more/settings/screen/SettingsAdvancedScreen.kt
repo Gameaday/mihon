@@ -31,20 +31,20 @@ import ephyra.presentation.more.settings.screen.advanced.ClearDatabaseScreen
 import ephyra.presentation.more.settings.screen.debug.DebugInfoScreen
 import ephyra.app.data.download.DownloadCache
 import ephyra.app.data.library.MetadataUpdateJob
-import eu.kanade.ephyra.network.NetworkHelper
-import eu.kanade.ephyra.network.NetworkPreferences
-import eu.kanade.ephyra.network.PREF_DOH_360
-import eu.kanade.ephyra.network.PREF_DOH_ADGUARD
-import eu.kanade.ephyra.network.PREF_DOH_ALIDNS
-import eu.kanade.ephyra.network.PREF_DOH_CLOUDFLARE
-import eu.kanade.ephyra.network.PREF_DOH_CONTROLD
-import eu.kanade.ephyra.network.PREF_DOH_DNSPOD
-import eu.kanade.ephyra.network.PREF_DOH_GOOGLE
-import eu.kanade.ephyra.network.PREF_DOH_MULLVAD
-import eu.kanade.ephyra.network.PREF_DOH_NJALLA
-import eu.kanade.ephyra.network.PREF_DOH_QUAD101
-import eu.kanade.ephyra.network.PREF_DOH_QUAD9
-import eu.kanade.ephyra.network.PREF_DOH_SHECAN
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.network.NetworkPreferences
+import eu.kanade.tachiyomi.network.PREF_DOH_360
+import eu.kanade.tachiyomi.network.PREF_DOH_ADGUARD
+import eu.kanade.tachiyomi.network.PREF_DOH_ALIDNS
+import eu.kanade.tachiyomi.network.PREF_DOH_CLOUDFLARE
+import eu.kanade.tachiyomi.network.PREF_DOH_CONTROLD
+import eu.kanade.tachiyomi.network.PREF_DOH_DNSPOD
+import eu.kanade.tachiyomi.network.PREF_DOH_GOOGLE
+import eu.kanade.tachiyomi.network.PREF_DOH_MULLVAD
+import eu.kanade.tachiyomi.network.PREF_DOH_NJALLA
+import eu.kanade.tachiyomi.network.PREF_DOH_QUAD101
+import eu.kanade.tachiyomi.network.PREF_DOH_QUAD9
+import eu.kanade.tachiyomi.network.PREF_DOH_SHECAN
 import ephyra.app.ui.more.OnboardingScreen
 import ephyra.app.util.CrashLogUtil
 import ephyra.app.util.system.GLUtil
@@ -67,8 +67,7 @@ import ephyra.domain.manga.interactor.ResetViewerFlags
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinInject
 import java.io.File
 
 object SettingsAdvancedScreen : SearchableSettings {
@@ -83,9 +82,9 @@ object SettingsAdvancedScreen : SearchableSettings {
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
 
-        val basePreferences = remember { Injekt.get<BasePreferences>() }
-        val networkPreferences = remember { Injekt.get<NetworkPreferences>() }
-        val libraryPreferences = remember { Injekt.get<LibraryPreferences>() }
+        val basePreferences = koinInject<BasePreferences>()
+        val networkPreferences = koinInject<NetworkPreferences>()
+        val libraryPreferences = koinInject<LibraryPreferences>()
 
         return listOf(
             Preference.PreferenceItem.TextPreference(
@@ -185,7 +184,8 @@ object SettingsAdvancedScreen : SearchableSettings {
                     subtitle = stringResource(MR.strings.pref_invalidate_download_cache_summary),
                     onClick = {
                         scope.launch {
-                            Injekt.get<DownloadCache>().invalidateCache()
+                            val downloadCache = koinInject<DownloadCache>()
+                            downloadCache.invalidateCache()
                             context.toast(MR.strings.download_cache_invalidated)
                         }
                     },
@@ -204,7 +204,7 @@ object SettingsAdvancedScreen : SearchableSettings {
         networkPreferences: NetworkPreferences,
     ): Preference.PreferenceGroup {
         val context = LocalContext.current
-        val networkHelper = remember { Injekt.get<NetworkHelper>() }
+        val networkHelper = koinInject<NetworkHelper>()
 
         val userAgentPref = networkPreferences.defaultUserAgent()
         val userAgent by userAgentPref.collectAsState()
@@ -307,8 +307,9 @@ object SettingsAdvancedScreen : SearchableSettings {
                     title = stringResource(MR.strings.pref_reset_viewer_flags),
                     subtitle = stringResource(MR.strings.pref_reset_viewer_flags_summary),
                     onClick = {
+                        val resetViewerFlags = koinInject<ResetViewerFlags>()
                         scope.launchNonCancellable {
-                            val success = Injekt.get<ResetViewerFlags>().await()
+                            val success = resetViewerFlags.await()
                             withUIContext {
                                 val message = if (success) {
                                     MR.strings.pref_reset_viewer_flags_success
@@ -394,7 +395,7 @@ object SettingsAdvancedScreen : SearchableSettings {
         val uriHandler = LocalUriHandler.current
         val extensionInstallerPref = basePreferences.extensionInstaller()
         var shizukuMissing by rememberSaveable { mutableStateOf(false) }
-        val trustExtension = remember { Injekt.get<TrustExtension>() }
+        val trustExtension = koinInject<TrustExtension>()
 
         if (shizukuMissing) {
             val dismiss = { shizukuMissing = false }

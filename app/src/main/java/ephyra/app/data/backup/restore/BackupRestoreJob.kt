@@ -22,8 +22,11 @@ import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.logcat
 import ephyra.i18n.MR
 
-class BackupRestoreJob(private val context: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(context, workerParams) {
+class BackupRestoreJob(
+    private val context: Context,
+    workerParams: WorkerParameters,
+    private val backupRestorer: BackupRestorer,
+) : CoroutineWorker(context, workerParams) {
 
     private val notifier = BackupNotifier(context)
 
@@ -40,7 +43,7 @@ class BackupRestoreJob(private val context: Context, workerParams: WorkerParamet
         setForegroundSafely()
 
         return try {
-            BackupRestorer(context, notifier, isSync).restore(uri, options)
+            backupRestorer.restore(uri, options, notifier, isSync)
             Result.success()
         } catch (e: Exception) {
             if (e is CancellationException) {

@@ -19,31 +19,31 @@ class InMemoryPreferenceStore(
 
     override fun getString(key: String, defaultValue: String): Preference<String> {
         val default = InMemoryPreference(key, null, defaultValue)
-        val data: String? = preferences[key]?.get() as? String
+        val data: String? = preferences[key]?.getSync() as? String
         return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
     override fun getLong(key: String, defaultValue: Long): Preference<Long> {
         val default = InMemoryPreference(key, null, defaultValue)
-        val data: Long? = preferences[key]?.get() as? Long
+        val data: Long? = preferences[key]?.getSync() as? Long
         return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
     override fun getInt(key: String, defaultValue: Int): Preference<Int> {
         val default = InMemoryPreference(key, null, defaultValue)
-        val data: Int? = preferences[key]?.get() as? Int
+        val data: Int? = preferences[key]?.getSync() as? Int
         return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
     override fun getFloat(key: String, defaultValue: Float): Preference<Float> {
         val default = InMemoryPreference(key, null, defaultValue)
-        val data: Float? = preferences[key]?.get() as? Float
+        val data: Float? = preferences[key]?.getSync() as? Float
         return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
     override fun getBoolean(key: String, defaultValue: Boolean): Preference<Boolean> {
         val default = InMemoryPreference(key, null, defaultValue)
-        val data: Boolean? = preferences[key]?.get() as? Boolean
+        val data: Boolean? = preferences[key]?.getSync() as? Boolean
         return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
@@ -59,7 +59,7 @@ class InMemoryPreferenceStore(
         deserializer: (String) -> T,
     ): Preference<T> {
         val default = InMemoryPreference(key, null, defaultValue)
-        val data: T? = preferences[key]?.get() as? T
+        val data: T? = preferences[key]?.getSync() as? T
         return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
@@ -71,7 +71,7 @@ class InMemoryPreferenceStore(
         deserializer: (Int) -> T,
     ): Preference<T> {
         val default = InMemoryPreference(key, null, defaultValue)
-        val data: T? = preferences[key]?.get() as? T
+        val data: T? = preferences[key]?.getSync() as? T
         return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
@@ -86,7 +86,9 @@ class InMemoryPreferenceStore(
     ) : Preference<T> {
         override fun key(): String = key
 
-        override fun get(): T = data ?: defaultValue()
+        override fun getSync(): T = data ?: defaultValue()
+
+        override suspend fun get(): T = data ?: defaultValue()
 
         override fun isSet(): Boolean = data != null
 
@@ -99,7 +101,7 @@ class InMemoryPreferenceStore(
         override fun changes(): Flow<T> = flow { data }
 
         override fun stateIn(scope: CoroutineScope): StateFlow<T> {
-            return changes().stateIn(scope, SharingStarted.Eagerly, get())
+            return changes().stateIn(scope, SharingStarted.Eagerly, getSync())
         }
 
         override fun set(value: T) {

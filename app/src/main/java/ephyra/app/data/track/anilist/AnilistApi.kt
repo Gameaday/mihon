@@ -10,11 +10,11 @@ import ephyra.app.data.track.anilist.dto.ALOAuth
 import ephyra.app.data.track.anilist.dto.ALSearchResult
 import ephyra.app.data.track.anilist.dto.ALUserListMangaQueryResult
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.network.POST
-import eu.kanade.ephyra.network.awaitSuccess
-import eu.kanade.ephyra.network.interceptor.rateLimit
-import eu.kanade.ephyra.network.jsonMime
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.POST
+import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.interceptor.rateLimit
+import eu.kanade.tachiyomi.network.jsonMime
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject

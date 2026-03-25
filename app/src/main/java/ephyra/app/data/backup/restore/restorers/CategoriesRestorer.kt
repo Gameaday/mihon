@@ -4,13 +4,10 @@ import ephyra.app.data.backup.models.BackupCategory
 import ephyra.data.DatabaseHandler
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.library.service.LibraryPreferences
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
 class CategoriesRestorer(
-    private val handler: DatabaseHandler = Injekt.get(),
-    private val getCategories: GetCategories = Injekt.get(),
-    private val libraryPreferences: LibraryPreferences = Injekt.get(),
+    private val handler: DatabaseHandler,
+    private val getCategories: GetCategories,
+    private val libraryPreferences: LibraryPreferences,
 ) {
 
     suspend operator fun invoke(backupCategories: List<BackupCategory>) {

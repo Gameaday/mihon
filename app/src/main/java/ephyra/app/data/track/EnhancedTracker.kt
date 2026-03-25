@@ -1,7 +1,7 @@
 package ephyra.app.data.track
 
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.source.Source
+import eu.kanade.tachiyomi.source.Source
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.track.model.Track
 

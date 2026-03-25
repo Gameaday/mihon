@@ -1,9 +1,9 @@
 package ephyra.data.source
 
 import androidx.paging.PagingState
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.model.FilterList
-import eu.kanade.ephyra.source.model.MangasPage
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.model.FilterList
+import eu.kanade.tachiyomi.source.model.MangasPage
 import ephyra.domain.manga.model.toDomainManga
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.manga.interactor.NetworkToLocalManga

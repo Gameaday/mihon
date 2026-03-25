@@ -2,14 +2,14 @@ package ephyra.source.local
 
 import android.content.Context
 import com.hippo.unifile.UniFile
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.UnmeteredSource
-import eu.kanade.ephyra.source.model.FilterList
-import eu.kanade.ephyra.source.model.MangasPage
-import eu.kanade.ephyra.source.model.Page
-import eu.kanade.ephyra.source.model.SChapter
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.UnmeteredSource
+import eu.kanade.tachiyomi.source.model.FilterList
+import eu.kanade.tachiyomi.source.model.MangasPage
+import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.source.model.SChapter
+import eu.kanade.tachiyomi.source.model.SManga
 import ephyra.app.util.lang.compareToCaseInsensitiveNaturalOrder
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -412,7 +412,7 @@ actual class LocalSource(
 
     companion object {
         const val ID = 0L
-        const val HELP_URL = "https://mihon.app/docs/guides/local-source/"
+        const val HELP_URL = "https://ephyra.app/docs/guides/local-source/"
 
         private val LATEST_THRESHOLD = 7.days.inWholeMilliseconds
     }

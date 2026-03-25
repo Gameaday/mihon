@@ -1,0 +1,58 @@
+package ephyra.feature.library
+
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import org.koin.core.annotation.Factory
+import ephyra.domain.base.BasePreferences
+import ephyra.app.data.track.TrackerManager
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import ephyra.core.common.preference.Preference
+import ephyra.core.common.preference.TriState
+import ephyra.core.common.preference.getAndSet
+import ephyra.core.common.util.lang.launchIO
+import ephyra.domain.category.interactor.SetDisplayMode
+import ephyra.domain.category.interactor.SetSortModeForCategory
+import ephyra.domain.category.model.Category
+import ephyra.domain.library.model.LibraryDisplayMode
+import ephyra.domain.library.model.LibrarySort
+import ephyra.domain.library.service.LibraryPreferences
+import ephyra.source.local.isLocal
+import kotlin.time.Duration.Companion.seconds
+
+@Factory
+class LibrarySettingsScreenModel(
+    val preferences: BasePreferences,
+    val libraryPreferences: LibraryPreferences,
+    private val setDisplayMode: SetDisplayMode,
+    private val setSortModeForCategory: SetSortModeForCategory,
+    trackerManager: TrackerManager,
+) : ScreenModel {
+
+    val trackersFlow = trackerManager.loggedInTrackersFlow()
+        .stateIn(
+            scope = screenModelScope,
+            started = SharingStarted.WhileSubscribed(5.seconds.inWholeMilliseconds),
+            initialValue = trackerManager.loggedInTrackers(),
+        )
+
+    fun toggleFilter(preference: (LibraryPreferences) -> Preference<TriState>) {
+        preference(libraryPreferences).getAndSet {
+            it.next()
+        }
+    }
+
+    fun toggleTracker(id: Int) {
+        toggleFilter { libraryPreferences.filterTracking(id) }
+    }
+
+    fun setDisplayMode(mode: LibraryDisplayMode) {
+        setDisplayMode.await(mode)
+    }
+
+    fun setSort(category: Category?, mode: LibrarySort.Type, direction: LibrarySort.Direction) {
+        screenModelScope.launchIO {
+            setSortModeForCategory.await(category, mode, direction)
+        }
+    }
+}

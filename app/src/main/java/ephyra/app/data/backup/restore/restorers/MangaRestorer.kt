@@ -18,21 +18,20 @@ import ephyra.domain.manga.model.Manga
 import ephyra.domain.track.interactor.GetTracks
 import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.model.Track
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.core.component.KoinComponent
 import java.time.ZonedDateTime
 import java.util.Date
 import kotlin.math.max
 
 class MangaRestorer(
-    private val handler: DatabaseHandler = Injekt.get(),
-    private val getCategories: GetCategories = Injekt.get(),
-    private val getMangaByUrlAndSourceId: GetMangaByUrlAndSourceId = Injekt.get(),
-    private val getChaptersByMangaId: GetChaptersByMangaId = Injekt.get(),
-    private val updateManga: UpdateManga = Injekt.get(),
-    private val getTracks: GetTracks = Injekt.get(),
-    private val insertTrack: InsertTrack = Injekt.get(),
-    fetchInterval: FetchInterval = Injekt.get(),
+    private val handler: DatabaseHandler,
+    private val getCategories: GetCategories,
+    private val getMangaByUrlAndSourceId: GetMangaByUrlAndSourceId,
+    private val getChaptersByMangaId: GetChaptersByMangaId,
+    private val updateManga: UpdateManga,
+    private val getTracks: GetTracks,
+    private val insertTrack: InsertTrack,
+    private val fetchInterval: FetchInterval,
 ) {
 
     private val now = ZonedDateTime.now()

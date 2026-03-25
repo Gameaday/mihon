@@ -19,16 +19,14 @@ import ephyra.domain.extensionrepo.interactor.UpdateExtensionRepo
 import ephyra.domain.extensionrepo.model.ExtensionRepo
 import ephyra.core.common.util.lang.launchIO
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 class ExtensionReposScreenModel(
-    private val getExtensionRepo: GetExtensionRepo = Injekt.get(),
-    private val createExtensionRepo: CreateExtensionRepo = Injekt.get(),
-    private val deleteExtensionRepo: DeleteExtensionRepo = Injekt.get(),
-    private val replaceExtensionRepo: ReplaceExtensionRepo = Injekt.get(),
-    private val updateExtensionRepo: UpdateExtensionRepo = Injekt.get(),
-    private val extensionManager: ExtensionManager = Injekt.get(),
+    private val getExtensionRepo: GetExtensionRepo,
+    private val createExtensionRepo: CreateExtensionRepo,
+    private val deleteExtensionRepo: DeleteExtensionRepo,
+    private val replaceExtensionRepo: ReplaceExtensionRepo,
+    private val updateExtensionRepo: UpdateExtensionRepo,
+    private val extensionManager: ExtensionManager,
 ) : StateScreenModel<RepoScreenState>(RepoScreenState.Loading) {
 
     private val _events: Channel<RepoEvent> = Channel(Int.MAX_VALUE)

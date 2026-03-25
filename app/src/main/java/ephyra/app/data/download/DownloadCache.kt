@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import com.hippo.unifile.UniFile
 import ephyra.app.extension.ExtensionManager
-import eu.kanade.ephyra.source.Source
+import eu.kanade.tachiyomi.source.Source
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -53,8 +53,8 @@ import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.storage.service.StorageManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import java.io.File
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -67,10 +67,10 @@ import kotlin.time.Duration.Companion.seconds
  */
 class DownloadCache(
     private val context: Context,
-    private val provider: DownloadProvider = Injekt.get(),
-    private val sourceManager: SourceManager = Injekt.get(),
-    private val extensionManager: ExtensionManager = Injekt.get(),
-    private val storageManager: StorageManager = Injekt.get(),
+    private val provider: DownloadProvider,
+    private val sourceManager: SourceManager,
+    private val extensionManager: ExtensionManager,
+    private val storageManager: StorageManager,
 ) {
 
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -517,7 +517,7 @@ private class MangaDirectory(
     var chapterDirs: MutableSet<String> = mutableSetOf(),
 )
 
-private object UniFileAsStringSerializer : KSerializer<UniFile?> {
+private object UniFileAsStringSerializer : KSerializer<UniFile?>, KoinComponent {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UniFile", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: UniFile?) {
@@ -530,7 +530,7 @@ private object UniFileAsStringSerializer : KSerializer<UniFile?> {
 
     override fun deserialize(decoder: Decoder): UniFile? {
         return if (decoder.decodeNotNullMark()) {
-            UniFile.fromUri(Injekt.get<Application>(), decoder.decodeString().toUri())
+            UniFile.fromUri(get<Application>(), decoder.decodeString().toUri())
         } else {
             decoder.decodeNull()
         }

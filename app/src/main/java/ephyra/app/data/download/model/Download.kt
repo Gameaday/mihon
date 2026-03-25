@@ -1,7 +1,7 @@
 package ephyra.app.data.download.model
 
-import eu.kanade.ephyra.source.model.Page
-import eu.kanade.ephyra.source.online.HttpSource
+import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,8 +15,6 @@ import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 data class Download(
     val source: HttpSource,
@@ -74,9 +72,9 @@ data class Download(
     companion object {
         suspend fun fromChapterId(
             chapterId: Long,
-            getChapter: GetChapter = Injekt.get(),
-            getManga: GetManga = Injekt.get(),
-            sourceManager: SourceManager = Injekt.get(),
+            getChapter: GetChapter,
+            getManga: GetManga,
+            sourceManager: SourceManager,
         ): Download? {
             val chapter = getChapter.await(chapterId) ?: return null
             val manga = getManga.await(chapter.mangaId) ?: return null

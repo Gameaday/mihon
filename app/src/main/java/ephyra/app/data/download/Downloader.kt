@@ -8,9 +8,9 @@ import ephyra.app.data.cache.ChapterCache
 import ephyra.app.data.download.model.Download
 import ephyra.app.data.library.LibraryUpdateNotifier
 import ephyra.app.data.notification.NotificationHandler
-import eu.kanade.ephyra.source.UnmeteredSource
-import eu.kanade.ephyra.source.model.Page
-import eu.kanade.ephyra.source.online.HttpSource
+import eu.kanade.tachiyomi.source.UnmeteredSource
+import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.app.ui.reader.setting.ReaderPreferences
 import ephyra.app.util.storage.DiskUtil
 import ephyra.app.util.storage.DiskUtil.NOMEDIA_FILE

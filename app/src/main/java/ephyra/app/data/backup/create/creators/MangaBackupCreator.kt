@@ -11,13 +11,10 @@ import ephyra.data.DatabaseHandler
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.history.interactor.GetHistory
 import ephyra.domain.manga.model.Manga
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
 class MangaBackupCreator(
-    private val handler: DatabaseHandler = Injekt.get(),
-    private val getCategories: GetCategories = Injekt.get(),
-    private val getHistory: GetHistory = Injekt.get(),
+    private val handler: DatabaseHandler,
+    private val getCategories: GetCategories,
+    private val getHistory: GetHistory,
 ) {
 
     suspend operator fun invoke(mangas: List<Manga>, options: BackupOptions): List<BackupManga> {

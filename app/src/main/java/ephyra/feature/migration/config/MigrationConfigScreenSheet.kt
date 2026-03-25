@@ -30,7 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.util.fastForEach
-import eu.kanade.core.util.fastFilterNot
+import ephyra.core.util.fastFilterNot
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.presentation.components.AdaptiveSheet
 import ephyra.domain.migration.models.MigrationFlag

@@ -2,8 +2,8 @@ package ephyra.app.data.download
 
 import android.content.Context
 import ephyra.app.data.download.model.Download
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.model.Page
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.model.Page
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.drop
@@ -18,14 +18,13 @@ import ephyra.core.common.storage.extension
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
-import ephyra.domain.category.interactor.GetCategories
+import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.download.service.DownloadPreferences
+import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 /**
  * This class is used to manage chapter downloads in the application. It must be instantiated once
@@ -34,11 +33,13 @@ import uy.kohesive.injekt.api.get
  */
 class DownloadManager(
     private val context: Context,
-    private val provider: DownloadProvider = Injekt.get(),
-    private val cache: DownloadCache = Injekt.get(),
-    private val getCategories: GetCategories = Injekt.get(),
-    private val sourceManager: SourceManager = Injekt.get(),
-    private val downloadPreferences: DownloadPreferences = Injekt.get(),
+    private val provider: DownloadProvider,
+    private val cache: DownloadCache,
+    private val getCategories: GetCategories,
+    private val getManga: GetManga,
+    private val getChapter: GetChapter,
+    private val sourceManager: SourceManager,
+    private val downloadPreferences: DownloadPreferences,
 ) {
 
     /**
@@ -106,7 +107,7 @@ class DownloadManager(
     suspend fun startDownloadNow(chapterId: Long) {
         val existingDownload = getQueuedDownloadOrNull(chapterId)
         // If not in queue try to start a new download
-        val toAdd = existingDownload ?: Download.fromChapterId(chapterId) ?: return
+        val toAdd = existingDownload ?: Download.fromChapterId(chapterId, getChapter, getManga, sourceManager) ?: return
         queueState.value.toMutableList().apply {
             existingDownload?.let { remove(it) }
             add(0, toAdd)

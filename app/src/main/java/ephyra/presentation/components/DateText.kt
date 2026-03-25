@@ -7,8 +7,7 @@ import ephyra.domain.ui.UiPreferences
 import ephyra.app.util.lang.toRelativeString
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinInject
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -32,7 +31,7 @@ fun relativeDateText(
 ): String {
     val context = LocalContext.current
 
-    val preferences = remember { Injekt.get<UiPreferences>() }
+    val preferences = koinInject<UiPreferences>()
     val relativeTime = remember { preferences.relativeTime().get() }
     val dateFormat = remember { UiPreferences.dateFormat(preferences.dateFormat().get()) }
 

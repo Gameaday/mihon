@@ -1,10 +1,10 @@
 package ephyra.app.data.track.jellyfin
 
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.network.GET
-import eu.kanade.ephyra.network.POST
-import eu.kanade.ephyra.network.awaitSuccess
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.POST
+import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType

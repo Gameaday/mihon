@@ -3,12 +3,9 @@ package ephyra.app.data.backup.restore.restorers
 import ephyra.app.data.backup.models.BackupExtensionRepos
 import ephyra.domain.extensionrepo.interactor.GetExtensionRepo
 import ephyra.data.DatabaseHandler
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
 class ExtensionRepoRestorer(
-    private val handler: DatabaseHandler = Injekt.get(),
-    private val getExtensionRepos: GetExtensionRepo = Injekt.get(),
+    private val handler: DatabaseHandler,
+    private val getExtensionRepos: GetExtensionRepo,
 ) {
 
     suspend operator fun invoke(

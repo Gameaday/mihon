@@ -1,7 +1,7 @@
 package ephyra.domain.chapter.model
 
 import ephyra.app.data.database.models.ChapterImpl
-import eu.kanade.ephyra.source.model.SChapter
+import eu.kanade.tachiyomi.source.model.SChapter
 import ephyra.domain.chapter.model.Chapter
 import ephyra.app.data.database.models.Chapter as DbChapter
 

@@ -23,8 +23,8 @@ import ephyra.domain.manga.model.toSManga
 import ephyra.app.data.cache.CoverCache
 import ephyra.app.data.download.DownloadManager
 import ephyra.app.data.notification.Notifications
-import eu.kanade.ephyra.source.model.SManga
-import eu.kanade.ephyra.source.model.UpdateStrategy
+import eu.kanade.tachiyomi.source.model.SManga
+import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import ephyra.app.util.storage.getUriCompat
 import ephyra.app.util.system.createFileInCacheDir
 import ephyra.app.util.system.isConnectedToWifi
@@ -68,8 +68,6 @@ import ephyra.domain.source.model.SourceNotInstalledException
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
 import ephyra.source.local.isLocal
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.File
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -81,21 +79,22 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
 
 @OptIn(ExperimentalAtomicApi::class)
-class LibraryUpdateJob(private val context: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(context, workerParams) {
-
-    private val sourceManager: SourceManager = Injekt.get()
-    private val libraryPreferences: LibraryPreferences = Injekt.get()
-    private val downloadManager: DownloadManager = Injekt.get()
-    private val coverCache: CoverCache = Injekt.get()
-    private val getLibraryManga: GetLibraryManga = Injekt.get()
-    private val getManga: GetManga = Injekt.get()
-    private val updateManga: UpdateManga = Injekt.get()
-    private val syncChaptersWithSource: SyncChaptersWithSource = Injekt.get()
-    private val fetchInterval: FetchInterval = Injekt.get()
-    private val filterChaptersForDownload: FilterChaptersForDownload = Injekt.get()
-    private val getChaptersByMangaId: GetChaptersByMangaId = Injekt.get()
-    private val refreshCanonicalMetadata: ephyra.domain.track.interactor.RefreshCanonicalMetadata = Injekt.get()
+class LibraryUpdateJob(
+    private val context: Context,
+    workerParams: WorkerParameters,
+    private val sourceManager: SourceManager,
+    private val libraryPreferences: LibraryPreferences,
+    private val downloadManager: DownloadManager,
+    private val coverCache: CoverCache,
+    private val getLibraryManga: GetLibraryManga,
+    private val getManga: GetManga,
+    private val updateManga: UpdateManga,
+    private val syncChaptersWithSource: SyncChaptersWithSource,
+    private val fetchInterval: FetchInterval,
+    private val filterChaptersForDownload: FilterChaptersForDownload,
+    private val getChaptersByMangaId: GetChaptersByMangaId,
+    private val refreshCanonicalMetadata: ephyra.domain.track.interactor.RefreshCanonicalMetadata,
+) : CoroutineWorker(context, workerParams) {
 
     private val notifier = LibraryUpdateNotifier(context)
 
@@ -596,7 +595,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
     private fun writeErrorFile(errors: List<Pair<Manga, String?>>): File {
         try {
             if (errors.isNotEmpty()) {
-                val file = context.createFileInCacheDir("mihon_update_errors.txt")
+                val file = context.createFileInCacheDir("ephyra_update_errors.txt")
                 file.bufferedWriter().use { out ->
                     out.write(context.stringResource(MR.strings.library_errors_help, ERROR_LOG_HELP_URL) + "\n\n")
                     // Error file format:
@@ -627,7 +626,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
         private const val WORK_NAME_AUTO = "LibraryUpdate-auto"
         private const val WORK_NAME_MANUAL = "LibraryUpdate-manual"
 
-        private const val ERROR_LOG_HELP_URL = "https://mihon.app/docs/guides/troubleshooting/"
+        private const val ERROR_LOG_HELP_URL = "https://ephyra.app/docs/guides/troubleshooting/"
 
         private const val MANGA_PER_SOURCE_QUEUE_WARNING_THRESHOLD = 60
 

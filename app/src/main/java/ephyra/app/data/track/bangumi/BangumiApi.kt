@@ -8,12 +8,12 @@ import ephyra.app.data.track.bangumi.dto.BGMOAuth
 import ephyra.app.data.track.bangumi.dto.BGMSearchResult
 import ephyra.app.data.track.bangumi.dto.BGMUser
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.network.GET
-import eu.kanade.ephyra.network.HttpException
-import eu.kanade.ephyra.network.POST
-import eu.kanade.ephyra.network.awaitSuccess
-import eu.kanade.ephyra.network.interceptor.rateLimit
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.HttpException
+import eu.kanade.tachiyomi.network.POST
+import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.interceptor.rateLimit
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
@@ -178,7 +178,7 @@ class BangumiApi(
         private const val OAUTH_URL = "https://bgm.tv/oauth/access_token"
         private const val LOGIN_URL = "https://bgm.tv/oauth/authorize"
 
-        private const val REDIRECT_URL = "mihon://bangumi-auth"
+        private const val REDIRECT_URL = "ephyra://bangumi-auth"
 
         private const val APP_JSON = "application/json"
 

@@ -17,8 +17,7 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinInject
 import java.text.NumberFormat
 
 object SettingsReaderScreen : SearchableSettings {
@@ -29,7 +28,7 @@ object SettingsReaderScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val readerPref = remember { Injekt.get<ReaderPreferences>() }
+        val readerPref = koinInject<ReaderPreferences>()
 
         return listOf(
             Preference.PreferenceItem.ListPreference(

@@ -1,11 +1,11 @@
 package ephyra.domain.manga.interactor
 
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.model.FilterList
-import eu.kanade.ephyra.source.model.MangasPage
-import eu.kanade.ephyra.source.model.Page
-import eu.kanade.ephyra.source.model.SChapter
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.model.FilterList
+import eu.kanade.tachiyomi.source.model.MangasPage
+import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.source.model.SChapter
+import eu.kanade.tachiyomi.source.model.SManga
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.Flow
@@ -283,7 +283,7 @@ private class FakeSourceManager : SourceManager {
     override val catalogueSources: Flow<List<CatalogueSource>> = flowOf(emptyList())
     override fun get(sourceKey: Long) = null
     override fun getOrStub(sourceKey: Long) = StubSource(sourceKey, "en", "Stub")
-    override fun getOnlineSources() = emptyList<eu.kanade.ephyra.source.online.HttpSource>()
+    override fun getOnlineSources() = emptyList<eu.kanade.tachiyomi.source.online.HttpSource>()
     override fun getCatalogueSources() = emptyList<CatalogueSource>()
     override fun getStubSources() = emptyList<StubSource>()
 }

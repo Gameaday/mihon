@@ -6,9 +6,9 @@ import ephyra.app.data.database.models.Track
 import ephyra.app.data.track.BaseTracker
 import ephyra.app.data.track.EnhancedTracker
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.source.ConfigurableSource
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.sourcePreferences
+import eu.kanade.tachiyomi.source.ConfigurableSource
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.sourcePreferences
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.domain.manga.model.Manga

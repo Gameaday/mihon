@@ -8,7 +8,10 @@ interface Preference<T> {
 
     fun key(): String
 
-    fun get(): T
+    @Deprecated("Use suspend fun get() instead", ReplaceWith("get()"))
+    fun getSync(): T
+
+    suspend fun get(): T
 
     fun set(value: T)
 
@@ -49,23 +52,23 @@ interface Preference<T> {
     }
 }
 
-inline fun <reified T, R : T> Preference<T>.getAndSet(crossinline block: (T) -> R) = set(
+suspend fun <reified T, R : T> Preference<T>.getAndSet(crossinline block: (T) -> R) = set(
     block(get()),
 )
 
-operator fun <T> Preference<Set<T>>.plusAssign(item: T) {
+suspend fun <T> Preference<Set<T>>.plusAssign(item: T) {
     set(get() + item)
 }
 
-operator fun <T> Preference<Set<T>>.plusAssign(items: Iterable<T>) {
+suspend fun <T> Preference<Set<T>>.plusAssign(items: Iterable<T>) {
     set(get() + items)
 }
 
-operator fun <T> Preference<Set<T>>.minusAssign(item: T) {
+suspend fun <T> Preference<Set<T>>.minusAssign(item: T) {
     set(get() - item)
 }
 
-fun Preference<Boolean>.toggle(): Boolean {
+suspend fun Preference<Boolean>.toggle(): Boolean {
     set(!get())
     return get()
 }

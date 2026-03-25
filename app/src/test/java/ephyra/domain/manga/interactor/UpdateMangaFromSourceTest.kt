@@ -3,8 +3,8 @@ package ephyra.domain.manga.interactor
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.app.data.cache.CoverCache
 import ephyra.app.data.download.DownloadManager
-import eu.kanade.ephyra.source.model.SManga
-import eu.kanade.ephyra.source.model.UpdateStrategy
+import eu.kanade.tachiyomi.source.model.SManga
+import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify

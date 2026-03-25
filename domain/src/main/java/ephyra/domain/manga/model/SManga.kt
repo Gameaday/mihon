@@ -1,6 +1,6 @@
 package ephyra.domain.manga.model
 
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.model.SManga
 import ephyra.domain.manga.model.Manga
 
 fun SManga.toDomainManga(sourceId: Long): Manga {

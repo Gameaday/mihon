@@ -119,7 +119,7 @@ class MatchUnlinkedNotifier(private val context: Context) {
                 setContentTitle(context.stringResource(MR.strings.tracker_match_all_complete_title))
                 setContentText(text)
                 setStyle(NotificationCompat.BigTextStyle().bigText(text))
-                setSmallIcon(R.drawable.ic_mihon)
+                setSmallIcon(R.drawable.ic_ephyra)
                 setLargeIcon(notificationBitmap)
                 setAutoCancel(true)
                 setContentIntent(resultsPendingIntent)
@@ -143,7 +143,7 @@ class MatchUnlinkedNotifier(private val context: Context) {
                     NotificationCompat.BigTextStyle()
                         .bigText(context.stringResource(MR.strings.tracker_match_all_failed)),
                 )
-                setSmallIcon(R.drawable.ic_mihon)
+                setSmallIcon(R.drawable.ic_ephyra)
                 setLargeIcon(notificationBitmap)
                 setAutoCancel(true)
                 setContentIntent(resultsPendingIntent)

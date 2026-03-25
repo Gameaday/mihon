@@ -4,7 +4,7 @@ import ephyra.domain.manga.model.hasCustomCover
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.app.data.cache.CoverCache
 import ephyra.app.data.download.DownloadManager
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.model.SManga
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.interactor.FetchInterval
 import ephyra.domain.manga.model.LockedField

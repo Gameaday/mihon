@@ -3,7 +3,7 @@ package ephyra.app.data.download
 import android.content.Context
 import androidx.core.content.edit
 import ephyra.app.data.download.model.Download
-import eu.kanade.ephyra.source.online.HttpSource
+import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -11,18 +11,16 @@ import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 /**
  * This class is used to persist active downloads across application restarts.
  */
 class DownloadStore(
     context: Context,
-    private val sourceManager: SourceManager = Injekt.get(),
-    private val json: Json = Injekt.get(),
-    private val getManga: GetManga = Injekt.get(),
-    private val getChapter: GetChapter = Injekt.get(),
+    private val sourceManager: SourceManager,
+    private val json: Json,
+    private val getManga: GetManga,
+    private val getChapter: GetChapter,
 ) {
 
     /**

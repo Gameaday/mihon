@@ -1,8 +1,8 @@
 package ephyra.domain.source.service
 
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.online.HttpSource
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import ephyra.domain.source.model.StubSource

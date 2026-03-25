@@ -31,7 +31,7 @@ sealed class AndroidPreference<T>(
         return key
     }
 
-    override fun get(): T {
+    override fun getSync(): T {
         return try {
             read(preferences, key, defaultValue)
         } catch (e: ClassCastException) {
@@ -40,6 +40,8 @@ sealed class AndroidPreference<T>(
             defaultValue
         }
     }
+
+    override suspend fun get(): T = getSync()
 
     override fun set(value: T) {
         // commit = false uses Editor.apply() — fire-and-forget async write, never blocks the
@@ -66,9 +68,9 @@ sealed class AndroidPreference<T>(
         return keyFlow
             .filter { it == key || it == null }
             .onStart { emit("ignition") }
-            .map { get() }
+            .map { getSync() }
             .conflate()
-            // H1 — Ensure SharedPreferences disk reads in map { get() } always execute on IO.
+            // H1 — Ensure SharedPreferences disk reads in map { getSync() } always execute on IO.
             // Without this, the first emission from onStart fires on whatever thread the
             // collector is running on, which is typically the main thread during Compose
             // recomposition. flowOn does NOT affect the downstream collector's thread.
@@ -76,7 +78,7 @@ sealed class AndroidPreference<T>(
     }
 
     override fun stateIn(scope: CoroutineScope): StateFlow<T> {
-        return changes().stateIn(scope, SharingStarted.Eagerly, get())
+        return changes().stateIn(scope, SharingStarted.Eagerly, getSync())
     }
 
     class StringPrimitive(

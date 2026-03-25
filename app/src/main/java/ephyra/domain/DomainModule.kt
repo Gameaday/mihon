@@ -106,124 +106,117 @@ import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.repository.TrackRepository
 import ephyra.domain.updates.interactor.GetUpdates
 import ephyra.domain.updates.repository.UpdatesRepository
-import uy.kohesive.injekt.api.InjektModule
-import uy.kohesive.injekt.api.InjektRegistrar
-import uy.kohesive.injekt.api.addFactory
-import uy.kohesive.injekt.api.addSingletonFactory
-import uy.kohesive.injekt.api.get
+import org.koin.dsl.module
 
-class DomainModule : InjektModule {
+val koinDomainModule = module {
+    single<CategoryRepository> { CategoryRepositoryImpl(get()) }
+    factory { GetCategories(get()) }
+    factory { ResetCategoryFlags(get(), get()) }
+    factory { SetDisplayMode(get()) }
+    factory { SetSortModeForCategory(get(), get()) }
+    factory { CreateCategoryWithName(get(), get()) }
+    factory { RenameCategory(get()) }
+    factory { ReorderCategory(get()) }
+    factory { UpdateCategory(get()) }
+    factory { DeleteCategory(get(), get(), get()) }
 
-    override fun InjektRegistrar.registerInjectables() {
-        addSingletonFactory<CategoryRepository> { CategoryRepositoryImpl(get()) }
-        addFactory { GetCategories(get()) }
-        addFactory { ResetCategoryFlags(get(), get()) }
-        addFactory { SetDisplayMode(get()) }
-        addFactory { SetSortModeForCategory(get(), get()) }
-        addFactory { CreateCategoryWithName(get(), get()) }
-        addFactory { RenameCategory(get()) }
-        addFactory { ReorderCategory(get()) }
-        addFactory { UpdateCategory(get()) }
-        addFactory { DeleteCategory(get(), get(), get()) }
-
-        addSingletonFactory<MangaRepository> { MangaRepositoryImpl(get()) }
-        addFactory { GetDuplicateLibraryManga(get()) }
-        addFactory { GetFavorites(get()) }
-        addFactory { GetFavoritesByCanonicalId(get()) }
-        addFactory { GetDeadFavorites(get()) }
-        addFactory { GetLibraryManga(get()) }
-        addFactory { GetMangaWithChapters(get(), get()) }
-        addFactory { GetMangaByUrlAndSourceId(get()) }
-        addFactory { GetManga(get()) }
-        addFactory { GetNextChapters(get(), get(), get()) }
-        addFactory { GetUpcomingManga(get()) }
-        addFactory { ResetViewerFlags(get()) }
-        addFactory { SetMangaChapterFlags(get()) }
-        addFactory { FetchInterval(get()) }
-        addFactory { SetMangaDefaultChapterFlags(get(), get(), get()) }
-        addFactory { SetMangaViewerFlags(get()) }
-        addFactory { NetworkToLocalManga(get()) }
-        addFactory { UpdateManga(get(), get()) }
-        addFactory { FindContentSource(get(), get()) }
-        addFactory { UpdateMangaNotes(get()) }
-        addFactory { SetMangaCategories(get()) }
-        addFactory { GetExcludedScanlators(get()) }
-        addFactory { SetExcludedScanlators(get()) }
-        addFactory { DeleteNonLibraryManga(get()) }
-        addFactory {
-            MigrateMangaUseCase(
-                get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
-            )
-        }
-
-        addSingletonFactory<ReleaseService> { ReleaseServiceImpl(get(), get()) }
-        addFactory { GetApplicationRelease(get(), get()) }
-
-        addSingletonFactory<TrackRepository> { TrackRepositoryImpl(get()) }
-        addFactory { TrackChapter(get(), get(), get(), get()) }
-        addFactory { AddTracks(get(), get(), get(), get()) }
-        addFactory { RefreshTracks(get(), get(), get(), get()) }
-        addFactory { DeleteTrack(get()) }
-        addFactory { GetTracksPerManga(get()) }
-        addFactory { GetTracks(get()) }
-        addFactory { InsertTrack(get()) }
-        addFactory { SyncChapterProgressWithTrack(get(), get(), get()) }
-        addFactory { TrackerListImporter(get(), get(), get(), get()) }
-        addFactory { LinkTrackedMangaToAuthority(get(), get()) }
-        addFactory { MatchUnlinkedManga(get(), get(), get(), get()) }
-        addFactory { RefreshCanonicalMetadata(get(), get(), get(), get()) }
-
-        addSingletonFactory<ChapterRepository> { ChapterRepositoryImpl(get()) }
-        addFactory { GetChapter(get()) }
-        addFactory { GetChaptersByMangaId(get()) }
-        addFactory { GetBookmarkedChaptersByMangaId(get()) }
-        addFactory { GetChapterByUrlAndMangaId(get()) }
-        addFactory { UpdateChapter(get()) }
-        addFactory { SetReadStatus(get(), get(), get(), get()) }
-        addFactory { ShouldUpdateDbChapter() }
-        addFactory { SyncChaptersWithSource(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-        addFactory { GetAvailableScanlators(get()) }
-        addFactory { FilterChaptersForDownload(get(), get(), get()) }
-        addFactory { GenerateAuthorityChapters(get()) }
-
-        addSingletonFactory<HistoryRepository> { HistoryRepositoryImpl(get()) }
-        addFactory { GetHistory(get()) }
-        addFactory { UpsertHistory(get()) }
-        addFactory { RemoveHistory(get()) }
-        addFactory { RemoveResettedHistory(get()) }
-        addFactory { GetTotalReadDuration(get()) }
-
-        addFactory { DeleteDownload(get(), get()) }
-
-        addFactory { GetExtensionsByType(get(), get()) }
-        addFactory { GetExtensionSources(get()) }
-        addFactory { GetExtensionLanguages(get(), get()) }
-
-        addSingletonFactory<UpdatesRepository> { UpdatesRepositoryImpl(get()) }
-        addFactory { GetUpdates(get()) }
-
-        addSingletonFactory<SourceRepository> { SourceRepositoryImpl(get(), get()) }
-        addSingletonFactory<StubSourceRepository> { StubSourceRepositoryImpl(get()) }
-        addFactory { GetEnabledSources(get(), get()) }
-        addFactory { GetLanguagesWithSources(get(), get()) }
-        addFactory { GetRemoteManga(get()) }
-        addFactory { GetSourcesWithFavoriteCount(get(), get()) }
-        addFactory { GetSourcesWithNonLibraryManga(get()) }
-        addFactory { SetMigrateSorting(get()) }
-        addFactory { ToggleLanguage(get()) }
-        addFactory { ToggleSource(get()) }
-        addFactory { ToggleSourcePin(get()) }
-        addFactory { TrustExtension(get(), get()) }
-
-        addSingletonFactory<ExtensionRepoRepository> { ExtensionRepoRepositoryImpl(get()) }
-        addFactory { ExtensionRepoService(get(), get()) }
-        addFactory { GetExtensionRepo(get()) }
-        addFactory { GetExtensionRepoCount(get()) }
-        addFactory { CreateExtensionRepo(get(), get()) }
-        addFactory { DeleteExtensionRepo(get()) }
-        addFactory { ReplaceExtensionRepo(get()) }
-        addFactory { UpdateExtensionRepo(get(), get()) }
-        addFactory { ToggleIncognito(get()) }
-        addFactory { GetIncognitoState(get(), get(), get()) }
+    single<MangaRepository> { MangaRepositoryImpl(get()) }
+    factory { GetDuplicateLibraryManga(get()) }
+    factory { GetFavorites(get()) }
+    factory { GetFavoritesByCanonicalId(get()) }
+    factory { GetDeadFavorites(get()) }
+    factory { GetLibraryManga(get()) }
+    factory { GetMangaWithChapters(get(), get()) }
+    factory { GetMangaByUrlAndSourceId(get()) }
+    factory { GetManga(get()) }
+    factory { GetNextChapters(get(), get(), get()) }
+    factory { GetUpcomingManga(get()) }
+    factory { ResetViewerFlags(get()) }
+    factory { SetMangaChapterFlags(get()) }
+    factory { FetchInterval(get()) }
+    factory { SetMangaDefaultChapterFlags(get(), get(), get()) }
+    factory { SetMangaViewerFlags(get()) }
+    factory { NetworkToLocalManga(get()) }
+    factory { UpdateManga(get(), get()) }
+    factory { FindContentSource(get(), get()) }
+    factory { UpdateMangaNotes(get()) }
+    factory { SetMangaCategories(get()) }
+    factory { GetExcludedScanlators(get()) }
+    factory { SetExcludedScanlators(get()) }
+    factory { DeleteNonLibraryManga(get()) }
+    factory {
+        MigrateMangaUseCase(
+            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
+        )
     }
+
+    single<ReleaseService> { ReleaseServiceImpl(get(), get()) }
+    factory { GetApplicationRelease(get(), get()) }
+
+    single<TrackRepository> { TrackRepositoryImpl(get()) }
+    factory { TrackChapter(get(), get(), get(), get()) }
+    factory { AddTracks(get(), get(), get(), get(), get(), get()) }
+    factory { RefreshTracks(get(), get(), get(), get()) }
+    factory { DeleteTrack(get()) }
+    factory { GetTracksPerManga(get()) }
+    factory { GetTracks(get()) }
+    factory { InsertTrack(get()) }
+    factory { SyncChapterProgressWithTrack(get(), get(), get()) }
+    factory { TrackerListImporter(get(), get(), get(), get()) }
+    factory { LinkTrackedMangaToAuthority(get(), get()) }
+    factory { MatchUnlinkedManga(get(), get(), get(), get()) }
+    factory { RefreshCanonicalMetadata(get(), get(), get(), get()) }
+
+    single<ChapterRepository> { ChapterRepositoryImpl(get()) }
+    factory { GetChapter(get()) }
+    factory { GetChaptersByMangaId(get()) }
+    factory { GetBookmarkedChaptersByMangaId(get()) }
+    factory { GetChapterByUrlAndMangaId(get()) }
+    factory { UpdateChapter(get()) }
+    factory { SetReadStatus(get(), get(), get(), get()) }
+    factory { ShouldUpdateDbChapter() }
+    factory { SyncChaptersWithSource(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory { GetAvailableScanlators(get()) }
+    factory { FilterChaptersForDownload(get(), get(), get()) }
+    factory { GenerateAuthorityChapters(get()) }
+
+    single<HistoryRepository> { HistoryRepositoryImpl(get()) }
+    factory { GetHistory(get()) }
+    factory { UpsertHistory(get()) }
+    factory { RemoveHistory(get()) }
+    factory { RemoveResettedHistory(get()) }
+    factory { GetTotalReadDuration(get()) }
+
+    factory { DeleteDownload(get(), get()) }
+
+    factory { GetExtensionsByType(get(), get()) }
+    factory { GetExtensionSources(get()) }
+    factory { GetExtensionLanguages(get(), get()) }
+
+    single<UpdatesRepository> { UpdatesRepositoryImpl(get()) }
+    factory { GetUpdates(get()) }
+
+    single<SourceRepository> { SourceRepositoryImpl(get(), get()) }
+    single<StubSourceRepository> { StubSourceRepositoryImpl(get()) }
+    factory { GetEnabledSources(get(), get()) }
+    factory { GetLanguagesWithSources(get(), get()) }
+    factory { GetRemoteManga(get()) }
+    factory { GetSourcesWithFavoriteCount(get(), get()) }
+    factory { GetSourcesWithNonLibraryManga(get()) }
+    factory { SetMigrateSorting(get()) }
+    factory { ToggleLanguage(get()) }
+    factory { ToggleSource(get()) }
+    factory { ToggleSourcePin(get()) }
+    factory { TrustExtension(get(), get()) }
+
+    single<ExtensionRepoRepository> { ExtensionRepoRepositoryImpl(get()) }
+    factory { ExtensionRepoService(get(), get()) }
+    factory { GetExtensionRepo(get()) }
+    factory { GetExtensionRepoCount(get()) }
+    factory { CreateExtensionRepo(get(), get()) }
+    factory { DeleteExtensionRepo(get()) }
+    factory { ReplaceExtensionRepo(get()) }
+    factory { UpdateExtensionRepo(get(), get()) }
+    factory { ToggleIncognito(get()) }
+    factory { GetIncognitoState(get(), get(), get()) }
 }

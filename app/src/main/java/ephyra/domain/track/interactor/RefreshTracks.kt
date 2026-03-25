@@ -4,7 +4,7 @@ import ephyra.domain.track.model.toDbTrack
 import ephyra.domain.track.model.toDomainTrack
 import ephyra.app.data.track.Tracker
 import ephyra.app.data.track.TrackerManager
-import eu.kanade.ephyra.network.HttpException
+import eu.kanade.tachiyomi.network.HttpException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay

@@ -6,7 +6,7 @@ import ephyra.app.data.database.models.Track
 import ephyra.app.data.track.BaseTracker
 import ephyra.app.data.track.EnhancedTracker
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.source.Source
+import eu.kanade.tachiyomi.source.Source
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import okhttp3.Dns

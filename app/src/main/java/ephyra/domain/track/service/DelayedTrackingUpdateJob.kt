@@ -16,22 +16,21 @@ import logcat.LogPriority
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.track.interactor.GetTracks
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.util.concurrent.TimeUnit
 
-class DelayedTrackingUpdateJob(private val context: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(context, workerParams) {
+class DelayedTrackingUpdateJob(
+    private val context: Context,
+    workerParams: WorkerParameters,
+    private val getTracks: GetTracks,
+    private val trackChapter: TrackChapter,
+    private val delayedTrackingStore: DelayedTrackingStore,
+) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         if (runAttemptCount > 3) {
             return Result.failure()
         }
 
-        val getTracks = Injekt.get<GetTracks>()
-        val trackChapter = Injekt.get<TrackChapter>()
-
-        val delayedTrackingStore = Injekt.get<DelayedTrackingStore>()
 
         withIOContext {
             val items = delayedTrackingStore.getItems()

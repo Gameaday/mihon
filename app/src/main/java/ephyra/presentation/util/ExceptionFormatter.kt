@@ -1,7 +1,7 @@
 package ephyra.presentation.util
 
 import android.content.Context
-import eu.kanade.ephyra.network.HttpException
+import eu.kanade.tachiyomi.network.HttpException
 import ephyra.app.util.system.isOnline
 import ephyra.core.common.i18n.stringResource
 import ephyra.data.source.NoResultsException

@@ -1,7 +1,5 @@
 package ephyra.app.di
 
-import android.app.Application
-import androidx.core.content.ContextCompat
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import app.cash.sqldelight.db.SqlDriver
@@ -10,15 +8,23 @@ import ephyra.domain.track.store.DelayedTrackingStore
 import ephyra.app.BuildConfig
 import ephyra.app.data.cache.ChapterCache
 import ephyra.app.data.cache.CoverCache
+import ephyra.app.data.backup.restore.restorers.ExtensionRepoRestorer
+import ephyra.app.data.backup.restore.restorers.MangaRestorer
+import ephyra.app.data.backup.restore.restorers.PreferenceRestorer
+import ephyra.app.data.backup.create.BackupCreateJob
+import ephyra.app.data.backup.create.BackupCreator
+import ephyra.app.data.backup.create.creators.CategoriesBackupCreator
+import ephyra.app.data.backup.create.creators.ExtensionRepoBackupCreator
+import ephyra.app.data.backup.create.creators.MangaBackupCreator
+import ephyra.app.data.backup.create.creators.PreferenceBackupCreator
+import ephyra.app.data.backup.create.creators.SourcesBackupCreator
 import ephyra.app.data.download.DownloadCache
-import ephyra.app.data.download.DownloadManager
-import ephyra.app.data.download.DownloadProvider
 import ephyra.app.data.saver.ImageSaver
 import ephyra.app.data.track.TrackerManager
 import ephyra.app.extension.ExtensionManager
-import eu.kanade.ephyra.network.JavaScriptEngine
-import eu.kanade.ephyra.network.NetworkHelper
-import eu.kanade.ephyra.source.AndroidSourceManager
+import eu.kanade.tachiyomi.network.JavaScriptEngine
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.source.AndroidSourceManager
 import io.requery.android.database.sqlite.RequerySQLiteOpenHelperFactory
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -38,148 +44,126 @@ import ephyra.domain.source.service.SourceManager
 import ephyra.domain.storage.service.StorageManager
 import ephyra.source.local.image.LocalCoverManager
 import ephyra.source.local.io.LocalSourceFileSystem
-import uy.kohesive.injekt.api.InjektModule
-import uy.kohesive.injekt.api.InjektRegistrar
-import uy.kohesive.injekt.api.addSingleton
-import uy.kohesive.injekt.api.addSingletonFactory
-import uy.kohesive.injekt.api.get
+import ephyra.app.data.download.DownloadJob
+import ephyra.app.data.library.LibraryUpdateJob
+import ephyra.domain.track.service.DelayedTrackingUpdateJob
+import org.koin.android.ext.koin.androidApplication
+import org.koin.androidx.workmanager.dsl.worker
+import org.koin.dsl.module
 
-class AppModule(val app: Application) : InjektModule {
-
-    override fun InjektRegistrar.registerInjectables() {
-        addSingleton(app)
-
-        addSingletonFactory<SqlDriver> {
-            AndroidSqliteDriver(
-                schema = Database.Schema,
-                context = app,
-                name = "tachiyomi.db",
-                factory = if (BuildConfig.DEBUG) {
-                    // Support database inspector in Android Studio
-                    FrameworkSQLiteOpenHelperFactory()
-                } else {
-                    RequerySQLiteOpenHelperFactory()
-                },
-                callback = object : AndroidSqliteDriver.Callback(Database.Schema) {
-                    override fun onConfigure(db: SupportSQLiteDatabase) {
-                        super.onConfigure(db)
-                        // Enable incremental auto-vacuum so the database file shrinks
-                        // as pages are freed by deletions. For new databases this takes
-                        // effect immediately. For existing databases already in a
-                        // different auto-vacuum mode, this PRAGMA alone does NOT change
-                        // the mode — a full VACUUM would be required. However, we still
-                        // set it so that any future fresh install or database recreation
-                        // picks up the setting automatically. The incremental_vacuum in
-                        // onOpen is only effective once the database is actually in
-                        // incremental mode.
-                        setPragma(db, "auto_vacuum = INCREMENTAL")
-                    }
-                    override fun onOpen(db: SupportSQLiteDatabase) {
-                        super.onOpen(db)
-                        setPragma(db, "foreign_keys = ON")
-                        setPragma(db, "journal_mode = WAL")
-                        setPragma(db, "synchronous = NORMAL")
-                        // Use memory for temporary tables instead of disk
-                        setPragma(db, "temp_store = MEMORY")
-                        // 8 MB page cache (negative = KB) — helps with large library views
-                        setPragma(db, "cache_size = -8192")
-                        // Memory-mapped I/O for faster reads (64 MB)
-                        setPragma(db, "mmap_size = 67108864")
-                        // Reclaim up to 256 free pages (~1 MB) left by previous sessions'
-                        // deletions, so the database file doesn't grow unboundedly over time.
-                        setPragma(db, "incremental_vacuum(256)")
-                        // Run expensive maintenance PRAGMAs on a background thread
-                        // to avoid adding cold-start latency. wal_checkpoint(TRUNCATE)
-                        // and optimize can be slow on large databases but are safe to
-                        // run concurrently under WAL mode.
-                        Thread {
-                            try {
-                                // Flush any leftover WAL frames from a previous unclean
-                                // shutdown into the main database file.
-                                setPragma(db, "wal_checkpoint(TRUNCATE)")
-                                // Let SQLite re-analyze tables whose stats are stale,
-                                // keeping query plans optimal as the library grows.
-                                setPragma(db, "optimize")
-                            } catch (_: Exception) {
-                                // Non-critical maintenance — swallow failures silently.
-                            }
-                        }.apply { name = "db-maintenance" }.start()
-                    }
-                    private fun setPragma(db: SupportSQLiteDatabase, pragma: String) {
-                        val cursor = db.query("PRAGMA $pragma")
-                        cursor.moveToFirst()
-                        cursor.close()
-                    }
-                },
-            )
-        }
-        addSingletonFactory {
-            Database(
-                driver = get(),
-                historyAdapter = History.Adapter(
-                    last_readAdapter = DateColumnAdapter,
-                ),
-                mangasAdapter = Mangas.Adapter(
-                    genreAdapter = StringListColumnAdapter,
-                    update_strategyAdapter = UpdateStrategyColumnAdapter,
-                ),
-            )
-        }
-        addSingletonFactory<DatabaseHandler> { AndroidDatabaseHandler(get(), get()) }
-
-        addSingletonFactory {
-            Json {
-                ignoreUnknownKeys = true
-                explicitNulls = false
-            }
-        }
-        addSingletonFactory {
-            XML {
-                defaultPolicy {
-                    ignoreUnknownChildren()
+val koinAppModule = module {
+    single<SqlDriver> {
+        AndroidSqliteDriver(
+            schema = Database.Schema,
+            context = androidApplication(),
+            name = "tachiyomi.db",
+            factory = if (BuildConfig.DEBUG) {
+                FrameworkSQLiteOpenHelperFactory()
+            } else {
+                RequerySQLiteOpenHelperFactory()
+            },
+            callback = object : AndroidSqliteDriver.Callback(Database.Schema) {
+                override fun onConfigure(db: SupportSQLiteDatabase) {
+                    super.onConfigure(db)
+                    setPragma(db, "auto_vacuum = INCREMENTAL")
                 }
-                autoPolymorphic = true
-                xmlDeclMode = XmlDeclMode.Charset
-                indent = 2
-                xmlVersion = XmlVersion.XML10
-            }
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    setPragma(db, "foreign_keys = ON")
+                    setPragma(db, "journal_mode = WAL")
+                    setPragma(db, "synchronous = NORMAL")
+                    setPragma(db, "temp_store = MEMORY")
+                    setPragma(db, "cache_size = -8192")
+                    setPragma(db, "mmap_size = 67108864")
+                    setPragma(db, "incremental_vacuum(256)")
+                    Thread {
+                        try {
+                            setPragma(db, "wal_checkpoint(TRUNCATE)")
+                            setPragma(db, "optimize")
+                        } catch (_: Exception) {}
+                    }.apply { name = "db-maintenance" }.start()
+                }
+                private fun setPragma(db: SupportSQLiteDatabase, pragma: String) {
+                    val cursor = db.query("PRAGMA $pragma")
+                    cursor.moveToFirst()
+                    cursor.close()
+                }
+            },
+        )
+    }
+
+    single {
+        Database(
+            driver = get(),
+            historyAdapter = History.Adapter(last_readAdapter = DateColumnAdapter),
+            mangasAdapter = Mangas.Adapter(
+                genreAdapter = StringListColumnAdapter,
+                update_strategyAdapter = UpdateStrategyColumnAdapter,
+            ),
+        )
+    }
+
+    single<DatabaseHandler> { AndroidDatabaseHandler(get(), get()) }
+
+    single {
+        Json {
+            ignoreUnknownKeys = true
+            explicitNulls = false
         }
-        addSingletonFactory<ProtoBuf> {
-            ProtoBuf
+    }
+
+    single {
+        XML {
+            defaultPolicy { ignoreUnknownChildren() }
+            autoPolymorphic = true
+            xmlDeclMode = XmlDeclMode.Charset
+            indent = 2
+            xmlVersion = XmlVersion.XML10
         }
+    }
 
-        addSingletonFactory { ChapterCache(app, get()) }
-        addSingletonFactory { CoverCache(app) }
+    single<ProtoBuf> { ProtoBuf }
 
-        addSingletonFactory { NetworkHelper(app, get()) }
-        addSingletonFactory { JavaScriptEngine(app) }
+    single { ChapterCache(androidApplication(), get()) }
+    single { CoverCache(androidApplication()) }
 
-        addSingletonFactory<SourceManager> { AndroidSourceManager(app, get(), get()) }
-        addSingletonFactory { ExtensionManager(app) }
+    single { NetworkHelper(androidApplication(), get()) }
+    single { JavaScriptEngine(androidApplication()) }
 
-        addSingletonFactory { DownloadProvider(app) }
-        addSingletonFactory { DownloadManager(app) }
-        addSingletonFactory { DownloadCache(app) }
+    single<SourceManager> { AndroidSourceManager(androidApplication(), get(), get()) }
+    single { ExtensionManager(androidApplication()) }
 
-        addSingletonFactory { TrackerManager() }
-        addSingletonFactory { DelayedTrackingStore(app) }
+    single { DownloadStore(androidApplication(), get(), get(), get(), get()) }
+    single { DownloadProvider(androidApplication(), get(), get()) }
+    single { DownloadCache(androidApplication(), get(), get(), get(), get()) }
+    single { DownloadManager(androidApplication(), get(), get(), get(), get(), get(), get(), get()) }
 
-        addSingletonFactory { ImageSaver(app) }
+    single { TrackerManager() }
+    single { DelayedTrackingStore(androidApplication()) }
 
-        addSingletonFactory { AndroidStorageFolderProvider(app) }
-        addSingletonFactory { LocalSourceFileSystem(get()) }
-        addSingletonFactory { LocalCoverManager(app, get()) }
-        addSingletonFactory { StorageManager(app, get()) }
+    single { CategoriesBackupCreator(get()) }
+    single { MangaBackupCreator(get(), get(), get()) }
+    single { PreferenceBackupCreator(get(), get()) }
+    single { ExtensionRepoBackupCreator(get()) }
+    single { SourcesBackupCreator(get()) }
+    single { BackupCreator(androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 
-        // Asynchronously init expensive components for a faster cold start
-        ContextCompat.getMainExecutor(app).execute {
-            get<NetworkHelper>()
+    single { PreferenceRestorer(androidApplication(), get(), get()) }
+    single { ExtensionRepoRestorer(get(), get()) }
+    single { MangaRestorer(get(), get(), get(), get(), get(), get(), get(), get()) }
 
-            get<SourceManager>()
+    single { ImageSaver(androidApplication()) }
 
-            get<Database>()
-
-            get<DownloadManager>()
-        }
+    single { AndroidStorageFolderProvider(androidApplication()) }
+    single { LocalSourceFileSystem(get()) }
+    single { LocalCoverManager(androidApplication(), get()) }
+    single { StorageManager(androidApplication(), get()) }
+    worker { BackupCreateJob(get(), get(), get(), get(), get()) }
+    worker { DownloadJob(get(), get(), get(), get()) }
+    worker { DelayedTrackingUpdateJob(get(), get(), get(), get(), get()) }
+    worker { 
+        LibraryUpdateJob(
+            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
+        ) 
     }
 }

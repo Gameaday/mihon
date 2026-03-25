@@ -1,0 +1,70 @@
+package ephyra.feature.library.presentation.components
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import ephyra.feature.library.LibraryItem
+import ephyra.domain.library.model.LibraryManga
+import ephyra.domain.manga.model.MangaCover
+
+@Composable
+internal fun LibraryCompactGrid(
+    items: List<LibraryItem>,
+    showTitle: Boolean,
+    columns: Int,
+    contentPadding: PaddingValues,
+    selection: Set<Long>,
+    onClick: (LibraryManga) -> Unit,
+    onLongClick: (LibraryManga) -> Unit,
+    onClickContinueReading: ((LibraryManga) -> Unit)?,
+    searchQuery: String?,
+    onGlobalSearchClicked: () -> Unit,
+) {
+    LazyLibraryGrid(
+        modifier = Modifier.fillMaxSize(),
+        columns = columns,
+        contentPadding = contentPadding,
+    ) {
+        globalSearchItem(searchQuery, onGlobalSearchClicked)
+
+        items(
+            items = items,
+            key = { it.libraryManga.manga.id },
+            contentType = { "library_compact_grid_item" },
+        ) { libraryItem ->
+            val manga = libraryItem.libraryManga.manga
+            MangaCompactGridItem(
+                isSelected = manga.id in selection,
+                title = manga.title.takeIf { showTitle },
+                coverData = MangaCover(
+                    mangaId = manga.id,
+                    sourceId = manga.source,
+                    isMangaFavorite = manga.favorite,
+                    url = manga.thumbnailUrl,
+                    lastModified = manga.coverLastModified,
+                ),
+                coverBadgeStart = {
+                    DownloadsBadge(count = libraryItem.downloadCount)
+                    UnreadBadge(count = libraryItem.unreadCount)
+                },
+                coverBadgeEnd = {
+                    AuthorityBadge(hasCanonicalId = manga.canonicalId != null, canonicalId = manga.canonicalId)
+                    SourceHealthBadge(sourceStatus = manga.sourceStatus)
+                    LanguageBadge(
+                        isLocal = libraryItem.isLocal,
+                        sourceLanguage = libraryItem.sourceLanguage,
+                    )
+                },
+                onLongClick = { onLongClick(libraryItem.libraryManga) },
+                onClick = { onClick(libraryItem.libraryManga) },
+                onClickContinueReading = if (onClickContinueReading != null && libraryItem.unreadCount > 0) {
+                    { onClickContinueReading(libraryItem.libraryManga) }
+                } else {
+                    null
+                },
+            )
+        }
+    }
+}

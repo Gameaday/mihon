@@ -30,8 +30,13 @@ import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.util.concurrent.TimeUnit
 
-class BackupCreateJob(private val context: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(context, workerParams) {
+class BackupCreateJob(
+    private val context: Context,
+    workerParams: WorkerParameters,
+    private val backupCreator: BackupCreator,
+    private val storageManager: StorageManager,
+    private val backupPreferences: BackupPreferences,
+) : CoroutineWorker(context, workerParams) {
 
     private val notifier = BackupNotifier(context)
 
@@ -50,7 +55,7 @@ class BackupCreateJob(private val context: Context, workerParams: WorkerParamete
             ?: BackupOptions()
 
         return try {
-            val location = BackupCreator(context, isAutoBackup).backup(uri, options)
+            val location = backupCreator.backup(uri, options, isAutoBackup)
             if (!isAutoBackup) {
                 notifier.showBackupComplete(UniFile.fromUri(context, location.toUri())!!)
             }
@@ -73,7 +78,6 @@ class BackupCreateJob(private val context: Context, workerParams: WorkerParamete
     }
 
     private fun getAutomaticBackupLocation(): Uri? {
-        val storageManager = Injekt.get<StorageManager>()
         return storageManager.getAutomaticBackupsDirectory()?.uri
     }
 

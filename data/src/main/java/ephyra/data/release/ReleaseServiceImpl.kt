@@ -1,10 +1,10 @@
 package ephyra.data.release
 
 import android.os.Build
-import eu.kanade.ephyra.network.GET
-import eu.kanade.ephyra.network.NetworkHelper
-import eu.kanade.ephyra.network.awaitSuccess
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import ephyra.domain.release.interactor.GetApplicationRelease
 import ephyra.domain.release.model.Release

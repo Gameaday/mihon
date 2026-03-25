@@ -3,9 +3,9 @@ package ephyra.app.data.track.komga
 import ephyra.app.BuildConfig
 import ephyra.app.data.database.models.Track
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.network.GET
-import eu.kanade.ephyra.network.awaitSuccess
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import logcat.LogPriority

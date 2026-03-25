@@ -7,8 +7,8 @@ import ephyra.app.data.track.BaseTracker
 import ephyra.app.data.track.DeletableTracker
 import ephyra.app.data.track.EnhancedTracker
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.network.interceptor.rateLimit
-import eu.kanade.ephyra.source.Source
+import eu.kanade.tachiyomi.network.interceptor.rateLimit
+import eu.kanade.tachiyomi.source.Source
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.sync.Mutex
@@ -18,10 +18,7 @@ import okhttp3.Dns
 import okhttp3.OkHttpClient
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.library.service.LibraryPreferences
-import ephyra.domain.manga.model.Manga
-import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.core.component.inject
 import kotlin.time.Duration.Companion.seconds
 import ephyra.domain.track.model.Track as DomainTrack
 
@@ -78,7 +75,7 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
 
     val api by lazy { JellyfinApi(id, client) }
 
-    private val libraryPreferences: LibraryPreferences by lazy { Injekt.get() }
+    private val libraryPreferences: LibraryPreferences by inject()
 
     /**
      * Mutex to prevent concurrent sync operations from corrupting read progress.

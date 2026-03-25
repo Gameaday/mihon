@@ -7,7 +7,7 @@ import ephyra.app.data.track.EnhancedTracker
 import ephyra.app.data.track.Tracker
 import ephyra.app.data.track.TrackerManager
 import ephyra.app.data.track.model.TrackSearch
-import eu.kanade.ephyra.source.Source
+import eu.kanade.tachiyomi.source.Source
 import ephyra.app.util.lang.convertEpochMillisZone
 import logcat.LogPriority
 import ephyra.core.common.util.lang.withIOContext
@@ -21,16 +21,15 @@ import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.model.mergedAlternativeTitles
 import ephyra.domain.manga.repository.MangaRepository
 import ephyra.domain.track.interactor.InsertTrack
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.time.ZoneOffset
 
 class AddTracks(
     private val insertTrack: InsertTrack,
     private val syncChapterProgressWithTrack: SyncChapterProgressWithTrack,
     private val getChaptersByMangaId: GetChaptersByMangaId,
+    private val getHistory: GetHistory,
     private val trackerManager: TrackerManager,
-    private val mangaRepository: MangaRepository = Injekt.get(),
+    private val mangaRepository: MangaRepository,
 ) {
 
     // TODO: update all trackers based on common data
@@ -73,7 +72,7 @@ class AddTracks(
                 }
 
                 if (track.startDate <= 0) {
-                    val firstReadChapterDate = Injekt.get<GetHistory>().await(mangaId)
+                    val firstReadChapterDate = getHistory.await(mangaId)
                         .sortedBy { it.readAt }
                         .firstOrNull()
                         ?.readAt

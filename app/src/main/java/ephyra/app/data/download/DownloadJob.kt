@@ -24,17 +24,17 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import ephyra.domain.download.service.DownloadPreferences
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 /**
  * This worker is used to manage the downloader. The system can decide to stop the worker, in
  * which case the downloader is also stopped. It's also stopped while there's no network available.
  */
-class DownloadJob(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
-
-    private val downloadManager: DownloadManager = Injekt.get()
-    private val downloadPreferences: DownloadPreferences = Injekt.get()
+class DownloadJob(
+    context: Context,
+    workerParams: WorkerParameters,
+    private val downloadManager: DownloadManager,
+    private val downloadPreferences: DownloadPreferences,
+) : CoroutineWorker(context, workerParams) {
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         val notification = applicationContext.notificationBuilder(Notifications.CHANNEL_DOWNLOADER_PROGRESS) {

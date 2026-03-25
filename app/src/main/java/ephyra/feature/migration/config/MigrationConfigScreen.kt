@@ -46,7 +46,7 @@ import ephyra.presentation.browse.components.SourceIcon
 import ephyra.presentation.components.AppBar
 import ephyra.presentation.components.AppBarActions
 import ephyra.presentation.util.Screen
-import eu.kanade.ephyra.source.online.HttpSource
+import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.app.ui.browse.migration.search.MigrateSearchScreen
 import ephyra.app.util.system.LocaleHelper
 import kotlinx.collections.immutable.persistentListOf

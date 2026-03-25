@@ -2,7 +2,7 @@ package ephyra.presentation.track.components
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import ephyra.app.data.track.Tracker
-import eu.kanade.test.DummyTracker
+import ephyra.test.DummyTracker
 
 internal class TrackLogoIconPreviewProvider : PreviewParameterProvider<Tracker> {
 

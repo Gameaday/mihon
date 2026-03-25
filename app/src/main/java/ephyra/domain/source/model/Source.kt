@@ -8,9 +8,8 @@ import ephyra.domain.source.model.Source
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
-val Source.icon: ImageBitmap?
-    get() {
-        return Injekt.get<ExtensionManager>().getAppIconForSource(id)
-            ?.toBitmap()
-            ?.asImageBitmap()
-    }
+fun Source.icon(extensionManager: ExtensionManager): ImageBitmap? {
+    return extensionManager.getAppIconForSource(id)
+        ?.toBitmap()
+        ?.asImageBitmap()
+}

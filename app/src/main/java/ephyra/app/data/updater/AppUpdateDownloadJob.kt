@@ -11,11 +11,11 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import ephyra.app.data.notification.Notifications
-import eu.kanade.ephyra.network.GET
-import eu.kanade.ephyra.network.NetworkHelper
-import eu.kanade.ephyra.network.ProgressListener
-import eu.kanade.ephyra.network.await
-import eu.kanade.ephyra.network.newCachelessCallWithProgress
+import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.network.ProgressListener
+import eu.kanade.tachiyomi.network.await
+import eu.kanade.tachiyomi.network.newCachelessCallWithProgress
 import ephyra.app.util.storage.getUriCompat
 import ephyra.app.util.storage.saveTo
 import ephyra.app.util.system.setForegroundSafely

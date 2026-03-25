@@ -32,13 +32,11 @@ import kotlin.concurrent.atomics.incrementAndFetch
 @OptIn(ExperimentalAtomicApi::class)
 class BackupRestorer(
     private val context: Context,
-    private val notifier: BackupNotifier,
-    private val isSync: Boolean,
 
-    private val categoriesRestorer: CategoriesRestorer = CategoriesRestorer(),
-    private val preferenceRestorer: PreferenceRestorer = PreferenceRestorer(context),
-    private val extensionRepoRestorer: ExtensionRepoRestorer = ExtensionRepoRestorer(),
-    private val mangaRestorer: MangaRestorer = MangaRestorer(),
+    private val categoriesRestorer: CategoriesRestorer,
+    private val preferenceRestorer: PreferenceRestorer,
+    private val extensionRepoRestorer: ExtensionRepoRestorer,
+    private val mangaRestorer: MangaRestorer,
 ) {
 
     private var restoreAmount = 0
@@ -50,7 +48,7 @@ class BackupRestorer(
      */
     private var sourceMapping: Map<Long, String> = emptyMap()
 
-    suspend fun restore(uri: Uri, options: RestoreOptions) {
+    suspend fun restore(uri: Uri, options: RestoreOptions, notifier: BackupNotifier, isSync: Boolean) {
         val startTime = System.currentTimeMillis()
 
         restoreFromFile(uri, options)
@@ -68,7 +66,7 @@ class BackupRestorer(
         )
     }
 
-    private suspend fun restoreFromFile(uri: Uri, options: RestoreOptions) {
+    private suspend fun restoreFromFile(uri: Uri, options: RestoreOptions, notifier: BackupNotifier, isSync: Boolean) {
         val backup = BackupDecoder(context).decode(uri)
 
         // Store source mapping for error messages
@@ -93,26 +91,30 @@ class BackupRestorer(
 
         coroutineScope {
             if (options.categories) {
-                restoreCategories(backup.backupCategories)
+                restoreCategories(backup.backupCategories, notifier, isSync)
             }
             if (options.appSettings) {
-                restoreAppPreferences(backup.backupPreferences, backup.backupCategories.takeIf { options.categories })
+                restoreAppPreferences(backup.backupPreferences, backup.backupCategories.takeIf { options.categories }, notifier, isSync)
             }
             if (options.sourceSettings) {
-                restoreSourcePreferences(backup.backupSourcePreferences)
+                restoreSourcePreferences(backup.backupSourcePreferences, notifier, isSync)
             }
             if (options.libraryEntries) {
-                restoreManga(backup.backupManga, if (options.categories) backup.backupCategories else emptyList())
+                restoreManga(backup.backupManga, if (options.categories) backup.backupCategories else emptyList(), notifier, isSync)
             }
             if (options.extensionRepoSettings) {
-                restoreExtensionRepos(backup.backupExtensionRepo)
+                restoreExtensionRepos(backup.backupExtensionRepo, notifier, isSync)
             }
 
             // TODO: optionally trigger online library + tracker update
         }
     }
 
-    private fun CoroutineScope.restoreCategories(backupCategories: List<BackupCategory>) = launch {
+    private fun CoroutineScope.restoreCategories(
+        backupCategories: List<BackupCategory>,
+        notifier: BackupNotifier,
+        isSync: Boolean,
+    ) = launch {
         ensureActive()
         categoriesRestorer(backupCategories)
 
@@ -128,6 +130,8 @@ class BackupRestorer(
     private fun CoroutineScope.restoreManga(
         backupMangas: List<BackupManga>,
         backupCategories: List<BackupCategory>,
+        notifier: BackupNotifier,
+        isSync: Boolean,
     ) = launch {
         mangaRestorer.sortByNew(backupMangas)
             .forEach {
@@ -148,6 +152,8 @@ class BackupRestorer(
     private fun CoroutineScope.restoreAppPreferences(
         preferences: List<BackupPreference>,
         categories: List<BackupCategory>?,
+        notifier: BackupNotifier,
+        isSync: Boolean,
     ) = launch {
         ensureActive()
         preferenceRestorer.restoreApp(
@@ -164,7 +170,11 @@ class BackupRestorer(
         )
     }
 
-    private fun CoroutineScope.restoreSourcePreferences(preferences: List<BackupSourcePreferences>) = launch {
+    private fun CoroutineScope.restoreSourcePreferences(
+        preferences: List<BackupSourcePreferences>,
+        notifier: BackupNotifier,
+        isSync: Boolean,
+    ) = launch {
         ensureActive()
         preferenceRestorer.restoreSource(preferences)
 
@@ -179,6 +189,8 @@ class BackupRestorer(
 
     private fun CoroutineScope.restoreExtensionRepos(
         backupExtensionRepo: List<BackupExtensionRepos>,
+        notifier: BackupNotifier,
+        isSync: Boolean,
     ) = launch {
         backupExtensionRepo
             .forEach {

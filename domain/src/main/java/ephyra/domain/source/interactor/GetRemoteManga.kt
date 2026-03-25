@@ -1,6 +1,6 @@
 package ephyra.domain.source.interactor
 
-import eu.kanade.ephyra.source.model.FilterList
+import eu.kanade.tachiyomi.source.model.FilterList
 import ephyra.domain.source.repository.SourcePagingSource
 import ephyra.domain.source.repository.SourceRepository
 

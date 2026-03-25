@@ -1,7 +1,7 @@
 package ephyra.domain.source.repository
 
 import androidx.paging.PagingSource
-import eu.kanade.ephyra.source.model.FilterList
+import eu.kanade.tachiyomi.source.model.FilterList
 import kotlinx.coroutines.flow.Flow
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.model.Source

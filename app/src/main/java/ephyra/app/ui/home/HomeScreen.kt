@@ -37,13 +37,13 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.presentation.util.Screen
 import ephyra.presentation.util.isTabletUi
-import ephyra.app.ui.browse.BrowseTab
-import ephyra.app.ui.download.DownloadQueueScreen
-import ephyra.app.ui.history.HistoryTab
-import ephyra.app.ui.library.LibraryTab
+import ephyra.feature.more.MoreTab
+import ephyra.feature.updates.UpdatesTab
+import ephyra.feature.library.LibraryTab
+import ephyra.feature.history.HistoryTab
+import ephyra.feature.browse.BrowseTab
+import ephyra.feature.download.DownloadQueueScreen
 import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.ui.more.MoreTab
-import ephyra.app.ui.updates.UpdatesTab
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -58,10 +58,10 @@ import ephyra.presentation.core.components.material.NavigationRail
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.theme.MotionTokens
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
-object HomeScreen : Screen() {
+object HomeScreen : Screen(), KoinComponent {
 
     private val librarySearchEvent = Channel<String>()
     private val openTabEvent = Channel<Tab>()
@@ -252,7 +252,7 @@ object HomeScreen : Screen() {
                 when {
                     tab is UpdatesTab -> {
                         val count by produceState(initialValue = 0) {
-                            val pref = Injekt.get<LibraryPreferences>()
+                            val pref = get<LibraryPreferences>()
                             combine(
                                 pref.newShowUpdatesCount().changes(),
                                 pref.newUpdatesCount().changes(),
@@ -275,7 +275,7 @@ object HomeScreen : Screen() {
                     }
                     BrowseTab::class.isInstance(tab) -> {
                         val count by produceState(initialValue = 0) {
-                            Injekt.get<SourcePreferences>().extensionUpdatesCount().changes()
+                            get<SourcePreferences>().extensionUpdatesCount().changes()
                                 .collectLatest { value = it }
                         }
                         if (count > 0) {

@@ -1,7 +1,7 @@
 package ephyra.source.local.filter
 
 import android.content.Context
-import eu.kanade.ephyra.source.model.Filter
+import eu.kanade.tachiyomi.source.model.Filter
 import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
 

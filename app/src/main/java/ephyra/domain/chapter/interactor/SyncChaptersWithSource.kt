@@ -7,9 +7,9 @@ import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.toSManga
 import ephyra.app.data.download.DownloadManager
 import ephyra.app.data.download.DownloadProvider
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.model.SChapter
-import eu.kanade.ephyra.source.online.HttpSource
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.model.SChapter
+import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.data.chapter.ChapterSanitizer
 import ephyra.domain.chapter.interactor.GetChaptersByMangaId
 import ephyra.domain.chapter.interactor.ShouldUpdateDbChapter

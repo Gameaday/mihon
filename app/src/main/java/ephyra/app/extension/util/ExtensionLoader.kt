@@ -9,9 +9,9 @@ import ephyra.domain.extension.interactor.TrustExtension
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.LoadResult
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.SourceFactory
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.SourceFactory
 import ephyra.app.util.lang.Hash
 import ephyra.app.util.storage.copyAndSetReadOnlyTo
 import ephyra.app.util.system.ChildFirstPathClassLoader

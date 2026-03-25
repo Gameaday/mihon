@@ -5,10 +5,10 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.domain.chapter.interactor.SyncChaptersWithSource
 import ephyra.domain.manga.model.toSManga
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.model.SChapter
-import eu.kanade.ephyra.source.online.ResolvableSource
-import eu.kanade.ephyra.source.online.UriType
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.model.SChapter
+import eu.kanade.tachiyomi.source.online.ResolvableSource
+import eu.kanade.tachiyomi.source.online.UriType
 import kotlinx.coroutines.flow.update
 import ephyra.domain.manga.model.toDomainManga
 import ephyra.core.common.util.lang.launchIO
@@ -17,15 +17,13 @@ import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.interactor.NetworkToLocalManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 class DeepLinkScreenModel(
-    query: String = "",
-    private val sourceManager: SourceManager = Injekt.get(),
-    private val networkToLocalManga: NetworkToLocalManga = Injekt.get(),
-    private val getChapterByUrlAndMangaId: GetChapterByUrlAndMangaId = Injekt.get(),
-    private val syncChaptersWithSource: SyncChaptersWithSource = Injekt.get(),
+    query: String,
+    private val sourceManager: SourceManager,
+    private val networkToLocalManga: NetworkToLocalManga,
+    private val getChapterByUrlAndMangaId: GetChapterByUrlAndMangaId,
+    private val syncChaptersWithSource: SyncChaptersWithSource,
 ) : StateScreenModel<DeepLinkScreenModel.State>(State.Loading) {
 
     init {

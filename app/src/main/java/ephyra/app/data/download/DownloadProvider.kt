@@ -2,7 +2,7 @@ package ephyra.app.data.download
 
 import android.content.Context
 import com.hippo.unifile.UniFile
-import eu.kanade.ephyra.source.Source
+import eu.kanade.tachiyomi.source.Source
 import ephyra.app.util.lang.Hash.md5
 import ephyra.app.util.storage.DiskUtil
 import logcat.LogPriority
@@ -15,8 +15,6 @@ import ephyra.domain.manga.model.JellyfinNaming
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.storage.service.StorageManager
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.IOException
 
 /**
@@ -27,8 +25,8 @@ import java.io.IOException
  */
 class DownloadProvider(
     private val context: Context,
-    private val storageManager: StorageManager = Injekt.get(),
-    private val libraryPreferences: LibraryPreferences = Injekt.get(),
+    private val storageManager: StorageManager,
+    private val libraryPreferences: LibraryPreferences,
 ) {
 
     private val downloadsDir: UniFile?

@@ -8,18 +8,15 @@ import ephyra.app.data.backup.models.IntPreferenceValue
 import ephyra.app.data.backup.models.LongPreferenceValue
 import ephyra.app.data.backup.models.StringPreferenceValue
 import ephyra.app.data.backup.models.StringSetPreferenceValue
-import eu.kanade.ephyra.source.ConfigurableSource
-import eu.kanade.ephyra.source.preferenceKey
-import eu.kanade.ephyra.source.sourcePreferences
+import eu.kanade.tachiyomi.source.ConfigurableSource
+import eu.kanade.tachiyomi.source.preferenceKey
+import eu.kanade.tachiyomi.source.sourcePreferences
 import ephyra.core.common.preference.Preference
 import ephyra.core.common.preference.PreferenceStore
 import ephyra.domain.source.service.SourceManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
 class PreferenceBackupCreator(
-    private val sourceManager: SourceManager = Injekt.get(),
-    private val preferenceStore: PreferenceStore = Injekt.get(),
+    private val sourceManager: SourceManager,
+    private val preferenceStore: PreferenceStore,
 ) {
 
     fun createApp(includePrivatePreferences: Boolean): List<BackupPreference> {

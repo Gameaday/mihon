@@ -1,9 +1,9 @@
 package ephyra.domain.source.model
 
-import eu.kanade.ephyra.source.Source
-import eu.kanade.ephyra.source.model.Page
-import eu.kanade.ephyra.source.model.SChapter
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.source.model.SChapter
+import eu.kanade.tachiyomi.source.model.SManga
 
 class StubSource(
     override val id: Long,

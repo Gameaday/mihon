@@ -9,13 +9,13 @@ import ephyra.app.data.track.shikimori.dto.SMManga
 import ephyra.app.data.track.shikimori.dto.SMOAuth
 import ephyra.app.data.track.shikimori.dto.SMUser
 import ephyra.app.data.track.shikimori.dto.SMUserListEntry
-import eu.kanade.ephyra.network.DELETE
-import eu.kanade.ephyra.network.GET
-import eu.kanade.ephyra.network.POST
-import eu.kanade.ephyra.network.awaitSuccess
-import eu.kanade.ephyra.network.interceptor.rateLimit
-import eu.kanade.ephyra.network.jsonMime
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.DELETE
+import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.POST
+import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.interceptor.rateLimit
+import eu.kanade.tachiyomi.network.jsonMime
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -165,7 +165,7 @@ class ShikimoriApi(
         private const val OAUTH_URL = "$BASE_URL/oauth/token"
         private const val LOGIN_URL = "$BASE_URL/oauth/authorize"
 
-        private const val REDIRECT_URL = "mihon://shikimori-auth"
+        private const val REDIRECT_URL = "ephyra://shikimori-auth"
 
         private const val CLIENT_ID = "PB9dq8DzI405s7wdtwTdirYqHiyVMh--djnP7lBUqSA"
         private const val CLIENT_SECRET = "NajpZcOBKB9sJtgNcejf8OB9jBN1OYYoo-k4h2WWZus"

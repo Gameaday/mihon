@@ -2,7 +2,7 @@
 
 package ephyra.app.data.database.models
 
-import eu.kanade.ephyra.source.model.SChapter
+import eu.kanade.tachiyomi.source.model.SChapter
 import java.io.Serializable
 import ephyra.domain.chapter.model.Chapter as DomainChapter
 

@@ -21,7 +21,7 @@ import ephyra.app.data.download.Downloader
 import ephyra.app.data.notification.NotificationHandler
 import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.notification.Notifications
-import eu.kanade.ephyra.source.UnmeteredSource
+import eu.kanade.tachiyomi.source.UnmeteredSource
 import ephyra.app.ui.main.MainActivity
 import ephyra.app.util.lang.chop
 import ephyra.app.util.system.cancelNotification
@@ -155,7 +155,7 @@ class LibraryUpdateNotifier(
         ) {
             setContentTitle(context.stringResource(MR.strings.notification_update_error, failed))
             setContentText(context.stringResource(MR.strings.action_show_errors))
-            setSmallIcon(R.drawable.ic_mihon)
+            setSmallIcon(R.drawable.ic_ephyra)
 
             setContentIntent(NotificationReceiver.openErrorLogPendingActivity(context, uri))
         }
@@ -195,7 +195,7 @@ class LibraryUpdateNotifier(
                 }
             }
 
-            setSmallIcon(R.drawable.ic_mihon)
+            setSmallIcon(R.drawable.ic_ephyra)
             setLargeIcon(notificationBitmap)
 
             setGroup(Notifications.GROUP_NEW_CHAPTERS)
@@ -231,7 +231,7 @@ class LibraryUpdateNotifier(
             setContentText(description)
             setStyle(NotificationCompat.BigTextStyle().bigText(description))
 
-            setSmallIcon(R.drawable.ic_mihon)
+            setSmallIcon(R.drawable.ic_ephyra)
 
             if (icon != null) {
                 setLargeIcon(icon)
@@ -526,7 +526,7 @@ class LibraryUpdateNotifier(
 
     companion object {
         const val HELP_WARNING_URL =
-            "https://mihon.app/docs/faq/library#why-am-i-warned-about-large-bulk-updates-and-downloads"
+            "https://ephyra.app/docs/faq/library#why-am-i-warned-about-large-bulk-updates-and-downloads"
 
         private const val NOTIF_MAX_CHAPTERS = 5
         private const val NOTIF_MAX_HEALTH_ENTRIES = 5

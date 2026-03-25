@@ -5,10 +5,10 @@ import ephyra.app.extension.ExtensionManager
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.LoadResult
 import ephyra.app.extension.util.ExtensionLoader
-import eu.kanade.ephyra.network.GET
-import eu.kanade.ephyra.network.NetworkHelper
-import eu.kanade.ephyra.network.awaitSuccess
-import eu.kanade.ephyra.network.parseAs
+import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.network.awaitSuccess
+import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.serialization.Serializable

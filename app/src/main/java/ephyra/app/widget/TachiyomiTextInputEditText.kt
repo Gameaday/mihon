@@ -14,8 +14,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
 /**
  * A custom [TextInputEditText] that sets [EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING] to imeOptions
@@ -27,14 +27,14 @@ class TachiyomiTextInputEditText @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.editTextStyle,
-) : TextInputEditText(context, attrs, defStyleAttr) {
+) : TextInputEditText(context, attrs, defStyleAttr), KoinComponent {
 
     private var scope: CoroutineScope? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-        setIncognito(scope!!)
+        setIncognito(scope!!, get())
     }
 
     override fun onDetachedFromWindow() {
@@ -48,8 +48,8 @@ class TachiyomiTextInputEditText @JvmOverloads constructor(
          * Sets Flow to this [EditText] that sets [EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING] to imeOptions
          * if [BasePreferences.incognitoMode] is true. Some IMEs may not respect this flag.
          */
-        fun EditText.setIncognito(viewScope: CoroutineScope) {
-            Injekt.get<BasePreferences>().incognitoMode().changes()
+        fun EditText.setIncognito(viewScope: CoroutineScope, preferences: BasePreferences) {
+            preferences.incognitoMode().changes()
                 .onEach {
                     imeOptions = if (it) {
                         imeOptions or EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING

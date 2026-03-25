@@ -4,12 +4,10 @@ import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.hasCustomCover
 import ephyra.domain.manga.model.toSManga
 import ephyra.app.data.cache.CoverCache
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.model.SManga
 import ephyra.domain.manga.model.Manga
 import ephyra.source.local.image.LocalCoverManager
 import ephyra.source.local.isLocal
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.InputStream
 import java.time.Instant
 
@@ -40,7 +38,7 @@ fun Manga.prepUpdateCover(coverCache: CoverCache, remoteManga: SManga, refreshSa
     }
 }
 
-fun Manga.removeCovers(coverCache: CoverCache = Injekt.get()): Manga {
+fun Manga.removeCovers(coverCache: CoverCache): Manga {
     if (isLocal()) return this
     return if (coverCache.deleteFromCache(this, true) > 0) {
         return copy(coverLastModified = Instant.now().toEpochMilli())
@@ -52,8 +50,8 @@ fun Manga.removeCovers(coverCache: CoverCache = Injekt.get()): Manga {
 suspend fun Manga.editCover(
     coverManager: LocalCoverManager,
     stream: InputStream,
-    updateManga: UpdateManga = Injekt.get(),
-    coverCache: CoverCache = Injekt.get(),
+    updateManga: UpdateManga,
+    coverCache: CoverCache,
 ) {
     if (isLocal()) {
         coverManager.update(toSManga(), stream)

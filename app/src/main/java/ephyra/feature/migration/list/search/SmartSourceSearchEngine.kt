@@ -1,7 +1,7 @@
 package ephyra.feature.migration.list.search
 
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.model.SManga
 import ephyra.domain.manga.model.toDomainManga
 import ephyra.domain.manga.model.Manga
 

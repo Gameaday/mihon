@@ -1,6 +1,6 @@
 package ephyra.data.manga
 
-import eu.kanade.ephyra.source.model.UpdateStrategy
+import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json

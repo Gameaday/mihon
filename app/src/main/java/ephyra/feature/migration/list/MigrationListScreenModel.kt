@@ -7,8 +7,8 @@ import ephyra.domain.chapter.interactor.SyncChaptersWithSource
 import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.toSManga
 import ephyra.domain.source.service.SourcePreferences
-import eu.kanade.ephyra.source.CatalogueSource
-import eu.kanade.ephyra.source.getNameForMangaInfo
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.getNameForMangaInfo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

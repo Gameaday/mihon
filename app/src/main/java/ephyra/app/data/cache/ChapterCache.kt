@@ -3,7 +3,7 @@ package ephyra.app.data.cache
 import android.content.Context
 import android.text.format.Formatter
 import coil3.disk.DiskCache
-import eu.kanade.ephyra.source.model.Page
+import eu.kanade.tachiyomi.source.model.Page
 import ephyra.app.util.storage.DiskUtil
 import ephyra.app.util.system.DeviceUtil
 import kotlinx.coroutines.Dispatchers

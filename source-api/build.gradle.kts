@@ -38,7 +38,7 @@ kotlin {
 }
 
 android {
-    namespace = "eu.kanade.ephyra.source"
+    namespace = "eu.kanade.tachiyomi.source"
 
     defaultConfig {
         consumerProguardFile("consumer-proguard.pro")

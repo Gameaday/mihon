@@ -72,8 +72,7 @@ import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinInject
 
 object SettingsTrackingScreen : SearchableSettings {
 
@@ -95,10 +94,11 @@ object SettingsTrackingScreen : SearchableSettings {
     @Composable
     override fun getPreferences(): List<Preference> {
         val context = LocalContext.current
-        val trackPreferences = remember { Injekt.get<TrackPreferences>() }
-        val trackerManager = remember { Injekt.get<TrackerManager>() }
-        val sourceManager = remember { Injekt.get<SourceManager>() }
-        val libraryPreferences = remember { Injekt.get<ephyra.domain.library.service.LibraryPreferences>() }
+        val trackPreferences = koinInject<TrackPreferences>()
+        val trackerManager = koinInject<TrackerManager>()
+        val sourceManager = koinInject<SourceManager>()
+        val libraryPreferences = koinInject<ephyra.domain.library.service.LibraryPreferences>()
+        val trackerListImporter = koinInject<TrackerListImporter>()
         val scope = rememberCoroutineScope()
 
         var dialog by remember { mutableStateOf<Any?>(null) }
@@ -126,8 +126,7 @@ object SettingsTrackingScreen : SearchableSettings {
                             dialog = null
                             importingFromMal = true
                             scope.launchIO {
-                                val importer = Injekt.get<TrackerListImporter>()
-                                val result = importer.importFromMal()
+                                val result = trackerListImporter.importFromMal()
                                 withUIContext {
                                     importingFromMal = false
                                     if (result.isSuccess) {

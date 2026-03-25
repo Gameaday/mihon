@@ -8,17 +8,15 @@ import ephyra.domain.ui.model.setAppCompatDelegateThemeMode
 import ephyra.presentation.more.settings.widget.AppThemeModePreferenceWidget
 import ephyra.presentation.more.settings.widget.AppThemePreferenceWidget
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinInject
 
 internal class ThemeStep : OnboardingStep {
 
     override val isComplete: Boolean = true
 
-    private val uiPreferences: UiPreferences = Injekt.get()
-
     @Composable
     override fun Content() {
+        val uiPreferences = koinInject<UiPreferences>()
         val themeModePref = uiPreferences.themeMode()
         val themeMode by themeModePref.collectAsState()
 

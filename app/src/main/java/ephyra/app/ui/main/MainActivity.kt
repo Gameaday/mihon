@@ -97,17 +97,17 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.injectLazy
+import org.koin.android.ext.android.inject
 
 class MainActivity : BaseActivity() {
 
-    private val libraryPreferences: LibraryPreferences by injectLazy()
-    private val preferences: BasePreferences by injectLazy()
+    private val libraryPreferences: LibraryPreferences by inject()
+    private val preferences: BasePreferences by inject()
 
-    private val downloadCache: DownloadCache by injectLazy()
-    private val chapterCache: ChapterCache by injectLazy()
+    private val downloadCache: DownloadCache by inject()
+    private val chapterCache: ChapterCache by inject()
 
-    private val getIncognitoState: GetIncognitoState by injectLazy()
+    private val getIncognitoState: GetIncognitoState by inject()
 
     // To be checked by splash screen. If true then splash screen will be removed.
     var ready = false
@@ -266,9 +266,11 @@ class MainActivity : BaseActivity() {
         }
         setSplashScreenExitAnimation(splashScreen)
 
-        if (isLaunch && libraryPreferences.autoClearChapterCache().get()) {
+        if (isLaunch) {
             lifecycleScope.launchIO {
-                chapterCache.clear()
+                if (libraryPreferences.autoClearChapterCache().get()) {
+                    chapterCache.clear()
+                }
             }
         }
     }

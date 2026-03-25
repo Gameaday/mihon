@@ -6,8 +6,8 @@ import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.model.toDomainTrack
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.app.data.database.models.Track
-import eu.kanade.ephyra.network.HttpException
-import eu.kanade.ephyra.network.NetworkHelper
+import eu.kanade.tachiyomi.network.HttpException
+import eu.kanade.tachiyomi.network.NetworkHelper
 import ephyra.app.util.system.toast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -17,20 +17,20 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.track.interactor.InsertTrack
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import uy.kohesive.injekt.injectLazy
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.component.get
 import ephyra.domain.track.model.Track as DomainTrack
 
 abstract class BaseTracker(
     override val id: Long,
     override val name: String,
-) : Tracker {
+) : Tracker, KoinComponent {
 
-    val trackPreferences: TrackPreferences by injectLazy()
-    val networkService: NetworkHelper by injectLazy()
-    private val addTracks: AddTracks by injectLazy()
-    private val insertTrack: InsertTrack by injectLazy()
+    val trackPreferences: TrackPreferences by inject()
+    val networkService: NetworkHelper by inject()
+    private val addTracks: AddTracks by inject()
+    private val insertTrack: InsertTrack by inject()
 
     override val client: OkHttpClient
         get() = networkService.client
@@ -84,7 +84,7 @@ abstract class BaseTracker(
                 is HttpException -> "$name: HTTP ${e.code}"
                 else -> "$name: ${e.message}"
             }
-            withUIContext { Injekt.get<Application>().toast(errorDetail) }
+            withUIContext { get<Application>().toast(errorDetail) }
         }
     }
 
@@ -144,7 +144,7 @@ abstract class BaseTracker(
                 else -> "$name: ${e.message}"
             }
             logcat(LogPriority.ERROR, e) { "Failed to update remote track data id=$id ($errorDetail)" }
-            withUIContext { Injekt.get<Application>().toast(errorDetail) }
+            withUIContext { get<Application>().toast(errorDetail) }
         }
     }
 }

@@ -25,12 +25,9 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Button
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinInject
 
 internal class StorageStep : OnboardingStep {
-
-    private val storagePref = Injekt.get<StoragePreferences>().baseStorageDirectory()
 
     private var _isComplete by mutableStateOf(false)
 
@@ -41,6 +38,8 @@ internal class StorageStep : OnboardingStep {
     override fun Content() {
         val context = LocalContext.current
         val handler = LocalUriHandler.current
+
+        val storagePref = koinInject<StoragePreferences>().baseStorageDirectory()
 
         val pickStorageLocation = SettingsDataScreen.storageLocationPicker(storagePref)
 

@@ -24,8 +24,6 @@ import coil3.request.allowRgb565
 import coil3.request.bitmapConfig
 import coil3.request.crossfade
 import coil3.util.DebugLogger
-import dev.ephyra.injekt.patchInjekt
-import ephyra.domain.DomainModule
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.setAppCompatDelegateThemeMode
@@ -38,10 +36,11 @@ import ephyra.app.data.coil.MangaCoverKeyer
 import ephyra.app.data.coil.MangaKeyer
 import ephyra.app.data.coil.TachiyomiImageDecoder
 import ephyra.app.data.notification.Notifications
-import ephyra.app.di.AppModule
-import ephyra.app.di.PreferenceModule
-import eu.kanade.ephyra.network.NetworkHelper
-import eu.kanade.ephyra.network.NetworkPreferences
+import ephyra.app.di.koinAppModule
+import ephyra.app.di.koinDomainModule
+import ephyra.app.di.koinPreferenceModule
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.network.NetworkPreferences
 import ephyra.app.ui.base.delegate.SecureActivityDelegate
 import ephyra.app.util.system.DeviceUtil
 import ephyra.app.util.system.GLUtil
@@ -56,35 +55,32 @@ import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
 import ephyra.core.migration.Migrator
-import ephyra.core.migration.migrations.migrations
 import ephyra.telemetry.TelemetryConfig
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 import ephyra.app.di.koinAppModule
+import ephyra.app.di.koinAppModule_UI
 import ephyra.app.di.koinDomainModule
-import ephyra.core.common.i18n.stringResource
-import ephyra.core.common.preference.Preference
+import ephyra.app.di.koinPreferenceModule
 import ephyra.core.common.preference.PreferenceStore
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
-import ephyra.i18n.MR
 import ephyra.presentation.widget.WidgetManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import uy.kohesive.injekt.injectLazy
 
 class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factory {
 
-    private val basePreferences: BasePreferences by injectLazy()
-    private val privacyPreferences: PrivacyPreferences by injectLazy()
-    private val networkPreferences: NetworkPreferences by injectLazy()
+    private val basePreferences: BasePreferences by inject()
+    private val privacyPreferences: PrivacyPreferences by inject()
+    private val networkPreferences: NetworkPreferences by inject()
 
     private val disableIncognitoReceiver = DisableIncognitoReceiver()
 
     @SuppressLint("LaunchActivityFromNotification")
     override fun onCreate() {
         super<Application>.onCreate()
-        patchInjekt()
         TelemetryConfig.init(applicationContext)
 
         GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
@@ -92,15 +88,12 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
         // Avoid potential crashes from multiple WebView processes
         val process = getProcessName()
         if (packageName != process) WebView.setDataDirectorySuffix(process)
-        
+
         startKoin {
             androidContext(this@App)
-            modules(koinAppModule, koinDomainModule)
+            workManagerFactory()
+            modules(koinAppModule, koinDomainModule, koinPreferenceModule, koinAppModule_UI)
         }
-
-        Injekt.importModule(PreferenceModule(this))
-        Injekt.importModule(AppModule(this))
-        Injekt.importModule(DomainModule())
 
         setupNotificationChannels()
 
@@ -155,10 +148,10 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
             .onEach { ImageUtil.hardwareBitmapThreshold = it }
             .launchIn(scope)
 
-        setAppCompatDelegateThemeMode(Injekt.get<UiPreferences>().themeMode().get())
+        setAppCompatDelegateThemeMode(get<UiPreferences>().themeMode().get())
 
         // Updates widget update
-        WidgetManager(Injekt.get(), Injekt.get()).apply { init(scope) }
+        WidgetManager(get(), get()).apply { init(scope) }
 
         if (!LogcatLogger.isInstalled) {
             val minLogPriority = when {
@@ -174,7 +167,7 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
     }
 
     private fun initializeMigrator() {
-        val preferenceStore = Injekt.get<PreferenceStore>()
+        val preferenceStore = get<PreferenceStore>()
         val preference = preferenceStore.getInt(Preference.appStateKey("last_version_code"), 0)
         logcat { "Migration from ${preference.get()} to ${BuildConfig.VERSION_CODE}" }
         Migrator.initialize(
@@ -190,7 +183,7 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
 
     override fun newImageLoader(context: Context): ImageLoader {
         return ImageLoader.Builder(this).apply {
-            val callFactoryLazy = lazy { Injekt.get<NetworkHelper>().client }
+            val callFactoryLazy = lazy { get<NetworkHelper>().client }
             components {
                 // NetworkFetcher.Factory
                 add(OkHttpNetworkFetcherFactory(callFactoryLazy::value))
@@ -228,11 +221,11 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        SecureActivityDelegate.onApplicationStart()
+        SecureActivityDelegate.onApplicationStart(get())
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        SecureActivityDelegate.onApplicationStopped()
+        SecureActivityDelegate.onApplicationStopped(get())
     }
 
     /**

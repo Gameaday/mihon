@@ -14,8 +14,8 @@ import coil3.request.Options
 import com.hippo.unifile.UniFile
 import ephyra.app.data.cache.CoverCache
 import ephyra.app.data.coil.MangaCoverFetcher.Companion.USE_CUSTOM_COVER_KEY
-import eu.kanade.ephyra.network.await
-import eu.kanade.ephyra.source.online.HttpSource
+import eu.kanade.tachiyomi.network.await
+import eu.kanade.tachiyomi.source.online.HttpSource
 import logcat.LogPriority
 import okhttp3.CacheControl
 import okhttp3.Call

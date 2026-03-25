@@ -1,7 +1,7 @@
 package ephyra.data
 
 import app.cash.sqldelight.ColumnAdapter
-import eu.kanade.ephyra.source.model.UpdateStrategy
+import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import java.util.Date
 
 object DateColumnAdapter : ColumnAdapter<Date, Long> {

@@ -1,6 +1,6 @@
 package ephyra.domain.upcoming.interactor
 
-import eu.kanade.ephyra.source.model.SManga
+import eu.kanade.tachiyomi.source.model.SManga
 import kotlinx.coroutines.flow.Flow
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.repository.MangaRepository
