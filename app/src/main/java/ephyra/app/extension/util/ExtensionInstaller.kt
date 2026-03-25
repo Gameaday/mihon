@@ -23,8 +23,6 @@ import logcat.LogPriority
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.File
 
 /**
@@ -34,14 +32,17 @@ import java.io.File
  */
 internal class ExtensionInstaller(
     private val context: Context,
+    private val basePreferences: BasePreferences,
+    private val networkHelper: NetworkHelper,
+    private val extensionLoader: ExtensionLoader,
 ) {
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private val activeJobs = mutableMapOf<String, Job>()
     private val activeSteps = mutableMapOf<Long, MutableStateFlow<InstallStep>>()
-    private val extensionInstaller = Injekt.get<BasePreferences>().extensionInstaller()
+    private val extensionInstaller = basePreferences.extensionInstaller()
 
-    private val httpClient: OkHttpClient = Injekt.get<NetworkHelper>().client
+    private val httpClient: OkHttpClient = networkHelper.client
 
     /**
      * Adds the given extension to the downloads queue and returns an observable containing its
@@ -112,7 +113,7 @@ internal class ExtensionInstaller(
             }
             BasePreferences.ExtensionInstaller.PRIVATE -> {
                 try {
-                    if (ExtensionLoader.installPrivateExtensionFile(context, tempFile)) {
+                    if (extensionLoader.installPrivateExtensionFile(context, tempFile)) {
                         updateInstallStep(downloadId, InstallStep.Installed)
                     } else {
                         updateInstallStep(downloadId, InstallStep.Error)
@@ -156,7 +157,7 @@ internal class ExtensionInstaller(
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         } else {
-            ExtensionLoader.uninstallPrivateExtension(context, pkgName)
+            extensionLoader.uninstallPrivateExtension(context, pkgName)
             ExtensionInstallReceiver.notifyRemoved(context, pkgName)
         }
     }

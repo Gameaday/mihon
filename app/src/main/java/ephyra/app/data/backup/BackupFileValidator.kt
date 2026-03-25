@@ -4,14 +4,11 @@ import android.content.Context
 import android.net.Uri
 import ephyra.app.data.track.TrackerManager
 import ephyra.domain.source.service.SourceManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
 class BackupFileValidator(
     private val context: Context,
-
-    private val sourceManager: SourceManager = Injekt.get(),
-    private val trackerManager: TrackerManager = Injekt.get(),
+    private val sourceManager: SourceManager,
+    private val trackerManager: TrackerManager,
+    private val backupDecoder: BackupDecoder,
 ) {
 
     /**
@@ -21,7 +18,7 @@ class BackupFileValidator(
      */
     fun validate(uri: Uri): Results {
         val backup = try {
-            BackupDecoder(context).decode(uri)
+            backupDecoder.decode(uri)
         } catch (e: Exception) {
             throw IllegalStateException(e)
         }

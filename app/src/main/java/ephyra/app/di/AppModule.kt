@@ -8,10 +8,13 @@ import ephyra.domain.track.store.DelayedTrackingStore
 import ephyra.app.BuildConfig
 import ephyra.app.data.cache.ChapterCache
 import ephyra.app.data.cache.CoverCache
+import ephyra.app.data.backup.BackupDecoder
+import ephyra.app.data.backup.BackupFileValidator
+import ephyra.app.data.backup.BackupNotifier
+import ephyra.app.data.backup.restore.BackupRestoreJob
+import ephyra.app.data.backup.restore.BackupRestorer
+import ephyra.app.data.backup.restore.restorers.CategoriesRestorer
 import ephyra.app.data.backup.restore.restorers.ExtensionRepoRestorer
-import ephyra.app.data.backup.restore.restorers.MangaRestorer
-import ephyra.app.data.backup.restore.restorers.PreferenceRestorer
-import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.create.BackupCreator
 import ephyra.app.data.backup.create.creators.CategoriesBackupCreator
 import ephyra.app.data.backup.create.creators.ExtensionRepoBackupCreator
@@ -19,8 +22,19 @@ import ephyra.app.data.backup.create.creators.MangaBackupCreator
 import ephyra.app.data.backup.create.creators.PreferenceBackupCreator
 import ephyra.app.data.backup.create.creators.SourcesBackupCreator
 import ephyra.app.data.download.DownloadCache
+import ephyra.app.extension.util.ExtensionInstaller
+import ephyra.app.extension.util.ExtensionLoader
+import ephyra.app.util.CrashLogUtil
+import ephyra.app.data.download.DownloadNotifier
+import ephyra.app.data.download.DownloadPendingDeleter
+import ephyra.app.data.download.Downloader
 import ephyra.app.data.saver.ImageSaver
-import ephyra.app.data.track.TrackerManager
+import ephyra.app.data.coil.MangaCoverKeyer
+import ephyra.app.data.coil.MangaKeyer
+import ephyra.app.ui.base.delegate.ThemingDelegate
+import ephyra.app.ui.base.delegate.SecureActivityDelegate
+import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
+import ephyra.app.ui.base.delegate.ThemingDelegateImpl
 import ephyra.app.extension.ExtensionManager
 import eu.kanade.tachiyomi.network.JavaScriptEngine
 import eu.kanade.tachiyomi.network.NetworkHelper
@@ -46,6 +60,9 @@ import ephyra.source.local.image.LocalCoverManager
 import ephyra.source.local.io.LocalSourceFileSystem
 import ephyra.app.data.download.DownloadJob
 import ephyra.app.data.library.LibraryUpdateJob
+import ephyra.app.data.library.LibraryUpdateNotifier
+import ephyra.app.data.library.MetadataUpdateJob
+import ephyra.app.data.updater.AppUpdateDownloadJob
 import ephyra.domain.track.service.DelayedTrackingUpdateJob
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.workmanager.dsl.worker
@@ -123,9 +140,19 @@ val koinAppModule = module {
     }
 
     single<ProtoBuf> { ProtoBuf }
+    single { ExtensionLoader(get(), get()) }
+    single { ExtensionInstaller(androidContext(), get(), get(), get()) }
 
+    single { ExtensionManager(androidContext(), get(), get(), get()) }
+    single { CrashLogUtil(androidContext(), get()) }
     single { ChapterCache(androidApplication(), get()) }
     single { CoverCache(androidApplication()) }
+    single { MangaKeyer() }
+    single<ThemingDelegate> { ThemingDelegateImpl(get()) }
+    single<SecureActivityDelegate> { SecureActivityDelegateImpl(get(), get()) }
+    single { MangaCoverKeyer(get()) }
+    single { MangaCoverFetcher.MangaFactory(lazy { get<okhttp3.Call.Factory>() }, get(), get()) }
+    single { MangaCoverFetcher.MangaCoverFactory(lazy { get<okhttp3.Call.Factory>() }, get(), get()) }
 
     single { NetworkHelper(androidApplication(), get()) }
     single { JavaScriptEngine(androidApplication()) }
@@ -137,9 +164,15 @@ val koinAppModule = module {
     single { DownloadProvider(androidApplication(), get(), get()) }
     single { DownloadCache(androidApplication(), get(), get(), get(), get()) }
     single { DownloadManager(androidApplication(), get(), get(), get(), get(), get(), get(), get()) }
+    single { Downloader(androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single { DownloadPendingDeleter(androidApplication(), get()) }
+    single { DownloadNotifier(androidApplication(), get()) }
 
-    single { TrackerManager() }
+    single { TrackerManager(androidApplication(), get(), get(), get(), get(), get()) }
     single { DelayedTrackingStore(androidApplication()) }
+
+    single { BackupDecoder(androidApplication(), get()) }
+    single { BackupFileValidator(androidApplication(), get(), get(), get()) }
 
     single { CategoriesBackupCreator(get()) }
     single { MangaBackupCreator(get(), get(), get()) }
@@ -148,9 +181,14 @@ val koinAppModule = module {
     single { SourcesBackupCreator(get()) }
     single { BackupCreator(androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 
-    single { PreferenceRestorer(androidApplication(), get(), get()) }
-    single { ExtensionRepoRestorer(get(), get()) }
+    single { CategoriesRestorer(get(), get(), get()) }
+    single { BackupRestorer(androidApplication(), get(), get(), get(), get()) }
+    single { AppUpdateChecker(get()) }
+
+    single { PreferenceRestorer(androidApplication(), get(), get(), get(), get()) }
     single { MangaRestorer(get(), get(), get(), get(), get(), get(), get(), get()) }
+    single { LibraryUpdateNotifier(androidApplication(), get(), get()) }
+    single { BackupNotifier(androidApplication(), get()) }
 
     single { ImageSaver(androidApplication()) }
 
@@ -158,12 +196,15 @@ val koinAppModule = module {
     single { LocalSourceFileSystem(get()) }
     single { LocalCoverManager(androidApplication(), get()) }
     single { StorageManager(androidApplication(), get()) }
-    worker { BackupCreateJob(get(), get(), get(), get(), get()) }
+    worker { AppUpdateDownloadJob(get(), get(), get()) }
+    worker { BackupCreateJob(get(), get(), get(), get(), get(), get()) }
+    worker { BackupRestoreJob(get(), get(), get(), get()) }
     worker { DownloadJob(get(), get(), get(), get()) }
     worker { DelayedTrackingUpdateJob(get(), get(), get(), get(), get()) }
+    worker { MetadataUpdateJob(get(), get(), get(), get(), get(), get(), get()) }
     worker { 
         LibraryUpdateJob(
-            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
+            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
         ) 
     }
 }

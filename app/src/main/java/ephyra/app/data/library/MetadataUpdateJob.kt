@@ -30,23 +30,22 @@ import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.manga.interactor.GetLibraryManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.fetchAndIncrement
 
 @OptIn(ExperimentalAtomicApi::class)
-class MetadataUpdateJob(private val context: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(context, workerParams) {
+class MetadataUpdateJob(
+    private val context: Context,
+    workerParams: WorkerParameters,
+    private val sourceManager: SourceManager,
+    private val coverCache: CoverCache,
+    private val getLibraryManga: GetLibraryManga,
+    private val updateManga: UpdateManga,
+    private val notifier: LibraryUpdateNotifier,
+) : CoroutineWorker(context, workerParams) {
 
-    private val sourceManager: SourceManager = Injekt.get()
-    private val coverCache: CoverCache = Injekt.get()
-    private val getLibraryManga: GetLibraryManga = Injekt.get()
-    private val updateManga: UpdateManga = Injekt.get()
-
-    private val notifier = LibraryUpdateNotifier(context)
 
     private var mangaToUpdate: List<LibraryManga> = mutableListOf()
 

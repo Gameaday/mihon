@@ -60,8 +60,9 @@ import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.EmptyScreen
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.selectedBackground
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+import org.koin.compose.koinInject
 
 class ClearDatabaseScreen : Screen() {
 
@@ -69,7 +70,7 @@ class ClearDatabaseScreen : Screen() {
     override fun Content() {
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { ClearDatabaseScreenModel() }
+        val model = koinScreenModel<ClearDatabaseScreenModel>()
         val state by model.state.collectAsStateWithLifecycle()
         val scope = rememberCoroutineScope()
 
@@ -222,10 +223,11 @@ class ClearDatabaseScreen : Screen() {
     }
 }
 
-private class ClearDatabaseScreenModel : StateScreenModel<ClearDatabaseScreenModel.State>(State.Loading) {
-    private val getSourcesWithNonLibraryManga: GetSourcesWithNonLibraryManga = Injekt.get()
-    private val deleteNonLibraryManga: DeleteNonLibraryManga = Injekt.get()
-    private val removeResettedHistory: RemoveResettedHistory = Injekt.get()
+private class ClearDatabaseScreenModel(
+    private val getSourcesWithNonLibraryManga: GetSourcesWithNonLibraryManga,
+    private val deleteNonLibraryManga: DeleteNonLibraryManga,
+    private val removeResettedHistory: RemoveResettedHistory,
+) : StateScreenModel<ClearDatabaseScreenModel.State>(State.Loading) {
 
     init {
         screenModelScope.launchIO {

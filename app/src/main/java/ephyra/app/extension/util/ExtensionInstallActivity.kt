@@ -7,8 +7,7 @@ import ephyra.app.extension.ExtensionManager
 import ephyra.app.extension.model.InstallStep
 import ephyra.app.util.system.hasMiuiPackageInstaller
 import ephyra.app.util.system.toast
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.android.ext.android.inject
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -16,6 +15,8 @@ import kotlin.time.Duration.Companion.seconds
  * with [startActivityForResult], which we need to update the UI.
  */
 class ExtensionInstallActivity : Activity() {
+
+    private val extensionManager: ExtensionManager by inject()
 
     // MIUI package installer bug workaround
     private var ignoreUntil = 0L
@@ -71,7 +72,6 @@ class ExtensionInstallActivity : Activity() {
 
     private fun checkInstallationResult(resultCode: Int) {
         val downloadId = intent.extras!!.getLong(ExtensionInstaller.EXTRA_DOWNLOAD_ID)
-        val extensionManager = Injekt.get<ExtensionManager>()
         val newStep = when (resultCode) {
             RESULT_OK -> InstallStep.Installed
             RESULT_CANCELED -> InstallStep.Idle

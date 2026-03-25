@@ -14,8 +14,20 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import ephyra.i18n.MR
 import ephyra.domain.track.model.Track as DomainTrack
+import android.app.Application
+import ephyra.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.network.NetworkHelper
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.InsertTrack
 
-class MangaUpdates(id: Long) : BaseTracker(id, "MangaUpdates"), DeletableTracker {
+class MangaUpdates(
+    id: Long,
+    context: Application,
+    trackPreferences: TrackPreferences,
+    networkService: NetworkHelper,
+    addTracks: AddTracks,
+    insertTrack: InsertTrack,
+) : BaseTracker(id, "MangaUpdates", context, trackPreferences, networkService, addTracks, insertTrack), DeletableTracker {
 
     companion object {
         const val READING_LIST = 0L
@@ -41,7 +53,7 @@ class MangaUpdates(id: Long) : BaseTracker(id, "MangaUpdates"), DeletableTracker
 
     private val interceptor by lazy { MangaUpdatesInterceptor(this) }
 
-    private val api by lazy { MangaUpdatesApi(interceptor, client) }
+    private val api by lazy { MangaUpdatesApi(interceptor, client, json) }
 
     override fun getLogo(): Int = R.drawable.brand_mangaupdates
 

@@ -37,6 +37,7 @@ class BackupRestorer(
     private val preferenceRestorer: PreferenceRestorer,
     private val extensionRepoRestorer: ExtensionRepoRestorer,
     private val mangaRestorer: MangaRestorer,
+    private val notifier: BackupNotifier,
 ) {
 
     private var restoreAmount = 0
@@ -48,7 +49,7 @@ class BackupRestorer(
      */
     private var sourceMapping: Map<Long, String> = emptyMap()
 
-    suspend fun restore(uri: Uri, options: RestoreOptions, notifier: BackupNotifier, isSync: Boolean) {
+    suspend fun restore(uri: Uri, options: RestoreOptions, isSync: Boolean) {
         val startTime = System.currentTimeMillis()
 
         restoreFromFile(uri, options)
@@ -66,7 +67,7 @@ class BackupRestorer(
         )
     }
 
-    private suspend fun restoreFromFile(uri: Uri, options: RestoreOptions, notifier: BackupNotifier, isSync: Boolean) {
+    private suspend fun restoreFromFile(uri: Uri, options: RestoreOptions, isSync: Boolean) {
         val backup = BackupDecoder(context).decode(uri)
 
         // Store source mapping for error messages
@@ -91,19 +92,19 @@ class BackupRestorer(
 
         coroutineScope {
             if (options.categories) {
-                restoreCategories(backup.backupCategories, notifier, isSync)
+                restoreCategories(backup.backupCategories, isSync)
             }
             if (options.appSettings) {
-                restoreAppPreferences(backup.backupPreferences, backup.backupCategories.takeIf { options.categories }, notifier, isSync)
+                restoreAppPreferences(backup.backupPreferences, backup.backupCategories.takeIf { options.categories }, isSync)
             }
             if (options.sourceSettings) {
-                restoreSourcePreferences(backup.backupSourcePreferences, notifier, isSync)
+                restoreSourcePreferences(backup.backupSourcePreferences, isSync)
             }
             if (options.libraryEntries) {
-                restoreManga(backup.backupManga, if (options.categories) backup.backupCategories else emptyList(), notifier, isSync)
+                restoreManga(backup.backupManga, if (options.categories) backup.backupCategories else emptyList(), isSync)
             }
             if (options.extensionRepoSettings) {
-                restoreExtensionRepos(backup.backupExtensionRepo, notifier, isSync)
+                restoreExtensionRepos(backup.backupExtensionRepo, isSync)
             }
 
             // TODO: optionally trigger online library + tracker update
@@ -112,7 +113,6 @@ class BackupRestorer(
 
     private fun CoroutineScope.restoreCategories(
         backupCategories: List<BackupCategory>,
-        notifier: BackupNotifier,
         isSync: Boolean,
     ) = launch {
         ensureActive()
@@ -130,7 +130,6 @@ class BackupRestorer(
     private fun CoroutineScope.restoreManga(
         backupMangas: List<BackupManga>,
         backupCategories: List<BackupCategory>,
-        notifier: BackupNotifier,
         isSync: Boolean,
     ) = launch {
         mangaRestorer.sortByNew(backupMangas)
@@ -152,7 +151,6 @@ class BackupRestorer(
     private fun CoroutineScope.restoreAppPreferences(
         preferences: List<BackupPreference>,
         categories: List<BackupCategory>?,
-        notifier: BackupNotifier,
         isSync: Boolean,
     ) = launch {
         ensureActive()
@@ -172,7 +170,6 @@ class BackupRestorer(
 
     private fun CoroutineScope.restoreSourcePreferences(
         preferences: List<BackupSourcePreferences>,
-        notifier: BackupNotifier,
         isSync: Boolean,
     ) = launch {
         ensureActive()
@@ -189,7 +186,6 @@ class BackupRestorer(
 
     private fun CoroutineScope.restoreExtensionRepos(
         backupExtensionRepo: List<BackupExtensionRepos>,
-        notifier: BackupNotifier,
         isSync: Boolean,
     ) = launch {
         backupExtensionRepo

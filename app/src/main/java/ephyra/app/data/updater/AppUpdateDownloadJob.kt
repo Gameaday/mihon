@@ -25,15 +25,16 @@ import okhttp3.internal.http2.StreamResetException
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.i18n.MR
-import uy.kohesive.injekt.injectLazy
 import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 
-class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(context, workerParams) {
+class AppUpdateDownloadJob(
+    private val context: Context,
+    workerParams: WorkerParameters,
+    private val network: NetworkHelper,
+) : CoroutineWorker(context, workerParams) {
 
     private val notifier = AppUpdateNotifier(context)
-    private val network: NetworkHelper by injectLazy()
 
     override suspend fun doWork(): Result {
         val url = inputData.getString(EXTRA_DOWNLOAD_URL)

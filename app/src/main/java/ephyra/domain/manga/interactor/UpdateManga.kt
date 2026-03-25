@@ -12,14 +12,16 @@ import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.repository.MangaRepository
 import ephyra.source.local.isLocal
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.time.Instant
 import java.time.ZonedDateTime
 
 class UpdateManga(
     private val mangaRepository: MangaRepository,
     private val fetchInterval: FetchInterval,
+    private val coverCache: CoverCache,
+    private val libraryPreferences: LibraryPreferences,
+    private val downloadManager: DownloadManager,
+    private val trackPreferences: TrackPreferences,
 ) {
 
     suspend fun await(mangaUpdate: MangaUpdate): Boolean {
@@ -34,10 +36,6 @@ class UpdateManga(
         localManga: Manga,
         remoteManga: SManga,
         manualFetch: Boolean,
-        coverCache: CoverCache = Injekt.get(),
-        libraryPreferences: LibraryPreferences = Injekt.get(),
-        downloadManager: DownloadManager = Injekt.get(),
-        trackPreferences: TrackPreferences = Injekt.get(),
     ): Boolean {
         val remoteTitle = try {
             remoteManga.title

@@ -16,7 +16,6 @@ import ephyra.app.util.system.notificationBuilder
 import ephyra.app.util.system.notify
 import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
-import uy.kohesive.injekt.injectLazy
 import java.util.regex.Pattern
 
 /**
@@ -24,9 +23,10 @@ import java.util.regex.Pattern
  *
  * @param context context of application
  */
-internal class DownloadNotifier(private val context: Context) {
-
-    private val preferences: SecurityPreferences by injectLazy()
+internal class DownloadNotifier(
+    private val context: Context,
+    private val securityPreferences: SecurityPreferences,
+) {
 
     private val progressNotificationBuilder by lazy {
         context.notificationBuilder(Notifications.CHANNEL_DOWNLOADER_PROGRESS) {
@@ -96,7 +96,7 @@ internal class DownloadNotifier(private val context: Context) {
                 download.pages!!.size,
             )
 
-            if (preferences.hideNotificationContent().get()) {
+            if (securityPreferences.hideNotificationContent().get()) {
                 setContentTitle(downloadingProgressText)
                 setContentText(null)
             } else {

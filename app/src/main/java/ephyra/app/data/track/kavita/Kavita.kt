@@ -14,11 +14,23 @@ import kotlinx.collections.immutable.persistentListOf
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
-import uy.kohesive.injekt.injectLazy
-import java.security.MessageDigest
 import ephyra.domain.track.model.Track as DomainTrack
+import android.app.Application
+import ephyra.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.network.NetworkHelper
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.InsertTrack
+import java.security.MessageDigest
 
-class Kavita(id: Long) : BaseTracker(id, "Kavita"), EnhancedTracker {
+class Kavita(
+    id: Long,
+    context: Application,
+    trackPreferences: TrackPreferences,
+    networkService: NetworkHelper,
+    addTracks: AddTracks,
+    insertTrack: InsertTrack,
+    private val sourceManager: SourceManager,
+) : BaseTracker(id, "Kavita", context, trackPreferences, networkService, addTracks, insertTrack), EnhancedTracker {
 
     companion object {
         const val UNREAD = 1L
@@ -29,9 +41,8 @@ class Kavita(id: Long) : BaseTracker(id, "Kavita"), EnhancedTracker {
     var authentications: OAuth? = null
 
     private val interceptor by lazy { KavitaInterceptor(this) }
-    val api by lazy { KavitaApi(client, interceptor) }
+    val api by lazy { KavitaApi(client, interceptor, json) }
 
-    private val sourceManager: SourceManager by injectLazy()
 
     override fun getLogo(): Int = R.drawable.brand_kavita
 

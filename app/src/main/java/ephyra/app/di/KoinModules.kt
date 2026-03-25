@@ -5,6 +5,11 @@ import ephyra.app.ui.category.CategoryScreenModel
 import ephyra.app.ui.reader.ReaderViewModel
 import ephyra.app.ui.deeplink.DeepLinkScreenModel
 import ephyra.presentation.more.settings.screen.browse.ExtensionReposScreenModel
+import ephyra.presentation.more.settings.screen.advanced.ClearDatabaseScreenModel
+import ephyra.feature.upcoming.UpcomingScreenModel
+import ephyra.feature.migration.config.MigrationConfigScreen
+import ephyra.presentation.more.settings.screen.debug.WorkerInfoScreen
+import ephyra.feature.migration.dialog.MigrateDialogScreenModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -70,6 +75,15 @@ val koinAppModule_UI = module {
             updateExtensionRepo = get(),
             extensionManager = get()
         )
+    }
+
+    factory { 
+        ClearDatabaseScreenModel(
+            getSourcesWithNonLibraryManga = get(),
+            deleteNonLibraryManga = get(),
+            removeResettedHistory = get()
+        )
+    }
     factory { (query: String) ->
         DeepLinkScreenModel(
             query = query,
@@ -77,6 +91,19 @@ val koinAppModule_UI = module {
             networkToLocalManga = get(),
             getChapterByUrlAndMangaId = get(),
             syncChaptersWithSource = get()
+        )
+    }
+
+    factory { MigrationConfigScreen.ScreenModel(get(), get()) }
+
+    factory { WorkerInfoScreen.Model(androidContext(), get()) }
+
+    factory { 
+        MigrateDialogScreenModel(
+            sourcePreference = get(),
+            coverCache = get(),
+            downloadManager = get(),
+            migrateManga = get()
         )
     }
 }

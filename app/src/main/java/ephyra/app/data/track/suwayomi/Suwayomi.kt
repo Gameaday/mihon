@@ -12,10 +12,25 @@ import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR
 import ephyra.domain.manga.model.Manga as DomainManga
 import ephyra.domain.track.model.Track as DomainTrack
+import kotlinx.serialization.json.Json
+import android.app.Application
+import ephyra.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.network.NetworkHelper
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.InsertTrack
+import ephyra.domain.source.service.SourceManager
 
-class Suwayomi(id: Long) : BaseTracker(id, "Suwayomi"), EnhancedTracker {
-
-    val api by lazy { SuwayomiApi(id) }
+class Suwayomi(
+    id: Long,
+    context: Application,
+    trackPreferences: TrackPreferences,
+    networkService: NetworkHelper,
+    addTracks: AddTracks,
+    insertTrack: InsertTrack,
+    private val sourceManager: SourceManager,
+    private val json: Json,
+) : BaseTracker(id, "Suwayomi", context, trackPreferences, networkService, addTracks, insertTrack), EnhancedTracker {
+    private val api by lazy { SuwayomiApi(id, sourceManager, json) }
 
     override fun getLogo() = R.drawable.brand_suwayomi
 

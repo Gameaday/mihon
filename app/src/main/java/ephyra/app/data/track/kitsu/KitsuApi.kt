@@ -28,15 +28,17 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import ephyra.core.common.util.lang.withIOContext
-import uy.kohesive.injekt.injectLazy
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import kotlin.time.Duration.Companion.seconds
 import ephyra.domain.track.model.Track as DomainTrack
 
-class KitsuApi(private val client: OkHttpClient, interceptor: KitsuInterceptor) {
+class KitsuApi(
+    private val client: OkHttpClient,
+    interceptor: KitsuInterceptor,
+    private val json: Json,
+) {
 
-    private val json: Json by injectLazy()
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)

@@ -11,14 +11,12 @@ import ephyra.app.util.system.toShareIntent
 import ephyra.app.util.system.toast
 import ephyra.core.common.util.lang.withNonCancellableContext
 import ephyra.core.common.util.lang.withUIContext
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.time.OffsetDateTime
 import java.time.ZoneId
 
 class CrashLogUtil(
     private val context: Context,
-    private val extensionManager: ExtensionManager = Injekt.get(),
+    private val extensionManager: ExtensionManager,
 ) {
 
     suspend fun dumpLogs(exception: Throwable? = null) = withNonCancellableContext {

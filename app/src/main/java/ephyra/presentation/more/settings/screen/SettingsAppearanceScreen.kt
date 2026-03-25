@@ -24,8 +24,7 @@ import kotlinx.collections.immutable.toImmutableMap
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.compose.koinInject
 import java.time.LocalDate
 
 object SettingsAppearanceScreen : SearchableSettings {
@@ -36,7 +35,7 @@ object SettingsAppearanceScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val uiPreferences = remember { Injekt.get<UiPreferences>() }
+        val uiPreferences = koinInject<UiPreferences>()
 
         return listOf(
             getThemeGroup(uiPreferences = uiPreferences),

@@ -11,7 +11,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import ephyra.core.common.util.lang.withIOContext
-import uy.kohesive.injekt.injectLazy
 
 /**
  * Jellyfin REST API client.
@@ -23,9 +22,9 @@ import uy.kohesive.injekt.injectLazy
 class JellyfinApi(
     private val trackId: Long,
     private val client: OkHttpClient,
+    private val json: Json,
 ) {
 
-    private val json: Json by injectLazy()
 
     // -- Image URL helpers (Jellyfin-style: quality params for caching) --
 

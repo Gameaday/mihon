@@ -7,17 +7,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
-/**
- * Class used to keep a list of chapters for future deletion.
- *
- * @param context the application context.
- */
 class DownloadPendingDeleter(
     context: Context,
-    private val json: Json = Injekt.get(),
+    private val json: Json,
 ) {
 
     /**

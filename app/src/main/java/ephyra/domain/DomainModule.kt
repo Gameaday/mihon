@@ -12,7 +12,8 @@ import ephyra.domain.manga.interactor.FindContentSource
 import ephyra.domain.manga.interactor.GetExcludedScanlators
 import ephyra.domain.manga.interactor.SetExcludedScanlators
 import ephyra.domain.manga.interactor.SetMangaViewerFlags
-import ephyra.domain.manga.interactor.UpdateManga
+import ephyra.domain.track.interactor.MatchUnlinkedJob
+import ephyra.domain.track.interactor.MatchUnlinkedManga
 import ephyra.domain.source.interactor.GetEnabledSources
 import ephyra.domain.source.interactor.GetIncognitoState
 import ephyra.domain.source.interactor.GetLanguagesWithSources
@@ -137,7 +138,7 @@ val koinDomainModule = module {
     factory { SetMangaDefaultChapterFlags(get(), get(), get()) }
     factory { SetMangaViewerFlags(get()) }
     factory { NetworkToLocalManga(get()) }
-    factory { UpdateManga(get(), get()) }
+    factory { UpdateManga(get(), get(), get(), get(), get(), get()) }
     factory { FindContentSource(get(), get()) }
     factory { UpdateMangaNotes(get()) }
     factory { SetMangaCategories(get()) }
@@ -166,6 +167,7 @@ val koinDomainModule = module {
     factory { LinkTrackedMangaToAuthority(get(), get()) }
     factory { MatchUnlinkedManga(get(), get(), get(), get()) }
     factory { RefreshCanonicalMetadata(get(), get(), get(), get()) }
+    org.koin.androidx.workmanager.dsl.worker { MatchUnlinkedJob(get(), get(), get()) }
 
     single<ChapterRepository> { ChapterRepositoryImpl(get()) }
     factory { GetChapter(get()) }

@@ -3,7 +3,9 @@ package ephyra.feature.upcoming
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.model.rememberScreenModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+import org.koin.compose.koinInject
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.presentation.util.Screen
@@ -15,7 +17,7 @@ class UpcomingScreen : Screen() {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val screenModel = rememberScreenModel { UpcomingScreenModel() }
+        val screenModel = koinScreenModel<UpcomingScreenModel>()
         val state by screenModel.state.collectAsStateWithLifecycle()
 
         UpcomingScreenContent(

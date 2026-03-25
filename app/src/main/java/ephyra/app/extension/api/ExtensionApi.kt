@@ -20,19 +20,24 @@ import ephyra.domain.extensionrepo.model.ExtensionRepo
 import ephyra.core.common.preference.Preference
 import ephyra.core.common.preference.PreferenceStore
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.app.extension.util.ExtensionLoader
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.injectLazy
+import ephyra.app.core.security.SecurityPreferences
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 
-internal class ExtensionApi {
+internal class ExtensionApi : KoinComponent {
 
-    private val networkService: NetworkHelper by injectLazy()
-    private val preferenceStore: PreferenceStore by injectLazy()
-    private val getExtensionRepo: GetExtensionRepo by injectLazy()
-    private val updateExtensionRepo: UpdateExtensionRepo by injectLazy()
-    private val extensionManager: ExtensionManager by injectLazy()
-    private val json: Json by injectLazy()
+    private val networkService: NetworkHelper by inject()
+    private val preferenceStore: PreferenceStore by inject()
+    private val getExtensionRepo: GetExtensionRepo by inject()
+    private val updateExtensionRepo: UpdateExtensionRepo by inject()
+    private val extensionManager: ExtensionManager by inject()
+    private val securityPreferences: SecurityPreferences by inject()
+    private val extensionLoader: ExtensionLoader by inject()
+    private val json: Json by inject()
 
     private val lastExtCheck: Preference<Long> by lazy {
         preferenceStore.getLong(Preference.appStateKey("last_ext_check"), 0)
@@ -85,7 +90,7 @@ internal class ExtensionApi {
             findExtensions().also { lastExtCheck.set(Instant.now().toEpochMilli()) }
         }
 
-        val installedExtensions = ExtensionLoader.loadExtensions(context)
+        val installedExtensions = extensionLoader.loadExtensions(context)
             .filterIsInstance<LoadResult.Success>()
             .map { it.extension }
 
@@ -102,7 +107,7 @@ internal class ExtensionApi {
         }
 
         if (extensionsWithUpdate.isNotEmpty()) {
-            ExtensionUpdateNotifier(context).promptUpdates(extensionsWithUpdate.map { it.name })
+            ExtensionUpdateNotifier(context, securityPreferences).promptUpdates(extensionsWithUpdate.map { it.name })
         }
 
         return extensionsWithUpdate

@@ -40,8 +40,9 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.plus
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+import org.koin.compose.koinInject
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -57,7 +58,7 @@ class WorkerInfoScreen : Screen() {
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
 
-        val screenModel = rememberScreenModel { Model(context) }
+        val screenModel = koinScreenModel<Model>()
         val enqueued by screenModel.enqueued.collectAsStateWithLifecycle()
         val finished by screenModel.finished.collectAsStateWithLifecycle()
         val running by screenModel.running.collectAsStateWithLifecycle()
@@ -118,7 +119,10 @@ class WorkerInfoScreen : Screen() {
         )
     }
 
-    private class Model(context: Context) : ScreenModel {
+    private class Model(
+        context: Context,
+        private val uiPreferences: UiPreferences,
+    ) : ScreenModel {
         private val workManager = context.workManager
 
         val finished = workManager
@@ -156,7 +160,7 @@ class WorkerInfoScreen : Screen() {
                         )
                             .toDateTimestampString(
                                 UiPreferences.dateFormat(
-                                    Injekt.get<UiPreferences>().dateFormat().get(),
+                                    uiPreferences.dateFormat().get(),
                                 ),
                             )
                         appendLine("Next scheduled run: $timestamp")

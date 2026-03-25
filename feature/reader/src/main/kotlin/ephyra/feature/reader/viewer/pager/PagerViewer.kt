@@ -32,16 +32,16 @@ import okio.Buffer
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.injectLazy
 import kotlin.math.min
 
 /**
  * Implementation of a [Viewer] to display pages with a [ViewPager].
  */
 @Suppress("LeakingThis")
-abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
-
-    val downloadManager: DownloadManager by injectLazy()
+abstract class PagerViewer(
+    val activity: ReaderActivity,
+    val downloadManager: DownloadManager,
+) : Viewer {
 
     private val scope = MainScope()
 

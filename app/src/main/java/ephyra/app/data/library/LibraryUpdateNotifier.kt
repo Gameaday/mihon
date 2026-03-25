@@ -37,16 +37,13 @@ import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.math.RoundingMode
 import java.text.NumberFormat
 
 class LibraryUpdateNotifier(
     private val context: Context,
-
-    private val securityPreferences: SecurityPreferences = Injekt.get(),
-    private val sourceManager: SourceManager = Injekt.get(),
+    private val securityPreferences: SecurityPreferences,
+    private val sourceManager: SourceManager,
 ) {
 
     private val percentFormatter = NumberFormat.getPercentInstance().apply {

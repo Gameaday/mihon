@@ -20,7 +20,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import logcat.LogPriority
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.injectLazy
 import java.io.File
 
 /**
@@ -37,10 +36,11 @@ import java.io.File
  * extension will be used unless the version codes are different. In that case the
  * one with higher version code will be used.
  */
-internal object ExtensionLoader {
+internal class ExtensionLoader(
+    private val preferences: SourcePreferences,
+    private val trustExtension: TrustExtension,
+) {
 
-    private val preferences: SourcePreferences by injectLazy()
-    private val trustExtension: TrustExtension by injectLazy()
     private val loadNsfwSource by lazy {
         preferences.showNsfwSource().get()
     }

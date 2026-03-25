@@ -10,12 +10,10 @@ import ephyra.app.util.system.cancelNotification
 import ephyra.app.util.system.notify
 import ephyra.core.common.i18n.pluralStringResource
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 class ExtensionUpdateNotifier(
     private val context: Context,
-    private val securityPreferences: SecurityPreferences = Injekt.get(),
+    private val securityPreferences: SecurityPreferences,
 ) {
     fun promptUpdates(names: List<String>) {
         context.notify(

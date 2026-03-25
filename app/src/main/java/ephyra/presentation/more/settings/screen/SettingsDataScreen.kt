@@ -265,7 +265,7 @@ object SettingsDataScreen : SearchableSettings {
                     ),
                     title = stringResource(MR.strings.pref_backup_interval),
                     onValueChanged = {
-                        BackupCreateJob.setupTask(context, it)
+                        BackupCreateJob.setupTask(context, backupPreferences, it)
                         true
                     },
                 ),

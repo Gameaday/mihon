@@ -14,13 +14,15 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.injectLazy
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class KavitaApi(private val client: OkHttpClient, interceptor: KavitaInterceptor) {
+class KavitaApi(
+    private val client: OkHttpClient,
+    interceptor: KavitaInterceptor,
+    private val json: Json,
+) {
 
-    private val json: Json by injectLazy()
 
     private val authClient = client.newBuilder()
         .dns(Dns.SYSTEM)

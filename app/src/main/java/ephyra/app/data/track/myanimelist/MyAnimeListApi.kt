@@ -24,7 +24,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import ephyra.core.common.util.lang.withIOContext
-import uy.kohesive.injekt.injectLazy
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
@@ -34,9 +33,9 @@ class MyAnimeListApi(
     private val trackId: Long,
     private val client: OkHttpClient,
     interceptor: MyAnimeListInterceptor,
+    private val json: Json,
 ) {
 
-    private val json: Json by injectLazy()
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)

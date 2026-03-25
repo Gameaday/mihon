@@ -24,16 +24,18 @@ import kotlinx.serialization.json.putJsonObject
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import ephyra.core.common.util.lang.withIOContext
-import uy.kohesive.injekt.injectLazy
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.time.Duration.Companion.minutes
 import ephyra.domain.track.model.Track as DomainTrack
 
-class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
+class AnilistApi(
+    val client: OkHttpClient,
+    interceptor: AnilistInterceptor,
+    private val json: Json,
+) {
 
-    private val json: Json by injectLazy()
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)

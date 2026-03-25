@@ -67,8 +67,9 @@ import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.shouldExpandFAB
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+import org.koin.compose.koinInject
 
 class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
 
@@ -78,7 +79,7 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val screenModel = rememberScreenModel { ScreenModel() }
+        val screenModel = koinScreenModel<ScreenModel>()
         val state by screenModel.state.collectAsStateWithLifecycle()
 
         var migrationSheetOpen by rememberSaveable { mutableStateOf(false) }
@@ -311,8 +312,8 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
     }
 
     private class ScreenModel(
-        val sourcePreferences: SourcePreferences = Injekt.get(),
-        private val sourceManager: SourceManager = Injekt.get(),
+        val sourcePreferences: SourcePreferences,
+        private val sourceManager: SourceManager,
     ) : StateScreenModel<ScreenModel.State>(State()) {
 
         private val sourcesComparator = { includedSources: List<Long> ->

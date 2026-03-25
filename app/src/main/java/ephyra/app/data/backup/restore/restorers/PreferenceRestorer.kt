@@ -21,10 +21,13 @@ import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.model.Category
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.library.service.LibraryPreferences
+import ephyra.domain.backup.service.BackupPreferences
 class PreferenceRestorer(
     private val context: Context,
     private val getCategories: GetCategories,
     private val preferenceStore: PreferenceStore,
+    private val libraryPreferences: LibraryPreferences,
+    private val backupPreferences: BackupPreferences,
 ) {
     suspend fun restoreApp(
         preferences: List<BackupPreference>,
@@ -36,8 +39,8 @@ class PreferenceRestorer(
             backupCategories,
         )
 
-        LibraryUpdateJob.setupTask(context)
-        BackupCreateJob.setupTask(context)
+        LibraryUpdateJob.setupTask(context, libraryPreferences)
+        BackupCreateJob.setupTask(context, backupPreferences)
     }
 
     suspend fun restoreSource(preferences: List<BackupSourcePreferences>) {

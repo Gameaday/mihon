@@ -16,8 +16,6 @@ import ephyra.app.util.view.setSecureScreen
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 interface SecureActivityDelegate {
     fun registerSecureActivity(activity: AppCompatActivity)
@@ -69,12 +67,12 @@ interface SecureActivityDelegate {
     }
 }
 
-class SecureActivityDelegateImpl : SecureActivityDelegate, DefaultLifecycleObserver, KoinComponent {
+class SecureActivityDelegateImpl(
+    private val preferences: BasePreferences,
+    private val securityPreferences: SecurityPreferences,
+) : SecureActivityDelegate, DefaultLifecycleObserver {
 
     private lateinit var activity: AppCompatActivity
-
-    private val preferences: BasePreferences by inject()
-    private val securityPreferences: SecurityPreferences by inject()
 
     override fun registerSecureActivity(activity: AppCompatActivity) {
         this.activity = activity

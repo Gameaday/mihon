@@ -15,8 +15,6 @@ import ephyra.app.util.system.workManager
 import kotlinx.coroutines.CancellationException
 import logcat.LogPriority
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 /**
  * WorkManager job that resolves canonical IDs for all unlinked library manga.
@@ -25,8 +23,11 @@ import uy.kohesive.injekt.api.get
  * so the user gets real-time feedback even when the Settings screen is backgrounded.
  * Shows a completion notification with a result summary when finished.
  */
-class MatchUnlinkedJob(private val context: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(context, workerParams) {
+class MatchUnlinkedJob(
+    private val context: Context,
+    workerParams: WorkerParameters,
+    private val matcher: MatchUnlinkedManga,
+) : CoroutineWorker(context, workerParams) {
 
     private val notifier = MatchUnlinkedNotifier(context)
 
@@ -34,7 +35,6 @@ class MatchUnlinkedJob(private val context: Context, workerParams: WorkerParamet
         setForegroundSafely()
 
         return try {
-            val matcher: MatchUnlinkedManga = Injekt.get()
             val result = matcher.await { current, total, title ->
                 notifier.showProgressNotification(title, current, total)
             }

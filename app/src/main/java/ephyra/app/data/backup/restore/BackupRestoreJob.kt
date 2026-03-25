@@ -26,9 +26,9 @@ class BackupRestoreJob(
     private val context: Context,
     workerParams: WorkerParameters,
     private val backupRestorer: BackupRestorer,
+    private val notifier: BackupNotifier,
 ) : CoroutineWorker(context, workerParams) {
 
-    private val notifier = BackupNotifier(context)
 
     override suspend fun doWork(): Result {
         val uri = inputData.getString(LOCATION_URI_KEY)?.toUri()
@@ -43,7 +43,7 @@ class BackupRestoreJob(
         setForegroundSafely()
 
         return try {
-            backupRestorer.restore(uri, options, notifier, isSync)
+            backupRestorer.restore(uri, options, isSync)
             Result.success()
         } catch (e: Exception) {
             if (e is CancellationException) {

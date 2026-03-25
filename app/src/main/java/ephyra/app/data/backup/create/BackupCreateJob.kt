@@ -26,8 +26,6 @@ import logcat.LogPriority
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.backup.service.BackupPreferences
 import ephyra.domain.storage.service.StorageManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.util.concurrent.TimeUnit
 
 class BackupCreateJob(
@@ -36,9 +34,8 @@ class BackupCreateJob(
     private val backupCreator: BackupCreator,
     private val storageManager: StorageManager,
     private val backupPreferences: BackupPreferences,
+    private val notifier: BackupNotifier,
 ) : CoroutineWorker(context, workerParams) {
-
-    private val notifier = BackupNotifier(context)
 
     override suspend fun doWork(): Result {
         val isAutoBackup = inputData.getBoolean(IS_AUTO_BACKUP_KEY, true)
@@ -93,8 +90,11 @@ class BackupCreateJob(
             return context.workManager.isRunning(TAG_MANUAL)
         }
 
-        fun setupTask(context: Context, prefInterval: Int? = null) {
-            val backupPreferences = Injekt.get<BackupPreferences>()
+        fun setupTask(
+            context: Context,
+            backupPreferences: BackupPreferences,
+            prefInterval: Int? = null,
+        ) {
             val interval = prefInterval ?: backupPreferences.backupInterval().get()
             if (interval > 0) {
                 val constraints = Constraints(

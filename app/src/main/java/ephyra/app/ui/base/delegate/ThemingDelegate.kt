@@ -4,8 +4,6 @@ import android.app.Activity
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.AppTheme
 import ephyra.app.R
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 interface ThemingDelegate {
     fun applyAppTheme(activity: Activity)
@@ -39,9 +37,10 @@ interface ThemingDelegate {
     }
 }
 
-class ThemingDelegateImpl : ThemingDelegate {
+class ThemingDelegateImpl(
+    private val uiPreferences: UiPreferences,
+) : ThemingDelegate {
     override fun applyAppTheme(activity: Activity) {
-        val uiPreferences = Injekt.get<UiPreferences>()
         ThemingDelegate.getThemeResIds(uiPreferences.appTheme().get(), uiPreferences.themeDarkAmoled().get())
             .forEach(activity::setTheme)
     }

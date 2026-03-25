@@ -21,7 +21,10 @@ import ephyra.core.common.util.system.logcat
  *
  * @param listener The listener that should be notified of extension installation events.
  */
-internal class ExtensionInstallReceiver(private val listener: Listener) : BroadcastReceiver() {
+internal class ExtensionInstallReceiver(
+    private val listener: Listener,
+    private val extensionLoader: ExtensionLoader,
+) : BroadcastReceiver() {
 
     val scope = CoroutineScope(SupervisorJob())
 
@@ -99,7 +102,7 @@ internal class ExtensionInstallReceiver(private val listener: Listener) : Broadc
             logcat(LogPriority.WARN) { "Package name not found" }
             return LoadResult.Error
         }
-        return ExtensionLoader.loadExtensionFromPkgName(context, pkgName)
+        return extensionLoader.loadExtensionFromPkgName(context, pkgName)
     }
 
     /**

@@ -17,20 +17,17 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.track.interactor.InsertTrack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.component.get
 import ephyra.domain.track.model.Track as DomainTrack
 
 abstract class BaseTracker(
     override val id: Long,
     override val name: String,
-) : Tracker, KoinComponent {
-
-    val trackPreferences: TrackPreferences by inject()
-    val networkService: NetworkHelper by inject()
-    private val addTracks: AddTracks by inject()
-    private val insertTrack: InsertTrack by inject()
+    private val context: Application,
+    val trackPreferences: TrackPreferences,
+    val networkService: NetworkHelper,
+    private val addTracks: AddTracks,
+    private val insertTrack: InsertTrack,
+) : Tracker {
 
     override val client: OkHttpClient
         get() = networkService.client
@@ -84,7 +81,7 @@ abstract class BaseTracker(
                 is HttpException -> "$name: HTTP ${e.code}"
                 else -> "$name: ${e.message}"
             }
-            withUIContext { get<Application>().toast(errorDetail) }
+            withUIContext { context.toast(errorDetail) }
         }
     }
 

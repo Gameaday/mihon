@@ -14,8 +14,20 @@ import okhttp3.OkHttpClient
 import ephyra.domain.manga.model.Manga
 import ephyra.i18n.MR
 import ephyra.domain.track.model.Track as DomainTrack
+import android.app.Application
+import ephyra.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.network.NetworkHelper
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.InsertTrack
 
-class Komga(id: Long) : BaseTracker(id, "Komga"), EnhancedTracker {
+class Komga(
+    id: Long,
+    context: Application,
+    trackPreferences: TrackPreferences,
+    networkService: NetworkHelper,
+    addTracks: AddTracks,
+    insertTrack: InsertTrack,
+) : BaseTracker(id, "Komga", context, trackPreferences, networkService, addTracks, insertTrack), EnhancedTracker {
 
     companion object {
         const val UNREAD = 1L
@@ -28,7 +40,7 @@ class Komga(id: Long) : BaseTracker(id, "Komga"), EnhancedTracker {
             .dns(Dns.SYSTEM) // don't use DNS over HTTPS as it breaks IP addressing
             .build()
 
-    val api by lazy { KomgaApi(id, client) }
+    private val api by lazy { KomgaApi(id, client, json) }
 
     override fun getLogo() = R.drawable.brand_komga
 

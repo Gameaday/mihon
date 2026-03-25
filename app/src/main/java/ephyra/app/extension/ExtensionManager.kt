@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import ephyra.domain.extension.interactor.TrustExtension
 import ephyra.domain.source.service.SourcePreferences
+import ephyra.app.core.security.SecurityPreferences
 import ephyra.app.extension.api.ExtensionApi
 import ephyra.app.extension.api.ExtensionUpdateNotifier
 import ephyra.app.extension.model.Extension
@@ -29,8 +30,6 @@ import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.source.model.StubSource
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.util.Locale
 
 /**
@@ -42,8 +41,10 @@ import java.util.Locale
  */
 class ExtensionManager(
     private val context: Context,
-    private val preferences: SourcePreferences = Injekt.get(),
-    private val trustExtension: TrustExtension = Injekt.get(),
+    private val preferences: SourcePreferences,
+    private val trustExtension: TrustExtension,
+    private val securityPreferences: SecurityPreferences,
+    private val extensionLoader: ExtensionLoader,
 ) {
 
     val scope = CoroutineScope(SupervisorJob())
@@ -89,7 +90,7 @@ class ExtensionManager(
 
     init {
         initExtensions()
-        ExtensionInstallReceiver(InstallationListener()).register(context)
+        ExtensionInstallReceiver(InstallationListener(), extensionLoader).register(context)
     }
 
     private var subLanguagesEnabledOnFirstRun = preferences.enabledLanguages().isSet()
@@ -106,7 +107,7 @@ class ExtensionManager(
         val pkgName = getExtensionPackage(sourceId) ?: return null
 
         return iconMap.getOrPut(pkgName) {
-            ExtensionLoader.getExtensionPackageInfoFromPkgName(context, pkgName)!!.applicationInfo!!
+            extensionLoader.getExtensionPackageInfoFromPkgName(context, pkgName)!!.applicationInfo!!
                 .loadIcon(context.packageManager)
         }
     }
@@ -127,7 +128,7 @@ class ExtensionManager(
      */
     private fun initExtensions() {
         scope.launch {
-            val extensions = ExtensionLoader.loadExtensions(context)
+            val extensions = extensionLoader.loadExtensions(context)
 
             installedExtensionMapFlow.value = extensions
                 .filterIsInstance<LoadResult.Success>()
@@ -289,7 +290,7 @@ class ExtensionManager(
 
         untrustedExtensionMapFlow.value -= extension.pkgName
 
-        ExtensionLoader.loadExtensionFromPkgName(context, extension.pkgName)
+        extensionLoader.loadExtensionFromPkgName(context, extension.pkgName)
             .let { it as? LoadResult.Success }
             ?.let { registerNewExtension(it.extension) }
     }
@@ -347,7 +348,7 @@ class ExtensionManager(
         }
 
         override fun onPackageUninstalled(pkgName: String) {
-            ExtensionLoader.uninstallPrivateExtension(context, pkgName)
+            extensionLoader.uninstallPrivateExtension(context, pkgName)
             unregisterExtension(pkgName)
             updatePendingUpdatesCount()
         }
@@ -376,7 +377,7 @@ class ExtensionManager(
         val pendingUpdateCount = installedExtensionMapFlow.value.values.count { it.hasUpdate }
         preferences.extensionUpdatesCount().set(pendingUpdateCount)
         if (pendingUpdateCount == 0) {
-            ExtensionUpdateNotifier(context).dismiss()
+            ExtensionUpdateNotifier(context, securityPreferences).dismiss()
         }
     }
 

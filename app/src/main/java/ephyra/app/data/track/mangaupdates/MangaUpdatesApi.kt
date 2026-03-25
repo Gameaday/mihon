@@ -26,15 +26,14 @@ import kotlinx.serialization.json.putJsonObject
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
-import uy.kohesive.injekt.injectLazy
 import kotlin.time.Duration.Companion.seconds
 import ephyra.domain.track.model.Track as DomainTrack
 
 class MangaUpdatesApi(
     interceptor: MangaUpdatesInterceptor,
     private val client: OkHttpClient,
+    private val json: Json,
 ) {
-    private val json: Json by injectLazy()
 
     private val authClient by lazy {
         client.newBuilder()

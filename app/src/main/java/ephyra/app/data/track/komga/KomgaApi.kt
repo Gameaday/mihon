@@ -16,11 +16,11 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.injectLazy
 
 class KomgaApi(
     private val trackId: Long,
     private val client: OkHttpClient,
+    private val json: Json,
 ) {
 
     private val headers: Headers by lazy {
@@ -29,7 +29,6 @@ class KomgaApi(
             .build()
     }
 
-    private val json: Json by injectLazy()
 
     suspend fun getTrackSearch(url: String): TrackSearch =
         withIOContext {

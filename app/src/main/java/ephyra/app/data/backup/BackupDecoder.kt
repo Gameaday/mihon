@@ -10,13 +10,9 @@ import okio.gzip
 import okio.source
 import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import java.io.IOException
-
 class BackupDecoder(
     private val context: Context,
-    private val parser: ProtoBuf = Injekt.get(),
+    private val parser: ProtoBuf,
 ) {
     /**
      * Decode a potentially-gzipped backup.

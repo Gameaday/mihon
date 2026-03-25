@@ -16,13 +16,13 @@ import ephyra.core.common.i18n.pluralStringResource
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.storage.displayablePath
 import ephyra.i18n.MR
-import uy.kohesive.injekt.injectLazy
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class BackupNotifier(private val context: Context) {
-
-    private val preferences: SecurityPreferences by injectLazy()
+class BackupNotifier(
+    private val context: Context,
+    private val securityPreferences: SecurityPreferences,
+) {
 
     private val progressNotificationBuilder = context.notificationBuilder(
         Notifications.CHANNEL_BACKUP_RESTORE_PROGRESS,
@@ -101,7 +101,7 @@ class BackupNotifier(private val context: Context) {
             }
             setContentTitle(contentTitle)
 
-            if (!preferences.hideNotificationContent().get()) {
+            if (!securityPreferences.hideNotificationContent().get()) {
                 setContentText(content)
             }
 

@@ -29,9 +29,8 @@ import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import uy.kohesive.injekt.injectLazy
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import ephyra.app.BuildConfig.APPLICATION_ID as ID
 
 /**
@@ -39,12 +38,12 @@ import ephyra.app.BuildConfig.APPLICATION_ID as ID
  * Pending Broadcasts should be made from here.
  * NOTE: Use local broadcasts if possible.
  */
-class NotificationReceiver : BroadcastReceiver() {
+class NotificationReceiver : BroadcastReceiver(), KoinComponent {
 
-    private val getManga: GetManga by injectLazy()
-    private val getChapter: GetChapter by injectLazy()
-    private val updateChapter: UpdateChapter by injectLazy()
-    private val downloadManager: DownloadManager by injectLazy()
+    private val getManga: GetManga by inject()
+    private val getChapter: GetChapter by inject()
+    private val updateChapter: UpdateChapter by inject()
+    private val downloadManager: DownloadManager by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
@@ -212,8 +211,8 @@ class NotificationReceiver : BroadcastReceiver() {
      * @param mangaId id of manga
      */
     private fun markAsRead(chapterUrls: Array<String>, mangaId: Long) {
-        val downloadPreferences: DownloadPreferences = Injekt.get()
-        val sourceManager: SourceManager = Injekt.get()
+        val downloadPreferences: DownloadPreferences by inject()
+        val sourceManager: SourceManager by inject()
 
         launchIO {
             val toUpdate = chapterUrls.mapNotNull { getChapter.await(it, mangaId) }

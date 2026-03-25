@@ -6,12 +6,13 @@ import ephyra.app.data.track.bangumi.dto.isExpired
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.Response
-import uy.kohesive.injekt.injectLazy
 import java.io.IOException
 
-class BangumiInterceptor(private val bangumi: Bangumi) : Interceptor {
+class BangumiInterceptor(
+    private val bangumi: Bangumi,
+    private val json: Json,
+) : Interceptor {
 
-    private val json: Json by injectLazy()
 
     /**
      * OAuth object used for authenticated requests.

@@ -15,12 +15,16 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority
 import okhttp3.Dns
+import ephyra.domain.track.model.Track as DomainTrack
+import kotlin.time.Duration.Companion.seconds
+import android.app.Application
 import okhttp3.OkHttpClient
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.library.service.LibraryPreferences
-import org.koin.core.component.inject
-import kotlin.time.Duration.Companion.seconds
-import ephyra.domain.track.model.Track as DomainTrack
+import ephyra.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.network.NetworkHelper
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.InsertTrack
 
 /**
  * Jellyfin tracker for syncing read progress with a Jellyfin media server.
@@ -45,7 +49,15 @@ import ephyra.domain.track.model.Track as DomainTrack
  * Jellyfin Bookshelf plugin compatibility:
  * - Recognizes series organized in Jellyfin hierarchy
  */
-class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, DeletableTracker {
+class Jellyfin(
+    id: Long,
+    context: Application,
+    trackPreferences: TrackPreferences,
+    networkService: NetworkHelper,
+    addTracks: AddTracks,
+    insertTrack: InsertTrack,
+    private val libraryPreferences: LibraryPreferences,
+) : BaseTracker(id, "Jellyfin", context, trackPreferences, networkService, addTracks, insertTrack), EnhancedTracker, DeletableTracker {
 
     companion object {
         const val UNREAD = 1L
@@ -73,9 +85,8 @@ class Jellyfin(id: Long) : BaseTracker(id, "Jellyfin"), EnhancedTracker, Deletab
             .rateLimit(permits = 10, period = 1.seconds) // self-hosted; generous for LAN use
             .build()
 
-    val api by lazy { JellyfinApi(id, client) }
+    val api by lazy { JellyfinApi(id, client, json) }
 
-    private val libraryPreferences: LibraryPreferences by inject()
 
     /**
      * Mutex to prevent concurrent sync operations from corrupting read progress.

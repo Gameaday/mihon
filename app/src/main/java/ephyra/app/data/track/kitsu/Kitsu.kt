@@ -11,11 +11,23 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
 import ephyra.i18n.MR
-import uy.kohesive.injekt.injectLazy
 import java.text.DecimalFormat
 import ephyra.domain.track.model.Track as DomainTrack
+import android.app.Application
+import ephyra.domain.track.service.TrackPreferences
+import eu.kanade.tachiyomi.network.NetworkHelper
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.InsertTrack
 
-class Kitsu(id: Long) : BaseTracker(id, "Kitsu"), DeletableTracker {
+class Kitsu(
+    id: Long,
+    context: Application,
+    trackPreferences: TrackPreferences,
+    networkService: NetworkHelper,
+    addTracks: AddTracks,
+    insertTrack: InsertTrack,
+    private val json: Json,
+) : BaseTracker(id, "Kitsu", context, trackPreferences, networkService, addTracks, insertTrack), DeletableTracker {
 
     companion object {
         const val READING = 1L
@@ -29,11 +41,10 @@ class Kitsu(id: Long) : BaseTracker(id, "Kitsu"), DeletableTracker {
 
     override val supportsPrivateTracking: Boolean = true
 
-    private val json: Json by injectLazy()
 
-    private val interceptor by lazy { KitsuInterceptor(this) }
+    private val interceptor by lazy { KitsuInterceptor(this, json) }
 
-    private val api by lazy { KitsuApi(client, interceptor) }
+    private val api by lazy { KitsuApi(client, interceptor, json) }
 
     override fun getLogo() = R.drawable.brand_kitsu
 

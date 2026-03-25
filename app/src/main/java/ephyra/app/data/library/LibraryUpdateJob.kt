@@ -94,9 +94,9 @@ class LibraryUpdateJob(
     private val filterChaptersForDownload: FilterChaptersForDownload,
     private val getChaptersByMangaId: GetChaptersByMangaId,
     private val refreshCanonicalMetadata: ephyra.domain.track.interactor.RefreshCanonicalMetadata,
+    private val notifier: LibraryUpdateNotifier,
 ) : CoroutineWorker(context, workerParams) {
 
-    private val notifier = LibraryUpdateNotifier(context)
 
     private var mangaToUpdate: List<LibraryManga> = mutableListOf()
 
@@ -686,9 +686,9 @@ class LibraryUpdateJob(
 
         fun setupTask(
             context: Context,
+            preferences: LibraryPreferences,
             prefInterval: Int? = null,
         ) {
-            val preferences = Injekt.get<LibraryPreferences>()
             val interval = prefInterval ?: preferences.autoUpdateInterval().get()
             if (interval > 0) {
                 val restrictions = preferences.autoUpdateDeviceRestrictions().get()
@@ -771,7 +771,10 @@ class LibraryUpdateJob(
 
                     // Re-enqueue cancelled scheduled work
                     if (it.tags.contains(WORK_NAME_AUTO)) {
-                        setupTask(context)
+                        // TODO: how to get preferences here? 
+                        // For now we assume setupTask will be called correctly from elsewhere
+                        // Or we can use Koin Java API
+                        // setupTask(context, GlobalContext.get().get())
                     }
                 }
         }

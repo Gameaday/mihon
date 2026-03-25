@@ -7,11 +7,10 @@ import ephyra.app.util.system.isNightlyBuildType
 import ephyra.app.util.system.isPreviewBuildType
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.release.interactor.GetApplicationRelease
-import uy.kohesive.injekt.injectLazy
 
-class AppUpdateChecker {
-
-    private val getApplicationRelease: GetApplicationRelease by injectLazy()
+class AppUpdateChecker(
+    private val getApplicationRelease: GetApplicationRelease,
+) {
 
     suspend fun checkForUpdate(context: Context, forceCheck: Boolean = false): GetApplicationRelease.Result {
         return withIOContext {

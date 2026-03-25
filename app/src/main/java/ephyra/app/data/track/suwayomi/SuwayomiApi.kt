@@ -20,17 +20,14 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.source.service.SourceManager
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import uy.kohesive.injekt.injectLazy
 import java.nio.charset.Charset
 import java.security.MessageDigest
 
-class SuwayomiApi(private val trackId: Long) {
-
-    private val json: Json by injectLazy()
-
-    private val sourceManager: SourceManager by injectLazy()
+class SuwayomiApi(
+    private val trackId: Long,
+    private val sourceManager: SourceManager,
+    private val json: Json,
+) {
     private val source: HttpSource by lazy { (sourceManager.get(sourceId) as HttpSource) }
     private val configurableSource: ConfigurableSource by lazy { (sourceManager.get(sourceId) as ConfigurableSource) }
     private val client: OkHttpClient by lazy { source.client }

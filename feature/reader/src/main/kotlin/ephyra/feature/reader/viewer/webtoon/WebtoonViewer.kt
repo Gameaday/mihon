@@ -23,18 +23,18 @@ import ephyra.app.util.system.DeviceUtil
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import uy.kohesive.injekt.injectLazy
 import kotlin.math.max
 import kotlin.math.min
 
 /**
  * Implementation of a [Viewer] to display pages with a [RecyclerView].
  */
-class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = true) : Viewer {
-
-    val downloadManager: DownloadManager by injectLazy()
+class WebtoonViewer(
+    val activity: ReaderActivity,
+    val downloadManager: DownloadManager,
+    val readerPreferences: ReaderPreferences,
+    val isContinuous: Boolean = true,
+) : Viewer {
 
     private val scope = MainScope()
 
@@ -74,7 +74,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
     private var currentPage: Any? = null
 
     private val threshold: Int =
-        Injekt.get<ReaderPreferences>()
+        readerPreferences
             .readerHideThreshold()
             .get()
             .threshold

@@ -6,12 +6,13 @@ import ephyra.app.data.track.shikimori.dto.isExpired
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.Response
-import uy.kohesive.injekt.injectLazy
 import java.io.IOException
 
-class ShikimoriInterceptor(private val shikimori: Shikimori) : Interceptor {
+class ShikimoriInterceptor(
+    private val shikimori: Shikimori,
+    private val json: Json,
+) : Interceptor {
 
-    private val json: Json by injectLazy()
 
     /**
      * OAuth object used for authenticated requests.

@@ -10,6 +10,7 @@ import ephyra.feature.reader.viewer.pager.R2LPagerViewer
 import ephyra.feature.reader.viewer.pager.VerticalPagerViewer
 import ephyra.feature.reader.viewer.webtoon.WebtoonViewer
 import ephyra.i18n.MR
+import org.koin.android.ext.android.get
 
 enum class ReadingMode(
     val stringRes: StringResource,
@@ -70,11 +71,11 @@ enum class ReadingMode(
 
         fun toViewer(preference: Int?, activity: ReaderActivity): Viewer {
             return when (fromPreference(preference)) {
-                LEFT_TO_RIGHT -> L2RPagerViewer(activity)
-                RIGHT_TO_LEFT -> R2LPagerViewer(activity)
-                VERTICAL -> VerticalPagerViewer(activity)
-                WEBTOON -> WebtoonViewer(activity)
-                CONTINUOUS_VERTICAL -> WebtoonViewer(activity, isContinuous = false)
+                LEFT_TO_RIGHT -> L2RPagerViewer(activity, activity.get())
+                RIGHT_TO_LEFT -> R2LPagerViewer(activity, activity.get())
+                VERTICAL -> VerticalPagerViewer(activity, activity.get())
+                WEBTOON -> WebtoonViewer(activity, activity.get(), activity.get())
+                CONTINUOUS_VERTICAL -> WebtoonViewer(activity, activity.get(), activity.get(), isContinuous = false)
                 DEFAULT -> throw IllegalStateException("Preference value must be resolved: $preference")
             }
         }

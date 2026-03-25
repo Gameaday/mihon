@@ -23,8 +23,6 @@ import rikka.sui.Sui
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.logcat
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.File
 
 /**
@@ -96,9 +94,10 @@ fun Context.createFileInCacheDir(name: String): File {
  * Context wrapping method obtained from AppCompatDelegateImpl
  * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=348;drc=e28752c96fc3fb4d3354781469a1af3dbded4898
  */
-fun Context.createReaderThemeContext(): Context {
-    val preferences = Injekt.get<UiPreferences>()
-    val readerPreferences = Injekt.get<ReaderPreferences>()
+fun Context.createReaderThemeContext(
+    preferences: UiPreferences,
+    readerPreferences: ReaderPreferences,
+): Context {
     val themeMode = preferences.themeMode().get()
     val isDarkBackground = when (readerPreferences.readerTheme().get()) {
         1, 2 -> true // Black, Gray

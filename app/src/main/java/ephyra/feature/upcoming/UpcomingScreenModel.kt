@@ -17,13 +17,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ephyra.domain.upcoming.interactor.GetUpcomingManga
 import ephyra.domain.manga.model.Manga
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.time.LocalDate
 import java.time.YearMonth
 
 class UpcomingScreenModel(
-    private val getUpcomingManga: GetUpcomingManga = Injekt.get(),
+    private val getUpcomingManga: GetUpcomingManga,
 ) : StateScreenModel<UpcomingScreenModel.State>(State()) {
 
     init {

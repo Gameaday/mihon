@@ -60,9 +60,8 @@ import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.interactor.GetTracks
+import ephyra.domain.track.interactor.GetTracks
 import ephyra.i18n.MR
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.File
 import java.io.IOException
 import java.util.Locale
@@ -78,14 +77,15 @@ class Downloader(
     private val context: Context,
     private val provider: DownloadProvider,
     private val cache: DownloadCache,
-    private val sourceManager: SourceManager = Injekt.get(),
-    private val chapterCache: ChapterCache = Injekt.get(),
-    private val downloadPreferences: DownloadPreferences = Injekt.get(),
-    private val readerPreferences: ReaderPreferences = Injekt.get(),
-    private val libraryPreferences: LibraryPreferences = Injekt.get(),
-    private val xml: XML = Injekt.get(),
-    private val getCategories: GetCategories = Injekt.get(),
-    private val getTracks: GetTracks = Injekt.get(),
+    private val sourceManager: SourceManager,
+    private val chapterCache: ChapterCache,
+    private val downloadPreferences: DownloadPreferences,
+    private val readerPreferences: ReaderPreferences,
+    private val libraryPreferences: LibraryPreferences,
+    private val xml: XML,
+    private val getCategories: GetCategories,
+    private val getTracks: GetTracks,
+    private val notifier: DownloadNotifier,
 ) {
 
     /**
@@ -102,7 +102,6 @@ class Downloader(
     /**
      * Notifier for the downloader state and progress.
      */
-    private val notifier by lazy { DownloadNotifier(context) }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var downloaderJob: Job? = null

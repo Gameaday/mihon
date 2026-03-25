@@ -37,8 +37,9 @@ import ephyra.presentation.core.components.LabeledCheckbox
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+import org.koin.compose.koinInject
 
 @Composable
 internal fun Screen.MigrateMangaDialog(
@@ -50,7 +51,7 @@ internal fun Screen.MigrateMangaDialog(
 ) {
     val scope = rememberCoroutineScope()
 
-    val screenModel = rememberScreenModel { MigrateDialogScreenModel() }
+    val screenModel = koinScreenModel<MigrateDialogScreenModel>()
     LaunchedEffect(current, target) {
         screenModel.init(current, target)
     }
@@ -124,10 +125,10 @@ internal fun Screen.MigrateMangaDialog(
 }
 
 private class MigrateDialogScreenModel(
-    private val sourcePreference: SourcePreferences = Injekt.get(),
-    private val coverCache: CoverCache = Injekt.get(),
-    private val downloadManager: DownloadManager = Injekt.get(),
-    private val migrateManga: MigrateMangaUseCase = Injekt.get(),
+    private val sourcePreference: SourcePreferences,
+    private val coverCache: CoverCache,
+    private val downloadManager: DownloadManager,
+    private val migrateManga: MigrateMangaUseCase,
 ) : StateScreenModel<MigrateDialogScreenModel.State>(State()) {
 
     fun init(current: Manga, target: Manga) {
