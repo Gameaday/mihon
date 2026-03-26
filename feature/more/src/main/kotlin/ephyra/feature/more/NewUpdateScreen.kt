@@ -8,7 +8,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.presentation.more.NewUpdateScreen
 import ephyra.presentation.util.Screen
 import ephyra.app.data.updater.AppUpdateDownloadJob
-import ephyra.app.util.system.openInBrowser
+import ephyra.presentation.core.util.system.openInBrowser
 
 class NewUpdateScreen(
     private val versionName: String,

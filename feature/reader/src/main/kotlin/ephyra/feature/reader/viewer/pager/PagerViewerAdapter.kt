@@ -8,7 +8,7 @@ import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.model.ViewerChapters
 import ephyra.feature.reader.viewer.calculateChapterGap
-import ephyra.app.util.system.createReaderThemeContext
+import ephyra.feature.reader.util.createReaderThemeContext
 import ephyra.app.widget.ViewPagerAdapter
 import ephyra.core.common.util.system.logcat
 

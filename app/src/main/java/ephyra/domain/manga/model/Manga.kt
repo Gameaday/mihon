@@ -3,8 +3,8 @@ package ephyra.domain.manga.model
 import ephyra.domain.base.BasePreferences
 import ephyra.app.data.cache.CoverCache
 import eu.kanade.tachiyomi.source.model.SManga
-import ephyra.app.ui.reader.setting.ReaderOrientation
-import ephyra.app.ui.reader.setting.ReadingMode
+import ephyra.feature.reader.setting.ReaderOrientation
+import ephyra.feature.reader.setting.ReadingMode
 import ephyra.core.common.preference.TriState
 import ephyra.core.metadata.comicinfo.ComicInfo
 import ephyra.core.metadata.comicinfo.ComicInfoPublishingStatus

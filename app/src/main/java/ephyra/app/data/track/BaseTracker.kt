@@ -8,7 +8,7 @@ import ephyra.domain.track.service.TrackPreferences
 import ephyra.app.data.database.models.Track
 import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.network.NetworkHelper
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import logcat.LogPriority

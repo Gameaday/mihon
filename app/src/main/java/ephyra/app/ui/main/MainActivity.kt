@@ -53,8 +53,8 @@ import ephyra.presentation.components.AppStateBanners
 import ephyra.presentation.components.DownloadedOnlyBannerBackgroundColor
 import ephyra.presentation.components.IncognitoModeBannerBackgroundColor
 import ephyra.presentation.components.IndexingBannerBackgroundColor
-import ephyra.presentation.more.settings.screen.browse.ExtensionReposScreen
-import ephyra.presentation.more.settings.screen.data.RestoreBackupScreen
+import ephyra.feature.settings.screen.browse.ExtensionReposScreen
+import ephyra.feature.settings.screen.data.RestoreBackupScreen
 import ephyra.presentation.util.AssistContentScreen
 import ephyra.presentation.util.DefaultNavigatorScreenTransition
 import ephyra.app.BuildConfig
@@ -75,7 +75,7 @@ import ephyra.app.ui.more.NewUpdateScreen
 import ephyra.app.ui.more.OnboardingScreen
 import ephyra.app.util.system.dpToPx
 import ephyra.app.util.system.isNavigationBarNeedsScrim
-import ephyra.app.util.system.openInBrowser
+import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.app.util.system.updaterEnabled
 import ephyra.app.util.view.setComposeContent
 import kotlinx.coroutines.channels.awaitClose

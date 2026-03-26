@@ -59,8 +59,8 @@ import coil3.request.crossfade
 import ephyra.presentation.components.AdaptiveSheet
 import ephyra.presentation.components.TabbedDialogPaddings
 import ephyra.feature.manga.presentation.components.MangaCover
-import ephyra.presentation.more.settings.LocalPreferenceMinHeight
-import ephyra.presentation.more.settings.widget.TextPreferenceWidget
+import ephyra.feature.settings.LocalPreferenceMinHeight
+import ephyra.feature.settings.widget.TextPreferenceWidget
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.model.SManga
 import ephyra.domain.manga.model.Manga

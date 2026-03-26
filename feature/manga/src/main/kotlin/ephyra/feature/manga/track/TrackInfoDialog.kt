@@ -59,8 +59,8 @@ import ephyra.app.data.track.TrackerManager
 import ephyra.app.data.track.model.TrackSearch
 import ephyra.app.util.lang.convertEpochMillisZone
 import ephyra.app.util.lang.toLocalDate
-import ephyra.app.util.system.copyToClipboard
-import ephyra.app.util.system.openInBrowser
+import ephyra.presentation.core.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.app.util.system.toast
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.catch

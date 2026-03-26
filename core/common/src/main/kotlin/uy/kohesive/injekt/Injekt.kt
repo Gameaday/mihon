@@ -1,35 +1,38 @@
 package uy.kohesive.injekt
 
 import org.koin.core.context.GlobalContext
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.qualifier
+import kotlin.reflect.KClass
 
 /**
- * A shim that allows legacy extension code that depends on the Injekt service locator
- * to instead resolve its dependencies from the global Koin context.
- * 
- * This object is placed in the `uy.kohesive.injekt` package to intercept calls made
- * by APK plugins/extensions that were compiled against the original Injekt library.
+ * A legacy compatibility shim for extensions that still rely on the Injekt service locator.
+ * Directs all [get] calls to the modern Koin [GlobalContext].
  */
 object Injekt {
 
-    /**
-     * Resolves a dependency of type [T] from the [GlobalContext].
-     */
-    inline fun <reified T : Any> get(): T {
-        return GlobalContext.get().get()
+    @Suppress("UNCHECKED_CAST")
+    inline fun <reified T : Any> get(
+        qualifier: String? = null,
+        noinline parameters: (() -> Any)? = null,
+    ): T {
+        return GlobalContext.get().get(
+            clazz = T::class,
+            qualifier = qualifier?.let { qualifier(it) },
+            parameters = parameters?.let { { parametersOf(it()) } },
+        )
     }
-    
-    /**
-     * Legacy Injekt API bridge for lazy injection.
-     */
-    inline fun <reified T : Any> injectLazy(): Lazy<T> = lazy { get<T>() }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Any> get(
+        clazz: KClass<T>,
+        qualifier: String? = null,
+        noinline parameters: (() -> Any)? = null,
+    ): T {
+        return GlobalContext.get().get(
+            clazz = clazz,
+            qualifier = qualifier?.let { qualifier(it) },
+            parameters = parameters?.let { { parametersOf(it()) } },
+        )
+    }
 }
-
-/**
- * Global extension for lazy injection, matching the original Injekt API.
- */
-inline fun <reified T : Any> Any.injectLazy(): Lazy<T> = Injekt.injectLazy()
-
-/**
- * Extension on the Injekt object to allow get() calls, facilitating binary compatibility.
- */
-inline fun <reified T : Any> Injekt.get(): T = Injekt.get<T>()

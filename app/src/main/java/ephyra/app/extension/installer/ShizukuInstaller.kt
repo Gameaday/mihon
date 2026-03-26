@@ -13,7 +13,7 @@ import android.os.IBinder
 import androidx.core.content.ContextCompat
 import ephyra.app.BuildConfig
 import ephyra.app.extension.model.InstallStep
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

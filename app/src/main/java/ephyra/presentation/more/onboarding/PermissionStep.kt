@@ -36,7 +36,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import ephyra.presentation.util.rememberRequestPackageInstallsPermissionState
 import ephyra.app.core.security.PrivacyPreferences
-import ephyra.app.util.system.launchRequestPackageInstallsPermission
+import ephyra.presentation.core.util.system.launchRequestPackageInstallsPermission
 import ephyra.app.util.system.telemetryIncluded
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource

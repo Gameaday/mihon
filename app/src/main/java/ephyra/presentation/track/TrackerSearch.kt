@@ -73,7 +73,7 @@ import ephyra.presentation.components.DropdownMenu
 import ephyra.presentation.manga.components.MangaCover
 import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.app.data.track.model.TrackSearch
-import ephyra.app.util.system.openInBrowser
+import ephyra.presentation.core.util.system.openInBrowser
 import kotlinx.coroutines.launch
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.ScrollbarLazyColumn

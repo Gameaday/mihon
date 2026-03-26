@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.setAppCompatDelegateThemeMode
-import ephyra.presentation.more.settings.widget.AppThemeModePreferenceWidget
-import ephyra.presentation.more.settings.widget.AppThemePreferenceWidget
+import ephyra.feature.settings.widget.AppThemeModePreferenceWidget
+import ephyra.feature.settings.widget.AppThemePreferenceWidget
 import ephyra.presentation.core.util.collectAsState
 import ephyra.presentation.util.LocalUiPreferences
 

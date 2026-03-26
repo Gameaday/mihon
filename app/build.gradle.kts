@@ -198,6 +198,20 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.presentationCore)
     implementation(projects.presentationWidget)
+    
+    // Feature modules
+    implementation(projects.feature.category)
+    implementation(projects.feature.download)
+    implementation(projects.feature.history)
+    implementation(projects.feature.library)
+    implementation(projects.feature.manga)
+    implementation(projects.feature.more)
+    implementation(projects.feature.reader)
+    implementation(projects.feature.security)
+    implementation(projects.feature.settings)
+    implementation(projects.feature.stats)
+    implementation(projects.feature.updates)
+    implementation(projects.feature.webview)
     implementation(projects.telemetry)
 
     // Compose

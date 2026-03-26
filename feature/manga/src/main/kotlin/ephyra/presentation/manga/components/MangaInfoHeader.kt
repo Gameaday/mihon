@@ -96,8 +96,8 @@ import ephyra.presentation.library.components.authorityBrandGradient
 import ephyra.app.R
 import ephyra.app.data.track.TrackerManager
 import eu.kanade.tachiyomi.source.model.SManga
-import ephyra.app.util.system.copyToClipboard
-import ephyra.app.util.system.openInBrowser
+import ephyra.presentation.core.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.openInBrowser
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.findChildOfType

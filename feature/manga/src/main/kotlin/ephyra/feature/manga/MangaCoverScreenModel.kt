@@ -22,7 +22,7 @@ import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.app.util.editCover
 import ephyra.app.util.system.encoder
 import ephyra.app.util.system.getBitmapOrNull
-import ephyra.app.util.system.toShareIntent
+import ephyra.presentation.core.util.system.toShareIntent
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority

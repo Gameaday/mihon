@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.more.settings.screen.SettingsDataScreen
-import ephyra.app.util.system.toast
+import ephyra.feature.settings.screen.SettingsDataScreen
+import ephyra.presentation.core.util.system.toast
 import kotlinx.coroutines.flow.collectLatest
 import ephyra.domain.storage.service.StoragePreferences
 import ephyra.i18n.MR

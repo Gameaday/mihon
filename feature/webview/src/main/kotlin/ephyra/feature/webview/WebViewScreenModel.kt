@@ -7,8 +7,8 @@ import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.util.system.openInBrowser
-import ephyra.app.util.system.toShareIntent
+import ephyra.presentation.core.util.system.openInBrowser
+import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.app.util.system.toast
 import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

@@ -47,7 +47,7 @@ import ephyra.feature.browse.presentation.components.BaseBrowseItem
 import ephyra.feature.browse.presentation.components.ExtensionIcon
 import ephyra.presentation.components.WarningBanner
 import ephyra.presentation.manga.components.DotSeparatorNoSpaceText
-import ephyra.presentation.more.settings.screen.browse.ExtensionReposScreen
+import ephyra.feature.settings.screen.browse.ExtensionReposScreen
 import ephyra.presentation.util.animateItemFastScroll
 import ephyra.presentation.util.rememberRequestPackageInstallsPermissionState
 import ephyra.app.extension.model.Extension
@@ -55,7 +55,7 @@ import ephyra.app.extension.model.InstallStep
 import ephyra.app.ui.browse.extension.ExtensionUiModel
 import ephyra.app.ui.browse.extension.ExtensionsScreenModel
 import ephyra.app.util.system.LocaleHelper
-import ephyra.app.util.system.launchRequestPackageInstallsPermission
+import ephyra.presentation.core.util.system.launchRequestPackageInstallsPermission
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.FastScrollLazyColumn

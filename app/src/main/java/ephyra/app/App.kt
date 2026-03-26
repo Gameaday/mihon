@@ -34,7 +34,7 @@ import ephyra.app.data.coil.BufferedSourceFetcher
 import ephyra.app.data.coil.MangaCoverFetcher
 import ephyra.app.data.coil.MangaCoverKeyer
 import ephyra.app.data.coil.MangaKeyer
-import ephyra.app.data.coil.TachiyomiImageDecoder
+import ephyra.presentation.core.data.coil.TachiyomiImageDecoder
 import ephyra.app.data.notification.Notifications
 import ephyra.app.di.koinAppModule
 import ephyra.app.di.koinDomainModule

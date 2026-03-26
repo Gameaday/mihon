@@ -6,7 +6,7 @@ import android.os.Bundle
 import ephyra.app.extension.ExtensionManager
 import ephyra.app.extension.model.InstallStep
 import ephyra.app.util.system.hasMiuiPackageInstaller
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import org.koin.android.ext.android.inject
 import kotlin.time.Duration.Companion.seconds
 

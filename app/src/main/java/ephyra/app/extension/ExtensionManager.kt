@@ -13,7 +13,7 @@ import ephyra.app.extension.model.LoadResult
 import ephyra.app.extension.util.ExtensionInstallReceiver
 import ephyra.app.extension.util.ExtensionInstaller
 import ephyra.app.extension.util.ExtensionLoader
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow

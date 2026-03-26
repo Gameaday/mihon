@@ -25,7 +25,7 @@ import ephyra.domain.source.interactor.SetMigrateSorting
 import ephyra.feature.browse.presentation.components.BaseSourceItem
 import ephyra.feature.browse.presentation.components.SourceIcon
 import ephyra.app.ui.browse.migration.sources.MigrateSourceScreenModel
-import ephyra.app.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.copyToClipboard
 import kotlinx.collections.immutable.ImmutableList
 import ephyra.domain.source.model.Source
 import ephyra.i18n.MR

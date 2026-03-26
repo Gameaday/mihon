@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import ephyra.feature.browse.presentation.components.BaseSourceItem
 import ephyra.presentation.components.AppBar
-import ephyra.presentation.more.settings.widget.SwitchPreferenceWidget
+import ephyra.feature.settings.widget.SwitchPreferenceWidget
 import ephyra.presentation.util.animateItemFastScroll
 import ephyra.app.ui.browse.source.SourcesFilterScreenModel
 import ephyra.app.util.system.LocaleHelper

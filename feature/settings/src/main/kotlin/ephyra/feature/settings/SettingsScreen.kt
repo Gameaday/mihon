@@ -12,11 +12,11 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.more.settings.screen.SettingsAppearanceScreen
-import ephyra.presentation.more.settings.screen.SettingsDataScreen
-import ephyra.presentation.more.settings.screen.SettingsMainScreen
-import ephyra.presentation.more.settings.screen.SettingsTrackingScreen
-import ephyra.presentation.more.settings.screen.about.AboutScreen
+import ephyra.feature.settings.screen.SettingsAppearanceScreen
+import ephyra.feature.settings.screen.SettingsDataScreen
+import ephyra.feature.settings.screen.SettingsMainScreen
+import ephyra.feature.settings.screen.SettingsTrackingScreen
+import ephyra.feature.settings.screen.about.AboutScreen
 import ephyra.presentation.util.DefaultNavigatorScreenTransition
 import ephyra.presentation.util.LocalBackPress
 import ephyra.presentation.util.Screen

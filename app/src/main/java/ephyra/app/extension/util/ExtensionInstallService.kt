@@ -12,7 +12,7 @@ import ephyra.app.extension.installer.Installer
 import ephyra.app.extension.installer.PackageInstallerInstaller
 import ephyra.app.extension.installer.ShizukuInstaller
 import ephyra.app.extension.util.ExtensionInstaller.Companion.EXTRA_DOWNLOAD_ID
-import ephyra.app.util.system.getSerializableExtraCompat
+import ephyra.presentation.core.util.system.getSerializableExtraCompat
 import ephyra.app.util.system.notificationBuilder
 import logcat.LogPriority
 import ephyra.core.common.i18n.stringResource

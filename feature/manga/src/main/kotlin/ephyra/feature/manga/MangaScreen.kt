@@ -56,8 +56,8 @@ import ephyra.feature.manga.track.TrackInfoDialogHomeScreen
 import ephyra.app.ui.reader.ReaderActivity
 import ephyra.app.ui.setting.SettingsScreen
 import ephyra.app.ui.webview.WebViewScreen
-import ephyra.app.util.system.copyToClipboard
-import ephyra.app.util.system.toShareIntent
+import ephyra.presentation.core.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.app.util.system.toast
 import kotlinx.coroutines.launch
 import logcat.LogPriority

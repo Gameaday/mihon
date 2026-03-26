@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.vectorResource
-import ephyra.presentation.more.settings.widget.SwitchPreferenceWidget
-import ephyra.presentation.more.settings.widget.TextPreferenceWidget
+import ephyra.feature.settings.widget.SwitchPreferenceWidget
+import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.app.R
 import ephyra.app.ui.more.DownloadQueueState
 import ephyra.core.common.Constants

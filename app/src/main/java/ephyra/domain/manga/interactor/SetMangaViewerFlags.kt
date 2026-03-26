@@ -1,7 +1,7 @@
 package ephyra.domain.manga.interactor
 
-import ephyra.app.ui.reader.setting.ReaderOrientation
-import ephyra.app.ui.reader.setting.ReadingMode
+import ephyra.feature.reader.setting.ReaderOrientation
+import ephyra.feature.reader.setting.ReadingMode
 import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.repository.MangaRepository
 

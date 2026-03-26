@@ -11,12 +11,12 @@ import ephyra.app.data.download.DownloadManager
 import ephyra.app.data.library.LibraryUpdateJob
 import ephyra.app.data.updater.AppUpdateDownloadJob
 import ephyra.app.ui.main.MainActivity
-import ephyra.app.ui.reader.ReaderActivity
+import ephyra.feature.reader.ReaderActivity
 import ephyra.app.util.system.cancelNotification
-import ephyra.app.util.system.getParcelableExtraCompat
+import ephyra.presentation.core.util.system.getParcelableExtraCompat
 import ephyra.app.util.system.notificationManager
-import ephyra.app.util.system.toShareIntent
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toShareIntent
+import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.Constants
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withUIContext

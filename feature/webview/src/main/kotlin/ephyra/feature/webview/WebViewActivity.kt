@@ -11,13 +11,13 @@ import ephyra.presentation.webview.WebViewScreenContent
 import ephyra.app.R
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.ui.base.activity.BaseActivity
+import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.app.util.system.WebViewUtil
-import ephyra.app.util.system.openInBrowser
-import ephyra.app.util.system.toShareIntent
-import ephyra.app.util.system.toast
-import ephyra.app.util.view.overrideTransitionCompat
-import ephyra.app.util.view.setComposeContent
+import ephyra.presentation.core.util.system.openInBrowser
+import ephyra.presentation.core.util.system.toShareIntent
+import ephyra.presentation.core.util.system.toast
+import ephyra.presentation.core.util.view.overrideTransitionCompat
+import ephyra.presentation.core.util.view.setComposeContent
 import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import ephyra.core.common.util.system.logcat
@@ -33,7 +33,6 @@ class WebViewActivity : BaseActivity() {
     private var assistUrl: String? = null
 
     init {
-        registerSecureActivity(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -48,14 +48,14 @@ import ephyra.feature.browse.presentation.components.ExtensionIcon
 import ephyra.presentation.components.AppBar
 import ephyra.presentation.components.AppBarActions
 import ephyra.presentation.components.WarningBanner
-import ephyra.presentation.more.settings.widget.TextPreferenceWidget
-import ephyra.presentation.more.settings.widget.TrailingWidgetBuffer
+import ephyra.feature.settings.widget.TextPreferenceWidget
+import ephyra.feature.settings.widget.TrailingWidgetBuffer
 import ephyra.app.R
 import ephyra.app.extension.model.Extension
 import eu.kanade.tachiyomi.source.ConfigurableSource
 import ephyra.app.ui.browse.extension.details.ExtensionDetailsScreenModel
 import ephyra.app.util.system.LocaleHelper
-import ephyra.app.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.copyToClipboard
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR

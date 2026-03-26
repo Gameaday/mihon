@@ -6,9 +6,9 @@ import ephyra.app.BuildConfig
 import ephyra.app.extension.ExtensionManager
 import ephyra.app.util.storage.getUriCompat
 import ephyra.app.util.system.WebViewUtil
-import ephyra.app.util.system.createFileInCacheDir
-import ephyra.app.util.system.toShareIntent
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.createFileInCacheDir
+import ephyra.presentation.core.util.system.toShareIntent
+import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.util.lang.withNonCancellableContext
 import ephyra.core.common.util.lang.withUIContext
 import java.time.OffsetDateTime

@@ -47,7 +47,7 @@ import coil3.compose.AsyncImage
 import ephyra.presentation.components.AppBar
 import ephyra.presentation.util.Screen
 import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.util.system.openInBrowser
+import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.domain.manga.model.Manga
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold

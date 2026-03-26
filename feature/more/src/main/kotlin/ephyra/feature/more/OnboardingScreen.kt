@@ -8,8 +8,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.domain.base.BasePreferences
 import ephyra.presentation.more.onboarding.OnboardingScreen
-import ephyra.presentation.more.settings.screen.SearchableSettings
-import ephyra.presentation.more.settings.screen.SettingsDataScreen
+import ephyra.feature.settings.screen.SearchableSettings
+import ephyra.feature.settings.screen.SettingsDataScreen
 import ephyra.presentation.util.Screen
 import ephyra.app.ui.setting.SettingsScreen
 import ephyra.presentation.core.i18n.stringResource

@@ -62,7 +62,7 @@ import ephyra.core.download.model.Download
 import eu.kanade.tachiyomi.source.getNameForMangaInfo
 import ephyra.feature.manga.ChapterList
 import ephyra.feature.manga.MangaScreenModel
-import ephyra.app.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.service.missingChaptersCount
 import ephyra.domain.library.service.LibraryPreferences

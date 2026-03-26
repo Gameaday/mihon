@@ -10,7 +10,7 @@ import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.InstallStep
 import eu.kanade.tachiyomi.network.NetworkHelper
 import ephyra.app.util.storage.getUriCompat
-import ephyra.app.util.system.isPackageInstalled
+import ephyra.presentation.core.util.system.isPackageInstalled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

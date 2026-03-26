@@ -26,7 +26,7 @@ import ephyra.app.data.notification.Notifications
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import ephyra.app.util.storage.getUriCompat
-import ephyra.app.util.system.createFileInCacheDir
+import ephyra.presentation.core.util.system.createFileInCacheDir
 import ephyra.app.util.system.isConnectedToWifi
 import ephyra.app.util.system.isPowerSaveMode
 import ephyra.app.util.system.isRunning

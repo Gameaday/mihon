@@ -13,7 +13,7 @@ import ephyra.presentation.components.AppBar
 import ephyra.presentation.util.Screen
 import ephyra.app.ui.browse.source.globalsearch.GlobalSearchScreen
 import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.ui.reader.ReaderActivity
+import ephyra.feature.reader.ReaderActivity
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource

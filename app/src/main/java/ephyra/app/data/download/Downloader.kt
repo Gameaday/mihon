@@ -11,7 +11,7 @@ import ephyra.app.data.notification.NotificationHandler
 import eu.kanade.tachiyomi.source.UnmeteredSource
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.ui.reader.setting.ReaderPreferences
+import ephyra.feature.reader.setting.ReaderPreferences
 import ephyra.app.util.storage.DiskUtil
 import ephyra.app.util.storage.DiskUtil.NOMEDIA_FILE
 import ephyra.app.util.storage.saveTo

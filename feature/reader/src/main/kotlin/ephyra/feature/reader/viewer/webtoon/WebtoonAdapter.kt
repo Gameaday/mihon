@@ -10,7 +10,7 @@ import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.model.ViewerChapters
 import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.feature.reader.viewer.calculateChapterGap
-import ephyra.app.util.system.createReaderThemeContext
+import ephyra.feature.reader.util.createReaderThemeContext
 
 /**
  * RecyclerView Adapter used by this [viewer] to where [ViewerChapters] updates are posted.

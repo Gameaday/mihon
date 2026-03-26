@@ -77,9 +77,9 @@ import ephyra.feature.reader.setting.ReadingMode
 import ephyra.feature.reader.viewer.ReaderProgressIndicator
 import ephyra.presentation.core.util.Navigator
 import ephyra.presentation.core.util.system.isNightMode
-import ephyra.app.util.system.openInBrowser
-import ephyra.app.util.system.toShareIntent
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.openInBrowser
+import ephyra.presentation.core.util.system.toShareIntent
+import ephyra.presentation.core.util.system.toast
 import ephyra.presentation.core.util.view.applyHighRefreshRate
 import ephyra.presentation.core.util.view.overrideTransitionCompat
 import ephyra.presentation.core.util.view.setComposeContent

@@ -55,7 +55,7 @@ import ephyra.presentation.track.components.TrackLogoIcon
 import ephyra.app.data.track.Tracker
 import ephyra.app.ui.manga.track.TrackItem
 import ephyra.app.util.lang.toLocalDate
-import ephyra.app.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import java.time.format.DateTimeFormatter

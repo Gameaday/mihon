@@ -14,7 +14,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.presentation.util.Screen
 import ephyra.app.ui.browse.migration.search.MigrateSearchScreen
 import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import ephyra.feature.migration.list.components.MigrationExitDialog
 import ephyra.feature.migration.list.components.MigrationMangaDialog
 import ephyra.feature.migration.list.components.MigrationProgressDialog

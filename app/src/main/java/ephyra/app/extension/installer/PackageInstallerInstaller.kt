@@ -12,8 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentSanitizer
 import ephyra.app.extension.model.InstallStep
 import ephyra.app.util.lang.use
-import ephyra.app.util.system.getParcelableExtraCompat
-import ephyra.app.util.system.getUriSize
+import ephyra.presentation.core.util.system.getParcelableExtraCompat
+import ephyra.presentation.core.util.system.getUriSize
 import logcat.LogPriority
 import ephyra.core.common.util.system.logcat
 

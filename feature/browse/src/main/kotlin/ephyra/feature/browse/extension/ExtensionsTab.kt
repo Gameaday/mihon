@@ -16,11 +16,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.ExtensionScreen
 import ephyra.presentation.components.AppBar
 import ephyra.presentation.components.TabContent
-import ephyra.presentation.more.settings.screen.browse.ExtensionReposScreen
+import ephyra.feature.settings.screen.browse.ExtensionReposScreen
 import ephyra.app.extension.model.Extension
 import ephyra.feature.browse.extension.details.ExtensionDetailsScreen
 import ephyra.app.ui.webview.WebViewScreen
-import ephyra.app.util.system.isPackageInstalled
+import ephyra.presentation.core.util.system.isPackageInstalled
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
