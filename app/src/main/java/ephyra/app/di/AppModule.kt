@@ -31,8 +31,8 @@ import ephyra.app.data.download.Downloader
 import ephyra.app.data.saver.ImageSaver
 import ephyra.app.data.coil.MangaCoverKeyer
 import ephyra.app.data.coil.MangaKeyer
-import ephyra.app.ui.base.delegate.ThemingDelegate
-import ephyra.app.ui.base.delegate.SecureActivityDelegate
+import ephyra.presentation.core.ui.delegate.SecureActivityDelegate as CoreSecureActivityDelegate
+import ephyra.presentation.core.ui.delegate.ThemingDelegate as CoreThemingDelegate
 import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
 import ephyra.app.ui.base.delegate.ThemingDelegateImpl
 import ephyra.app.extension.ExtensionManager
@@ -144,8 +144,10 @@ val koinAppModule = module {
     single { ChapterCache(androidApplication(), get()) }
     single { CoverCache(androidApplication()) }
     single { MangaKeyer() }
-    single<ThemingDelegate> { ThemingDelegateImpl(get()) }
-    single<SecureActivityDelegate> { SecureActivityDelegateImpl(get(), get()) }
+    single<ephyra.presentation.core.util.Navigator> { ephyra.app.util.NavigatorImpl() }
+    single<ephyra.core.common.notification.NotificationManager> { ephyra.app.data.notification.NotificationManagerImpl(get()) }
+    single<CoreThemingDelegate> { ThemingDelegateImpl(get()) }
+    single<CoreSecureActivityDelegate> { SecureActivityDelegateImpl(get(), get()) }
     single { MangaCoverKeyer(get()) }
     single { MangaCoverFetcher.MangaFactory(lazy { get<okhttp3.Call.Factory>() }, get(), get()) }
     single { MangaCoverFetcher.MangaCoverFactory(lazy { get<okhttp3.Call.Factory>() }, get(), get()) }

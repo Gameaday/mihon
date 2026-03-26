@@ -64,7 +64,7 @@ import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.updater.AppUpdateChecker
 import ephyra.app.data.updater.RELEASE_URL
 import ephyra.app.extension.api.ExtensionApi
-import ephyra.app.ui.base.activity.BaseActivity
+import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.app.ui.browse.source.authority.MatchResultsScreen
 import ephyra.app.ui.browse.source.browse.BrowseSourceScreen
 import ephyra.app.ui.browse.source.globalsearch.GlobalSearchScreen

@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package ephyra.app.util.view
+package ephyra.presentation.core.util.view
 
 import android.content.res.Resources
 import android.graphics.Rect

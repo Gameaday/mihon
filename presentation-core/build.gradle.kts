@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "tachiyomi.presentation.core"
+    namespace = "ephyra.presentation.core"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -29,6 +29,7 @@ kotlin {
 
 dependencies {
     api(projects.core.common)
+    api(projects.domain)
     api(projects.i18n)
 
     // Compose
@@ -44,6 +45,11 @@ dependencies {
 
     implementation(androidx.paging.runtime)
     implementation(androidx.paging.compose)
+    implementation(androidx.appcompat)
+    implementation(androidx.lifecycle.runtimektx)
     implementation(kotlinx.immutables)
     implementation(androidx.lifecycle.runtime.compose)
+    implementation(libs.image.decoder)
+    implementation(libs.bundles.coil)
+    implementation(libs.okio)
 }

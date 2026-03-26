@@ -4,9 +4,15 @@ import android.app.Activity
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.AppTheme
 import ephyra.app.R
+import ephyra.presentation.core.ui.delegate.ThemingDelegate as CoreThemingDelegate
 
-interface ThemingDelegate {
-    fun applyAppTheme(activity: Activity)
+class ThemingDelegateImpl(
+    private val uiPreferences: UiPreferences,
+) : CoreThemingDelegate {
+    override fun applyAppTheme(activity: Activity) {
+        getThemeResIds(uiPreferences.appTheme().get(), uiPreferences.themeDarkAmoled().get())
+            .forEach(activity::setTheme)
+    }
 
     companion object {
         private val themeResources: Map<AppTheme, Int> = mapOf(
@@ -34,14 +40,5 @@ interface ThemingDelegate {
                 if (isAmoled) add(R.style.ThemeOverlay_Tachiyomi_Amoled)
             }
         }
-    }
-}
-
-class ThemingDelegateImpl(
-    private val uiPreferences: UiPreferences,
-) : ThemingDelegate {
-    override fun applyAppTheme(activity: Activity) {
-        ThemingDelegate.getThemeResIds(uiPreferences.appTheme().get(), uiPreferences.themeDarkAmoled().get())
-            .forEach(activity::setTheme)
     }
 }

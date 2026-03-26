@@ -1,4 +1,4 @@
-package ephyra.app.util.view
+package ephyra.presentation.core.util.view
 
 import android.app.Activity
 import android.os.Build
