@@ -71,9 +71,9 @@ enum class ReadingMode(
 
         fun toViewer(preference: Int?, activity: ReaderActivity): Viewer {
             return when (fromPreference(preference)) {
-                LEFT_TO_RIGHT -> L2RPagerViewer(activity, activity.get())
-                RIGHT_TO_LEFT -> R2LPagerViewer(activity, activity.get())
-                VERTICAL -> VerticalPagerViewer(activity, activity.get())
+                LEFT_TO_RIGHT -> L2RPagerViewer(activity, activity.get(), activity.get())
+                RIGHT_TO_LEFT -> R2LPagerViewer(activity, activity.get(), activity.get())
+                VERTICAL -> VerticalPagerViewer(activity, activity.get(), activity.get())
                 WEBTOON -> WebtoonViewer(activity, activity.get(), activity.get())
                 CONTINUOUS_VERTICAL -> WebtoonViewer(activity, activity.get(), activity.get(), isContinuous = false)
                 DEFAULT -> throw IllegalStateException("Preference value must be resolved: $preference")

@@ -36,15 +36,12 @@ import ephyra.app.ui.base.delegate.SecureActivityDelegate
 import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
 import ephyra.app.ui.base.delegate.ThemingDelegateImpl
 import ephyra.app.extension.ExtensionManager
+import ephyra.app.extension.api.ExtensionApi
+import ephyra.domain.track.interactor.GetExtensionRepo
+import ephyra.domain.track.interactor.UpdateExtensionRepo
 import eu.kanade.tachiyomi.network.JavaScriptEngine
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.source.AndroidSourceManager
-import io.requery.android.database.sqlite.RequerySQLiteOpenHelperFactory
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.protobuf.ProtoBuf
-import nl.adaptivity.xmlutil.XmlDeclMode
-import nl.adaptivity.xmlutil.core.XmlVersion
-import nl.adaptivity.xmlutil.serialization.XML
 import ephyra.core.common.storage.AndroidStorageFolderProvider
 import ephyra.data.AndroidDatabaseHandler
 import ephyra.data.Database
@@ -143,7 +140,6 @@ val koinAppModule = module {
     single { ExtensionLoader(get(), get()) }
     single { ExtensionInstaller(androidContext(), get(), get(), get()) }
 
-    single { ExtensionManager(androidContext(), get(), get(), get()) }
     single { CrashLogUtil(androidContext(), get()) }
     single { ChapterCache(androidApplication(), get()) }
     single { CoverCache(androidApplication()) }
@@ -156,9 +152,10 @@ val koinAppModule = module {
 
     single { NetworkHelper(androidApplication(), get()) }
     single { JavaScriptEngine(androidApplication()) }
+    single { ExtensionApi(get(), get(), get(), get(), get(), get(), get()) }
 
-    single<SourceManager> { AndroidSourceManager(androidApplication(), get(), get()) }
-    single { ExtensionManager(androidApplication()) }
+    single<SourceManager> { AndroidSourceManager(androidApplication(), get(), get(), get(), get(), get()) }
+    single { ExtensionManager(androidApplication(), get(), get(), get(), get(), get()) }
 
     single { DownloadStore(androidApplication(), get(), get(), get(), get()) }
     single { DownloadProvider(androidApplication(), get(), get()) }

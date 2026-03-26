@@ -53,8 +53,7 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.secondaryItemAlpha
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.fullType
+
 
 @Composable
 internal fun AppThemePreferenceWidget(
@@ -257,18 +256,23 @@ fun AppThemePreviewItem(
     }
 }
 
+import ephyra.presentation.util.LocalUiPreferences
+import androidx.compose.runtime.CompositionLocalProvider
+
 @PreviewLightDark
 @Composable
 private fun AppThemesListPreview() {
     var appTheme by remember { mutableStateOf(AppTheme.DEFAULT) }
-    Injekt.addSingleton(fullType<UiPreferences>(), UiPreferences(InMemoryPreferenceStore()))
-    TachiyomiTheme(appTheme = appTheme) {
-        Surface {
-            AppThemesList(
-                currentTheme = appTheme,
-                amoled = false,
-                onItemClick = { appTheme = it },
-            )
+    val uiPreferences = UiPreferences(InMemoryPreferenceStore())
+    CompositionLocalProvider(LocalUiPreferences provides uiPreferences) {
+        TachiyomiTheme(appTheme = appTheme) {
+            Surface {
+                AppThemesList(
+                    currentTheme = appTheme,
+                    amoled = false,
+                    onItemClick = { appTheme = it },
+                )
+            }
         }
     }
 }

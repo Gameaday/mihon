@@ -28,16 +28,15 @@ import org.koin.core.component.inject
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 
-internal class ExtensionApi : KoinComponent {
-
-    private val networkService: NetworkHelper by inject()
-    private val preferenceStore: PreferenceStore by inject()
-    private val getExtensionRepo: GetExtensionRepo by inject()
-    private val updateExtensionRepo: UpdateExtensionRepo by inject()
-    private val extensionManager: ExtensionManager by inject()
-    private val securityPreferences: SecurityPreferences by inject()
-    private val extensionLoader: ExtensionLoader by inject()
-    private val json: Json by inject()
+internal class ExtensionApi(
+    private val networkService: NetworkHelper,
+    private val preferenceStore: PreferenceStore,
+    private val getExtensionRepo: GetExtensionRepo,
+    private val updateExtensionRepo: UpdateExtensionRepo,
+    private val securityPreferences: SecurityPreferences,
+    private val extensionLoader: ExtensionLoader,
+    private val json: Json,
+) {
 
     private val lastExtCheck: Preference<Long> by lazy {
         preferenceStore.getLong(Preference.appStateKey("last_ext_check"), 0)
@@ -72,10 +71,10 @@ internal class ExtensionApi : KoinComponent {
 
     suspend fun checkForUpdates(
         context: Context,
-        fromAvailableExtensionList: Boolean = false,
+        availableExtensions: List<Extension.Available>? = null,
     ): List<Extension.Installed>? {
         // Limit checks to once a day at most
-        if (!fromAvailableExtensionList &&
+        if (availableExtensions == null &&
             Instant.now().toEpochMilli() < lastExtCheck.get() + 1.days.inWholeMilliseconds
         ) {
             return null
@@ -84,11 +83,8 @@ internal class ExtensionApi : KoinComponent {
         // Update extension repo details
         updateExtensionRepo.awaitAll()
 
-        val extensions = if (fromAvailableExtensionList) {
-            extensionManager.availableExtensionsFlow.value
-        } else {
-            findExtensions().also { lastExtCheck.set(Instant.now().toEpochMilli()) }
-        }
+        val extensions = availableExtensions
+            ?: findExtensions().also { lastExtCheck.set(Instant.now().toEpochMilli()) }
 
         val installedExtensions = extensionLoader.loadExtensions(context)
             .filterIsInstance<LoadResult.Success>()

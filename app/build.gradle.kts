@@ -25,10 +25,10 @@ android {
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
-        applicationId = "app.mihon"
+        applicationId = "app.Ephyra"
 
-        versionCode = 17
-        versionName = "0.19.4"
+        versionCode = 20
+        versionName = "0.20.0"
 
         buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")

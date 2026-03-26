@@ -79,7 +79,7 @@ class MigrationListScreenModel(
                             manga = manga,
                             chapterCount = chapterInfo.chapterCount,
                             latestChapter = chapterInfo.latestChapter,
-                            source = sourceManager.getOrStub(manga.source).getNameForMangaInfo(),
+                            source = sourceManager.getOrStub(manga.source).getNameForMangaInfo(preferences),
                             parentContext = screenModelScope.coroutineContext,
                         )
                     }
@@ -100,7 +100,7 @@ class MigrationListScreenModel(
 
     private suspend fun Manga.toSuccessSearchResult(matchConfidence: Double = 1.0): SearchResult.Success {
         val chapterInfo = getChapterInfo(id)
-        val source = sourceManager.getOrStub(source).getNameForMangaInfo()
+        val source = sourceManager.getOrStub(source).getNameForMangaInfo(preferences)
         return SearchResult.Success(
             manga = this,
             chapterCount = chapterInfo.chapterCount,

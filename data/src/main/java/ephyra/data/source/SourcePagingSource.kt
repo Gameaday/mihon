@@ -9,26 +9,31 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.manga.interactor.NetworkToLocalManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.repository.SourcePagingSource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 class SourceSearchPagingSource(
     source: CatalogueSource,
     private val query: String,
     private val filters: FilterList,
-) : BaseSourcePagingSource(source) {
+    networkToLocalManga: NetworkToLocalManga,
+) : BaseSourcePagingSource(source, networkToLocalManga) {
     override suspend fun requestNextPage(currentPage: Int): MangasPage {
         return source.getSearchManga(currentPage, query, filters)
     }
 }
 
-class SourcePopularPagingSource(source: CatalogueSource) : BaseSourcePagingSource(source) {
+class SourcePopularPagingSource(
+    source: CatalogueSource,
+    networkToLocalManga: NetworkToLocalManga,
+) : BaseSourcePagingSource(source, networkToLocalManga) {
     override suspend fun requestNextPage(currentPage: Int): MangasPage {
         return source.getPopularManga(currentPage)
     }
 }
 
-class SourceLatestPagingSource(source: CatalogueSource) : BaseSourcePagingSource(source) {
+class SourceLatestPagingSource(
+    source: CatalogueSource,
+    networkToLocalManga: NetworkToLocalManga,
+) : BaseSourcePagingSource(source, networkToLocalManga) {
     override suspend fun requestNextPage(currentPage: Int): MangasPage {
         return source.getLatestUpdates(currentPage)
     }
@@ -36,7 +41,7 @@ class SourceLatestPagingSource(source: CatalogueSource) : BaseSourcePagingSource
 
 abstract class BaseSourcePagingSource(
     protected val source: CatalogueSource,
-    private val networkToLocalManga: NetworkToLocalManga = Injekt.get(),
+    private val networkToLocalManga: NetworkToLocalManga,
 ) : SourcePagingSource() {
 
     private val seenManga = hashSetOf<String>()

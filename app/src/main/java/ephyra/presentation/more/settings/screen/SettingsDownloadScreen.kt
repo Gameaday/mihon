@@ -60,8 +60,7 @@ import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinScreenModel
 
 object SettingsDownloadScreen : SearchableSettings {
 
@@ -71,12 +70,13 @@ object SettingsDownloadScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val getCategories = remember { Injekt.get<GetCategories>() }
-        val allCategories by getCategories.subscribe().collectAsState(initial = emptyList())
+        val screenModel = koinScreenModel<SettingsDownloadScreenModel>()
+        val allCategories by screenModel.getCategories.subscribe().collectAsState(initial = emptyList())
 
-        val downloadPreferences = remember { Injekt.get<DownloadPreferences>() }
+        val downloadPreferences = screenModel.downloadPreferences
         val parallelSourceLimit by downloadPreferences.parallelSourceLimit().collectAsStateWithLifecycle()
         val parallelPageLimit by downloadPreferences.parallelPageLimit().collectAsStateWithLifecycle()
+
         return listOf(
             Preference.PreferenceItem.SwitchPreference(
                 preference = downloadPreferences.downloadOnlyOverWifi(),
@@ -114,7 +114,12 @@ object SettingsDownloadScreen : SearchableSettings {
             ),
             getDownloadAheadGroup(downloadPreferences = downloadPreferences),
             getPageFilterGroup(downloadPreferences = downloadPreferences),
-            getJellyfinSyncGroup(downloadPreferences = downloadPreferences),
+            getJellyfinSyncGroup(
+                downloadPreferences = downloadPreferences,
+                trackerManager = screenModel.trackerManager,
+                trackPreferences = screenModel.trackPreferences,
+                libraryPreferences = screenModel.libraryPreferences,
+            ),
         )
     }
 
@@ -424,9 +429,6 @@ object SettingsDownloadScreen : SearchableSettings {
         downloadPreferences: DownloadPreferences,
     ): Preference.PreferenceGroup {
         val context = LocalContext.current
-        val trackerManager = remember { Injekt.get<TrackerManager>() }
-        val trackPreferences = remember { Injekt.get<TrackPreferences>() }
-        val libraryPreferences = remember { Injekt.get<LibraryPreferences>() }
         val isLoggedIn = trackerManager.jellyfin.isLoggedIn
         val isAdmin by trackPreferences.jellyfinIsAdmin().collectAsStateWithLifecycle()
         val autoSync by downloadPreferences.autoSyncToJellyfin().collectAsStateWithLifecycle()

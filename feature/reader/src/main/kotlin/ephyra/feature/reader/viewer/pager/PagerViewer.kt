@@ -41,6 +41,7 @@ import kotlin.math.min
 abstract class PagerViewer(
     val activity: ReaderActivity,
     val downloadManager: DownloadManager,
+    val readerPreferences: ReaderPreferences,
 ) : Viewer {
 
     private val scope = MainScope()
@@ -61,7 +62,7 @@ abstract class PagerViewer(
     /**
      * Configuration used by the pager, like allow taps, scale mode on images, page transitions...
      */
-    val config = PagerConfig(this, scope)
+    val config = PagerConfig(this, scope, readerPreferences)
 
     /**
      * Adapter of the pager.

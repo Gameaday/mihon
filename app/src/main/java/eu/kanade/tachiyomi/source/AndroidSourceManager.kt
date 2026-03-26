@@ -19,21 +19,20 @@ import ephyra.domain.source.model.StubSource
 import ephyra.domain.source.repository.StubSourceRepository
 import ephyra.domain.source.service.SourceManager
 import ephyra.source.local.LocalSource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import uy.kohesive.injekt.injectLazy
+
 import java.util.concurrent.ConcurrentHashMap
 
 class AndroidSourceManager(
     private val context: Context,
     private val extensionManager: ExtensionManager,
     private val sourceRepository: StubSourceRepository,
+    private val fileSystem: ephyra.source.local.io.LocalSourceFileSystem,
+    private val coverManager: ephyra.source.local.image.LocalCoverManager,
+    private val downloadManager: DownloadManager,
 ) : SourceManager {
 
     private val _isInitialized = MutableStateFlow(false)
     override val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
-
-    private val downloadManager: DownloadManager by injectLazy()
 
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
@@ -53,8 +52,8 @@ class AndroidSourceManager(
                         mapOf(
                             LocalSource.ID to LocalSource(
                                 context,
-                                Injekt.get(),
-                                Injekt.get(),
+                                fileSystem,
+                                coverManager,
                             ),
                         ),
                     )

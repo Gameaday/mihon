@@ -13,11 +13,13 @@ import ephyra.domain.source.model.StubSource
 import ephyra.domain.source.repository.SourcePagingSource
 import ephyra.domain.source.repository.SourceRepository
 import ephyra.domain.source.service.SourceManager
+import ephyra.domain.manga.interactor.NetworkToLocalManga
 import ephyra.domain.source.model.Source as DomainSource
 
 class SourceRepositoryImpl(
     private val sourceManager: SourceManager,
     private val handler: DatabaseHandler,
+    private val networkToLocalManga: NetworkToLocalManga,
 ) : SourceRepository {
 
     override fun getSources(): Flow<List<DomainSource>> {
@@ -74,17 +76,17 @@ class SourceRepositoryImpl(
         filterList: FilterList,
     ): SourcePagingSource {
         val source = sourceManager.get(sourceId) as CatalogueSource
-        return SourceSearchPagingSource(source, query, filterList)
+        return SourceSearchPagingSource(source, query, filterList, networkToLocalManga)
     }
 
     override fun getPopular(sourceId: Long): SourcePagingSource {
         val source = sourceManager.get(sourceId) as CatalogueSource
-        return SourcePopularPagingSource(source)
+        return SourcePopularPagingSource(source, networkToLocalManga)
     }
 
     override fun getLatest(sourceId: Long): SourcePagingSource {
         val source = sourceManager.get(sourceId) as CatalogueSource
-        return SourceLatestPagingSource(source)
+        return SourceLatestPagingSource(source, networkToLocalManga)
     }
 
     private fun mapSourceToDomainSource(source: Source): DomainSource = DomainSource(

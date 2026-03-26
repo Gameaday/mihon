@@ -124,7 +124,7 @@ internal fun Screen.MigrateMangaDialog(
     )
 }
 
-private class MigrateDialogScreenModel(
+class MigrateDialogScreenModel(
     private val sourcePreference: SourcePreferences,
     private val coverCache: CoverCache,
     private val downloadManager: DownloadManager,

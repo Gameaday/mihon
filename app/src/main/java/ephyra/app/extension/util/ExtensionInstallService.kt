@@ -19,8 +19,11 @@ import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.logcat
 import ephyra.i18n.MR
 
+import org.koin.android.ext.android.inject
+
 class ExtensionInstallService : Service() {
 
+    private val extensionManager: ephyra.app.extension.ExtensionManager by inject()
     private var installer: Installer? = null
 
     override fun onCreate() {
@@ -46,8 +49,8 @@ class ExtensionInstallService : Service() {
 
         if (installer == null) {
             installer = when (installerUsed) {
-                BasePreferences.ExtensionInstaller.PACKAGEINSTALLER -> PackageInstallerInstaller(this)
-                BasePreferences.ExtensionInstaller.SHIZUKU -> ShizukuInstaller(this)
+                BasePreferences.ExtensionInstaller.PACKAGEINSTALLER -> PackageInstallerInstaller(this, extensionManager)
+                BasePreferences.ExtensionInstaller.SHIZUKU -> ShizukuInstaller(this, extensionManager)
                 else -> {
                     logcat(LogPriority.ERROR) { "Not implemented for installer $installerUsed" }
                     stopSelf()

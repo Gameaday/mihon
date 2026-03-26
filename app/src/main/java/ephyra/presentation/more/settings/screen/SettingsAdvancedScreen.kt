@@ -67,7 +67,7 @@ import ephyra.domain.manga.interactor.ResetViewerFlags
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import cafe.adriel.voyager.koin.koinInject
+import cafe.adriel.voyager.koin.koinScreenModel
 import java.io.File
 
 object SettingsAdvancedScreen : SearchableSettings {
@@ -78,13 +78,14 @@ object SettingsAdvancedScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
+        val screenModel = koinScreenModel<SettingsAdvancedScreenModel>()
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
 
-        val basePreferences = koinInject<BasePreferences>()
-        val networkPreferences = koinInject<NetworkPreferences>()
-        val libraryPreferences = koinInject<LibraryPreferences>()
+        val basePreferences = screenModel.basePreferences
+        val networkPreferences = screenModel.networkPreferences
+        val libraryPreferences = screenModel.libraryPreferences
 
         return listOf(
             Preference.PreferenceItem.TextPreference(
@@ -123,11 +124,20 @@ object SettingsAdvancedScreen : SearchableSettings {
                 },
             ),
             getBackgroundActivityGroup(),
-            getDataGroup(),
-            getNetworkGroup(networkPreferences = networkPreferences),
-            getLibraryGroup(libraryPreferences = libraryPreferences),
+            getDataGroup(downloadCache = screenModel.downloadCache),
+            getNetworkGroup(
+                networkPreferences = networkPreferences,
+                networkHelper = screenModel.networkHelper,
+            ),
+            getLibraryGroup(
+                libraryPreferences = libraryPreferences,
+                resetViewerFlags = screenModel.resetViewerFlags,
+            ),
             getReaderGroup(basePreferences = basePreferences),
-            getExtensionsGroup(basePreferences = basePreferences),
+            getExtensionsGroup(
+                basePreferences = basePreferences,
+                trustExtension = screenModel.trustExtension,
+            ),
         )
     }
 
@@ -171,7 +181,7 @@ object SettingsAdvancedScreen : SearchableSettings {
     }
 
     @Composable
-    private fun getDataGroup(): Preference.PreferenceGroup {
+    private fun getDataGroup(downloadCache: DownloadCache): Preference.PreferenceGroup {
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
@@ -184,7 +194,6 @@ object SettingsAdvancedScreen : SearchableSettings {
                     subtitle = stringResource(MR.strings.pref_invalidate_download_cache_summary),
                     onClick = {
                         scope.launch {
-                            val downloadCache = koinInject<DownloadCache>()
                             downloadCache.invalidateCache()
                             context.toast(MR.strings.download_cache_invalidated)
                         }
@@ -202,9 +211,9 @@ object SettingsAdvancedScreen : SearchableSettings {
     @Composable
     private fun getNetworkGroup(
         networkPreferences: NetworkPreferences,
+        networkHelper: NetworkHelper,
     ): Preference.PreferenceGroup {
         val context = LocalContext.current
-        val networkHelper = koinInject<NetworkHelper>()
 
         val userAgentPref = networkPreferences.defaultUserAgent()
         val userAgent by userAgentPref.collectAsState()
@@ -292,6 +301,7 @@ object SettingsAdvancedScreen : SearchableSettings {
     @Composable
     private fun getLibraryGroup(
         libraryPreferences: LibraryPreferences,
+        resetViewerFlags: ResetViewerFlags,
     ): Preference.PreferenceGroup {
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
@@ -307,7 +317,6 @@ object SettingsAdvancedScreen : SearchableSettings {
                     title = stringResource(MR.strings.pref_reset_viewer_flags),
                     subtitle = stringResource(MR.strings.pref_reset_viewer_flags_summary),
                     onClick = {
-                        val resetViewerFlags = koinInject<ResetViewerFlags>()
                         scope.launchNonCancellable {
                             val success = resetViewerFlags.await()
                             withUIContext {
@@ -390,12 +399,12 @@ object SettingsAdvancedScreen : SearchableSettings {
     @Composable
     private fun getExtensionsGroup(
         basePreferences: BasePreferences,
+        trustExtension: TrustExtension,
     ): Preference.PreferenceGroup {
         val context = LocalContext.current
         val uriHandler = LocalUriHandler.current
         val extensionInstallerPref = basePreferences.extensionInstaller()
         var shizukuMissing by rememberSaveable { mutableStateOf(false) }
-        val trustExtension = koinInject<TrustExtension>()
 
         if (shizukuMissing) {
             val dismiss = { shizukuMissing = false }

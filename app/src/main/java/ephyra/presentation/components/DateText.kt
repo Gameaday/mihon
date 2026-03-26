@@ -31,7 +31,7 @@ fun relativeDateText(
 ): String {
     val context = LocalContext.current
 
-    val preferences = koinInject<UiPreferences>()
+    val preferences = ephyra.presentation.util.LocalUiPreferences.current
     val relativeTime = remember { preferences.relativeTime().get() }
     val dateFormat = remember { UiPreferences.dateFormat(preferences.dateFormat().get()) }
 

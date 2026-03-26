@@ -1,10 +1,10 @@
 package ephyra.core.migration
 
-import uy.kohesive.injekt.Injekt
+import org.koin.core.context.GlobalContext
 
 class MigrationContext(val dryrun: Boolean) {
 
-    inline fun <reified T> get(): T? {
-        return Injekt.getInstanceOrNull(T::class.java)
+    inline fun <reified T : Any> get(): T? {
+        return GlobalContext.getOrNull()?.getOrNull<T>()
     }
 }

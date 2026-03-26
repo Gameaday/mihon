@@ -8,11 +8,11 @@ import ephyra.app.ui.base.activity.BaseActivity
 import ephyra.app.ui.main.MainActivity
 import ephyra.app.util.view.setComposeContent
 import ephyra.presentation.core.screens.LoadingScreen
-import uy.kohesive.injekt.injectLazy
+import org.koin.android.ext.android.inject
 
 abstract class BaseOAuthLoginActivity : BaseActivity() {
 
-    internal val trackerManager: TrackerManager by injectLazy()
+    internal val trackerManager: TrackerManager by inject()
 
     abstract fun handleResult(uri: Uri)
 
