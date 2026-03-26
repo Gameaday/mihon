@@ -1,0 +1,712 @@
+Initialized native services in: /home/c/.gradle/native
+Initialized jansi services in: /home/c/.gradle/native
+Found daemon DaemonInfo{pid=54345, address=[ae1f5ef3-a62a-403f-8844-9d403067f7fb port:42805, addresses:[/127.0.0.1]], state=Idle, lastBusy=1774534636800, context=DefaultDaemonContext[uid=aaeacded-6d8a-4de7-96a3-d62352ffe791,javaHome=/home/c/.sdkman/candidates/java/21.0.2-tem,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=/home/c/.gradle/daemon,pid=54345,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]} however its context does not match the desired criteria.
+At least one daemon option is different.
+Wanted: DaemonRequestContext{jvmCriteria=/home/c/.sdkman/candidates/java/21.0.2-tem (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:+UseParallelGC, -XX:MaxMetaspaceSize=512m, -Xmx4g, -Dfile.encoding=UTF-8, -Duser.country=US, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=aaeacded-6d8a-4de7-96a3-d62352ffe791,javaHome=/home/c/.sdkman/candidates/java/21.0.2-tem,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=/home/c/.gradle/daemon,pid=54345,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 47413). The daemon log file: /home/c/.gradle/daemon/9.4.1/daemon-47413.out.log
+Starting 14th build in daemon [uptime: 10 mins 18.358 secs, performance: 99%, GC rate: 0.02/s, heap usage: 4% of 2.6 GiB, non-heap usage: 51% of 512 MiB]
+Using 8 worker leases.
+Operational build model parameters: {cachingModelBuilding=false, configurationCache=true, configurationCacheDisabledReason=null, configurationCacheParallelLoad=true, configurationCacheParallelStore=false, configureOnDemand=true, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=true, resilientModelBuilding=false}
+Configuration on demand is an incubating feature.
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/9.4.1/fileHashes/fileHashes.bin
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/9.4.1/fileHashes/resourceHashesCache.bin
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/buildOutputCleanup/outputFiles.bin
+Encryption key source: default Gradle keystore (pkcs12)
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+Calculating task graph as no cached configuration is available for tasks: :core:common:compileDebugKotlin
+Now considering [/home/c/Github/Android/Ephyra, /home/c/Github/Android/Ephyra/buildSrc] as hierarchies to watch
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/buildSrc/.gradle/buildOutputCleanup/outputFiles.bin
+Now considering [/home/c/Github/Android/Ephyra/buildSrc, /home/c/Github/Android/Ephyra] as hierarchies to watch
+Watching the file system is configured to be enabled
+Dropping VFS state for moved directory /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin/dsl/plugins/_a1bc33ed03ad67f9f24c78a84c28af75
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin/dsl/plugins
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin/dsl
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin
+Dropping VFS state for moved directory /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/gradle/kotlin/dsl/plugins/_a1bc33ed03ad67f9f24c78a84c28af75
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/gradle/kotlin/dsl
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/META-INF
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/gradle/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/gradle/kotlin/dsl/plugins
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/gradle
+Dropping VFS state for moved directory /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/extracted
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/extracted
+Dropping VFS state for moved directory /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/precompiled-script-plugins-metadata/plugin-spec-builders
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/precompiled-script-plugins-metadata/plugin-spec-builders
+File system watching is active
+Starting Build
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/kotlinDslCompileAvoidanceClasspathHashCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/fileHashes.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/KotlinMetadataCompatibilityCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/resourceHashesCache.bin
+Settings evaluated using settings file '/home/c/Github/Android/Ephyra/settings.gradle.kts'.
+Using local directory build cache for the root build (location = /home/c/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+Type-safe project accessors is an incubating feature.
+Projects loaded. Root project using build file '/home/c/Github/Android/Ephyra/build.gradle.kts'.
+Included projects: [root project 'Ephyra', project ':app', project ':core', project ':core-metadata', project ':data', project ':domain', project ':feature', project ':i18n', project ':macrobenchmark', project ':presentation-core', project ':presentation-widget', project ':source-api', project ':source-local', project ':telemetry', project ':core:archive', project ':core:common', project ':core:download', project ':feature:browse', project ':feature:library', project ':feature:manga']
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/lookups
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/inputs
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/compilerPluginFiles
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/jvm
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/jvm/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/classpath-snapshot
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-plugins/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/ephyra
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/ephyra/buildlogic/tasks
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/ephyra/buildlogic
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/META-INF
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/plugins
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/plugins/_a1bc33ed03ad67f9f24c78a84c28af75
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_2f464d9c1a7a524c8af600eea3dc6558
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_7960b91ea74ef8af5c9d7fe98b818ec7
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_06fc10c307721ff8a52fbf20d800e64a
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_be12aedfeed71181e40f413f8cd59f27
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/classpath-snapshot
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/compilerPluginFiles
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/pluginDescriptors
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/resources/main/META-INF/gradle-plugins
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/kotlinDslCompileAvoidanceClasspathHashCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/fileHashes.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/KotlinMetadataCompatibilityCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/resourceHashesCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+
+> Configure project :buildSrc
+Evaluating project ':buildSrc' using build file '/home/c/Github/Android/Ephyra/buildSrc/build.gradle.kts'.
+Resolved plugin [id: 'org.gradle.kotlin.kotlin-dsl', version: '6.5.2']
+Build c9073f6f-caa5-4e18-80fd-e0df7009de69 is started
+Using Kotlin Gradle Plugin gradle813 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+file or directory '/home/c/Github/Android/Ephyra/buildSrc/src/main/java', not found
+Resolve mutations for :buildSrc:checkKotlinGradlePluginConfigurationErrors (Thread[#550,Execution worker,5,main]) started.
+:buildSrc:checkKotlinGradlePluginConfigurationErrors (Thread[#550,Execution worker,5,main]) started.
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/buildSrc/.gradle/9.4.1/executionHistory/executionHistory.bin
+
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':buildSrc:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :buildSrc:generateExternalPluginSpecBuilders (Thread[#550,Execution worker,5,main]) started.
+:buildSrc:generateExternalPluginSpecBuilders (Thread[#549,included builds,5,main]) started.
+
+> Task :buildSrc:generateExternalPluginSpecBuilders UP-TO-DATE
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/buildSrc/.gradle/buildOutputCleanup/outputFiles.bin
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/9.4.1/fileHashes/fileHashes.bin
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/9.4.1/fileHashes/resourceHashesCache.bin
+Build cache key for task ':buildSrc:generateExternalPluginSpecBuilders' is 4f45ca02ba04c44e39a40babcae3a0e0
+Skipping task ':buildSrc:generateExternalPluginSpecBuilders' as it is up-to-date.
+Resolve mutations for :buildSrc:extractPrecompiledScriptPluginPlugins (Thread[#549,included builds,5,main]) started.
+:buildSrc:extractPrecompiledScriptPluginPlugins (Thread[#549,included builds,5,main]) started.
+
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+Build cache key for task ':buildSrc:extractPrecompiledScriptPluginPlugins' is a80513a3198cd48b4b6ea35e1c77abb9
+Skipping task ':buildSrc:extractPrecompiledScriptPluginPlugins' as it is up-to-date.
+Resolve mutations for :buildSrc:compilePluginsBlocks (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:compilePluginsBlocks (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:compilePluginsBlocks UP-TO-DATE
+Custom actions are attached to task ':buildSrc:compilePluginsBlocks'.
+Build cache key for task ':buildSrc:compilePluginsBlocks' is 84047bb7d09ab03ffae13f05c4ba4ba2
+Skipping task ':buildSrc:compilePluginsBlocks' as it is up-to-date.
+Resolve mutations for :buildSrc:generatePrecompiledScriptPluginAccessors (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:generatePrecompiledScriptPluginAccessors (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+Build cache key for task ':buildSrc:generatePrecompiledScriptPluginAccessors' is 8bc26dcffcfc73d8f4c5d95e0cc51e49
+Skipping task ':buildSrc:generatePrecompiledScriptPluginAccessors' as it is up-to-date.
+Resolve mutations for :buildSrc:generateScriptPluginAdapters (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:generateScriptPluginAdapters (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:generateScriptPluginAdapters UP-TO-DATE
+Build cache key for task ':buildSrc:generateScriptPluginAdapters' is 34fd46f173a7b4efda08f6d108dcbadf
+Skipping task ':buildSrc:generateScriptPluginAdapters' as it is up-to-date.
+Resolve mutations for :buildSrc:compileKotlin (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:compileKotlin (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:compileKotlin UP-TO-DATE
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/kotlinDslCompileAvoidanceClasspathHashCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/fileHashes.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/KotlinMetadataCompatibilityCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/resourceHashesCache.bin
+Custom actions are attached to task ':buildSrc:compileKotlin'.
+Build cache key for task ':buildSrc:compileKotlin' is 8067351dd517e3c280e6e826246f4169
+Skipping task ':buildSrc:compileKotlin' as it is up-to-date.
+Resolve mutations for :buildSrc:compileJava (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:compileJava (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:compileJava NO-SOURCE
+Skipping task ':buildSrc:compileJava' as it has no source files and no previous output files.
+Resolve mutations for :buildSrc:compileGroovy (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:compileGroovy (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:compileGroovy NO-SOURCE
+Skipping task ':buildSrc:compileGroovy' as it has no source files and no previous output files.
+Resolve mutations for :buildSrc:pluginDescriptors (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:pluginDescriptors (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+Caching disabled for task ':buildSrc:pluginDescriptors' because:
+  Not worth caching
+Skipping task ':buildSrc:pluginDescriptors' as it is up-to-date.
+Resolve mutations for :buildSrc:processResources (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:processResources (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:processResources UP-TO-DATE
+Caching disabled for task ':buildSrc:processResources' because:
+  Not worth caching
+Skipping task ':buildSrc:processResources' as it is up-to-date.
+Resolve mutations for :buildSrc:classes (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:classes (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:classes UP-TO-DATE
+Skipping task ':buildSrc:classes' as it has no actions.
+Resolve mutations for :buildSrc:jar (Thread[#555,Execution worker Thread 5,5,main]) started.
+:buildSrc:jar (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :buildSrc:jar UP-TO-DATE
+Caching disabled for task ':buildSrc:jar' because:
+  Not worth caching
+Skipping task ':buildSrc:jar' as it is up-to-date.
+Task path ':core:common:compileDebugKotlin' matched project ':core:common'
+
+> Configure project :
+Evaluating root project 'Ephyra' using build file '/home/c/Github/Android/Ephyra/build.gradle.kts'.
+Resolved plugin [id: 'org.jetbrains.kotlin.plugin.serialization', version: '2.3.20', apply: false]
+Resolved plugin [id: 'com.mikepenz.aboutlibraries.plugin.android', version: '13.2.1', apply: false]
+Resolved plugin [id: 'com.google.firebase.crashlytics', version: '3.0.6', apply: false]
+Resolved plugin [id: 'com.google.gms.google-services', version: '4.4.4', apply: false]
+Resolved plugin [id: 'dev.icerock.mobile.multiplatform-resources', version: '0.26.1', apply: false]
+Resolved plugin [id: 'app.cash.sqldelight', version: '2.3.2', apply: false]
+Resolved plugin [id: 'com.google.devtools.ksp', version: '2.3.6', apply: false]
+
+> Configure project :core
+Evaluating project ':core' using build file '/home/c/Github/Android/Ephyra/core/build.gradle'.
+
+> Configure project :core:common
+Evaluating project ':core:common' using build file '/home/c/Github/Android/Ephyra/core/common/build.gradle.kts'.
+Resolved plugin [id: 'mihon.library']
+Resolved plugin [id: 'org.jetbrains.kotlin.android']
+Resolved plugin [id: 'org.jetbrains.kotlin.plugin.serialization']
+Using default execution profile
+Build 327e7b95-7df9-44f0-a668-e35e7dff3c3d is started
+Using Kotlin Gradle Plugin gradle813 variant
+w: [33m[1m⚠️ Deprecated Gradle Property 'kotlin.incremental.useClasspathSnapshot' Used[0m[0m
+The `kotlin.incremental.useClasspathSnapshot` deprecated property is used in your build.
+[32m[1mSolutions:[0m[0m
+[32m * [3mIt is unsupported, please stop using it.[0m[0m
+[32m * [3mHistory based incremental compilation approach for JVM platform is removed. Kotlin Gradle plugin is now using a more efficient approach based on ABI snapshots.[0m[0m
+
+w: [33m[1m⚠️ Deprecated Gradle Property 'kotlin.compiler.preciseCompilationResultsBackup' Used[0m[0m
+The `kotlin.compiler.preciseCompilationResultsBackup` deprecated property is used in your build.
+[32m[1mSolutions:[0m[0m
+[32m * [3mIt is unsupported, please stop using it.[0m[0m
+[32m * [3mBackups of compilation outputs using the non-precise method have been deprecated and phased out. Only the precise backup method is now used, which is more efficient.[0m[0m
+
+Task name matched 'compileDebugKotlin'
+Selected primary task 'compileDebugKotlin' from project :core:common
+Couldn't stop watching /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin/dsl/plugins/_a1bc33ed03ad67f9f24c78a84c28af75 (probably because the directory was removed)
+Couldn't stop watching /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin/dsl/plugins (probably because the directory was removed)
+Couldn't stop watching /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle (probably because the directory was removed)
+Couldn't stop watching /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin (probably because the directory was removed)
+Couldn't stop watching /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin/gradle/kotlin/dsl (probably because the directory was removed)
+Couldn't stop watching /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin (probably because the directory was removed)
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/precompiled-script-plugins-metadata/plugin-spec-builders
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/extracted
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/META-INF
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/gradle/kotlin/dsl/plugins
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/gradle/kotlin/dsl/plugins/_a1bc33ed03ad67f9f24c78a84c28af75
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/plugins-blocks/compiled
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin-dsl/precompiled-script-plugins-metadata/accessors
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_2f464d9c1a7a524c8af600eea3dc6558
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_7960b91ea74ef8af5c9d7fe98b818ec7
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_06fc10c307721ff8a52fbf20d800e64a
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_be12aedfeed71181e40f413f8cd59f27
+
+> Configure project :i18n
+Evaluating project ':i18n' using build file '/home/c/Github/Android/Ephyra/i18n/build.gradle.kts'.
+Resolved plugin [id: 'mihon.library']
+Resolved plugin [id: 'org.jetbrains.kotlin.multiplatform']
+Resolved plugin [id: 'dev.icerock.mobile.multiplatform-resources', version: '0.26.1']
+Using default execution profile
+Using Kotlin Gradle Plugin gradle813 variant
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+All projects evaluated.
+Tasks to be executed: [task ':i18n:kmpPartiallyResolvedDependenciesChecker', task ':i18n:checkKotlinGradlePluginConfigurationErrors', task ':i18n:generateLocalesConfig', task ':i18n:generateMRcommonMain', task ':i18n:generateMRandroidDebug', task ':i18n:generateMRandroidInstrumentedTest', task ':i18n:generateMRandroidInstrumentedTestDebug', task ':i18n:generateMRandroidMain', task ':i18n:generateMRandroidRelease', task ':i18n:generateMRcommonTest', task ':i18n:generateMRandroidUnitTest', task ':i18n:generateMRandroidUnitTestDebug', task ':i18n:generateMRandroidUnitTestRelease', task ':i18n:preBuild', task ':i18n:preDebugBuild', task ':i18n:generateDebugResValues', task ':i18n:generateDebugResources', task ':i18n:packageDebugResources', task ':i18n:processDebugNavigationResources', task ':i18n:parseDebugLocalResources', task ':i18n:generateDebugRFile', task ':i18n:compileDebugKotlinAndroid', task ':i18n:javaPreCompileDebug', task ':i18n:compileDebugJavaWithJavac', task ':i18n:bundleLibCompileToJarDebug', task ':core:common:checkKotlinGradlePluginConfigurationErrors', task ':core:common:preBuild', task ':core:common:preDebugBuild', task ':core:common:generateDebugResValues', task ':core:common:generateDebugResources', task ':core:common:packageDebugResources', task ':core:common:processDebugNavigationResources', task ':core:common:parseDebugLocalResources', task ':core:common:generateDebugRFile', task ':core:common:compileDebugKotlin']
+Tasks that were excluded: []
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+Adding -Xuse-inline-scopes-numbers Kotlin compiler flag for task :core:common:compileDebugAndroidTestKotlin
+Using local directory build cache for the root build (location = /home/c/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+Ignoring listeners of task graph ready event, as this build (:) has already executed work.
+Resolve mutations for :i18n:kmpPartiallyResolvedDependenciesChecker (Thread[#549,included builds,5,main]) started.
+Resolve mutations for :i18n:generateMRandroidInstrumentedTest (Thread[#554,Execution worker Thread 4,5,main]) started.
+Resolve mutations for :i18n:generateMRcommonMain (Thread[#555,Execution worker Thread 5,5,main]) started.
+Resolve mutations for :i18n:generateLocalesConfig (Thread[#550,Execution worker,5,main]) started.
+:i18n:kmpPartiallyResolvedDependenciesChecker (Thread[#557,Execution worker Thread 7,5,main]) started.
+Resolve mutations for :i18n:generateMRandroidInstrumentedTestDebug (Thread[#551,Execution worker Thread 2,5,main]) started.
+:i18n:generateMRandroidInstrumentedTestDebug (Thread[#551,Execution worker Thread 2,5,main]) started.
+
+> Task :i18n:generateMRandroidInstrumentedTestDebug SKIPPED
+Skipping task ':i18n:generateMRandroidInstrumentedTestDebug' as task onlyIf 'generation on Android supported only for main flavor' is false.
+Resolve mutations for :i18n:generateMRcommonTest (Thread[#551,Execution worker Thread 2,5,main]) started.
+
+> Task :i18n:kmpPartiallyResolvedDependenciesChecker
+Caching disabled for task ':i18n:kmpPartiallyResolvedDependenciesChecker' because:
+  This task is not intended for execution
+Task ':i18n:kmpPartiallyResolvedDependenciesChecker' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Execution stopped by some action with message: null
+:i18n:generateMRcommonTest (Thread[#551,Execution worker Thread 2,5,main]) started.
+Resolve mutations for :i18n:checkKotlinGradlePluginConfigurationErrors (Thread[#557,Execution worker Thread 7,5,main]) started.
+:i18n:checkKotlinGradlePluginConfigurationErrors (Thread[#557,Execution worker Thread 7,5,main]) started.
+Resolve mutations for :core:common:checkKotlinGradlePluginConfigurationErrors (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':i18n:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+:core:common:checkKotlinGradlePluginConfigurationErrors (Thread[#556,Execution worker Thread 6,5,main]) started.
+Resolve mutations for :core:common:preBuild (Thread[#552,Execution worker Thread 3,5,main]) started.
+:i18n:generateMRcommonMain (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :core:common:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':core:common:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+:core:common:preBuild (Thread[#552,Execution worker Thread 3,5,main]) started.
+
+> Task :core:common:preBuild UP-TO-DATE
+Skipping task ':core:common:preBuild' as it has no actions.
+:i18n:generateMRandroidInstrumentedTest (Thread[#554,Execution worker Thread 4,5,main]) started.
+:i18n:generateLocalesConfig (Thread[#550,Execution worker,5,main]) started.
+Resolve mutations for :core:common:preDebugBuild (Thread[#552,Execution worker Thread 3,5,main]) started.
+:core:common:preDebugBuild (Thread[#552,Execution worker Thread 3,5,main]) started.
+
+> Task :core:common:preDebugBuild UP-TO-DATE
+Skipping task ':core:common:preDebugBuild' as it has no actions.
+Resolve mutations for :core:common:generateDebugResValues (Thread[#556,Execution worker Thread 6,5,main]) started.
+:core:common:generateDebugResValues (Thread[#556,Execution worker Thread 6,5,main]) started.
+Resolve mutations for :core:common:processDebugNavigationResources (Thread[#557,Execution worker Thread 7,5,main]) started.
+:core:common:processDebugNavigationResources (Thread[#552,Execution worker Thread 3,5,main]) started.
+
+> Task :core:common:processDebugNavigationResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/generated/updated_navigation_xml/debug
+Build cache key for task ':core:common:processDebugNavigationResources' is baf07f7682d65a29ff1e9f7b31a82c83
+Task ':core:common:processDebugNavigationResources' is not up-to-date because:
+  Output property 'outputDir' file /home/c/Github/Android/Ephyra/core/common/build/generated/updated_navigation_xml/debug has been removed.
+Loaded cache entry for task ':core:common:processDebugNavigationResources' with cache key baf07f7682d65a29ff1e9f7b31a82c83
+
+> Task :core:common:generateDebugResValues FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/generated/res/resValues/debug
+Build cache key for task ':core:common:generateDebugResValues' is 044e6ec28057341ce233633b22f41589
+Task ':core:common:generateDebugResValues' is not up-to-date because:
+  Output property 'outputDirectory' file /home/c/Github/Android/Ephyra/core/common/build/generated/res/resValues/debug has been removed.
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+Loaded cache entry for task ':core:common:generateDebugResValues' with cache key 044e6ec28057341ce233633b22f41589
+Resolve mutations for :core:common:generateDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+:core:common:generateDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:generateMRcommonTest FROM-CACHE
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/buildOutputCleanup/outputFiles.bin
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/commonTest-metadata.json
+Build cache key for task ':i18n:generateMRcommonTest' is 778f5132437d2c1f030ce1f7d2ac4116
+Task ':i18n:generateMRcommonTest' is not up-to-date because:
+  Output property 'outputMetadataFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/commonTest-metadata.json has been removed.
+Loaded cache entry for task ':i18n:generateMRcommonTest' with cache key 778f5132437d2c1f030ce1f7d2ac4116
+Resolve mutations for :i18n:generateMRandroidUnitTest (Thread[#551,Execution worker Thread 2,5,main]) started.
+:i18n:generateMRandroidUnitTest (Thread[#551,Execution worker Thread 2,5,main]) started.
+Resolve mutations for :i18n:generateMRandroidUnitTestDebug (Thread[#552,Execution worker Thread 3,5,main]) started.
+:i18n:generateMRandroidUnitTestDebug (Thread[#552,Execution worker Thread 3,5,main]) started.
+
+> Task :i18n:generateMRandroidUnitTestDebug SKIPPED
+Skipping task ':i18n:generateMRandroidUnitTestDebug' as task onlyIf 'generation on Android supported only for main flavor' is false.
+Resolve mutations for :i18n:generateMRandroidUnitTestRelease (Thread[#557,Execution worker Thread 7,5,main]) started.
+:i18n:generateMRandroidUnitTestRelease (Thread[#557,Execution worker Thread 7,5,main]) started.
+
+> Task :i18n:generateMRandroidUnitTestRelease SKIPPED
+Skipping task ':i18n:generateMRandroidUnitTestRelease' as task onlyIf 'generation on Android supported only for main flavor' is false.
+
+> Task :i18n:generateMRandroidInstrumentedTest FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidInstrumentedTest/res
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/androidInstrumentedTest-metadata.json
+Build cache key for task ':i18n:generateMRandroidInstrumentedTest' is c2356974659f1957d50cd0dc5fd47d59
+Task ':i18n:generateMRandroidInstrumentedTest' is not up-to-date because:
+  Output property 'outputMetadataFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/androidInstrumentedTest-metadata.json has been removed.
+  Output property 'outputResourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidInstrumentedTest/res has been removed.
+  Output property 'outputResourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidInstrumentedTest/res/font has been removed.
+  and more...
+Loaded cache entry for task ':i18n:generateMRandroidInstrumentedTest' with cache key c2356974659f1957d50cd0dc5fd47d59
+
+> Task :core:common:generateDebugResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+Build cache key for task ':core:common:generateDebugResources' is 5185b5e175c96b982220e73ad311ea5c
+Task ':core:common:generateDebugResources' is not up-to-date because:
+  Output property 'validationReportFile' file /home/c/Github/Android/Ephyra/core/common/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt has been removed.
+Loaded cache entry for task ':core:common:generateDebugResources' with cache key 5185b5e175c96b982220e73ad311ea5c
+Resolve mutations for :core:common:packageDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+:core:common:packageDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:generateMRandroidUnitTest FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidUnitTest/res
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/androidUnitTest-metadata.json
+Build cache key for task ':i18n:generateMRandroidUnitTest' is 8da2f221c6a2c8e079b496d85ef6ce11
+Task ':i18n:generateMRandroidUnitTest' is not up-to-date because:
+  Output property 'outputMetadataFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/androidUnitTest-metadata.json has been removed.
+  Output property 'outputResourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidUnitTest/res has been removed.
+  Output property 'outputResourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidUnitTest/res/font has been removed.
+  and more...
+Loaded cache entry for task ':i18n:generateMRandroidUnitTest' with cache key 8da2f221c6a2c8e079b496d85ef6ce11
+
+> Task :core:common:packageDebugResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/generated/res/pngs/debug
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/data_binding_layout_info_type_package/debug/packageDebugResources/out
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/incremental/debug/packageDebugResources
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/packaged_res/debug/packageDebugResources
+Build cache key for task ':core:common:packageDebugResources' is 2b0b10598ed89da12a1c95ce82edb4ce
+Task ':core:common:packageDebugResources' is not up-to-date because:
+  Output property 'dataBindingLayoutInfoOutFolder' file /home/c/Github/Android/Ephyra/core/common/build/intermediates/data_binding_layout_info_type_package/debug/packageDebugResources/out has been removed.
+  Output property 'generatedPngsOutputDir' file /home/c/Github/Android/Ephyra/core/common/build/generated/res/pngs/debug has been removed.
+  Output property 'incrementalFolder' file /home/c/Github/Android/Ephyra/core/common/build/intermediates/incremental/debug/packageDebugResources has been removed.
+  and more...
+Loaded cache entry for task ':core:common:packageDebugResources' with cache key 2b0b10598ed89da12a1c95ce82edb4ce
+Resolve mutations for :core:common:parseDebugLocalResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+:core:common:parseDebugLocalResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :core:common:parseDebugLocalResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+Build cache key for task ':core:common:parseDebugLocalResources' is bfdb845e902a1c2f82d0a84459c160a5
+Task ':core:common:parseDebugLocalResources' is not up-to-date because:
+  Output property 'librarySymbolsFile' file /home/c/Github/Android/Ephyra/core/common/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt has been removed.
+Loaded cache entry for task ':core:common:parseDebugLocalResources' with cache key bfdb845e902a1c2f82d0a84459c160a5
+
+> Task :i18n:generateLocalesConfig
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/mihon/android/res/xml/locales_config.xml
+Caching disabled for task ':i18n:generateLocalesConfig' because:
+  Caching has not been enabled for the task
+Task ':i18n:generateLocalesConfig' is not up-to-date because:
+  Output property 'outputXmlFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/mihon/android/res/xml/locales_config.xml has been removed.
+
+> Task :i18n:generateMRcommonMain FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/commonMain-metadata.json
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/commonMain/src
+Build cache key for task ':i18n:generateMRcommonMain' is 23927e79101b8388808b647cabf3d52b
+Task ':i18n:generateMRcommonMain' is not up-to-date because:
+  Output property 'outputMetadataFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/commonMain-metadata.json has been removed.
+  Output property 'outputSourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/commonMain/src has been removed.
+  Output property 'outputSourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/commonMain/src/ephyra has been removed.
+  and more...
+Loaded cache entry for task ':i18n:generateMRcommonMain' with cache key 23927e79101b8388808b647cabf3d52b
+Resolve mutations for :i18n:generateMRandroidDebug (Thread[#555,Execution worker Thread 5,5,main]) started.
+Resolve mutations for :i18n:generateMRandroidMain (Thread[#550,Execution worker,5,main]) started.
+:i18n:generateMRandroidMain (Thread[#550,Execution worker,5,main]) started.
+:i18n:generateMRandroidDebug (Thread[#555,Execution worker Thread 5,5,main]) started.
+Resolve mutations for :i18n:generateMRandroidRelease (Thread[#551,Execution worker Thread 2,5,main]) started.
+
+> Task :i18n:generateMRandroidDebug SKIPPED
+Skipping task ':i18n:generateMRandroidDebug' as task onlyIf 'generation on Android supported only for main flavor' is false.
+:i18n:generateMRandroidRelease (Thread[#551,Execution worker Thread 2,5,main]) started.
+
+> Task :i18n:generateMRandroidRelease SKIPPED
+Skipping task ':i18n:generateMRandroidRelease' as task onlyIf 'generation on Android supported only for main flavor' is false.
+
+> Task :i18n:generateMRandroidMain FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/androidMain-metadata.json
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidMain/src
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidMain/res
+Build cache key for task ':i18n:generateMRandroidMain' is cc1204f967c67e0a4c7a9288d9c1e946
+Task ':i18n:generateMRandroidMain' is not up-to-date because:
+  Output property 'outputMetadataFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/androidMain-metadata.json has been removed.
+  Output property 'outputResourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidMain/res has been removed.
+  Output property 'outputResourcesDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/androidMain/res/font has been removed.
+  and more...
+Loaded cache entry for task ':i18n:generateMRandroidMain' with cache key cc1204f967c67e0a4c7a9288d9c1e946
+Resolve mutations for :i18n:preBuild (Thread[#550,Execution worker,5,main]) started.
+:i18n:preBuild (Thread[#550,Execution worker,5,main]) started.
+
+> Task :i18n:preBuild
+Skipping task ':i18n:preBuild' as it has no actions.
+Resolve mutations for :i18n:preDebugBuild (Thread[#550,Execution worker,5,main]) started.
+:i18n:preDebugBuild (Thread[#550,Execution worker,5,main]) started.
+
+> Task :i18n:preDebugBuild
+Skipping task ':i18n:preDebugBuild' as it has no actions.
+Resolve mutations for :i18n:generateDebugResValues (Thread[#556,Execution worker Thread 6,5,main]) started.
+Resolve mutations for :i18n:javaPreCompileDebug (Thread[#554,Execution worker Thread 4,5,main]) started.
+:i18n:generateDebugResValues (Thread[#556,Execution worker Thread 6,5,main]) started.
+:i18n:javaPreCompileDebug (Thread[#554,Execution worker Thread 4,5,main]) started.
+Resolve mutations for :i18n:processDebugNavigationResources (Thread[#555,Execution worker Thread 5,5,main]) started.
+:i18n:processDebugNavigationResources (Thread[#555,Execution worker Thread 5,5,main]) started.
+
+> Task :i18n:generateDebugResValues FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/res/resValues/debug
+Build cache key for task ':i18n:generateDebugResValues' is 044e6ec28057341ce233633b22f41589
+Task ':i18n:generateDebugResValues' is not up-to-date because:
+  Output property 'outputDirectory' file /home/c/Github/Android/Ephyra/i18n/build/generated/res/resValues/debug has been removed.
+Loaded cache entry for task ':i18n:generateDebugResValues' with cache key 044e6ec28057341ce233633b22f41589
+Resolve mutations for :i18n:generateDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+:i18n:generateDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:javaPreCompileDebug FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+Build cache key for task ':i18n:javaPreCompileDebug' is 956244e8b687adbdc3ec40a766b8a0cf
+Task ':i18n:javaPreCompileDebug' is not up-to-date because:
+  Output property 'annotationProcessorListFile' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json has been removed.
+Loaded cache entry for task ':i18n:javaPreCompileDebug' with cache key 956244e8b687adbdc3ec40a766b8a0cf
+
+> Task :i18n:generateDebugResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+Build cache key for task ':i18n:generateDebugResources' is 42c4043641e429a2985d103d9420e0ab
+Task ':i18n:generateDebugResources' is not up-to-date because:
+  Output property 'validationReportFile' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt has been removed.
+Loaded cache entry for task ':i18n:generateDebugResources' with cache key 42c4043641e429a2985d103d9420e0ab
+Resolve mutations for :i18n:packageDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:processDebugNavigationResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/updated_navigation_xml/debug
+Build cache key for task ':i18n:processDebugNavigationResources' is 79e7a0951fa709777ecf2f1ae0fee93c
+Task ':i18n:processDebugNavigationResources' is not up-to-date because:
+  Output property 'outputDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/updated_navigation_xml/debug has been removed.
+Loaded cache entry for task ':i18n:processDebugNavigationResources' with cache key 79e7a0951fa709777ecf2f1ae0fee93c
+:i18n:packageDebugResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:packageDebugResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/data_binding_layout_info_type_package/debug/packageDebugResources/out
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/incremental/debug/packageDebugResources
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/res/pngs/debug
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/packaged_res/debug/packageDebugResources
+Build cache key for task ':i18n:packageDebugResources' is c522e5f692975a0e172b12a4ebb0c494
+Task ':i18n:packageDebugResources' is not up-to-date because:
+  Output property 'dataBindingLayoutInfoOutFolder' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/data_binding_layout_info_type_package/debug/packageDebugResources/out has been removed.
+  Output property 'generatedPngsOutputDir' file /home/c/Github/Android/Ephyra/i18n/build/generated/res/pngs/debug has been removed.
+  Output property 'incrementalFolder' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/incremental/debug/packageDebugResources has been removed.
+  and more...
+Loaded cache entry for task ':i18n:packageDebugResources' with cache key c522e5f692975a0e172b12a4ebb0c494
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/buildOutputCleanup/outputFiles.bin
+Resolve mutations for :i18n:parseDebugLocalResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+:i18n:parseDebugLocalResources (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:parseDebugLocalResources FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+Build cache key for task ':i18n:parseDebugLocalResources' is 773270e2f4df50e1f372dad51041dd44
+Task ':i18n:parseDebugLocalResources' is not up-to-date because:
+  Output property 'librarySymbolsFile' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt has been removed.
+Invalidating in-memory cache of /home/c/.gradle/caches/journal-1/file-access.bin
+Loaded cache entry for task ':i18n:parseDebugLocalResources' with cache key 773270e2f4df50e1f372dad51041dd44
+Resolve mutations for :i18n:generateDebugRFile (Thread[#556,Execution worker Thread 6,5,main]) started.
+:i18n:generateDebugRFile (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:generateDebugRFile FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/kotlinDslCompileAvoidanceClasspathHashCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/fileHashes.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/KotlinMetadataCompatibilityCache.bin
+Invalidating in-memory cache of /home/c/.gradle/caches/9.4.1/fileHashes/resourceHashesCache.bin
+Build cache key for task ':i18n:generateDebugRFile' is 5044c7b72216d6ba5ab6be17e9795a67
+Task ':i18n:generateDebugRFile' is not up-to-date because:
+  Output property 'RClassOutputJar' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar has been removed.
+  Output property 'symbolsWithPackageNameOutputFile' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt has been removed.
+  Output property 'textSymbolOutputFileProperty' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt has been removed.
+Loaded cache entry for task ':i18n:generateDebugRFile' with cache key 5044c7b72216d6ba5ab6be17e9795a67
+Resolve mutations for :i18n:compileDebugKotlinAndroid (Thread[#556,Execution worker Thread 6,5,main]) started.
+work action resolve package-aware-r.txt (project :i18n) (Thread[#555,Execution worker Thread 5,5,main]) started.
+Resolve mutations for :core:common:generateDebugRFile (Thread[#555,Execution worker Thread 5,5,main]) started.
+:core:common:generateDebugRFile (Thread[#555,Execution worker Thread 5,5,main]) started.
+:i18n:compileDebugKotlinAndroid (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:compileDebugKotlinAndroid FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/kotlin/compileDebugKotlinAndroid/cacheable
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/kotlin/compileDebugKotlinAndroid/classpath-snapshot
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/tmp/kotlin-classes/debug
+Build cache key for task ':i18n:compileDebugKotlinAndroid' is be244ea476a7c72ff2bfd55cb722a46f
+Task ':i18n:compileDebugKotlinAndroid' is not up-to-date because:
+  Output property 'classpathSnapshotProperties.classpathSnapshotDir' file /home/c/Github/Android/Ephyra/i18n/build/kotlin/compileDebugKotlinAndroid/classpath-snapshot has been removed.
+  Output property 'classpathSnapshotProperties.classpathSnapshotDir' file /home/c/Github/Android/Ephyra/i18n/build/kotlin/compileDebugKotlinAndroid/classpath-snapshot/shrunk-classpath-snapshot.bin has been removed.
+  Output property 'destinationDirectory' file /home/c/Github/Android/Ephyra/i18n/build/tmp/kotlin-classes/debug has been removed.
+  and more...
+Loaded cache entry for task ':i18n:compileDebugKotlinAndroid' with cache key be244ea476a7c72ff2bfd55cb722a46f
+Resolve mutations for :i18n:compileDebugJavaWithJavac (Thread[#556,Execution worker Thread 6,5,main]) started.
+:i18n:compileDebugJavaWithJavac (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :i18n:compileDebugJavaWithJavac NO-SOURCE
+Skipping task ':i18n:compileDebugJavaWithJavac' as it has no source files and no previous output files.
+Resolve mutations for :i18n:bundleLibCompileToJarDebug (Thread[#556,Execution worker Thread 6,5,main]) started.
+:i18n:bundleLibCompileToJarDebug (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :core:common:generateDebugRFile FROM-CACHE
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
+Build cache key for task ':core:common:generateDebugRFile' is 8c978cf4c130e6a6a5da860bf06027b2
+Task ':core:common:generateDebugRFile' is not up-to-date because:
+  Output property 'RClassOutputJar' file /home/c/Github/Android/Ephyra/core/common/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar has been removed.
+  Output property 'symbolsWithPackageNameOutputFile' file /home/c/Github/Android/Ephyra/core/common/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt has been removed.
+  Output property 'textSymbolOutputFileProperty' file /home/c/Github/Android/Ephyra/core/common/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt has been removed.
+Loaded cache entry for task ':core:common:generateDebugRFile' with cache key 8c978cf4c130e6a6a5da860bf06027b2
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/buildOutputCleanup/outputFiles.bin
+
+> Task :i18n:bundleLibCompileToJarDebug
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar
+Caching disabled for task ':i18n:bundleLibCompileToJarDebug' because:
+  Simple merging task
+Task ':i18n:bundleLibCompileToJarDebug' is not up-to-date because:
+  Output property 'output' file /home/c/Github/Android/Ephyra/i18n/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar has been removed.
+work action resolve classes.jar (project :i18n) (Thread[#556,Execution worker Thread 6,5,main]) started.
+Resolve mutations for :core:common:compileDebugKotlin (Thread[#556,Execution worker Thread 6,5,main]) started.
+:core:common:compileDebugKotlin (Thread[#556,Execution worker Thread 6,5,main]) started.
+
+> Task :core:common:compileDebugKotlin
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/tmp/kotlin-classes/debug
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/kotlin/compileDebugKotlin/classpath-snapshot
+Deleting stale output file: /home/c/Github/Android/Ephyra/core/common/build/kotlin/compileDebugKotlin/cacheable
+Build cache key for task ':core:common:compileDebugKotlin' is 10deafc1d80c4c5c42b3872fd3b502da
+Task ':core:common:compileDebugKotlin' is not up-to-date because:
+  Task has failed previously.
+The input changes require a full rebuild for incremental task ':core:common:compileDebugKotlin'.
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/kotlin', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/main/java', not found
+file or directory '/home/c/Github/Android/Ephyra/core/common/src/debug/java', not found
+Kotlin source files: /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/lang/Hash.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/lang/StringExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/storage/DiskUtil.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/system/DensityExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/system/ToastExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/system/DeviceUtil.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/system/GLUtil.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/util/system/WebViewUtil.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/core/security/SecurityPreferences.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/app/core/security/PrivacyPreferences.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/storage/FolderProvider.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/storage/AndroidStorageFolderProvider.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/storage/UniFileExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/SortUtil.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/BooleanExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/CoroutinesExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/system/ImageUtil.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/system/LogcatExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/Constants.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/CheckboxState.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/InMemoryPreferenceStore.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/AndroidPreference.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/AndroidPreferenceStore.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/DataStorePreferenceStore.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/Preference.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/PreferenceStore.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/TriState.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/utils/Set.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/i18n/Localize.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/ProgressListener.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/Requests.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/OkHttpExtensions.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/DohProviders.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/NetworkHelper.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/ProgressResponseBody.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/interceptor/SpecificHostRateLimitInterceptor.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/interceptor/CloudflareInterceptor.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/interceptor/UncaughtExceptionInterceptor.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/interceptor/IgnoreGzipInterceptor.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/interceptor/WebViewInterceptor.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/interceptor/RateLimitInterceptor.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/interceptor/UserAgentInterceptor.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/NetworkPreferences.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/JavaScriptEngine.kt, /home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/AndroidCookieJar.kt
+Java source files: 
+Script source files: 
+Script file extensions: 
+Using Kotlin/JVM incremental compilation
+[KOTLIN] Kotlin compilation 'jdkHome' argument: null
+i: starting the daemon as: /home/c/.sdkman/candidates/java/21.0.2-tem/bin/java -cp /home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-compat/2.3.20/649d59d16f0dc2427cc900a8b003496ad39aaa33/kotlin-build-tools-compat-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-impl/2.3.20/90a14213a621db275bf64e605e6c849d482656be/kotlin-build-tools-impl-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-tooling-core/2.3.20/7a050c09910ee587944bc2a7413e2d97d751f647/kotlin-tooling-core-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-cri-impl/2.3.20/52abdf3a26f3f71b94b90b45ad54f6a64610dcba/kotlin-build-tools-cri-impl-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-api/2.3.20/9d10b958f69ea67132d24ce9c759cf60465f29a5/kotlin-build-tools-api-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-runner/2.3.20/11f74384a212c68bb6eb18ab6cd2cdf6354901b8/kotlin-compiler-runner-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.3.20/2fac4210c52c27b244305d60b0906e831f49be/kotlin-compiler-embeddable-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-client/2.3.20/d1f3f5c2efb2ed264dd3dfaf3ae8a581cbf47138/kotlin-daemon-client-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.3.20/ed866de74ad3d49086a27bbd75952cd186479436/kotlin-stdlib-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.3.20/4831ca1fea87f25bf39891ff56327b23b18c9bfa/kotlin-script-runtime-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.3.20/92a638246f2a388e2ccf43784623b1c685c93ab8/kotlin-daemon-embeddable-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar -Djava.awt.headless=true -Djava.rmi.server.hostname=127.0.0.1 -Xmx4g -XX:MaxMetaspaceSize=512m -XX:ReservedCodeCacheSize=320m -ea -Dkotlin.daemon.custom.run.files.path.for.tests=/home/c/.local/share/kotlin/daemon -XX:+UseCodeCacheFlushing -XX:+UseParallelGC -Dkotlin.daemon.initiator.marker.file=/tmp/kotlin-compiler-client-9392965334989525064-is-running --add-exports java.base/sun.nio.ch=ALL-UNNAMED org.jetbrains.kotlin.daemon.KotlinCompileDaemon --daemon-runFilesPath /home/c/.local/share/kotlin/daemon --daemon-autoshutdownIdleSeconds=7200 --daemon-compilerClasspath /home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-compat/2.3.20/649d59d16f0dc2427cc900a8b003496ad39aaa33/kotlin-build-tools-compat-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-impl/2.3.20/90a14213a621db275bf64e605e6c849d482656be/kotlin-build-tools-impl-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-tooling-core/2.3.20/7a050c09910ee587944bc2a7413e2d97d751f647/kotlin-tooling-core-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-cri-impl/2.3.20/52abdf3a26f3f71b94b90b45ad54f6a64610dcba/kotlin-build-tools-cri-impl-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-tools-api/2.3.20/9d10b958f69ea67132d24ce9c759cf60465f29a5/kotlin-build-tools-api-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-runner/2.3.20/11f74384a212c68bb6eb18ab6cd2cdf6354901b8/kotlin-compiler-runner-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.3.20/2fac4210c52c27b244305d60b0906e831f49be/kotlin-compiler-embeddable-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-client/2.3.20/d1f3f5c2efb2ed264dd3dfaf3ae8a581cbf47138/kotlin-daemon-client-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.3.20/ed866de74ad3d49086a27bbd75952cd186479436/kotlin-stdlib-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.3.20/4831ca1fea87f25bf39891ff56327b23b18c9bfa/kotlin-script-runtime-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.3.20/92a638246f2a388e2ccf43784623b1c685c93ab8/kotlin-daemon-embeddable-2.3.20.jar:/home/c/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar
+i: #1 retrying connecting to the daemon 
+i: Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[], generateCompilerRefIndex=false), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$Unknown@65427bb, classpathChanges=NotAvailableDueToMissingClasspathSnapshot, workingDir=/home/c/Github/Android/Ephyra/core/common/build/kotlin/compileDebugKotlin/cacheable, multiModuleICSettings=null, icFeatures=IncrementalCompilationFeatures(usePreciseJavaTracking=true, withAbiSnapshot=false, preciseCompilationResultsBackup=true, keepIncrementalCompilationCachesInMemory=true, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=true), outputFiles=[/home/c/Github/Android/Ephyra/core/common/build/tmp/kotlin-classes/debug, /home/c/Github/Android/Ephyra/core/common/build/kotlin/compileDebugKotlin/cacheable, /home/c/Github/Android/Ephyra/core/common/build/kotlin/compileDebugKotlin/local-state])
+
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/lookups
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/inputs
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/compilerPluginFiles
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/cacheable/caches-jvm/jvm/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compilePluginsBlocks/classpath-snapshot
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sources/kotlin-dsl-plugins/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/ephyra/buildlogic/tasks
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/ephyra/buildlogic
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/META-INF
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/plugins/_a1bc33ed03ad67f9f24c78a84c28af75
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_2f464d9c1a7a524c8af600eea3dc6558
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_7960b91ea74ef8af5c9d7fe98b818ec7
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_06fc10c307721ff8a52fbf20d800e64a
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_be12aedfeed71181e40f413f8cd59f27
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/classes/kotlin/main
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/classpath-snapshot
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/compilerPluginFiles
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/pluginDescriptors
+Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/resources/main/META-INF/gradle-plugins
+
+> Task :core:common:compileDebugKotlin
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/DataStorePreferenceStore.kt:155:62 Suspend function 'suspend fun get(): T' can only be called from a coroutine or another suspend function.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/DataStorePreferenceStore.kt:196:62 Suspend function 'suspend fun get(): T' can only be called from a coroutine or another suspend function.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/Preference.kt:55:14 Only type parameters of inline functions can be reified.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/preference/Preference.kt:55:56 Modifier is only allowed for function parameters of an inline function.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/CoroutinesExtensions.kt:22:57 Unresolved reference 'Job'.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/CoroutinesExtensions.kt:33:57 Unresolved reference 'Job'.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/CoroutinesExtensions.kt:44:58 Unresolved reference 'Job'.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/CoroutinesExtensions.kt:47:72 Unresolved reference 'Job'.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/CoroutinesExtensions.kt:50:72 Unresolved reference 'Job'.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/ephyra/core/common/util/lang/CoroutinesExtensions.kt:53:84 Unresolved reference 'Job'.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/NetworkHelper.kt:48:42 Suspend function 'suspend fun get(): Boolean' can only be called from a coroutine or another suspend function.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/NetworkHelper.kt:55:41 Suspend function 'suspend fun get(): Int' can only be called from a coroutine or another suspend function.
+e: file:///home/c/Github/Android/Ephyra/core/common/src/main/kotlin/eu/kanade/tachiyomi/network/NetworkHelper.kt:87:69 Suspend function 'suspend fun get(): String' can only be called from a coroutine or another suspend function.
+i: Finished executing kotlin compiler using DAEMON strategy
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/9.4.1/fileHashes/fileHashes.bin
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/9.4.1/fileHashes/resourceHashesCache.bin
+Invalidating in-memory cache of /home/c/Github/Android/Ephyra/.gradle/buildOutputCleanup/outputFiles.bin
+
+> Task :core:common:compileDebugKotlin FAILED
+Build c9073f6f-caa5-4e18-80fd-e0df7009de69 is closed
+Build 327e7b95-7df9-44f0-a668-e35e7dff3c3d is closed
+
+See the complete report at file:///home/c/Github/Android/Ephyra/build/reports/configuration-cache/85gudccln9fusupnnbonsggf5/bchmesmok0neorci7hhwvarmo/configuration-cache-report.html
+
+[Incubating] Problems report is available at: file:///home/c/Github/Android/Ephyra/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':core:common:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.btapi.BuildToolsApiCompilationWork
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 15s
+32 actionable tasks: 4 executed, 19 from cache, 9 up-to-date
+Configuration cache entry stored.

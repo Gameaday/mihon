@@ -12,20 +12,14 @@ import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.core.archive.archiveReader
 import ephyra.domain.manga.model.Manga
-import uy.kohesive.injekt.injectLazy
-
-/**
- * Loader used to load a chapter from the downloaded chapters.
- */
 internal class DownloadPageLoader(
     private val chapter: ReaderChapter,
     private val manga: Manga,
     private val source: Source,
     private val downloadManager: DownloadManager,
     private val downloadProvider: DownloadProvider,
+    private val context: Application,
 ) : PageLoader() {
-
-    private val context: Application by injectLazy()
 
     @Volatile
     private var archivePageLoader: ArchivePageLoader? = null

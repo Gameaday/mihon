@@ -1,15 +1,28 @@
 package ephyra.buildlogic.tasks
 
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.Task
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
-private val emptyResourcesElement = "<resources>\\s*</resources>|<resources\\s*/>".toRegex()
+abstract class LocalesConfigTask : DefaultTask() {
 
-fun Project.getLocalesConfigTask(outputResourceDir: File): TaskProvider<Task> {
-    return tasks.register("generateLocalesConfig") {
-        val locales = fileTree("$projectDir/src/commonMain/moko-resources/")
+    @get:InputDirectory
+    abstract val mokoResourcesDir: DirectoryProperty
+
+    @get:OutputFile
+    abstract val outputXmlFile: RegularFileProperty
+
+    private val emptyResourcesElement = "<resources>\\s*</resources>|<resources\\s*/>".toRegex()
+
+    @TaskAction
+    fun generate() {
+        val locales = mokoResourcesDir.get().asFileTree
             .matching { include("**/strings.xml") }
             .filterNot { it.readText().contains(emptyResourcesElement) }
             .map {
@@ -28,9 +41,16 @@ fun Project.getLocalesConfigTask(outputResourceDir: File): TaskProvider<Task> {
         |</locale-config>
         """.trimMargin()
 
-        outputResourceDir.resolve("xml/locales_config.xml").apply {
+        outputXmlFile.get().asFile.apply {
             parentFile.mkdirs()
             writeText(content)
         }
+    }
+}
+
+fun Project.getLocalesConfigTask(outputResourceDir: File): TaskProvider<LocalesConfigTask> {
+    return tasks.register("generateLocalesConfig", LocalesConfigTask::class.java) {
+        mokoResourcesDir.set(file("$projectDir/src/commonMain/moko-resources/"))
+        outputXmlFile.set(outputResourceDir.resolve("xml/locales_config.xml"))
     }
 }

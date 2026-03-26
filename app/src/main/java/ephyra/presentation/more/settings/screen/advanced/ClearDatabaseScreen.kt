@@ -223,7 +223,7 @@ class ClearDatabaseScreen : Screen() {
     }
 }
 
-private class ClearDatabaseScreenModel(
+class ClearDatabaseScreenModel(
     private val getSourcesWithNonLibraryManga: GetSourcesWithNonLibraryManga,
     private val deleteNonLibraryManga: DeleteNonLibraryManga,
     private val removeResettedHistory: RemoveResettedHistory,

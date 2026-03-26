@@ -45,17 +45,13 @@ class ExtensionManager(
     private val trustExtension: TrustExtension,
     private val securityPreferences: SecurityPreferences,
     private val extensionLoader: ExtensionLoader,
+    private val api: ExtensionApi,
 ) {
 
     val scope = CoroutineScope(SupervisorJob())
 
     private val _isInitialized = MutableStateFlow(false)
     val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
-
-    /**
-     * API where all the available extensions can be found.
-     */
-    private val api = ExtensionApi()
 
     /**
      * The installer which installs, updates and uninstalls the extensions.

@@ -198,7 +198,7 @@ val koinDomainModule = module {
     single<UpdatesRepository> { UpdatesRepositoryImpl(get()) }
     factory { GetUpdates(get()) }
 
-    single<SourceRepository> { SourceRepositoryImpl(get(), get()) }
+    single<SourceRepository> { SourceRepositoryImpl(get(), get(), get()) }
     single<StubSourceRepository> { StubSourceRepositoryImpl(get()) }
     factory { GetEnabledSources(get(), get()) }
     factory { GetLanguagesWithSources(get(), get()) }

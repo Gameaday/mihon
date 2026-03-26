@@ -61,7 +61,7 @@ class WebtoonViewer(
     /**
      * Configuration used by this viewer, like allow taps, or crop image borders.
      */
-    val config = WebtoonConfig(scope)
+    val config = WebtoonConfig(scope, readerPreferences)
 
     /**
      * Adapter of the recycler view.

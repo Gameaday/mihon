@@ -1,6 +1,8 @@
 package ephyra.feature.reader.loader
 
+import android.app.Application
 import android.content.Context
+import ephyra.app.data.cache.ChapterCache
 import ephyra.app.data.download.DownloadManager
 import ephyra.app.data.download.DownloadProvider
 import eu.kanade.tachiyomi.source.Source
@@ -18,18 +20,18 @@ import ephyra.domain.source.model.StubSource
 import ephyra.i18n.MR
 import ephyra.source.local.LocalSource
 import ephyra.source.local.io.Format
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 /**
  * Loader used to retrieve the [PageLoader] for a given chapter.
  */
 class ChapterLoader(
-    private val context: Context,
+    private val context: Application,
     private val downloadManager: DownloadManager,
     private val downloadProvider: DownloadProvider,
     private val manga: Manga,
     private val source: Source,
+    private val downloadPreferences: DownloadPreferences,
+    private val chapterCache: ChapterCache,
 ) {
 
     // Computed once and reused for every chapter loaded in this session.
@@ -39,7 +41,7 @@ class ChapterLoader(
      * Unified page pre-processor shared with [HttpPageLoader] so that both immediate
      * (downloaded / local) and incremental (online) filtering use the same pipeline.
      */
-    private val preProcessor by lazy { ReaderPagePreProcessor(Injekt.get<DownloadPreferences>()) }
+    private val preProcessor by lazy { ReaderPagePreProcessor(downloadPreferences) }
 
     /**
      * Assigns the chapter's page loader and loads the its pages. Returns immediately if the chapter
@@ -129,6 +131,7 @@ class ChapterLoader(
                 source,
                 downloadManager,
                 downloadProvider,
+                context,
             )
             source is LocalSource -> source.getFormat(chapter.chapter).let { format ->
                 when (format) {
@@ -140,6 +143,7 @@ class ChapterLoader(
             source is HttpSource -> HttpPageLoader(
                 chapter,
                 source,
+                chapterCache = chapterCache,
                 performanceTier = performanceTier,
                 isPreloadOnly = isPreloadOnly,
                 preProcessor = preProcessor,

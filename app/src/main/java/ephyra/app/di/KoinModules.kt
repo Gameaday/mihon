@@ -1,8 +1,8 @@
 package ephyra.app.di
 
 import ephyra.feature.migration.list.MigrationListScreenModel
-import ephyra.app.ui.category.CategoryScreenModel
-import ephyra.app.ui.reader.ReaderViewModel
+import ephyra.feature.category.CategoryScreenModel
+import ephyra.feature.reader.ReaderViewModel
 import ephyra.app.ui.deeplink.DeepLinkScreenModel
 import ephyra.presentation.more.settings.screen.browse.ExtensionReposScreenModel
 import ephyra.presentation.more.settings.screen.advanced.ClearDatabaseScreenModel
@@ -10,6 +10,11 @@ import ephyra.feature.upcoming.UpcomingScreenModel
 import ephyra.feature.migration.config.MigrationConfigScreen
 import ephyra.presentation.more.settings.screen.debug.WorkerInfoScreen
 import ephyra.feature.migration.dialog.MigrateDialogScreenModel
+import ephyra.presentation.more.settings.screen.about.AboutScreenModel
+import ephyra.presentation.more.settings.screen.SettingsDownloadScreenModel
+import ephyra.presentation.more.settings.screen.SettingsDataScreenModel
+import ephyra.presentation.more.settings.screen.SettingsBrowseScreenModel
+import ephyra.presentation.more.settings.screen.SettingsLibraryScreenModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -95,7 +100,7 @@ val koinAppModule_UI = module {
     }
 
     factory { MigrationConfigScreen.ScreenModel(get(), get()) }
-
+    factory { UpcomingScreenModel(get()) }
     factory { WorkerInfoScreen.Model(androidContext(), get()) }
 
     factory { 
@@ -106,4 +111,15 @@ val koinAppModule_UI = module {
             migrateManga = get()
         )
     }
+
+    factory { AboutScreenModel(get(), get()) }
+    factory { SettingsDownloadScreenModel(get(), get(), get(), get(), get()) }
+    factory { SettingsDataScreenModel(get(), get(), get(), get(), get()) }
+    factory { SettingsBrowseScreenModel(get(), get()) }
+    factory { SettingsLibraryScreenModel(get(), get(), get()) }
+    factory { SettingsTrackingScreenModel(get(), get(), get(), get(), get()) }
+    factory { SettingsAppearanceScreenModel(get()) }
+    factory { SettingsReaderScreenModel(get()) }
+    factory { SettingsSecurityScreenModel(get(), get()) }
+    factory { SettingsAdvancedScreenModel(get(), get(), get(), get(), get(), get(), get()) }
 }

@@ -101,13 +101,18 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : BaseActivity() {
 
-    private val libraryPreferences: LibraryPreferences by inject()
-    private val preferences: BasePreferences by inject()
+    private val libraryPreferences: ephyra.domain.library.service.LibraryPreferences by inject()
+    private val preferences: ephyra.domain.base.BasePreferences by inject()
 
-    private val downloadCache: DownloadCache by inject()
-    private val chapterCache: ChapterCache by inject()
+    private val downloadCache: ephyra.app.data.download.DownloadCache by inject()
+    private val chapterCache: ephyra.app.data.cache.ChapterCache by inject()
 
-    private val getIncognitoState: GetIncognitoState by inject()
+    private val getIncognitoState: ephyra.domain.source.interactor.GetIncognitoState by inject()
+    private val uiPreferences: ephyra.domain.ui.UiPreferences by inject()
+    private val privacyPreferences: ephyra.app.core.security.PrivacyPreferences by inject()
+    private val storagePreferences: ephyra.domain.storage.service.StoragePreferences by inject()
+    private val extensionApi: ExtensionApi by inject()
+    private val appUpdateChecker: AppUpdateChecker by inject()
 
     // To be checked by splash screen. If true then splash screen will be removed.
     var ready = false
@@ -133,7 +138,14 @@ class MainActivity : BaseActivity() {
         }
 
         setComposeContent {
-            var didMigration by remember { mutableStateOf<Boolean?>(null) }
+            androidx.compose.runtime.CompositionLocalProvider(
+                ephyra.presentation.util.LocalUiPreferences provides uiPreferences,
+                ephyra.presentation.util.LocalBasePreferences provides preferences,
+                ephyra.presentation.util.LocalPrivacyPreferences provides privacyPreferences,
+                ephyra.presentation.util.LocalLibraryPreferences provides libraryPreferences,
+                ephyra.presentation.util.LocalStoragePreferences provides storagePreferences,
+            ) {
+                var didMigration by remember { mutableStateOf<Boolean?>(null) }
             LaunchedEffect(Unit) {
                 didMigration = Migrator.awaitAndRelease()
             }
@@ -306,7 +318,7 @@ class MainActivity : BaseActivity() {
         LaunchedEffect(Unit) {
             if (updaterEnabled) {
                 try {
-                    val result = AppUpdateChecker().checkForUpdate(context)
+                    val result = appUpdateChecker.checkForUpdate(context)
                     if (result is GetApplicationRelease.Result.NewUpdate) {
                         val updateScreen = NewUpdateScreen(
                             versionName = result.release.version,
@@ -325,7 +337,7 @@ class MainActivity : BaseActivity() {
         // Extensions updates
         LaunchedEffect(Unit) {
             try {
-                ExtensionApi().checkForUpdates(context)
+                extensionApi.checkForUpdates(context)
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e)
             }

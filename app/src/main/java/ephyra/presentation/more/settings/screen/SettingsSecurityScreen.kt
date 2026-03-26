@@ -7,8 +7,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import ephyra.presentation.more.settings.Preference
-import ephyra.app.core.security.PrivacyPreferences
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.domain.security.service.PrivacyPreferences
+import ephyra.domain.security.service.SecurityPreferences
 import ephyra.app.util.system.AuthenticatorUtil.authenticate
 import ephyra.app.util.system.AuthenticatorUtil.isAuthenticationSupported
 import ephyra.app.util.system.telemetryIncluded
@@ -19,7 +19,7 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import cafe.adriel.voyager.koin.koinInject
+import cafe.adriel.voyager.koin.koinScreenModel
 
 object SettingsSecurityScreen : SearchableSettings {
 
@@ -29,8 +29,10 @@ object SettingsSecurityScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val securityPreferences = koinInject<SecurityPreferences>()
-        val privacyPreferences = koinInject<PrivacyPreferences>()
+        val screenModel = koinScreenModel<SettingsSecurityScreenModel>()
+        val securityPreferences = screenModel.securityPreferences
+        val privacyPreferences = screenModel.privacyPreferences
+        
         return buildList(2) {
             add(getSecurityGroup(securityPreferences))
             if (!telemetryIncluded) return@buildList

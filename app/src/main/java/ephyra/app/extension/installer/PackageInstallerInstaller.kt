@@ -17,7 +17,10 @@ import ephyra.app.util.system.getUriSize
 import logcat.LogPriority
 import ephyra.core.common.util.system.logcat
 
-class PackageInstallerInstaller(private val service: Service) : Installer(service) {
+class PackageInstallerInstaller(
+    private val service: Service,
+    extensionManager: ephyra.app.extension.ExtensionManager,
+) : Installer(service, extensionManager) {
 
     private val packageInstaller = service.packageManager.packageInstaller
 

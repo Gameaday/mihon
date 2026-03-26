@@ -45,14 +45,14 @@ class NetworkHelper(
             .addNetworkInterceptor(IgnoreGzipInterceptor())
             .addNetworkInterceptor(BrotliInterceptor)
 
-        if (preferences.verboseLogging().get()) {
+        if (preferences.verboseLogging().getSync()) {
             val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.HEADERS
             }
             builder.addNetworkInterceptor(httpLoggingInterceptor)
         }
 
-        when (preferences.dohProvider().get()) {
+        when (preferences.dohProvider().getSync()) {
             PREF_DOH_CLOUDFLARE -> builder.dohCloudflare()
             PREF_DOH_GOOGLE -> builder.dohGoogle()
             PREF_DOH_ADGUARD -> builder.dohAdGuard()
@@ -84,5 +84,5 @@ class NetworkHelper(
     @Suppress("UNUSED")
     val cloudflareClient: OkHttpClient = client
 
-    fun defaultUserAgentProvider() = preferences.defaultUserAgent().get().trim()
+    fun defaultUserAgentProvider() = preferences.defaultUserAgent().getSync().trim()
 }

@@ -113,6 +113,7 @@ class ReaderViewModel @JvmOverloads constructor(
     private val coverCache: CoverCache,
     private val localCoverManager: LocalCoverManager,
     private val updateManga: UpdateManga,
+    private val chapterCache: ChapterCache,
 ) : ViewModel() {
     private companion object {
         const val FALLBACK_LAST_PAGE_INDEX = Int.MAX_VALUE
@@ -334,7 +335,7 @@ class ReaderViewModel @JvmOverloads constructor(
                     if (chapterId == -1L) chapterId = initialChapterId
 
                     val source = sourceManager.getOrStub(manga.source)
-                    loader = ChapterLoader(app, downloadManager, downloadProvider, manga, source)
+                    loader = ChapterLoader(app, downloadManager, downloadProvider, manga, source, downloadPreferences, chapterCache)
 
                     loadChapter(loader!!, getChapterList().first { chapterId == it.chapter.id })
                     Result.success(true)
@@ -993,7 +994,7 @@ class ReaderViewModel @JvmOverloads constructor(
         if (page?.status != Page.State.Ready) return
         val manga = manga ?: return
 
-        val context = Injekt.get<Application>()
+        val context = app
         val notifier = SaveImageNotifier(context)
         notifier.onClear()
 

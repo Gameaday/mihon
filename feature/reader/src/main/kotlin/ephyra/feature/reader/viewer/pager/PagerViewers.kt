@@ -2,11 +2,16 @@ package ephyra.feature.reader.viewer.pager
 
 import ephyra.feature.reader.ReaderActivity
 import ephyra.app.data.download.DownloadManager
+import ephyra.feature.reader.setting.ReaderPreferences
 
 /**
  * Implementation of a left to right PagerViewer.
  */
-class L2RPagerViewer(activity: ReaderActivity, downloadManager: DownloadManager) : PagerViewer(activity, downloadManager) {
+class L2RPagerViewer(
+    activity: ReaderActivity,
+    downloadManager: DownloadManager,
+    readerPreferences: ReaderPreferences,
+) : PagerViewer(activity, downloadManager, readerPreferences) {
     /**
      * Creates a new left to right pager.
      */
@@ -18,7 +23,11 @@ class L2RPagerViewer(activity: ReaderActivity, downloadManager: DownloadManager)
 /**
  * Implementation of a right to left PagerViewer.
  */
-class R2LPagerViewer(activity: ReaderActivity, downloadManager: DownloadManager) : PagerViewer(activity, downloadManager) {
+class R2LPagerViewer(
+    activity: ReaderActivity,
+    downloadManager: DownloadManager,
+    readerPreferences: ReaderPreferences,
+) : PagerViewer(activity, downloadManager, readerPreferences) {
     /**
      * Creates a new right to left pager.
      */
@@ -44,7 +53,11 @@ class R2LPagerViewer(activity: ReaderActivity, downloadManager: DownloadManager)
 /**
  * Implementation of a vertical (top to bottom) PagerViewer.
  */
-class VerticalPagerViewer(activity: ReaderActivity, downloadManager: DownloadManager) : PagerViewer(activity, downloadManager) {
+class VerticalPagerViewer(
+    activity: ReaderActivity,
+    downloadManager: DownloadManager,
+    readerPreferences: ReaderPreferences,
+) : PagerViewer(activity, downloadManager, readerPreferences) {
     /**
      * Creates a new vertical pager.
      */

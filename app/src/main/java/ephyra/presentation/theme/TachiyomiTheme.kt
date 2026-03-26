@@ -36,7 +36,7 @@ import ephyra.presentation.core.theme.EphyraThemeConfig
 import ephyra.presentation.core.theme.LocalBrandedTheme
 import ephyra.presentation.core.theme.NagareThemeConfig
 import ephyra.presentation.core.theme.toShapes
-import org.koin.compose.koinInject
+import ephyra.presentation.util.LocalUiPreferences
 
 @Composable
 fun TachiyomiTheme(
@@ -44,7 +44,7 @@ fun TachiyomiTheme(
     amoled: Boolean? = null,
     content: @Composable () -> Unit,
 ) {
-    val uiPreferences = koinInject<UiPreferences>()
+    val uiPreferences = LocalUiPreferences.current
     BaseTachiyomiTheme(
         appTheme = appTheme ?: uiPreferences.appTheme().get(),
         isAmoled = amoled ?: uiPreferences.themeDarkAmoled().get(),

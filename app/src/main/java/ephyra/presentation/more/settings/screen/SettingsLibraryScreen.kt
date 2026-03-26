@@ -24,7 +24,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.launch
-import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.interactor.ResetCategoryFlags
 import ephyra.domain.category.model.Category
 import ephyra.domain.library.service.LibraryPreferences
@@ -40,9 +39,7 @@ import ephyra.domain.library.service.LibraryPreferences.Companion.MARK_DUPLICATE
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
-import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinScreenModel
 
 object SettingsLibraryScreen : SearchableSettings {
 
@@ -52,15 +49,19 @@ object SettingsLibraryScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val getCategories = remember { Injekt.get<GetCategories>() }
-        val libraryPreferences = remember { Injekt.get<LibraryPreferences>() }
-        val allCategories by getCategories.subscribe().collectAsState(initial = emptyList())
+        val screenModel = koinScreenModel<SettingsLibraryScreenModel>()
+        val allCategories by screenModel.getCategories().collectAsStateWithLifecycle(initialValue = emptyList())
 
         return listOf(
-            getCategoriesGroup(LocalNavigator.currentOrThrow, allCategories, libraryPreferences),
-            getGlobalUpdateGroup(allCategories, libraryPreferences),
-            getCoverQualityGroup(libraryPreferences),
-            getBehaviorGroup(libraryPreferences),
+            getCategoriesGroup(
+                navigator = LocalNavigator.currentOrThrow,
+                allCategories = allCategories,
+                libraryPreferences = screenModel.libraryPreferences,
+                resetCategoryFlags = screenModel.resetCategoryFlags,
+            ),
+            getGlobalUpdateGroup(allCategories, screenModel.libraryPreferences),
+            getCoverQualityGroup(screenModel.libraryPreferences),
+            getBehaviorGroup(screenModel.libraryPreferences),
         )
     }
 
@@ -69,6 +70,7 @@ object SettingsLibraryScreen : SearchableSettings {
         navigator: Navigator,
         allCategories: List<Category>,
         libraryPreferences: LibraryPreferences,
+        resetCategoryFlags: ResetCategoryFlags,
     ): Preference.PreferenceGroup {
         val scope = rememberCoroutineScope()
         val userCategoriesCount = allCategories.filterNot(Category::isSystemCategory).size
@@ -102,7 +104,7 @@ object SettingsLibraryScreen : SearchableSettings {
                     onValueChanged = {
                         if (!it) {
                             scope.launch {
-                                Injekt.get<ResetCategoryFlags>().await()
+                                resetCategoryFlags.await()
                             }
                         }
                         true

@@ -17,11 +17,9 @@ import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,18 +42,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.MatchUnlinkedJob
-import ephyra.domain.track.interactor.TrackerListImporter
 import ephyra.domain.track.model.AutoTrackState
-import ephyra.domain.track.service.TrackPreferences
 import ephyra.presentation.more.settings.Preference
 import ephyra.app.data.track.EnhancedTracker
 import ephyra.app.data.track.Tracker
-import ephyra.app.data.track.TrackerManager
 import ephyra.app.data.track.anilist.AnilistApi
 import ephyra.app.data.track.bangumi.BangumiApi
 import ephyra.app.data.track.myanimelist.MyAnimeListApi
@@ -68,11 +62,10 @@ import kotlinx.collections.immutable.toPersistentMap
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withUIContext
-import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import cafe.adriel.voyager.koin.koinInject
+import cafe.adriel.voyager.koin.koinScreenModel
 
 object SettingsTrackingScreen : SearchableSettings {
 
@@ -94,11 +87,14 @@ object SettingsTrackingScreen : SearchableSettings {
     @Composable
     override fun getPreferences(): List<Preference> {
         val context = LocalContext.current
-        val trackPreferences = koinInject<TrackPreferences>()
-        val trackerManager = koinInject<TrackerManager>()
-        val sourceManager = koinInject<SourceManager>()
-        val libraryPreferences = koinInject<ephyra.domain.library.service.LibraryPreferences>()
-        val trackerListImporter = koinInject<TrackerListImporter>()
+        val screenModel = koinScreenModel<SettingsTrackingScreenModel>()
+        
+        val trackPreferences = screenModel.trackPreferences
+        val trackerManager = screenModel.trackerManager
+        val sourceManager = screenModel.sourceManager
+        val libraryPreferences = screenModel.libraryPreferences
+        val trackerListImporter = screenModel.trackerListImporter
+        
         val scope = rememberCoroutineScope()
 
         var dialog by remember { mutableStateOf<Any?>(null) }
@@ -753,9 +749,9 @@ object SettingsTrackingScreen : SearchableSettings {
                                 Icon(
                                     imageVector = if (hidePassword) {
                                         Icons.Filled.Visibility
-                                    } else {
+                                      } else {
                                         Icons.Filled.VisibilityOff
-                                    },
+                                      },
                                     contentDescription = null,
                                 )
                             }
@@ -799,332 +795,4 @@ object SettingsTrackingScreen : SearchableSettings {
             },
         )
     }
-
-    private suspend fun checkLogin(
-        context: Context,
-        tracker: Tracker,
-        username: String,
-        password: String,
-    ): Boolean {
-        return try {
-            tracker.login(username, password)
-            withUIContext { context.toast(MR.strings.login_success) }
-            true
-        } catch (e: Throwable) {
-            tracker.logout()
-            withUIContext { context.toast(e.message.toString()) }
-            false
-        }
-    }
-
-    @Composable
-    private fun JellyfinLoginDialog(
-        tracker: Tracker,
-        onDismissRequest: () -> Unit,
-    ) {
-        val context = LocalContext.current
-        val scope = rememberCoroutineScope()
-        val jellyfin = tracker as ephyra.app.data.track.jellyfin.Jellyfin
-        val jfTrackPreferences = remember { Injekt.get<ephyra.domain.track.service.TrackPreferences>() }
-
-        var serverUrl by remember { mutableStateOf(TextFieldValue(jellyfin.getServerUrl())) }
-        var jellyfinUsername by remember { mutableStateOf(TextFieldValue(jfTrackPreferences.jellyfinUsername().get())) }
-        var jellyfinPassword by remember { mutableStateOf(TextFieldValue()) }
-        var processing by remember { mutableStateOf(false) }
-        var inputError by remember { mutableStateOf(false) }
-
-        AlertDialog(
-            onDismissRequest = onDismissRequest,
-            title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(MR.strings.login_title, tracker.name),
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = onDismissRequest) {
-                        Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = stringResource(MR.strings.action_close),
-                        )
-                    }
-                }
-            },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = serverUrl,
-                        onValueChange = { serverUrl = it },
-                        label = { Text(text = stringResource(MR.strings.jellyfin_server_url)) },
-                        placeholder = { Text(text = "http://192.168.1.100:8096") },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Uri,
-                            imeAction = ImeAction.Next,
-                        ),
-                        singleLine = true,
-                        isError = inputError && !processing,
-                    )
-
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = jellyfinUsername,
-                        onValueChange = { jellyfinUsername = it },
-                        label = { Text(text = stringResource(MR.strings.jellyfin_username)) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next,
-                        ),
-                        singleLine = true,
-                        isError = inputError && !processing,
-                    )
-
-                    var hidePassword by remember { mutableStateOf(true) }
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = jellyfinPassword,
-                        onValueChange = { jellyfinPassword = it },
-                        label = { Text(text = stringResource(MR.strings.jellyfin_password)) },
-                        trailingIcon = {
-                            IconButton(onClick = { hidePassword = !hidePassword }) {
-                                Icon(
-                                    imageVector = if (hidePassword) {
-                                        Icons.Filled.Visibility
-                                    } else {
-                                        Icons.Filled.VisibilityOff
-                                    },
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                        visualTransformation = if (hidePassword) {
-                            PasswordVisualTransformation()
-                        } else {
-                            VisualTransformation.None
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done,
-                        ),
-                        singleLine = true,
-                        isError = inputError && !processing,
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !processing &&
-                        serverUrl.text.isNotBlank() &&
-                        jellyfinUsername.text.isNotBlank(),
-                    onClick = {
-                        scope.launchIO {
-                            processing = true
-                            val result = try {
-                                jellyfin.loginWithCredentials(
-                                    serverUrl = serverUrl.text,
-                                    jellyfinUser = jellyfinUsername.text,
-                                    jellyfinPassword = jellyfinPassword.text,
-                                )
-                                withUIContext { context.toast(MR.strings.login_success) }
-                                true
-                            } catch (e: Throwable) {
-                                jellyfin.logout()
-                                withUIContext { context.toast(e.message.toString()) }
-                                false
-                            }
-                            inputError = !result
-                            if (result) onDismissRequest()
-                            processing = false
-                        }
-                    },
-                ) {
-                    val id = if (processing) MR.strings.logging_in else MR.strings.login
-                    Text(text = stringResource(id))
-                }
-            },
-        )
-    }
-
-    @Composable
-    private fun JellyfinUpdateServerUrlDialog(
-        jellyfin: ephyra.app.data.track.jellyfin.Jellyfin,
-        onDismissRequest: () -> Unit,
-    ) {
-        val context = LocalContext.current
-        val scope = rememberCoroutineScope()
-
-        var newServerUrl by remember { mutableStateOf(TextFieldValue(jellyfin.getServerUrl())) }
-        var processing by remember { mutableStateOf(false) }
-        var inputError by remember { mutableStateOf(false) }
-
-        AlertDialog(
-            onDismissRequest = onDismissRequest,
-            title = {
-                Text(text = stringResource(MR.strings.jellyfin_update_server_url))
-            },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(text = stringResource(MR.strings.jellyfin_update_server_url_summary))
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = newServerUrl,
-                        onValueChange = { newServerUrl = it },
-                        label = { Text(text = stringResource(MR.strings.jellyfin_server_url)) },
-                        placeholder = { Text(text = "http://192.168.1.100:8096") },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Uri,
-                            imeAction = ImeAction.Done,
-                        ),
-                        singleLine = true,
-                        isError = inputError && !processing,
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !processing && newServerUrl.text.isNotBlank(),
-                    onClick = {
-                        scope.launchIO {
-                            processing = true
-                            try {
-                                jellyfin.updateServerUrl(newServerUrl.text)
-                                withUIContext {
-                                    context.toast(MR.strings.jellyfin_server_updated)
-                                }
-                                onDismissRequest()
-                            } catch (e: IllegalStateException) {
-                                inputError = true
-                                withUIContext {
-                                    context.toast(MR.strings.jellyfin_server_mismatch)
-                                }
-                            } catch (e: Exception) {
-                                inputError = true
-                                withUIContext {
-                                    context.toast(MR.strings.jellyfin_test_failed)
-                                }
-                            }
-                            processing = false
-                        }
-                    },
-                ) {
-                    val id = if (processing) MR.strings.logging_in else MR.strings.login
-                    Text(text = stringResource(id))
-                }
-            },
-        )
-    }
-
-    @Composable
-    private fun TrackingLogoutDialog(
-        tracker: Tracker,
-        onDismissRequest: () -> Unit,
-    ) {
-        val context = LocalContext.current
-        AlertDialog(
-            onDismissRequest = onDismissRequest,
-            title = {
-                Text(
-                    text = stringResource(MR.strings.logout_title, tracker.name),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-            confirmButton = {
-                Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall)) {
-                    OutlinedButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = onDismissRequest,
-                    ) {
-                        Text(text = stringResource(MR.strings.action_cancel))
-                    }
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            tracker.logout()
-                            onDismissRequest()
-                            context.toast(MR.strings.logout_success)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError,
-                        ),
-                    ) {
-                        Text(text = stringResource(MR.strings.logout))
-                    }
-                }
-            },
-        )
-    }
-
-    @Composable
-    private fun TrackingImportConfirmDialog(
-        trackerName: String,
-        onConfirm: () -> Unit,
-        onDismissRequest: () -> Unit,
-    ) {
-        AlertDialog(
-            onDismissRequest = onDismissRequest,
-            title = {
-                Text(
-                    text = stringResource(MR.strings.tracker_import_title, trackerName),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(MR.strings.tracker_import_confirm_body, trackerName),
-                )
-            },
-            confirmButton = {
-                Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall)) {
-                    OutlinedButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = onDismissRequest,
-                    ) {
-                        Text(text = stringResource(MR.strings.action_cancel))
-                    }
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = onConfirm,
-                    ) {
-                        Text(text = stringResource(MR.strings.action_import))
-                    }
-                }
-            },
-        )
-    }
-}
-
-private data class LoginDialog(
-    val tracker: Tracker,
-    val uNameStringRes: StringResource,
-)
-
-private data class LogoutDialog(
-    val tracker: Tracker,
-)
-
-private data class ImportConfirmDialog(
-    val trackerName: String,
-)
-
-private data class JellyfinLogin(
-    val tracker: Tracker,
-)
-
-/** Returns a localized label for a [LockedField] constant. */
-@Composable
-@ReadOnlyComposable
-private fun lockedFieldLabel(field: Long): String = when (field) {
-    ephyra.domain.manga.model.LockedField.TITLE -> stringResource(MR.strings.locked_field_title)
-    ephyra.domain.manga.model.LockedField.DESCRIPTION -> stringResource(MR.strings.locked_field_description)
-    ephyra.domain.manga.model.LockedField.AUTHOR -> stringResource(MR.strings.locked_field_author)
-    ephyra.domain.manga.model.LockedField.ARTIST -> stringResource(MR.strings.locked_field_artist)
-    ephyra.domain.manga.model.LockedField.COVER -> stringResource(MR.strings.locked_field_cover)
-    ephyra.domain.manga.model.LockedField.STATUS -> stringResource(MR.strings.locked_field_status)
-    ephyra.domain.manga.model.LockedField.CONTENT_TYPE -> stringResource(MR.strings.locked_field_content_type)
-    ephyra.domain.manga.model.LockedField.GENRE -> stringResource(MR.strings.locked_field_genre)
-    else -> ""
 }

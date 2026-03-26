@@ -75,8 +75,7 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.TextButton
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinScreenModel
 
 object SettingsDataScreen : SearchableSettings {
 
@@ -100,16 +99,18 @@ object SettingsDataScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val backupPreferences = remember { Injekt.get<BackupPreferences>() }
-        val storagePreferences = remember { Injekt.get<StoragePreferences>() }
+        val screenModel = koinScreenModel<SettingsDataScreenModel>()
 
         return persistentListOf(
-            getStorageLocationPref(storagePreferences = storagePreferences),
+            getStorageLocationPref(storagePreferences = screenModel.storagePreferences),
             Preference.PreferenceItem.InfoPreference(stringResource(MR.strings.pref_storage_location_info)),
 
-            getBackupAndRestoreGroup(backupPreferences = backupPreferences),
-            getDataGroup(),
-            getExportGroup(),
+            getBackupAndRestoreGroup(backupPreferences = screenModel.backupPreferences),
+            getDataGroup(
+                libraryPreferences = screenModel.libraryPreferences,
+                chapterCache = screenModel.chapterCache,
+            ),
+            getExportGroup(getFavorites = screenModel.getFavorites),
         )
     }
 
@@ -278,12 +279,13 @@ object SettingsDataScreen : SearchableSettings {
     }
 
     @Composable
-    private fun getDataGroup(): Preference.PreferenceGroup {
+    private fun getDataGroup(
+        libraryPreferences: LibraryPreferences,
+        chapterCache: ChapterCache,
+    ): Preference.PreferenceGroup {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
-        val libraryPreferences = remember { Injekt.get<LibraryPreferences>() }
 
-        val chapterCache = remember { Injekt.get<ChapterCache>() }
         var cacheReadableSizeSema by remember { mutableIntStateOf(0) }
         var cacheReadableSize by remember { mutableStateOf(context.stringResource(MR.strings.calculating)) }
         LaunchedEffect(cacheReadableSizeSema) {
@@ -332,7 +334,7 @@ object SettingsDataScreen : SearchableSettings {
     }
 
     @Composable
-    private fun getExportGroup(): Preference.PreferenceGroup {
+    private fun getExportGroup(getFavorites: GetFavorites): Preference.PreferenceGroup {
         var showDialog by remember { mutableStateOf(false) }
         var exportOptions by remember {
             mutableStateOf(
@@ -346,7 +348,6 @@ object SettingsDataScreen : SearchableSettings {
 
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
-        val getFavorites = remember { Injekt.get<GetFavorites>() }
         var favorites by remember { mutableStateOf<List<Manga>>(emptyList()) }
         LaunchedEffect(Unit) {
             favorites = getFavorites.await()

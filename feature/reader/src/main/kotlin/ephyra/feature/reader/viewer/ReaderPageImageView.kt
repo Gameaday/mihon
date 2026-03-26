@@ -39,8 +39,7 @@ import ephyra.app.util.system.animatorDurationScale
 import ephyra.app.util.view.isVisibleOnScreen
 import okio.BufferedSource
 import ephyra.core.common.util.system.ImageUtil
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.android.ext.android.getKoin
 
 /**
  * A wrapper view for showing page image.
@@ -58,7 +57,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttrs, defStyleRes) {
 
     private val alwaysDecodeLongStripWithSSIV by lazy {
-        Injekt.get<BasePreferences>().alwaysDecodeLongStripWithSSIV().get()
+        context.getKoin().get<BasePreferences>().alwaysDecodeLongStripWithSSIV().get()
     }
 
     private var pageView: View? = null

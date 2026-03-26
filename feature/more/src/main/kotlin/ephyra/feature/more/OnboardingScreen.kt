@@ -14,8 +14,7 @@ import ephyra.presentation.util.Screen
 import ephyra.app.ui.setting.SettingsScreen
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.compose.koinInject
 
 class OnboardingScreen : Screen() {
 
@@ -23,7 +22,7 @@ class OnboardingScreen : Screen() {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val basePreferences = remember { Injekt.get<BasePreferences>() }
+        val basePreferences = koinInject<BasePreferences>()
         val shownOnboardingFlow by basePreferences.shownOnboardingFlow().collectAsState()
 
         val finishOnboarding: () -> Unit = {

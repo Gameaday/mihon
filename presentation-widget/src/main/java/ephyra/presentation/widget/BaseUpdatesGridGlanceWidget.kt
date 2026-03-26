@@ -43,16 +43,16 @@ import ephyra.presentation.widget.components.LockedWidget
 import ephyra.presentation.widget.components.UpdatesWidget
 import ephyra.presentation.widget.util.appWidgetBackgroundRadius
 import ephyra.presentation.widget.util.calculateRowAndColumnCount
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.time.Instant
 import java.time.ZonedDateTime
 
-abstract class BaseUpdatesGridGlanceWidget(
-    private val context: Context = Injekt.get<Application>(),
-    private val getUpdates: GetUpdates = Injekt.get(),
-    private val preferences: SecurityPreferences = Injekt.get(),
-) : GlanceAppWidget() {
+abstract class BaseUpdatesGridGlanceWidget : GlanceAppWidget(), KoinComponent {
+
+    private val context: Context by inject<Application>()
+    private val getUpdates: GetUpdates by inject()
+    private val preferences: SecurityPreferences by inject()
 
     override val sizeMode = SizeMode.Exact
 

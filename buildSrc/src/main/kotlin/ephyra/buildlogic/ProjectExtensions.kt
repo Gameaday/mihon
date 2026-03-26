@@ -75,15 +75,15 @@ internal fun Project.configureCompose(commonExtension: CommonExtension<*, *, *, 
         val enableMetrics = project.providers.gradleProperty("enableComposeCompilerMetrics").orNull.toBoolean()
         val enableReports = project.providers.gradleProperty("enableComposeCompilerReports").orNull.toBoolean()
 
-        val rootBuildDir = rootProject.layout.buildDirectory.asFile.get()
+        val rootBuildDir = rootProject.layout.buildDirectory
         val relativePath = projectDir.relativeTo(rootDir)
 
         if (enableMetrics) {
-            rootBuildDir.resolve("compose-metrics").resolve(relativePath).let(metricsDestination::set)
+            metricsDestination.set(rootBuildDir.dir("compose-metrics").map { it.dir(relativePath.path) })
         }
 
         if (enableReports) {
-            rootBuildDir.resolve("compose-reports").resolve(relativePath).let(reportsDestination::set)
+            reportsDestination.set(rootBuildDir.dir("compose-reports").map { it.dir(relativePath.path) })
         }
 
         // Mark common immutable types as stable to reduce compilation work

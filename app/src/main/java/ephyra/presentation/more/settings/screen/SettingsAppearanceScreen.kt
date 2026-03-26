@@ -24,7 +24,7 @@ import kotlinx.collections.immutable.toImmutableMap
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import org.koin.compose.koinInject
+import cafe.adriel.voyager.koin.koinScreenModel
 import java.time.LocalDate
 
 object SettingsAppearanceScreen : SearchableSettings {
@@ -35,7 +35,8 @@ object SettingsAppearanceScreen : SearchableSettings {
 
     @Composable
     override fun getPreferences(): List<Preference> {
-        val uiPreferences = koinInject<UiPreferences>()
+        val screenModel = koinScreenModel<SettingsAppearanceScreenModel>()
+        val uiPreferences = screenModel.uiPreferences
 
         return listOf(
             getThemeGroup(uiPreferences = uiPreferences),

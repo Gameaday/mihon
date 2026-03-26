@@ -25,7 +25,10 @@ import rikka.shizuku.Shizuku
 import ephyra.core.common.util.system.logcat
 import ephyra.i18n.MR
 
-class ShizukuInstaller(private val service: Service) : Installer(service) {
+class ShizukuInstaller(
+    private val service: Service,
+    extensionManager: ephyra.app.extension.ExtensionManager,
+) : Installer(service, extensionManager) {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

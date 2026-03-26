@@ -22,8 +22,6 @@ import logcat.LogPriority
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.io.IOException
 import java.util.concurrent.PriorityBlockingQueue
 import kotlin.concurrent.atomics.AtomicBoolean
@@ -38,7 +36,7 @@ import kotlin.math.min
 internal class HttpPageLoader(
     private val chapter: ReaderChapter,
     private val source: HttpSource,
-    private val chapterCache: ChapterCache = Injekt.get(),
+    private val chapterCache: ChapterCache,
     /**
      * Device performance tier used to scale preload window sizes and worker concurrency.
      * Defaults to [DeviceUtil.PerformanceTier.MEDIUM] so that the loader is safe to instantiate

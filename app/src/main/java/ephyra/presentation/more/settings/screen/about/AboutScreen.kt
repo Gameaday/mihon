@@ -29,20 +29,15 @@ import ephyra.presentation.more.settings.widget.TextPreferenceWidget
 import ephyra.presentation.util.LocalBackPress
 import ephyra.presentation.util.Screen
 import ephyra.app.BuildConfig
-import ephyra.app.data.updater.AppUpdateChecker
+import cafe.adriel.voyager.koin.koinScreenModel
 import ephyra.app.data.updater.RELEASE_URL
 import ephyra.app.ui.more.NewUpdateScreen
 import ephyra.app.util.CrashLogUtil
-import ephyra.app.util.lang.toDateTimestampString
 import ephyra.app.util.system.copyToClipboard
-import ephyra.app.util.system.isNightlyBuildType
-import ephyra.app.util.system.isPreviewBuildType
 import ephyra.app.util.system.toast
 import ephyra.app.util.system.updaterEnabled
-import kotlinx.coroutines.launch
 import logcat.LogPriority
-import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.lang.withUIContext
+import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.release.interactor.GetApplicationRelease
 import ephyra.i18n.MR
@@ -53,22 +48,39 @@ import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.icons.CustomIcons
 import ephyra.presentation.core.icons.Discord
 import ephyra.presentation.core.icons.Github
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
+import kotlinx.coroutines.flow.collectLatest
 
 object AboutScreen : Screen() {
 
     @Composable
     override fun Content() {
-        val scope = rememberCoroutineScope()
+        val screenModel = koinScreenModel<AboutScreenModel>()
+        val state by screenModel.state.collectAsState()
+
         val context = LocalContext.current
         val uriHandler = LocalUriHandler.current
         val handleBack = LocalBackPress.current
         val navigator = LocalNavigator.currentOrThrow
-        var isCheckingUpdates by remember { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            screenModel.events.collectLatest { event ->
+                when (event) {
+                    is AboutEvent.NewUpdate -> {
+                        val updateScreen = NewUpdateScreen(
+                            versionName = event.result.release.version,
+                            changelogInfo = event.result.release.info,
+                            releaseLink = event.result.release.releaseLink,
+                            downloadLink = event.result.release.downloadLink,
+                        )
+                        navigator.push(updateScreen)
+                    }
+                    is AboutEvent.UpdateError -> {
+                        context.toast(event.error.message)
+                        logcat(LogPriority.ERROR, event.error)
+                    }
+                }
+            }
+        }
 
         Scaffold(
             topBar = { scrollBehavior ->
@@ -89,7 +101,7 @@ object AboutScreen : Screen() {
                 item {
                     TextPreferenceWidget(
                         title = stringResource(MR.strings.version),
-                        subtitle = getVersionName(withBuildDate = true),
+                        subtitle = screenModel.getVersionName(withBuildDate = true),
                         onPreferenceClick = {
                             val deviceInfo = CrashLogUtil(context).getDebugInfo()
                             context.copyToClipboard("Debug information", deviceInfo)
@@ -102,36 +114,14 @@ object AboutScreen : Screen() {
                         TextPreferenceWidget(
                             title = stringResource(MR.strings.check_for_updates),
                             widget = {
-                                AnimatedVisibility(visible = isCheckingUpdates) {
+                                AnimatedVisibility(visible = state.isCheckingUpdates) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(28.dp),
                                         strokeWidth = 3.dp,
                                     )
                                 }
                             },
-                            onPreferenceClick = {
-                                if (!isCheckingUpdates) {
-                                    scope.launch {
-                                        isCheckingUpdates = true
-
-                                        checkVersion(
-                                            context = context,
-                                            onAvailableUpdate = { result ->
-                                                val updateScreen = NewUpdateScreen(
-                                                    versionName = result.release.version,
-                                                    changelogInfo = result.release.info,
-                                                    releaseLink = result.release.releaseLink,
-                                                    downloadLink = result.release.downloadLink,
-                                                )
-                                                navigator.push(updateScreen)
-                                            },
-                                            onFinish = {
-                                                isCheckingUpdates = false
-                                            },
-                                        )
-                                    }
-                                }
-                            },
+                            onPreferenceClick = { screenModel.checkVersion(context) },
                         )
                     }
                 }
@@ -186,94 +176,6 @@ object AboutScreen : Screen() {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Checks version and shows a user prompt if an update is available.
-     */
-    private suspend fun checkVersion(
-        context: Context,
-        onAvailableUpdate: (GetApplicationRelease.Result.NewUpdate) -> Unit,
-        onFinish: () -> Unit,
-    ) {
-        val updateChecker = AppUpdateChecker()
-        withUIContext {
-            try {
-                when (val result = withIOContext { updateChecker.checkForUpdate(context, forceCheck = true) }) {
-                    is GetApplicationRelease.Result.NewUpdate -> {
-                        onAvailableUpdate(result)
-                    }
-                    is GetApplicationRelease.Result.NoNewUpdate -> {
-                        context.toast(MR.strings.update_check_no_new_updates)
-                    }
-                    is GetApplicationRelease.Result.OsTooOld -> {
-                        context.toast(MR.strings.update_check_eol)
-                    }
-                }
-            } catch (e: Exception) {
-                context.toast(e.message)
-                logcat(LogPriority.ERROR, e)
-            } finally {
-                onFinish()
-            }
-        }
-    }
-
-    fun getVersionName(withBuildDate: Boolean): String {
-        return when {
-            BuildConfig.DEBUG -> {
-                "Debug ${BuildConfig.COMMIT_SHA}".let {
-                    if (withBuildDate) {
-                        "$it (${getFormattedBuildTime()})"
-                    } else {
-                        it
-                    }
-                }
-            }
-            isPreviewBuildType -> {
-                "Beta r${BuildConfig.COMMIT_COUNT}".let {
-                    if (withBuildDate) {
-                        "$it (${BuildConfig.COMMIT_SHA}, ${getFormattedBuildTime()})"
-                    } else {
-                        "$it (${BuildConfig.COMMIT_SHA})"
-                    }
-                }
-            }
-            isNightlyBuildType -> {
-                "Ephyra ${BuildConfig.VERSION_NAME}".let {
-                    if (withBuildDate) {
-                        "$it (${BuildConfig.COMMIT_SHA}, ${getFormattedBuildTime()})"
-                    } else {
-                        "$it (${BuildConfig.COMMIT_SHA})"
-                    }
-                }
-            }
-            else -> {
-                "Stable ${BuildConfig.VERSION_NAME}".let {
-                    if (withBuildDate) {
-                        "$it (${getFormattedBuildTime()})"
-                    } else {
-                        it
-                    }
-                }
-            }
-        }
-    }
-
-    internal fun getFormattedBuildTime(): String {
-        return try {
-            LocalDateTime.ofInstant(
-                Instant.parse(BuildConfig.BUILD_TIME),
-                ZoneId.systemDefault(),
-            )
-                .toDateTimestampString(
-                    UiPreferences.dateFormat(
-                        Injekt.get<UiPreferences>().dateFormat().get(),
-                    ),
-                )
-        } catch (e: Exception) {
-            BuildConfig.BUILD_TIME
         }
     }
 }

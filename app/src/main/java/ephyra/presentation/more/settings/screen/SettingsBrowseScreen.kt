@@ -19,8 +19,7 @@ import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import cafe.adriel.voyager.koin.koinScreenModel
 
 object SettingsBrowseScreen : SearchableSettings {
 
@@ -33,22 +32,20 @@ object SettingsBrowseScreen : SearchableSettings {
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
 
-        val sourcePreferences = remember { Injekt.get<SourcePreferences>() }
-        val getExtensionRepoCount = remember { Injekt.get<GetExtensionRepoCount>() }
-
-        val reposCount by getExtensionRepoCount.subscribe().collectAsState(0)
+        val screenModel = koinScreenModel<SettingsBrowseScreenModel>()
+        val reposCount by screenModel.getExtensionRepoCount().collectAsStateWithLifecycle(0L)
 
         return listOf(
             Preference.PreferenceGroup(
                 title = stringResource(MR.strings.label_sources),
                 preferenceItems = persistentListOf(
                     Preference.PreferenceItem.SwitchPreference(
-                        preference = sourcePreferences.hideInLibraryItems(),
+                        preference = screenModel.sourcePreferences.hideInLibraryItems(),
                         title = stringResource(MR.strings.pref_hide_in_library_items),
                     ),
                     Preference.PreferenceItem.TextPreference(
                         title = stringResource(MR.strings.label_extension_repos),
-                        subtitle = pluralStringResource(MR.plurals.num_repos, reposCount, reposCount),
+                        subtitle = pluralStringResource(MR.plurals.num_repos, reposCount.toInt(), reposCount.toInt()),
                         onClick = {
                             navigator.push(ExtensionReposScreen())
                         },
@@ -59,7 +56,7 @@ object SettingsBrowseScreen : SearchableSettings {
                 title = stringResource(MR.strings.pref_category_nsfw_content),
                 preferenceItems = persistentListOf(
                     Preference.PreferenceItem.SwitchPreference(
-                        preference = sourcePreferences.showNsfwSource(),
+                        preference = screenModel.sourcePreferences.showNsfwSource(),
                         title = stringResource(MR.strings.pref_show_nsfw_source),
                         subtitle = stringResource(MR.strings.requires_app_restart),
                         onValueChanged = {

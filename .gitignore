@@ -24,4 +24,4 @@ Thumbs.db
 
 # Project IDX
 # .idx/dev.nix (Keep tracked)
-*.py
+*.pytroubleshooting/
