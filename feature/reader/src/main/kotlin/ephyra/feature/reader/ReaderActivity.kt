@@ -58,13 +58,12 @@ import ephyra.presentation.reader.ReadingModeSelectDialog
 import ephyra.presentation.reader.appbars.ReaderAppBars
 import ephyra.presentation.reader.settings.ReaderSettingsDialog
 import ephyra.app.R
+import ephyra.app.R
 import ephyra.app.data.coil.TachiyomiImageDecoder
-import ephyra.app.data.notification.NotificationReceiver
-import ephyra.app.data.notification.Notifications
+import ephyra.core.common.notification.NotificationManager
 import ephyra.app.databinding.ReaderActivityBinding
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.ui.base.activity.BaseActivity
-import ephyra.app.ui.main.MainActivity
+import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.AddToLibraryFirst
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.Error
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.Success
@@ -76,8 +75,8 @@ import ephyra.feature.reader.setting.ReaderPreferences
 import ephyra.feature.reader.setting.ReaderSettingsScreenModel
 import ephyra.feature.reader.setting.ReadingMode
 import ephyra.feature.reader.viewer.ReaderProgressIndicator
-import ephyra.app.ui.webview.WebViewActivity
-import ephyra.app.util.system.isNightMode
+import ephyra.presentation.core.util.Navigator
+import ephyra.presentation.core.util.system.isNightMode
 import ephyra.app.util.system.openInBrowser
 import ephyra.app.util.system.toShareIntent
 import ephyra.app.util.system.toast
@@ -118,6 +117,8 @@ class ReaderActivity : BaseActivity() {
 
     private val readerPreferences: ReaderPreferences by inject()
     private val preferences: BasePreferences by inject()
+    private val navigator: Navigator by inject()
+    private val notificationManager: NotificationManager by inject()
 
     lateinit var binding: ReaderActivityBinding
 
@@ -144,7 +145,6 @@ class ReaderActivity : BaseActivity() {
      * Called when the activity is created. Initializes the presenter and configuration.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        registerSecureActivity(this)
         overrideTransitionCompat(
             OVERRIDE_TRANSITION_OPEN,
             R.anim.shared_axis_x_push_enter,
@@ -168,7 +168,7 @@ class ReaderActivity : BaseActivity() {
                 finish()
                 return
             }
-            NotificationReceiver.dismissNotification(this, manga.hashCode(), Notifications.ID_NEW_CHAPTERS)
+            notificationManager.dismissNewChaptersNotification(manga)
 
             lifecycleScope.launchNonCancellable {
                 val initResult = viewModel.init(manga, chapter)
@@ -548,13 +548,7 @@ class ReaderActivity : BaseActivity() {
 
     private fun openMangaScreen() {
         viewModel.manga?.id?.let { id ->
-            startActivity(
-                Intent(this, MainActivity::class.java).apply {
-                    action = Constants.SHORTCUT_MANGA
-                    putExtra(Constants.MANGA_EXTRA, id)
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                },
-            )
+            navigator.openMangaScreen(this, id)
         }
     }
 
@@ -562,8 +556,7 @@ class ReaderActivity : BaseActivity() {
         val manga = viewModel.manga ?: return
         val source = viewModel.getSource() ?: return
         assistUrl?.let {
-            val intent = WebViewActivity.newIntent(this@ReaderActivity, it, source.id, manga.title)
-            startActivity(intent)
+            navigator.openWebView(this, it, source.id, manga.title)
         }
     }
 
