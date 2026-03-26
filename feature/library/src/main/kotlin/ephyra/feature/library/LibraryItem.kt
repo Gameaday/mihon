@@ -4,16 +4,14 @@ import eu.kanade.tachiyomi.source.getNameForMangaInfo
 import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.source.service.SourceManager
 import ephyra.source.local.LocalSource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
-
 data class LibraryItem(
     val libraryManga: LibraryManga,
     val downloadCount: Long = -1,
     val unreadCount: Long = -1,
     val isLocal: Boolean = false,
     val sourceLanguage: String = "",
-    private val sourceManager: SourceManager = Injekt.get(),
+    val sourceId: Long = 0L,
+    val sourceName: String = "",
 ) {
     val id: Long = libraryManga.id
 
@@ -24,16 +22,14 @@ data class LibraryItem(
      * @return true if the manga matches the query, false otherwise.
      */
     fun matches(constraint: String): Boolean {
-        val source = sourceManager.getOrStub(libraryManga.manga.source)
-        val sourceName by lazy { source.getNameForMangaInfo() }
         if (constraint.startsWith("id:", true)) {
             return id == constraint.substringAfter("id:").toLongOrNull()
         } else if (constraint.startsWith("src:", true)) {
             val querySource = constraint.substringAfter("src:")
             return if (querySource.equals(LOCAL_SOURCE_ID_ALIAS, ignoreCase = true)) {
-                source.id == LocalSource.ID
+                sourceId == LocalSource.ID
             } else {
-                source.id == querySource.toLongOrNull()
+                sourceId == querySource.toLongOrNull()
             }
         }
         return libraryManga.manga.title.contains(constraint, true) ||

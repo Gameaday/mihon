@@ -43,8 +43,6 @@ import ephyra.app.data.saver.ImageSaver
 import ephyra.app.data.cache.CoverCache
 import eu.kanade.tachiyomi.network.NetworkHelper
 import ephyra.domain.library.service.LibraryPreferences
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 @Factory
 class MangaCoverScreenModel(

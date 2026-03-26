@@ -390,6 +390,8 @@ private fun MangaScreenSmallImpl(
                             isStubSource = remember { state.source is StubSource },
                             sourceStatus = state.manga.sourceStatus,
                             metadataSourceName = state.metadataSourceName,
+                            jellyfinServerUrl = state.jellyfinServerUrl,
+                            imagesInDescription = state.imagesInDescription,
                             onCoverClick = onCoverClicked,
                             doSearch = onSearch,
                         )
@@ -437,6 +439,7 @@ private fun MangaScreenSmallImpl(
                             description = state.manga.description,
                             tagsProvider = { state.manga.genre },
                             notes = state.manga.notes,
+                            imagesInDescription = state.imagesInDescription,
                             onTagSearch = onTagSearch,
                             onCopyTagToClipboard = onCopyTagToClipboard,
                             onEditNotes = onEditNotesClicked,
@@ -646,6 +649,8 @@ fun MangaScreenLargeImpl(
                             isStubSource = remember { state.source is StubSource },
                             sourceStatus = state.manga.sourceStatus,
                             metadataSourceName = state.metadataSourceName,
+                            jellyfinServerUrl = state.jellyfinServerUrl,
+                            imagesInDescription = state.imagesInDescription,
                             onCoverClick = onCoverClicked,
                             doSearch = onSearch,
                         )
@@ -675,6 +680,7 @@ fun MangaScreenLargeImpl(
                             description = state.manga.description,
                             tagsProvider = { state.manga.genre },
                             notes = state.manga.notes,
+                            imagesInDescription = state.imagesInDescription,
                             onTagSearch = onTagSearch,
                             onCopyTagToClipboard = onCopyTagToClipboard,
                             onEditNotes = onEditNotesClicked,

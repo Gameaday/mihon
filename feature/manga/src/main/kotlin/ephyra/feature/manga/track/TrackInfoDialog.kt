@@ -1,5 +1,9 @@
 package ephyra.app.ui.manga.track
 
+import org.koin.compose.koinInject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
 import android.app.Application
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
@@ -81,8 +85,7 @@ import ephyra.presentation.core.components.LabeledCheckbox
 import ephyra.presentation.core.components.material.AlertDialogContent
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -98,9 +101,21 @@ data class TrackInfoDialogHomeScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
-        val screenModel = rememberScreenModel { Model(mangaId, sourceId) }
 
-        val dateFormat = remember { UiPreferences.dateFormat(Injekt.get<UiPreferences>().dateFormat().get()) }
+        val getTracks = koinInject<GetTracks>()
+        val trackerManager = koinInject<TrackerManager>()
+        val sourceManager = koinInject<SourceManager>()
+        val getManga = koinInject<GetManga>()
+        val refreshTracks = koinInject<RefreshTracks>()
+        val application = koinInject<Application>()
+        val deleteTrack = koinInject<DeleteTrack>()
+
+        val screenModel = rememberScreenModel {
+            Model(mangaId, sourceId, getTracks, trackerManager, sourceManager, getManga, refreshTracks, application, deleteTrack)
+        }
+
+        val uiPreferences = koinInject<UiPreferences>()
+        val dateFormat = remember { UiPreferences.dateFormat(uiPreferences.dateFormat().get()) }
         val state by screenModel.state.collectAsStateWithLifecycle()
 
         TrackInfoDialogHome(
@@ -198,7 +213,13 @@ data class TrackInfoDialogHomeScreen(
     private class Model(
         private val mangaId: Long,
         private val sourceId: Long,
-        private val getTracks: GetTracks = Injekt.get(),
+        private val getTracks: GetTracks,
+        private val trackerManager: TrackerManager,
+        private val sourceManager: SourceManager,
+        private val getManga: GetManga,
+        private val refreshTracks: RefreshTracks,
+        private val application: Application,
+        private val deleteTrack: DeleteTrack,
     ) : StateScreenModel<Model.State>(State()) {
 
         init {
@@ -218,19 +239,18 @@ data class TrackInfoDialogHomeScreen(
         fun registerEnhancedTracking(item: TrackItem) {
             item.tracker as EnhancedTracker
             screenModelScope.launchNonCancellable {
-                val manga = Injekt.get<GetManga>().await(mangaId) ?: return@launchNonCancellable
+                val manga = getManga.await(mangaId) ?: return@launchNonCancellable
                 try {
                     val matchResult = item.tracker.match(manga) ?: throw Exception()
                     item.tracker.register(matchResult, mangaId)
                 } catch (_: Exception) {
-                    withUIContext { Injekt.get<Application>().toast(MR.strings.error_no_match) }
+                    withUIContext { application.toast(MR.strings.error_no_match) }
                 }
             }
         }
 
         private suspend fun refreshTrackers() {
-            val refreshTracks = Injekt.get<RefreshTracks>()
-            val context = Injekt.get<Application>()
+            val context = application
 
             refreshTracks.await(mangaId)
                 .filter { it.first != null }
@@ -257,9 +277,8 @@ data class TrackInfoDialogHomeScreen(
         }
 
         private fun List<Track>.mapToTrackItem(): List<TrackItem> {
-            val trackerManager = Injekt.get<TrackerManager>()
             val loggedInTrackers = trackerManager.loggedInTrackers()
-            val source = Injekt.get<SourceManager>().getOrStub(sourceId)
+            val source = sourceManager.getOrStub(sourceId)
             // Include Jellyfin even when not logged in so users can discover it
             val jellyfin = trackerManager.jellyfin
             val visibleTrackers = if (jellyfin.isLoggedIn) {
@@ -289,10 +308,11 @@ private data class TrackStatusSelectorScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val trackerManager = koinInject<TrackerManager>()
         val screenModel = rememberScreenModel {
             Model(
                 track = track,
-                tracker = Injekt.get<TrackerManager>().get(serviceId)!!,
+                tracker = trackerManager.get(serviceId)!!,
             )
         }
         val state by screenModel.state.collectAsStateWithLifecycle()
@@ -342,10 +362,11 @@ private data class TrackChapterSelectorScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val trackerManager = koinInject<TrackerManager>()
         val screenModel = rememberScreenModel {
             Model(
                 track = track,
-                tracker = Injekt.get<TrackerManager>().get(serviceId)!!,
+                tracker = trackerManager.get(serviceId)!!,
             )
         }
         val state by screenModel.state.collectAsStateWithLifecycle()
@@ -401,10 +422,11 @@ private data class TrackScoreSelectorScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val trackerManager = koinInject<TrackerManager>()
         val screenModel = rememberScreenModel {
             Model(
                 track = track,
-                tracker = Injekt.get<TrackerManager>().get(serviceId)!!,
+                tracker = trackerManager.get(serviceId)!!,
             )
         }
         val state by screenModel.state.collectAsStateWithLifecycle()
@@ -503,10 +525,11 @@ private data class TrackDateSelectorScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val trackerManager = koinInject<TrackerManager>()
         val screenModel = rememberScreenModel {
             Model(
                 track = track,
-                tracker = Injekt.get<TrackerManager>().get(serviceId)!!,
+                tracker = trackerManager.get(serviceId)!!,
                 start = start,
             )
         }
@@ -576,10 +599,11 @@ private data class TrackDateRemoverScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val trackerManager = koinInject<TrackerManager>()
         val screenModel = rememberScreenModel {
             Model(
                 track = track,
-                tracker = Injekt.get<TrackerManager>().get(serviceId)!!,
+                tracker = trackerManager.get(serviceId)!!,
                 start = start,
             )
         }
@@ -662,12 +686,13 @@ data class TrackerSearchScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val trackerManager = koinInject<TrackerManager>()
         val screenModel = rememberScreenModel {
             Model(
                 mangaId = mangaId,
                 currentUrl = currentUrl,
                 initialQuery = initialQuery,
-                tracker = Injekt.get<TrackerManager>().get(serviceId)!!,
+                tracker = trackerManager.get(serviceId)!!,
             )
         }
 
@@ -754,11 +779,14 @@ private data class TrackerRemoveScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val trackerManager = koinInject<TrackerManager>()
+        val deleteTrack = koinInject<DeleteTrack>()
         val screenModel = rememberScreenModel {
             Model(
                 mangaId = mangaId,
                 track = track,
-                tracker = Injekt.get<TrackerManager>().get(serviceId)!!,
+                tracker = trackerManager.get(serviceId)!!,
+                deleteTrack = deleteTrack,
             )
         }
         val serviceName = screenModel.getName()
@@ -827,7 +855,7 @@ private data class TrackerRemoveScreen(
         private val mangaId: Long,
         private val track: Track,
         private val tracker: Tracker,
-        private val deleteTrack: DeleteTrack = Injekt.get(),
+        private val deleteTrack: DeleteTrack,
     ) : ScreenModel {
 
         fun getName() = tracker.name

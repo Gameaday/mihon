@@ -113,8 +113,6 @@ import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.clickableNoIndication
 import ephyra.presentation.core.util.secondaryItemAlpha
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
@@ -128,6 +126,8 @@ fun MangaInfoBox(
     isStubSource: Boolean,
     sourceStatus: Int,
     metadataSourceName: String?,
+    jellyfinServerUrl: String?,
+    imagesInDescription: Boolean,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -167,6 +167,7 @@ fun MangaInfoBox(
                     isStubSource = isStubSource,
                     sourceStatus = sourceStatus,
                     metadataSourceName = metadataSourceName,
+                    jellyfinServerUrl = jellyfinServerUrl,
                     onCoverClick = onCoverClick,
                     doSearch = doSearch,
                 )
@@ -178,6 +179,7 @@ fun MangaInfoBox(
                     isStubSource = isStubSource,
                     sourceStatus = sourceStatus,
                     metadataSourceName = metadataSourceName,
+                    jellyfinServerUrl = jellyfinServerUrl,
                     onCoverClick = onCoverClick,
                     doSearch = doSearch,
                 )
@@ -275,6 +277,7 @@ fun ExpandableMangaDescription(
     description: String?,
     tagsProvider: () -> List<String>?,
     notes: String,
+    imagesInDescription: Boolean,
     onTagSearch: (String) -> Unit,
     onCopyTagToClipboard: (tag: String) -> Unit,
     onEditNotes: () -> Unit,
@@ -291,6 +294,7 @@ fun ExpandableMangaDescription(
             description = desc,
             expanded = expanded,
             notes = notes,
+            imagesInDescription = imagesInDescription,
             onEditNotesClicked = onEditNotes,
             modifier = Modifier
                 .padding(top = 8.dp)
@@ -373,6 +377,7 @@ private fun MangaAndSourceTitlesLarge(
     isStubSource: Boolean,
     sourceStatus: Int,
     metadataSourceName: String?,
+    jellyfinServerUrl: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
 ) {
@@ -403,6 +408,7 @@ private fun MangaAndSourceTitlesLarge(
             sourceStatus = sourceStatus,
             metadataSourceName = metadataSourceName,
             canonicalId = manga.canonicalId,
+            jellyfinServerUrl = jellyfinServerUrl,
             lockedFields = manga.lockedFields,
             doSearch = doSearch,
             textAlign = TextAlign.Center,
@@ -418,6 +424,7 @@ private fun MangaAndSourceTitlesSmall(
     isStubSource: Boolean,
     sourceStatus: Int,
     metadataSourceName: String?,
+    jellyfinServerUrl: String?,
     onCoverClick: () -> Unit,
     doSearch: (query: String, global: Boolean) -> Unit,
 ) {
@@ -453,6 +460,7 @@ private fun MangaAndSourceTitlesSmall(
                 sourceStatus = sourceStatus,
                 metadataSourceName = metadataSourceName,
                 canonicalId = manga.canonicalId,
+                jellyfinServerUrl = jellyfinServerUrl,
                 lockedFields = manga.lockedFields,
                 doSearch = doSearch,
             )
@@ -471,6 +479,7 @@ private fun ColumnScope.MangaContentInfo(
     sourceStatus: Int,
     metadataSourceName: String?,
     canonicalId: String?,
+    jellyfinServerUrl: String?,
     lockedFields: Long = 0L,
     doSearch: (query: String, global: Boolean) -> Unit,
     textAlign: TextAlign? = LocalTextStyle.current.textAlign,
@@ -667,12 +676,10 @@ private fun ColumnScope.MangaContentInfo(
     if (canonicalId != null) {
         val authorityLabel = remember(canonicalId) { CanonicalId.toLabel(canonicalId) }
         // Build the authority URL — for Jellyfin, resolve the server URL from the tracker
-        val authorityUrl = remember(canonicalId) {
+        val authorityUrl = remember(canonicalId, jellyfinServerUrl) {
             if (canonicalId.startsWith("jf:")) {
-                val trackerManager: TrackerManager = Injekt.get()
                 // Exclude "jellyfin" which is the noop login placeholder credential
-                val serverUrl = trackerManager.jellyfin.getServerUrl()
-                    .takeIf { it.isNotBlank() }
+                val serverUrl = jellyfinServerUrl.takeIf { !it.isNullOrBlank() && it != "jellyfin" }
                 CanonicalId.toUrl(canonicalId, jellyfinServerUrl = serverUrl)
             } else {
                 CanonicalId.toUrl(canonicalId)
@@ -838,8 +845,7 @@ private fun MangaSummary(
     onEditNotesClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val preferences = remember { Injekt.get<UiPreferences>() }
-    val loadImages = remember { preferences.imagesInDescription().get() }
+    val loadImages = imagesInDescription
     val animProgress by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
         label = "summary",

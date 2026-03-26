@@ -108,35 +108,21 @@ class MangaScreenModel(
     @InjectedParam private val mangaId: Long,
     @InjectedParam private val isFromSource: Boolean,
     private val basePreferences: ephyra.domain.base.BasePreferences,
+    private val uiPreferences: ephyra.domain.ui.UiPreferences,
     private val libraryPreferences: LibraryPreferences,
-    private val trackPreferences: TrackPreferences,
     private val readerPreferences: ReaderPreferences,
-    private val trackerManager: TrackerManager,
-    private val trackChapter: TrackChapter,
     private val downloadManager: DownloadManager,
     private val downloadCache: DownloadCache,
-    private val downloadPreferences: DownloadPreferences,
-    private val downloadProvider: DownloadProvider,
     private val getMangaAndChapters: GetMangaWithChapters,
     private val getDuplicateLibraryManga: GetDuplicateLibraryManga,
     private val getAvailableScanlators: GetAvailableScanlators,
     private val getExcludedScanlators: GetExcludedScanlators,
-    private val setExcludedScanlators: SetExcludedScanlators,
-    private val setMangaChapterFlags: SetMangaChapterFlags,
-    private val setMangaDefaultChapterFlags: SetMangaDefaultChapterFlags,
-    private val setReadStatus: SetReadStatus,
-    private val updateChapter: UpdateChapter,
-    private val updateManga: UpdateManga,
-    private val syncChaptersWithSource: SyncChaptersWithSource,
     private val getCategories: GetCategories,
-    private val getTracks: GetTracks,
-    private val addTracks: AddTracks,
-    private val setMangaCategories: SetMangaCategories,
-    private val mangaRepository: MangaRepository,
-    private val filterChaptersForDownload: FilterChaptersForDownload,
     private val sourceManager: SourceManager,
-    private val refreshCanonical: ephyra.domain.track.interactor.RefreshCanonicalMetadata,
-    private val matchUnlinkedManga: ephyra.domain.track.interactor.MatchUnlinkedManga,
+    private val mangaInfoInteractor: ephyra.feature.manga.interactor.MangaInfoInteractor,
+    private val mangaChapterInteractor: ephyra.feature.manga.interactor.MangaChapterInteractor,
+    private val mangaTrackInteractor: ephyra.feature.manga.interactor.MangaTrackInteractor,
+    private val syncJellyfin: ephyra.domain.jellyfin.interactor.SyncJellyfin,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) : StateScreenModel<MangaScreenModel.State>(State.Loading) {
 
@@ -158,16 +144,7 @@ class MangaScreenModel(
     private val filteredChapters: List<ChapterList.Item>?
         get() = successState?.processedChapters
 
-/*
-    val chapterSwipeStartAction = libraryPreferences.swipeToEndAction().getSync()
-    val chapterSwipeEndAction = libraryPreferences.swipeToStartAction().getSync()
-    var autoTrackState = trackPreferences.autoUpdateTrackOnMarkRead().getSync()
-
     private val skipFiltered by readerPreferences.skipFiltered().asState(screenModelScope)
-
-    val isUpdateIntervalEnabled =
-        LibraryPreferences.MANGA_OUTSIDE_RELEASE_PERIOD in libraryPreferences.autoUpdateMangaRestrictions().getSync()
-*/
 
     private val selectedPositions: Array<Int> = arrayOf(-1, -1) // first and last selected index in list
     private val selectedChapterIds: HashSet<Long> = HashSet()
@@ -192,7 +169,7 @@ class MangaScreenModel(
                 downloadManager.queueState,
                 libraryPreferences.swipeToEndAction().changes(),
                 libraryPreferences.swipeToStartAction().changes(),
-                trackPreferences.autoUpdateTrackOnMarkRead().changes(),
+                mangaTrackInteractor.autoUpdateTrackOnMarkRead().changes(),
             ) { mangaAndChapters, _, _, swipeStart, swipeEnd, autoTrack ->
                 Triple(mangaAndChapters, swipeStart, swipeEnd) to autoTrack
             }
@@ -246,7 +223,7 @@ class MangaScreenModel(
                 .toChapterListItems(manga)
 
             if (!manga.favorite) {
-                setMangaDefaultChapterFlags.await(manga)
+                mangaChapterInteractor.resetToDefaultSettings(manga)
             }
 
             val needRefreshInfo = !manga.initialized
@@ -264,12 +241,14 @@ class MangaScreenModel(
                     chapters = chapters,
                     availableScanlators = getAvailableScanlators.await(mangaId),
                     excludedScanlators = getExcludedScanlators.await(mangaId),
+                    jellyfinServerUrl = mangaTrackInteractor.jellyfin.getServerUrl(),
+                    imagesInDescription = uiPreferences.imagesInDescription().get(),
                     isRefreshingData = needRefreshInfo || needRefreshChapter,
                     dialog = null,
                     hideMissingChapters = libraryPreferences.hideMissingChapters().getSync(),
                     chapterSwipeStartAction = libraryPreferences.swipeToEndAction().getSync(),
                     chapterSwipeEndAction = libraryPreferences.swipeToStartAction().getSync(),
-                    autoTrackState = trackPreferences.autoUpdateTrackOnMarkRead().getSync(),
+                    autoTrackState = mangaTrackInteractor.autoUpdateTrackOnMarkRead().getSync(),
                     isUpdateIntervalEnabled = LibraryPreferences.MANGA_OUTSIDE_RELEASE_PERIOD in libraryPreferences.autoUpdateMangaRestrictions().getSync(),
                     metadataSourceName = metadataSourceName,
                 )
@@ -292,7 +271,55 @@ class MangaScreenModel(
         }
     }
 
-    fun fetchAllFromSource(manualFetch: Boolean = true) {
+    fun onEvent(event: MangaScreenEvent) {
+        when (event) {
+            is MangaScreenEvent.FetchAllFromSource -> fetchAllFromSource(event.manualFetch)
+            is MangaScreenEvent.SetMetadataSource -> setMetadataSource(event.sourceId, event.mangaUrl)
+            is MangaScreenEvent.ToggleLockedField -> toggleLockedField(event.field)
+            is MangaScreenEvent.SetLockedFields -> setLockedFields(event.mask)
+            is MangaScreenEvent.RefreshFromAuthority -> refreshFromAuthority()
+            is MangaScreenEvent.ToggleFavorite -> toggleFavorite(onRemoved = {}, checkDuplicate = event.checkDuplicate)
+            is MangaScreenEvent.ShowChangeCategoryDialog -> showChangeCategoryDialog()
+            is MangaScreenEvent.ShowSetFetchIntervalDialog -> showSetFetchIntervalDialog()
+            is MangaScreenEvent.SetFetchInterval -> setFetchInterval(event.manga, event.interval)
+            is MangaScreenEvent.MoveMangaToCategoriesAndAddToLibrary -> moveMangaToCategoriesAndAddToLibrary(event.manga, event.categories)
+            is MangaScreenEvent.ChapterSwipe -> chapterSwipe(event.chapterItem, event.swipeAction)
+            is MangaScreenEvent.RunChapterDownloadActions -> runChapterDownloadActions(event.items, event.action)
+            is MangaScreenEvent.RunDownloadAction -> runDownloadAction(event.action)
+            is MangaScreenEvent.MarkPreviousChapterRead -> markPreviousChapterRead(event.pointer)
+            is MangaScreenEvent.MarkChaptersRead -> markChaptersRead(event.chapters, event.read)
+            is MangaScreenEvent.BookmarkChapters -> bookmarkChapters(event.chapters, event.bookmarked)
+            is MangaScreenEvent.DeleteChapters -> deleteChapters(event.chapters)
+            is MangaScreenEvent.SetUnreadFilter -> setUnreadFilter(event.state)
+            is MangaScreenEvent.SetDownloadedFilter -> setDownloadedFilter(event.state)
+            is MangaScreenEvent.SetBookmarkedFilter -> setBookmarkedFilter(event.state)
+            is MangaScreenEvent.SetDisplayMode -> setDisplayMode(event.mode)
+            is MangaScreenEvent.SetSorting -> setSorting(event.sort)
+            is MangaScreenEvent.SetCurrentSettingsAsDefault -> setCurrentSettingsAsDefault(event.applyToExisting)
+            is MangaScreenEvent.ResetToDefaultSettings -> resetToDefaultSettings()
+            is MangaScreenEvent.ToggleSelection -> toggleSelection(event.item, event.selected, event.fromLongPress)
+            is MangaScreenEvent.ToggleAllSelection -> toggleAllSelection(event.selected)
+            is MangaScreenEvent.InvertSelection -> invertSelection()
+            is MangaScreenEvent.DismissDialog -> dismissDialog()
+            is MangaScreenEvent.ShowDeleteChapterDialog -> showDeleteChapterDialog(event.chapters)
+            is MangaScreenEvent.ShowSettingsDialog -> showSettingsDialog()
+            is MangaScreenEvent.ShowTrackDialog -> showTrackDialog()
+            is MangaScreenEvent.ShowCoverDialog -> showCoverDialog()
+            is MangaScreenEvent.ShowEditMetadataDialog -> showEditMetadataDialog()
+            is MangaScreenEvent.EditTitle -> editTitle(event.value)
+            is MangaScreenEvent.EditAuthor -> editAuthor(event.value)
+            is MangaScreenEvent.EditArtist -> editArtist(event.value)
+            is MangaScreenEvent.EditDescription -> editDescription(event.value)
+            is MangaScreenEvent.EditStatus -> editStatus(event.value)
+            is MangaScreenEvent.EditGenres -> editGenres(event.value)
+            is MangaScreenEvent.ShowMigrateDialog -> showMigrateDialog(event.duplicate)
+            is MangaScreenEvent.SetExcludedScanlators -> setExcludedScanlators(event.excludedScanlators)
+            is MangaScreenEvent.ResolveCanonicalId -> resolveCanonicalId()
+            is MangaScreenEvent.UnlinkAuthority -> unlinkAuthority()
+        }
+    }
+
+    private fun fetchAllFromSource(manualFetch: Boolean = true) {
         screenModelScope.launch {
             updateSuccessState { it.copy(isRefreshingData = true) }
             val fetchFromSourceTasks = listOf(
@@ -329,7 +356,7 @@ class MangaScreenModel(
                 // Authority-only manga have no content source — refresh from canonical tracker only.
                 if (isAuthorityOnly) {
                     if (manga.canonicalId != null) {
-                        refreshCanonical.await(manga)
+                        mangaTrackInteractor.refreshCanonical(manga)
                     }
                     return@withIOContext
                 }
@@ -360,7 +387,7 @@ class MangaScreenModel(
                     networkManga = state.source.getMangaDetails(manga.toSManga())
                 }
 
-                updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch)
+                mangaInfoInteractor.updateUpdateStrategy(manga, networkManga, manualFetch)
 
                 // On manual refresh, also refresh metadata from the canonical tracker source
                 // to capture updates (status changes, new cover art, description updates).
@@ -370,8 +397,8 @@ class MangaScreenModel(
                 // detections and alternating cover flicker.
                 if (manualFetch && manga.canonicalId != null) {
                     try {
-                        val freshManga = mangaRepository.getMangaById(manga.id)
-                        refreshCanonical.await(freshManga)
+                        val freshManga = mangaInfoInteractor.getMangaById(manga.id)
+                        mangaTrackInteractor.refreshCanonical(freshManga)
                     } catch (e: Exception) {
                         logcat(LogPriority.DEBUG, e) {
                             "Canonical metadata refresh failed for ${manga.title}"
@@ -395,10 +422,10 @@ class MangaScreenModel(
      * When set, metadata (description, cover, etc.) will be fetched from this source
      * instead of the chapter source.
      */
-    fun setMetadataSource(sourceId: Long, mangaUrl: String) {
+    private fun setMetadataSource(sourceId: Long, mangaUrl: String) {
         val manga = successState?.manga ?: return
         screenModelScope.launchIO {
-            updateManga.await(
+            mangaInfoInteractor.updateManga(
                 ephyra.domain.manga.model.MangaUpdate(
                     id = manga.id,
                     metadataSource = sourceId,
@@ -416,11 +443,11 @@ class MangaScreenModel(
      * Toggles a per-field metadata lock (Jellyfin-style).
      * When locked, the authority refresh will skip this field, preserving user edits.
      */
-    fun toggleLockedField(field: Long) {
+    private fun toggleLockedField(field: Long) {
         val manga = successState?.manga ?: return
         val newLocked = manga.lockedFields xor field
         screenModelScope.launchIO {
-            updateManga.await(
+            mangaInfoInteractor.updateManga(
                 ephyra.domain.manga.model.MangaUpdate(
                     id = manga.id,
                     lockedFields = newLocked,
@@ -429,10 +456,10 @@ class MangaScreenModel(
         }
     }
 
-    fun setLockedFields(mask: Long) {
+    private fun setLockedFields(mask: Long) {
         val manga = successState?.manga ?: return
         screenModelScope.launchIO {
-            updateManga.await(
+            mangaInfoInteractor.updateManga(
                 ephyra.domain.manga.model.MangaUpdate(
                     id = manga.id,
                     lockedFields = mask,
@@ -446,12 +473,12 @@ class MangaScreenModel(
      * touching the content source.  This is the Jellyfin-style "re-scan from
      * metadata provider" action — it respects per-field locks.
      */
-    fun refreshFromAuthority() {
+    private fun refreshFromAuthority() {
         val manga = successState?.manga ?: return
         if (manga.canonicalId == null) return
         screenModelScope.launchIO {
             try {
-                refreshCanonical.await(manga)
+                mangaTrackInteractor.refreshCanonical(manga)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -462,7 +489,7 @@ class MangaScreenModel(
         }
     }
 
-    fun toggleFavorite() {
+    private fun toggleFavorite() {
         val hasAuthority = successState?.manga?.canonicalId != null
         toggleFavorite(
             onRemoved = {
@@ -495,7 +522,7 @@ class MangaScreenModel(
     /**
      * Update favorite status of manga, (removes / adds) manga (to / from) library.
      */
-    fun toggleFavorite(
+    private fun toggleFavorite(
         onRemoved: () -> Unit,
         checkDuplicate: Boolean = true,
     ) {
@@ -505,13 +532,13 @@ class MangaScreenModel(
 
             if (isFavorited) {
                 // Remove from library
-                if (updateManga.awaitUpdateFavorite(manga.id, false)) {
+                if (mangaInfoInteractor.updateFavorite(manga.id, false)) {
                     // Remove covers and update last modified in db
                     if (manga.removeCovers() != manga) {
-                        updateManga.awaitUpdateCoverLastModified(manga.id)
+                        mangaInfoInteractor.updateCoverLastModified(manga.id)
                     }
                     // Jellyfin: unmark favorite on server when removing from library
-                    markJellyfinFavoriteIfLinked(manga, favorite = false)
+                    mangaInfoInteractor.markJellyfinFavoriteIfLinked(manga, favorite = false)
                     withUIContext { onRemoved() }
                 }
             } else {
@@ -533,14 +560,14 @@ class MangaScreenModel(
                 when {
                     // Default category set
                     defaultCategory != null -> {
-                        val result = updateManga.awaitUpdateFavorite(manga.id, true)
+                        val result = mangaInfoInteractor.updateFavorite(manga.id, true)
                         if (!result) return@launchIO
                         moveMangaToCategory(defaultCategory)
                     }
 
                     // Automatic 'Default' or no categories
                     defaultCategoryId == 0L || categories.isEmpty() -> {
-                        val result = updateManga.awaitUpdateFavorite(manga.id, true)
+                        val result = mangaInfoInteractor.updateFavorite(manga.id, true)
                         if (!result) return@launchIO
                         moveMangaToCategory(null)
                     }
@@ -556,7 +583,7 @@ class MangaScreenModel(
                 // adding to library automatically resolves metadata provider)
                 if (manga.canonicalId == null) {
                     try {
-                        matchUnlinkedManga.awaitSingle(manga)
+                        mangaTrackInteractor.matchUnlinkedManga(manga)
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
@@ -566,12 +593,12 @@ class MangaScreenModel(
 
                 // Jellyfin: mark as favorite on server when adding to library
                 // (Jellyfin "favorite" ≈ "in library" concept)
-                markJellyfinFavoriteIfLinked(manga, favorite = true)
+                mangaInfoInteractor.markJellyfinFavoriteIfLinked(manga, favorite = true)
             }
         }
     }
 
-    fun showChangeCategoryDialog() {
+    private fun showChangeCategoryDialog() {
         val manga = successState?.manga ?: return
         screenModelScope.launch {
             val categories = getCategories()
@@ -587,22 +614,22 @@ class MangaScreenModel(
         }
     }
 
-    fun showSetFetchIntervalDialog() {
+    private fun showSetFetchIntervalDialog() {
         val manga = successState?.manga ?: return
         updateSuccessState {
             it.copy(dialog = Dialog.SetFetchInterval(manga))
         }
     }
 
-    fun setFetchInterval(manga: Manga, interval: Int) {
+    private fun setFetchInterval(manga: Manga, interval: Int) {
         screenModelScope.launchIO {
             if (
-                updateManga.awaitUpdateFetchInterval(
+                mangaInfoInteractor.updateFetchInterval(
                     // Custom intervals are negative
                     manga.copy(fetchInterval = -interval),
                 )
             ) {
-                val updatedManga = mangaRepository.getMangaById(manga.id)
+                val updatedManga = mangaInfoInteractor.getMangaById(manga.id)
                 updateSuccessState { it.copy(manga = updatedManga) }
             }
         }
@@ -644,12 +671,12 @@ class MangaScreenModel(
             .map { it.id }
     }
 
-    fun moveMangaToCategoriesAndAddToLibrary(manga: Manga, categories: List<Long>) {
+    private fun moveMangaToCategoriesAndAddToLibrary(manga: Manga, categories: List<Long>) {
         moveMangaToCategory(categories)
         if (manga.favorite) return
 
         screenModelScope.launchIO {
-            updateManga.awaitUpdateFavorite(manga.id, true)
+            mangaInfoInteractor.updateFavorite(manga.id, true)
         }
     }
 
@@ -665,7 +692,7 @@ class MangaScreenModel(
 
     private fun moveMangaToCategory(categoryIds: List<Long>) {
         screenModelScope.launchIO {
-            setMangaCategories.await(mangaId, categoryIds)
+            mangaInfoInteractor.setMangaCategories(mangaId, categoryIds)
         }
     }
 
@@ -767,7 +794,7 @@ class MangaScreenModel(
             withIOContext {
                 val chapters = state.source.getChapterList(state.manga.toSManga())
 
-                val newChapters = syncChaptersWithSource.await(
+                val newChapters = mangaChapterInteractor.syncChaptersWithSource(
                     chapters,
                     state.manga,
                     state.source,
@@ -789,7 +816,7 @@ class MangaScreenModel(
             screenModelScope.launch {
                 snackbarHostState.showSnackbar(message = message)
             }
-            val newManga = mangaRepository.getMangaById(mangaId)
+            val newManga = mangaInfoInteractor.getMangaById(mangaId)
             updateSuccessState { it.copy(manga = newManga, isRefreshingData = false) }
         }
     }
@@ -797,7 +824,7 @@ class MangaScreenModel(
     /**
      * @throws IllegalStateException if the swipe action is [LibraryPreferences.ChapterSwipeAction.Disabled]
      */
-    fun chapterSwipe(chapterItem: ChapterList.Item, swipeAction: LibraryPreferences.ChapterSwipeAction) {
+    private fun chapterSwipe(chapterItem: ChapterList.Item, swipeAction: LibraryPreferences.ChapterSwipeAction) {
         screenModelScope.launch {
             executeChapterSwipeAction(chapterItem, swipeAction)
         }
@@ -895,7 +922,7 @@ class MangaScreenModel(
         }
     }
 
-    fun runChapterDownloadActions(
+    private fun runChapterDownloadActions(
         items: List<ChapterList.Item>,
         action: ChapterDownloadAction,
     ) {
@@ -920,7 +947,7 @@ class MangaScreenModel(
         }
     }
 
-    fun runDownloadAction(action: DownloadAction) {
+    private fun runDownloadAction(action: DownloadAction) {
         when (action) {
             DownloadAction.SYNC_TO_JELLYFIN,
             DownloadAction.SYNC_READ_TO_JELLYFIN,
@@ -984,324 +1011,18 @@ class MangaScreenModel(
         val successState = successState ?: return
         val manga = successState.manga
 
-        // Pre-check: user must be logged in to Jellyfin
-        if (!trackerManager.jellyfin.isLoggedIn) {
-            screenModelScope.launchIO {
-                withUIContext {
-                    context.toast(context.stringResource(MR.strings.jellyfin_sync_not_logged_in))
-                }
-            }
-            return
-        }
-
-        // Pre-check: manga must be linked to Jellyfin
-        val canonicalId = manga.canonicalId
-        if (canonicalId == null || !canonicalId.startsWith("jf:")) {
-            screenModelScope.launchIO {
-                withUIContext {
-                    context.toast(context.stringResource(MR.strings.jellyfin_sync_not_linked))
-                }
-            }
-            return
+        val syncAction = when (action) {
+            DownloadAction.SYNC_ALL_TO_JELLYFIN -> ephyra.domain.jellyfin.interactor.SyncJellyfin.SyncAction.SYNC_ALL_TO_JELLYFIN
+            DownloadAction.SYNC_READ_TO_JELLYFIN -> ephyra.domain.jellyfin.interactor.SyncJellyfin.SyncAction.SYNC_READ_TO_JELLYFIN
+            DownloadAction.SYNC_TO_JELLYFIN -> ephyra.domain.jellyfin.interactor.SyncJellyfin.SyncAction.SYNC_UNREAD_TO_JELLYFIN
+            else -> return
         }
 
         screenModelScope.launchIO {
-            // Pre-flight: verify server is reachable before starting expensive work
-            val serverUrl = trackerManager.jellyfin.getServerUrl()
-            if (serverUrl.isBlank() || !trackerManager.jellyfin.api.checkServerReachable(serverUrl)) {
-                withUIContext {
-                    context.toast(context.stringResource(MR.strings.jellyfin_sync_server_unreachable))
-                }
-                return@launchIO
-            }
-
-            // Temporarily enable Jellyfin-compatible naming for the sync download,
-            // then restore the original setting afterward.
-            val wasJellyfinNamingEnabled = libraryPreferences.jellyfinCompatibleNaming().get()
-            libraryPreferences.jellyfinCompatibleNaming().set(true)
-
-            try {
-                // Get the actual chapter items from Jellyfin for accurate comparison
-                val jellyfinChapters = getJellyfinChapterNames(manga)
-
-                // Select chapters missing from Jellyfin based on the action
-                val allChapterItems = allChapters.orEmpty()
-                val missingFromServer = when (action) {
-                    DownloadAction.SYNC_READ_TO_JELLYFIN -> allChapterItems.filter { item ->
-                        item.chapter.read && !isChapterOnServer(item.chapter, jellyfinChapters)
-                    }
-                    DownloadAction.SYNC_ALL_TO_JELLYFIN -> allChapterItems.filter { item ->
-                        !isChapterOnServer(item.chapter, jellyfinChapters)
-                    }
-                    else -> allChapterItems.filter { item ->
-                        !item.chapter.read && !isChapterOnServer(item.chapter, jellyfinChapters)
-                    }
-                }
-
-                // Split into chapters that need downloading vs already downloaded locally
-                val needsDownload = missingFromServer
-                    .filter { it.downloadState == Download.State.NOT_DOWNLOADED }
-                    .map { it.chapter }
-                val alreadyDownloadedItems = missingFromServer
-                    .filter { it.downloadState == Download.State.DOWNLOADED }
-                val alreadyDownloadedCount = alreadyDownloadedItems.size
-
-                if (needsDownload.isNotEmpty()) {
-                    downloadChapters(needsDownload)
-                }
-
-                // Copy already-downloaded chapters to Jellyfin library folder if configured
-                val jellyfinFolder = downloadPreferences.jellyfinLibraryFolder().get()
-                if (jellyfinFolder.isNotBlank() && alreadyDownloadedItems.isNotEmpty()) {
-                    copyChaptersToJellyfinFolder(
-                        manga,
-                        alreadyDownloadedItems.map { it.chapter },
-                        jellyfinFolder,
-                    )
-                }
-
-                val totalSynced = needsDownload.size + alreadyDownloadedCount
-                if (totalSynced > 0) {
-                    withUIContext {
-                        context.toast(
-                            context.stringResource(
-                                MR.strings.jellyfin_sync_started,
-                                totalSynced,
-                            ),
-                        )
-                    }
-                } else {
-                    withUIContext {
-                        context.toast(context.stringResource(MR.strings.jellyfin_sync_up_to_date))
-                    }
-                }
-
-                // Trigger a Jellyfin library scan so the server discovers files.
-                // Scans are useful even when only already-downloaded chapters are
-                // missing from the server (they're on disk but not yet indexed).
-                if (totalSynced > 0) {
-                    val scanResult = triggerJellyfinLibraryScan()
-                    if (scanResult != null) {
-                        withUIContext {
-                            context.toast(scanResult)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                logcat(LogPriority.ERROR, e) { "Jellyfin sync failed" }
-                withUIContext {
-                    context.toast(
-                        context.stringResource(MR.strings.jellyfin_sync_error, e.message ?: "Unknown error"),
-                    )
-                }
-            } finally {
-                // Restore the original Jellyfin naming preference
-                libraryPreferences.jellyfinCompatibleNaming().set(wasJellyfinNamingEnabled)
-            }
-        }
-    }
-
-    /**
-     * Copies already-downloaded chapter CBZ files to the configured Jellyfin library folder.
-     * This makes locally-downloaded content discoverable by the Jellyfin server via library scan,
-     * even when the app's download directory is not directly accessible to the server (e.g., the
-     * Jellyfin folder is an SMB/NFS network share on a NAS).
-     */
-    private fun copyChaptersToJellyfinFolder(
-        manga: Manga,
-        chapters: List<Chapter>,
-        jellyfinFolderUri: String,
-    ) {
-        try {
-            val jellyfinRoot = UniFile.fromUri(
-                context,
-                Uri.parse(jellyfinFolderUri),
-            ) ?: run {
-                logcat(LogPriority.WARN) { "Jellyfin library folder not accessible" }
-                return
-            }
-
-            val seriesDir = jellyfinRoot.createDirectory(
-                DiskUtil.buildValidFilename(manga.title),
-            ) ?: run {
-                logcat(LogPriority.WARN) { "Failed to create series dir in Jellyfin folder" }
-                return
-            }
-
-            val source = Injekt.get<SourceManager>().getOrStub(manga.source)
-            val mangaDirResult = downloadProvider.getMangaDir(manga.title, source)
-            val mangaDir = mangaDirResult.getOrNull() ?: run {
-                logcat(LogPriority.WARN) { "Could not resolve manga download directory" }
-                return
-            }
-
-            var copied = 0
-            for (chapter in chapters) {
-                val jellyfinName = downloadProvider.getJellyfinChapterDirName(
-                    manga.title,
-                    chapter.chapterNumber,
-                    chapter.name,
-                )
-                val cbzName = "$jellyfinName.cbz"
-
-                // Skip if already in the Jellyfin folder
-                val existing = seriesDir.findFile(cbzName)
-                if (existing != null && existing.length() > 0) continue
-
-                // Try Jellyfin-named CBZ first, then fall back to standard naming
-                val sourceCbz = mangaDir.findFile(cbzName)
-                    ?: mangaDir.findFile(
-                        downloadProvider.getChapterDirName(
-                            chapter.name,
-                            chapter.scanlator,
-                            chapter.url,
-                        ) + ".cbz",
-                    )
-
-                if (sourceCbz == null || !sourceCbz.exists()) continue
-
-                val destFile = seriesDir.createFile(cbzName) ?: continue
-                try {
-                    sourceCbz.openInputStream().use { input ->
-                        destFile.openOutputStream().use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    copied++
-                } catch (e: Exception) {
-                    logcat(LogPriority.WARN, e) { "Failed to copy $cbzName to Jellyfin folder" }
-                    destFile.delete()
-                }
-            }
-
-            if (copied > 0) {
-                logcat(LogPriority.INFO) { "Copied $copied chapter(s) to Jellyfin library folder" }
-            }
-        } catch (e: Exception) {
-            logcat(LogPriority.ERROR, e) { "Failed to copy chapters to Jellyfin folder" }
-        }
-    }
-
-    /**
-     * Returns the names of chapters that already exist in the Jellyfin library
-     * for the manga linked to this screen. Returns an empty set if the manga
-     * is not linked to Jellyfin or if the query fails.
-     *
-     * Uses actual item names from the server for accurate comparison instead
-     * of relying on sequential count, which breaks for series with chapter gaps.
-     */
-    private suspend fun getJellyfinChapterNames(manga: Manga): Set<String> {
-        val canonicalId = manga.canonicalId ?: return emptySet()
-        if (!canonicalId.startsWith("jf:")) return emptySet()
-
-        val tracks = getTracks.await(manga.id)
-        val jellyfinTrack = tracks.firstOrNull {
-            it.trackerId == trackerManager.jellyfin.id
-        } ?: return emptySet()
-
-        return try {
-            trackerManager.jellyfin.getChaptersFromServer(jellyfinTrack.remoteUrl)
-                .map { it.name.lowercase(java.util.Locale.ROOT) }
-                .toSet()
-        } catch (e: Exception) {
-            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin chapter list" }
-            emptySet()
-        }
-    }
-
-    /**
-     * Returns the count of chapters that already exist in the Jellyfin library
-     * for the manga linked to this screen. Returns 0 if the manga is not
-     * linked to Jellyfin or if the query fails.
-     *
-     * Jellyfin returns children sorted by SortName ascending, so the count
-     * of children maps directly to which sequential chapters are present.
-     */
-    private suspend fun getJellyfinChapterCount(manga: Manga): Int {
-        val canonicalId = manga.canonicalId ?: return 0
-        if (!canonicalId.startsWith("jf:")) return 0
-
-        val tracks = getTracks.await(manga.id)
-        val jellyfinTrack = tracks.firstOrNull {
-            it.trackerId == trackerManager.jellyfin.id
-        } ?: return 0
-
-        return try {
-            trackerManager.jellyfin.getChaptersFromServer(jellyfinTrack.remoteUrl).size
-        } catch (e: Exception) {
-            logcat(LogPriority.WARN, e) { "Failed to get Jellyfin chapter list" }
-            0
-        }
-    }
-
-    /**
-     * Checks if a chapter already exists on the Jellyfin server by comparing
-     * against the set of chapter names returned from the server.
-     *
-     * Falls back to count-based comparison if the name set is empty
-     * (e.g., if server names don't match local chapter format).
-     * The name comparison is case-insensitive and checks if the server-side
-     * name contains the chapter number to handle different naming conventions.
-     */
-    private fun isChapterOnServer(chapter: Chapter, serverChapterNames: Set<String>): Boolean {
-        if (serverChapterNames.isEmpty()) return false
-
-        // Format the chapter number the way Jellyfin-compatible naming produces it
-        val chapterNum = chapter.chapterNumber
-        val formattedNum = if (chapterNum == kotlin.math.floor(chapterNum)) {
-            String.format(java.util.Locale.ROOT, "%03d", chapterNum.toInt())
-        } else {
-            String.format(java.util.Locale.ROOT, "%06.2f", chapterNum)
-        }
-
-        // Check if any server chapter name contains this chapter number pattern
-        val chPattern = "ch. $formattedNum".lowercase(java.util.Locale.ROOT)
-        val chPatternAlt = "ch.$formattedNum".lowercase(java.util.Locale.ROOT)
-        return serverChapterNames.any { name ->
-            name.contains(chPattern) || name.contains(chPatternAlt)
-        }
-    }
-
-    /**
-     * Triggers a Jellyfin library scan after syncing content. This makes newly
-     * downloaded files appear in the Jellyfin library without manual intervention.
-     *
-     * Proactively checks cached admin status before making the network request.
-     * Non-admin users get instant feedback instead of waiting for a 403 response.
-     * The admin status is cached during login from the user's Policy.IsAdministrator.
-     *
-     * Returns a user-facing warning message if the scan failed or was skipped,
-     * or null on success.
-     */
-    private suspend fun triggerJellyfinLibraryScan(): String? {
-        val jellyfin = trackerManager.jellyfin
-        if (!jellyfin.isLoggedIn) return null
-        val serverUrl = jellyfin.getServerUrl()
-        if (serverUrl.isBlank()) return null
-
-        // Proactive admin gating: skip the network request entirely for non-admin users.
-        // The admin status was cached at login from AuthenticateByName → User.Policy.IsAdministrator.
-        val isAdmin = trackPreferences.jellyfinIsAdmin().get()
-        if (!isAdmin) {
-            logcat(LogPriority.INFO) { "Skipping library scan — user is not admin (cached)" }
-            return context.stringResource(MR.strings.jellyfin_scan_requires_admin)
-        }
-
-        return when (val result = jellyfin.api.triggerLibraryScan(serverUrl)) {
-            is JellyfinApi.LibraryScanResult.Success -> {
-                logcat(LogPriority.INFO) { "Triggered Jellyfin library scan after sync" }
-                null
-            }
-            is JellyfinApi.LibraryScanResult.Forbidden -> {
-                // Admin status may have changed since login — update cache
-                trackPreferences.jellyfinIsAdmin().set(false)
-                logcat(LogPriority.WARN) { "Library scan denied — user is not admin (updated cache)" }
-                context.stringResource(MR.strings.jellyfin_scan_requires_admin)
-            }
-            is JellyfinApi.LibraryScanResult.Error -> {
-                logcat(LogPriority.WARN) { "Library scan failed: ${result.message}" }
-                context.stringResource(MR.strings.jellyfin_scan_failed, result.message)
-            }
+            val allChapterItems = allChapters.orEmpty()
+            val chapters = allChapterItems.map { it.chapter }
+            val downloadStates = allChapterItems.associate { it.id to (it.downloadState == Download.State.DOWNLOADED) }
+            syncJellyfin.syncToJellyfin(manga, chapters, downloadStates, syncAction)
         }
     }
 
@@ -1311,7 +1032,7 @@ class MangaScreenModel(
         updateDownloadState(activeDownload.apply { status = Download.State.NOT_DOWNLOADED })
     }
 
-    fun markPreviousChapterRead(pointer: Chapter) {
+    private fun markPreviousChapterRead(pointer: Chapter) {
         val manga = successState?.manga ?: return
         val chapters = filteredChapters.orEmpty().map { it.chapter }
         val prevChapters = if (manga.sortDescending()) chapters.asReversed() else chapters
@@ -1324,28 +1045,25 @@ class MangaScreenModel(
      * @param chapters the list of selected chapters.
      * @param read whether to mark chapters as read or unread.
      */
-    fun markChaptersRead(chapters: List<Chapter>, read: Boolean) {
+    private fun markChaptersRead(chapters: List<Chapter>, read: Boolean) {
         toggleAllSelection(false)
         if (chapters.isEmpty()) return
         screenModelScope.launchIO {
-            setReadStatus.await(
-                read = read,
-                chapters = chapters.toTypedArray(),
-            )
+            mangaChapterInteractor.markChaptersRead(chapters, read)
 
-            if (!read || successState?.hasLoggedInTrackers == false || autoTrackState == AutoTrackState.NEVER) {
+            if (!read || successState?.hasLoggedInTrackers == false || mangaTrackInteractor.isAutoTrackStateNever()) {
                 return@launchIO
             }
 
             refreshTrackers()
 
-            val tracks = getTracks.await(mangaId)
+            val tracks = mangaTrackInteractor.getTracks(mangaId)
             val maxChapterNumber = chapters.maxOf { it.chapterNumber }
             val shouldPromptTrackingUpdate = tracks.any { track -> maxChapterNumber > track.lastChapterRead }
 
             if (!shouldPromptTrackingUpdate) return@launchIO
-            if (autoTrackState == AutoTrackState.ALWAYS) {
-                trackChapter.await(context, mangaId, maxChapterNumber)
+            if (mangaTrackInteractor.isAutoTrackStateAlways()) {
+                mangaTrackInteractor.trackChapter(context, mangaId, maxChapterNumber)
                 withUIContext {
                     context.toast(context.stringResource(MR.strings.trackers_updated_summary, maxChapterNumber.toInt()))
                 }
@@ -1360,15 +1078,13 @@ class MangaScreenModel(
             )
 
             if (result == SnackbarResult.ActionPerformed) {
-                trackChapter.await(context, mangaId, maxChapterNumber)
+                mangaTrackInteractor.trackChapter(context, mangaId, maxChapterNumber)
             }
         }
     }
 
-    private suspend fun refreshTrackers(
-        refreshTracks: RefreshTracks = Injekt.get(),
-    ) {
-        refreshTracks.await(mangaId)
+    private suspend fun refreshTrackers() {
+        mangaTrackInteractor.refreshTracks(mangaId)
             .filter { it.first != null }
             .forEach { (track, e) ->
                 val errorDetail = when (e) {
@@ -1398,7 +1114,7 @@ class MangaScreenModel(
      */
     private fun downloadChapters(chapters: List<Chapter>) {
         val manga = successState?.manga ?: return
-        downloadManager.downloadChapters(manga, chapters)
+        mangaChapterInteractor.downloadChapters(chapters, manga)
         toggleAllSelection(false)
     }
 
@@ -1406,12 +1122,9 @@ class MangaScreenModel(
      * Bookmarks the given list of chapters.
      * @param chapters the list of chapters to bookmark.
      */
-    fun bookmarkChapters(chapters: List<Chapter>, bookmarked: Boolean) {
+    private fun bookmarkChapters(chapters: List<Chapter>, bookmarked: Boolean) {
         screenModelScope.launchIO {
-            chapters
-                .filterNot { it.bookmark == bookmarked }
-                .map { ChapterUpdate(id = it.id, bookmark = bookmarked) }
-                .let { updateChapter.awaitAll(it) }
+            mangaChapterInteractor.bookmarkChapters(chapters, bookmarked)
         }
         toggleAllSelection(false)
     }
@@ -1421,11 +1134,11 @@ class MangaScreenModel(
      *
      * @param chapters the list of chapters to delete.
      */
-    fun deleteChapters(chapters: List<Chapter>) {
+    private fun deleteChapters(chapters: List<Chapter>) {
         screenModelScope.launchNonCancellable {
             try {
                 successState?.let { state ->
-                    downloadManager.deleteChapters(
+                    mangaChapterInteractor.deleteChapters(
                         chapters,
                         state.manga,
                         state.source,
@@ -1440,7 +1153,7 @@ class MangaScreenModel(
     private fun downloadNewChapters(chapters: List<Chapter>) {
         screenModelScope.launchNonCancellable {
             val manga = successState?.manga ?: return@launchNonCancellable
-            val chaptersToDownload = filterChaptersForDownload.await(manga, chapters)
+            val chaptersToDownload = mangaChapterInteractor.filterChaptersForDownload(manga, chapters)
 
             if (chaptersToDownload.isNotEmpty()) {
                 downloadChapters(chaptersToDownload)
@@ -1452,16 +1165,11 @@ class MangaScreenModel(
      * Sets the read filter and requests an UI update.
      * @param state whether to display only unread chapters or all chapters.
      */
-    fun setUnreadFilter(state: TriState) {
+    private fun setUnreadFilter(state: TriState) {
         val manga = successState?.manga ?: return
 
-        val flag = when (state) {
-            TriState.DISABLED -> Manga.SHOW_ALL
-            TriState.ENABLED_IS -> Manga.CHAPTER_SHOW_UNREAD
-            TriState.ENABLED_NOT -> Manga.CHAPTER_SHOW_READ
-        }
         screenModelScope.launchNonCancellable {
-            setMangaChapterFlags.awaitSetUnreadFilter(manga, flag)
+            mangaChapterInteractor.setUnreadFilter(manga, state)
         }
     }
 
@@ -1469,17 +1177,11 @@ class MangaScreenModel(
      * Sets the download filter and requests an UI update.
      * @param state whether to display only downloaded chapters or all chapters.
      */
-    fun setDownloadedFilter(state: TriState) {
+    private fun setDownloadedFilter(state: TriState) {
         val manga = successState?.manga ?: return
 
-        val flag = when (state) {
-            TriState.DISABLED -> Manga.SHOW_ALL
-            TriState.ENABLED_IS -> Manga.CHAPTER_SHOW_DOWNLOADED
-            TriState.ENABLED_NOT -> Manga.CHAPTER_SHOW_NOT_DOWNLOADED
-        }
-
         screenModelScope.launchNonCancellable {
-            setMangaChapterFlags.awaitSetDownloadedFilter(manga, flag)
+            mangaChapterInteractor.setDownloadedFilter(manga, state)
         }
     }
 
@@ -1487,17 +1189,11 @@ class MangaScreenModel(
      * Sets the bookmark filter and requests an UI update.
      * @param state whether to display only bookmarked chapters or all chapters.
      */
-    fun setBookmarkedFilter(state: TriState) {
+    private fun setBookmarkedFilter(state: TriState) {
         val manga = successState?.manga ?: return
 
-        val flag = when (state) {
-            TriState.DISABLED -> Manga.SHOW_ALL
-            TriState.ENABLED_IS -> Manga.CHAPTER_SHOW_BOOKMARKED
-            TriState.ENABLED_NOT -> Manga.CHAPTER_SHOW_NOT_BOOKMARKED
-        }
-
         screenModelScope.launchNonCancellable {
-            setMangaChapterFlags.awaitSetBookmarkFilter(manga, flag)
+            mangaChapterInteractor.setBookmarkedFilter(manga, state)
         }
     }
 
@@ -1505,11 +1201,11 @@ class MangaScreenModel(
      * Sets the active display mode.
      * @param mode the mode to set.
      */
-    fun setDisplayMode(mode: Long) {
+    private fun setDisplayMode(mode: Long) {
         val manga = successState?.manga ?: return
 
         screenModelScope.launchNonCancellable {
-            setMangaChapterFlags.awaitSetDisplayMode(manga, mode)
+            mangaChapterInteractor.setDisplayMode(manga, mode)
         }
     }
 
@@ -1517,33 +1213,30 @@ class MangaScreenModel(
      * Sets the sorting method and requests an UI update.
      * @param sort the sorting mode.
      */
-    fun setSorting(sort: Long) {
+    private fun setSorting(sort: Long) {
         val manga = successState?.manga ?: return
 
         screenModelScope.launchNonCancellable {
-            setMangaChapterFlags.awaitSetSortingModeOrFlipOrder(manga, sort)
+            mangaChapterInteractor.setSorting(manga, sort)
         }
     }
 
-    fun setCurrentSettingsAsDefault(applyToExisting: Boolean) {
+    private fun setCurrentSettingsAsDefault(applyToExisting: Boolean) {
         val manga = successState?.manga ?: return
         screenModelScope.launchNonCancellable {
-            libraryPreferences.setChapterSettingsDefault(manga)
-            if (applyToExisting) {
-                setMangaDefaultChapterFlags.awaitAll()
-            }
+            mangaChapterInteractor.setCurrentSettingsAsDefault(manga, applyToExisting)
             snackbarHostState.showSnackbar(message = context.stringResource(MR.strings.chapter_settings_updated))
         }
     }
 
-    fun resetToDefaultSettings() {
+    private fun resetToDefaultSettings() {
         val manga = successState?.manga ?: return
         screenModelScope.launchNonCancellable {
-            setMangaDefaultChapterFlags.await(manga)
+            mangaChapterInteractor.resetToDefaultSettings(manga)
         }
     }
 
-    fun toggleSelection(
+    private fun toggleSelection(
         item: ChapterList.Item,
         selected: Boolean,
         fromLongPress: Boolean = false,
@@ -1606,7 +1299,7 @@ class MangaScreenModel(
         }
     }
 
-    fun toggleAllSelection(selected: Boolean) {
+    private fun toggleAllSelection(selected: Boolean) {
         updateSuccessState { successState ->
             val newChapters = successState.chapters.map {
                 selectedChapterIds.addOrRemove(it.id, selected)
@@ -1618,7 +1311,7 @@ class MangaScreenModel(
         }
     }
 
-    fun invertSelection() {
+    private fun invertSelection() {
         updateSuccessState { successState ->
             val newChapters = successState.chapters.map {
                 selectedChapterIds.addOrRemove(it.id, !it.selected)
@@ -1639,8 +1332,8 @@ class MangaScreenModel(
 
         screenModelScope.launchIO {
             combine(
-                getTracks.subscribe(manga.id).catch { logcat(LogPriority.ERROR, it) },
-                trackerManager.loggedInTrackersFlow(),
+                mangaTrackInteractor.subscribeTracks(manga.id).catch { logcat(LogPriority.ERROR, it) },
+                mangaTrackInteractor.loggedInTrackersFlow(),
             ) { mangaTracks, loggedInTrackers ->
                 // Show only if the service supports this manga's source
                 val supportedTrackers = loggedInTrackers.filter { (it as? EnhancedTracker)?.accept(source!!) ?: true }
@@ -1678,27 +1371,27 @@ class MangaScreenModel(
         data object EditMetadata : Dialog
     }
 
-    fun dismissDialog() {
+    private fun dismissDialog() {
         updateSuccessState { it.copy(dialog = null) }
     }
 
-    fun showDeleteChapterDialog(chapters: List<Chapter>) {
+    private fun showDeleteChapterDialog(chapters: List<Chapter>) {
         updateSuccessState { it.copy(dialog = Dialog.DeleteChapters(chapters)) }
     }
 
-    fun showSettingsDialog() {
+    private fun showSettingsDialog() {
         updateSuccessState { it.copy(dialog = Dialog.SettingsSheet) }
     }
 
-    fun showTrackDialog() {
+    private fun showTrackDialog() {
         updateSuccessState { it.copy(dialog = Dialog.TrackSheet) }
     }
 
-    fun showCoverDialog() {
+    private fun showCoverDialog() {
         updateSuccessState { it.copy(dialog = Dialog.FullCover) }
     }
 
-    fun showEditMetadataDialog() {
+    private fun showEditMetadataDialog() {
         updateSuccessState { it.copy(dialog = Dialog.EditMetadata) }
     }
 
@@ -1714,7 +1407,7 @@ class MangaScreenModel(
     ) {
         val manga = successState?.manga ?: return
         screenModelScope.launchIO {
-            updateManga.await(
+            mangaInfoInteractor.updateManga(
                 buildUpdate(manga.id, manga.lockedFields or lockField),
             )
             // Push metadata to Jellyfin if linked via "jf" canonical prefix
@@ -1730,13 +1423,13 @@ class MangaScreenModel(
     private suspend fun pushMetadataToJellyfinIfLinked(manga: Manga) {
         val canonicalId = manga.canonicalId ?: return
         if (!canonicalId.startsWith("jf:")) return
-        val jellyfin = trackerManager.jellyfin
+        val jellyfin = mangaTrackInteractor.jellyfin
         if (!jellyfin.isLoggedIn) return
 
         // Find the Jellyfin track for this manga to get the tracking URL
-        val tracks = getTracks.await(manga.id)
+        val tracks = mangaTrackInteractor.getTracks(manga.id)
         val jellyfinTrack = tracks.firstOrNull {
-            it.trackerId == trackerManager.jellyfin.id
+            it.trackerId == mangaTrackInteractor.jellyfin.id
         } ?: return
 
         // Re-read the manga to get the latest values after the update
@@ -1766,19 +1459,19 @@ class MangaScreenModel(
     private suspend fun markJellyfinFavoriteIfLinked(manga: Manga, favorite: Boolean) {
         val canonicalId = manga.canonicalId ?: return
         if (!canonicalId.startsWith("jf:")) return
-        val jellyfin = trackerManager.jellyfin
+        val jellyfin = mangaTrackInteractor.jellyfin
         if (!jellyfin.isLoggedIn) return
         if (!libraryPreferences.jellyfinSyncEnabled().get()) return
 
-        val tracks = getTracks.await(manga.id)
+        val tracks = mangaTrackInteractor.getTracks(manga.id)
         val jellyfinTrack = tracks.firstOrNull {
-            it.trackerId == trackerManager.jellyfin.id
+            it.trackerId == mangaTrackInteractor.jellyfin.id
         } ?: return
 
         try {
             val serverUrl = jellyfin.resolveServerUrl(jellyfinTrack.remoteUrl)
             val itemId = jellyfin.api.getItemIdFromUrl(jellyfinTrack.remoteUrl)
-            val userId = trackPreferences.jellyfinUserId().get()
+            val userId = mangaTrackInteractor.jellyfinUserId().get()
             if (userId.isNotBlank()) {
                 jellyfin.api.markFavorite(serverUrl, userId, itemId, favorite)
                 logcat(LogPriority.INFO) { "Jellyfin favorite=$favorite for item $itemId" }
@@ -1790,7 +1483,7 @@ class MangaScreenModel(
         }
     }
 
-    fun editTitle(value: String) {
+    private fun editTitle(value: String) {
         val manga = successState?.manga ?: return
         if (value == manga.title) return
         editFieldAndLock(ephyra.domain.manga.model.LockedField.TITLE) { id, locked ->
@@ -1798,7 +1491,7 @@ class MangaScreenModel(
         }
     }
 
-    fun editAuthor(value: String) {
+    private fun editAuthor(value: String) {
         val manga = successState?.manga ?: return
         if (value == (manga.author ?: "")) return
         editFieldAndLock(ephyra.domain.manga.model.LockedField.AUTHOR) { id, locked ->
@@ -1806,7 +1499,7 @@ class MangaScreenModel(
         }
     }
 
-    fun editArtist(value: String) {
+    private fun editArtist(value: String) {
         val manga = successState?.manga ?: return
         if (value == (manga.artist ?: "")) return
         editFieldAndLock(ephyra.domain.manga.model.LockedField.ARTIST) { id, locked ->
@@ -1814,7 +1507,7 @@ class MangaScreenModel(
         }
     }
 
-    fun editDescription(value: String) {
+    private fun editDescription(value: String) {
         val manga = successState?.manga ?: return
         if (value == (manga.description ?: "")) return
         editFieldAndLock(ephyra.domain.manga.model.LockedField.DESCRIPTION) { id, locked ->
@@ -1822,7 +1515,7 @@ class MangaScreenModel(
         }
     }
 
-    fun editStatus(value: Long) {
+    private fun editStatus(value: Long) {
         val manga = successState?.manga ?: return
         if (value == manga.status) return
         editFieldAndLock(ephyra.domain.manga.model.LockedField.STATUS) { id, locked ->
@@ -1830,7 +1523,7 @@ class MangaScreenModel(
         }
     }
 
-    fun editGenres(value: List<String>) {
+    private fun editGenres(value: List<String>) {
         val manga = successState?.manga ?: return
         if (value == manga.genre) return
         editFieldAndLock(ephyra.domain.manga.model.LockedField.GENRE) { id, locked ->
@@ -1838,14 +1531,14 @@ class MangaScreenModel(
         }
     }
 
-    fun showMigrateDialog(duplicate: Manga) {
+    private fun showMigrateDialog(duplicate: Manga) {
         val manga = successState?.manga ?: return
         updateSuccessState { it.copy(dialog = Dialog.Migrate(target = manga, current = duplicate)) }
     }
 
-    fun setExcludedScanlators(excludedScanlators: Set<String>) {
+    private fun setExcludedScanlators(excludedScanlators: Set<String>) {
         screenModelScope.launchIO {
-            setExcludedScanlators.await(mangaId, excludedScanlators)
+            mangaInfoInteractor.setExcludedScanlators(mangaId, excludedScanlators)
         }
     }
 
@@ -1855,7 +1548,7 @@ class MangaScreenModel(
      * If no trackers are available for search (Phase 2), guides the user to enable one.
      * This is the per-manga version of the bulk "Resolve all unlinked" operation.
      */
-    fun resolveCanonicalId() {
+    private fun resolveCanonicalId() {
         val manga = successState?.manga ?: return
         if (manga.canonicalId != null) {
             screenModelScope.launch {
@@ -1867,13 +1560,12 @@ class MangaScreenModel(
         }
         screenModelScope.launchIO {
             try {
-                val matchUnlinkedManga: MatchUnlinkedManga = Injekt.get()
-                val result = matchUnlinkedManga.awaitSingle(manga)
+                val result = mangaTrackInteractor.matchUnlinkedManga(manga)
                 if (result != null) {
                     // Refresh manga from DB so UI reflects the new canonical ID
                     // (e.g. hides the "Link to authority" toolbar button, shows updated metadata)
                     try {
-                        val updatedManga = mangaRepository.getMangaById(mangaId)
+                        val updatedManga = mangaInfoInteractor.getMangaById(mangaId)
                         updateSuccessState { it.copy(manga = updatedManga) }
                     } catch (e: Exception) {
                         logcat(LogPriority.DEBUG, e) { "Failed to refresh manga state after linking" }
@@ -1885,7 +1577,7 @@ class MangaScreenModel(
                     }
                 } else {
                     withUIContext {
-                        if (!matchUnlinkedManga.hasQueryableTracker()) {
+                        if (!mangaTrackInteractor.hasQueryableTracker()) {
                             // No trackers available for search — guide user to settings
                             snackbarHostState.showSnackbar(
                                 context.stringResource(MR.strings.no_tracker_for_linking),
@@ -1916,14 +1608,14 @@ class MangaScreenModel(
      * locks, and refreshes the UI state. After unlinking, the user can re-identify
      * via the "Identify" button in the metadata editor.
      */
-    fun unlinkAuthority() {
+    private fun unlinkAuthority() {
         val manga = successState?.manga ?: return
         if (manga.canonicalId == null) return
         screenModelScope.launchIO {
-            mangaRepository.clearCanonicalId(manga.id)
+            mangaInfoInteractor.unlinkAuthority(manga)
             // Refresh in-memory state so the UI reflects the change
             try {
-                val updatedManga = mangaRepository.getMangaById(mangaId)
+                val updatedManga = mangaInfoInteractor.getMangaById(mangaId)
                 updateSuccessState { it.copy(manga = updatedManga) }
             } catch (e: Exception) {
                 logcat(LogPriority.DEBUG, e) { "Failed to reload manga after unlinking authority" }
@@ -1945,6 +1637,8 @@ class MangaScreenModel(
             val excludedScanlators: Set<String>,
             val trackingCount: Int = 0,
             val hasLoggedInTrackers: Boolean = false,
+            val jellyfinServerUrl: String? = null,
+            val imagesInDescription: Boolean = false,
             val isRefreshingData: Boolean = false,
             val dialog: Dialog? = null,
             val hasPromptedToAddBefore: Boolean = false,

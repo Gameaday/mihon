@@ -433,6 +433,7 @@ class LibraryScreenModel(
                 preferences.globalFilterDownloaded
 
             libraryManga.map { manga ->
+                val source = sourceManager.getOrStub(manga.manga.source)
                 LibraryItem(
                     libraryManga = manga,
                     downloadCount = if (needDownloadCount) {
@@ -451,6 +452,8 @@ class LibraryScreenModel(
                         false
                     },
                     sourceLanguage = sourceLangMap[manga.manga.source] ?: "",
+                    sourceId = source.id,
+                    sourceName = source.getNameForMangaInfo(),
                 )
             }
         }
