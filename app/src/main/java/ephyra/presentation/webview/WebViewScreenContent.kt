@@ -41,9 +41,9 @@ import com.kevinnzou.web.WebContent
 import com.kevinnzou.web.WebView
 import com.kevinnzou.web.WebViewNavigator
 import com.kevinnzou.web.WebViewState
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.components.WarningBanner
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.components.WarningBanner
 import ephyra.app.BuildConfig
 import ephyra.app.R
 import ephyra.app.util.system.getHtml

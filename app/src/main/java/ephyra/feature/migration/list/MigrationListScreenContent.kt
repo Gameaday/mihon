@@ -53,12 +53,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.manga.components.MangaCover
-import ephyra.presentation.util.animateItemFastScroll
-import ephyra.presentation.util.formatChapterNumber
-import ephyra.presentation.util.rememberResourceBitmapPainter
+import ephyra.presentation.core.util.animateItemFastScroll
+import ephyra.presentation.core.util.formatChapterNumber
+import ephyra.presentation.core.util.rememberResourceBitmapPainter
 import ephyra.app.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

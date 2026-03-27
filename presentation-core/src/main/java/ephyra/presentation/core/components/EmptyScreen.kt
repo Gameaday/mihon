@@ -1,4 +1,4 @@
-package ephyra.presentation.components
+package ephyra.presentation.core.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline

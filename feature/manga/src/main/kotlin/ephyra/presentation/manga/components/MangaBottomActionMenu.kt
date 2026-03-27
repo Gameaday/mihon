@@ -54,8 +54,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.components.DownloadDropdownMenu
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.DownloadDropdownMenu
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.feature.manga.presentation.DownloadAction
 import ephyra.app.R
 import kotlinx.coroutines.Job

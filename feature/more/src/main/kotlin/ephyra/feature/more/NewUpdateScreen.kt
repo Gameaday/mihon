@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.presentation.more.NewUpdateScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.app.data.updater.AppUpdateDownloadJob
 import ephyra.presentation.core.util.system.openInBrowser
 

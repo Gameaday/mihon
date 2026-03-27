@@ -35,7 +35,7 @@ import ephyra.domain.track.model.AutoTrackState
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.feature.manga.presentation.DownloadAction
 import ephyra.feature.manga.presentation.components.ChapterDownloadAction
-import ephyra.presentation.util.formattedMessage
+import ephyra.presentation.core.util.formattedMessage
 import ephyra.core.download.DownloadCache
 import ephyra.core.download.DownloadManager
 import ephyra.core.download.DownloadProvider

@@ -1,4 +1,4 @@
-package ephyra.presentation.more
+package ephyra.feature.more
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,8 +18,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.vectorResource
 import ephyra.feature.settings.widget.SwitchPreferenceWidget
 import ephyra.feature.settings.widget.TextPreferenceWidget
-import ephyra.app.R
-import ephyra.app.ui.more.DownloadQueueState
+import ephyra.presentation.core.R
 import ephyra.core.common.Constants
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.ScrollbarLazyColumn

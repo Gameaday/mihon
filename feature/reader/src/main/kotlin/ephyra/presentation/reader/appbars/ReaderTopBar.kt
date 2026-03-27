@@ -6,8 +6,8 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource

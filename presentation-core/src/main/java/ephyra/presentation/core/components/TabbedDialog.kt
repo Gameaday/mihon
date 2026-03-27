@@ -1,4 +1,4 @@
-package ephyra.presentation.components
+package ephyra.presentation.core.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box

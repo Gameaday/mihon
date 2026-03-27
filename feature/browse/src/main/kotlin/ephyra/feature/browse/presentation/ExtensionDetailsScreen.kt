@@ -45,9 +45,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ephyra.domain.extension.interactor.ExtensionSourceItem
 import ephyra.feature.browse.presentation.components.ExtensionIcon
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.components.WarningBanner
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.components.WarningBanner
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.feature.settings.widget.TrailingWidgetBuffer
 import ephyra.app.R

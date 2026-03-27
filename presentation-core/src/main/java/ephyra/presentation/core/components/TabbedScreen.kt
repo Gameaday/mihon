@@ -1,4 +1,4 @@
-package ephyra.presentation.components
+package ephyra.presentation.core.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues

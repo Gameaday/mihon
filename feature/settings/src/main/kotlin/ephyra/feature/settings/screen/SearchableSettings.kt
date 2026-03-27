@@ -7,7 +7,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.resources.StringResource
 import ephyra.feature.settings.Preference
 import ephyra.feature.settings.PreferenceScaffold
-import ephyra.presentation.util.LocalBackPress
+import ephyra.presentation.core.util.LocalBackPress
 
 interface SearchableSettings : Screen {
 

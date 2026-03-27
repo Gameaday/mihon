@@ -18,7 +18,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import ephyra.presentation.updates.UpdateScreen
 import ephyra.presentation.updates.UpdatesDeleteConfirmationDialog
 import ephyra.presentation.updates.UpdatesFilterDialog
-import ephyra.presentation.util.Tab
+import ephyra.presentation.core.util.Tab
 import ephyra.app.R
 import ephyra.app.ui.download.DownloadQueueScreen
 import ephyra.app.ui.home.HomeScreen

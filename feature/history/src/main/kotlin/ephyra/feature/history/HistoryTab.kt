@@ -21,7 +21,7 @@ import ephyra.presentation.history.HistoryScreen
 import ephyra.presentation.history.components.HistoryDeleteAllDialog
 import ephyra.presentation.history.components.HistoryDeleteDialog
 import ephyra.presentation.manga.DuplicateMangaDialog
-import ephyra.presentation.util.Tab
+import ephyra.presentation.core.util.Tab
 import ephyra.app.R
 import ephyra.app.ui.category.CategoryScreen
 import ephyra.app.ui.main.MainActivity

@@ -19,9 +19,8 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import ephyra.core.preference.asState
 import ephyra.domain.base.BasePreferences
-import ephyra.presentation.more.MoreScreen
-import ephyra.presentation.util.Tab
-import ephyra.app.R
+import ephyra.presentation.core.util.Tab
+import ephyra.presentation.core.R
 import ephyra.app.data.download.DownloadManager
 import ephyra.feature.category.CategoryScreen
 import ephyra.feature.download.DownloadQueueScreen

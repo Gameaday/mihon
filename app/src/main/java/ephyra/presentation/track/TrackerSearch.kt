@@ -69,7 +69,7 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.manga.components.MangaCover
 import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.app.data.track.model.TrackSearch

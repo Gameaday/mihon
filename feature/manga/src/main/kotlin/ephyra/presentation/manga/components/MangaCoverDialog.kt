@@ -43,9 +43,9 @@ import coil3.imageLoader
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.size.Size
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.feature.manga.presentation.EditCoverAction
 import ephyra.app.ui.reader.viewer.ReaderPageImageView
 import kotlinx.collections.immutable.persistentListOf

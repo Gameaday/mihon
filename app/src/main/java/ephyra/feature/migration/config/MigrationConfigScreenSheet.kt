@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.util.fastForEach
 import ephyra.core.util.fastFilterNot
 import ephyra.domain.source.service.SourcePreferences
-import ephyra.presentation.components.AdaptiveSheet
+import ephyra.presentation.core.components.AdaptiveSheet
 import ephyra.domain.migration.models.MigrationFlag
 import ephyra.feature.common.utils.getLabel
 import ephyra.core.common.preference.Preference

@@ -19,8 +19,8 @@ import androidx.paging.compose.LazyPagingItems
 import ephyra.feature.browse.presentation.components.BrowseSourceComfortableGrid
 import ephyra.feature.browse.presentation.components.BrowseSourceCompactGrid
 import ephyra.feature.browse.presentation.components.BrowseSourceList
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.util.formattedMessage
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.util.formattedMessage
 import eu.kanade.tachiyomi.source.Source
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.StateFlow

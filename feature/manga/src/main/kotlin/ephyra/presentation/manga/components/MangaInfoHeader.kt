@@ -90,7 +90,7 @@ import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.model.markdownAnnotatorConfig
 import com.mikepenz.markdown.utils.getUnescapedTextInNode
 import ephyra.domain.ui.UiPreferences
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.library.components.authorityBrandColor
 import ephyra.presentation.library.components.authorityBrandGradient
 import ephyra.app.R

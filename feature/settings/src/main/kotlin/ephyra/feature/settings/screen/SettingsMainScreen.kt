@@ -33,12 +33,12 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.StringResource
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
 import ephyra.feature.settings.screen.about.AboutScreen
 import ephyra.feature.settings.widget.TextPreferenceWidget
-import ephyra.presentation.util.LocalBackPress
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.LocalBackPress
+import ephyra.presentation.core.util.Screen
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold

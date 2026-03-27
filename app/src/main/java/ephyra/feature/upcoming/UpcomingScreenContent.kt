@@ -22,9 +22,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.relativeDateText
-import ephyra.presentation.util.isTabletUi
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.relativeDateText
+import ephyra.presentation.core.util.isTabletUi
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.launch

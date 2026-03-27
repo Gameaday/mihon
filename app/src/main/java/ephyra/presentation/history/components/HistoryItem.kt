@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import ephyra.presentation.manga.components.MangaCover
 import ephyra.presentation.theme.TachiyomiPreviewTheme
-import ephyra.presentation.util.formatChapterNumber
+import ephyra.presentation.core.util.formatChapterNumber
 import ephyra.app.util.lang.toTimestampString
 import ephyra.domain.history.model.HistoryWithRelations
 import ephyra.i18n.MR

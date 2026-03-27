@@ -1,4 +1,4 @@
-package ephyra.presentation.more
+package ephyra.feature.more
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

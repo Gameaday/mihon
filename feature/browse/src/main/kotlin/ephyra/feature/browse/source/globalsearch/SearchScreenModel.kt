@@ -6,7 +6,7 @@ import androidx.compose.runtime.produceState
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.domain.source.service.SourcePreferences
-import ephyra.presentation.util.ioCoroutineScope
+import ephyra.presentation.core.util.ioCoroutineScope
 import ephyra.app.extension.ExtensionManager
 import eu.kanade.tachiyomi.source.CatalogueSource
 import kotlinx.collections.immutable.PersistentMap

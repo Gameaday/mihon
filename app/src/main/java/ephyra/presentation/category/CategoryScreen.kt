@@ -16,7 +16,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import ephyra.presentation.category.components.CategoryFloatingActionButton
 import ephyra.presentation.category.components.CategoryListItem
-import ephyra.presentation.components.AppBar
+import ephyra.presentation.core.components.AppBar
 import ephyra.app.ui.category.CategoryScreenState
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState

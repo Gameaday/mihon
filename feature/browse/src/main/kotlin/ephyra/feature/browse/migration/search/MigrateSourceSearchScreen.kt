@@ -22,8 +22,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.util.ifSourcesLoaded
 import ephyra.feature.browse.presentation.BrowseSourceContent
-import ephyra.presentation.components.SearchToolbar
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.components.SearchToolbar
+import ephyra.presentation.core.util.Screen
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel
 import ephyra.feature.browse.source.browse.SourceFilterDialog

@@ -38,8 +38,8 @@ class WebViewActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         overrideTransitionCompat(
             Activity.OVERRIDE_TRANSITION_OPEN,
-            R.anim.shared_axis_x_push_enter,
-            R.anim.shared_axis_x_push_exit,
+            ephyra.presentation.core.R.anim.shared_axis_x_push_enter,
+            ephyra.presentation.core.R.anim.shared_axis_x_push_exit,
         )
         super.onCreate(savedInstanceState)
 
@@ -84,8 +84,8 @@ class WebViewActivity : BaseActivity() {
         super.finish()
         overrideTransitionCompat(
             Activity.OVERRIDE_TRANSITION_CLOSE,
-            R.anim.shared_axis_x_pop_enter,
-            R.anim.shared_axis_x_pop_exit,
+            ephyra.presentation.core.R.anim.shared_axis_x_pop_enter,
+            ephyra.presentation.core.R.anim.shared_axis_x_pop_exit,
         )
     }
 

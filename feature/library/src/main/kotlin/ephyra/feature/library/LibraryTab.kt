@@ -34,7 +34,7 @@ import ephyra.feature.library.presentation.components.LibraryContent
 import ephyra.feature.library.presentation.components.LibraryToolbar
 import ephyra.presentation.manga.components.LibraryBottomActionMenu
 import ephyra.presentation.more.onboarding.GETTING_STARTED_URL
-import ephyra.presentation.util.Tab
+import ephyra.presentation.core.util.Tab
 import ephyra.app.R
 import ephyra.app.data.library.LibraryUpdateJob
 import ephyra.app.ui.browse.source.globalsearch.GlobalSearchScreen

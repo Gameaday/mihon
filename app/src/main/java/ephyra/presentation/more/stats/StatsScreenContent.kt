@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import ephyra.presentation.more.stats.components.StatsItem
 import ephyra.presentation.more.stats.components.StatsOverviewItem
 import ephyra.presentation.more.stats.data.StatsData
-import ephyra.presentation.util.toDurationString
+import ephyra.presentation.core.util.toDurationString
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.SectionCard
 import ephyra.presentation.core.components.material.padding

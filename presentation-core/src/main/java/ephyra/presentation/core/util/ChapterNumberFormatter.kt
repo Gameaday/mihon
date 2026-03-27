@@ -1,4 +1,4 @@
-package ephyra.presentation.util
+package ephyra.presentation.core.util
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols

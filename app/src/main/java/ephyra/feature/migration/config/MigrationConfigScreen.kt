@@ -43,9 +43,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.presentation.browse.components.SourceIcon
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.util.Screen
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.app.ui.browse.migration.search.MigrateSearchScreen
 import ephyra.app.util.system.LocaleHelper

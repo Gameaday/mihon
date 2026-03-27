@@ -30,7 +30,7 @@ import ephyra.app.data.cache.CoverCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.manga.model.toSManga
 import ephyra.presentation.category.components.ChangeCategoryDialog
-import ephyra.presentation.components.NavigatorAdaptiveSheet
+import ephyra.presentation.core.components.NavigatorAdaptiveSheet
 import ephyra.feature.manga.presentation.ChapterSettingsDialog
 import ephyra.feature.manga.presentation.DuplicateMangaDialog
 import ephyra.feature.manga.presentation.EditCoverAction
@@ -41,9 +41,9 @@ import ephyra.feature.manga.presentation.components.EditMetadataDialog
 import ephyra.feature.manga.presentation.components.MangaCoverDialog
 import ephyra.feature.manga.presentation.components.ScanlatorFilterDialog
 import ephyra.feature.manga.presentation.components.SetIntervalDialog
-import ephyra.presentation.util.AssistContentScreen
-import ephyra.presentation.util.Screen
-import ephyra.presentation.util.isTabletUi
+import ephyra.presentation.core.util.AssistContentScreen
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.isTabletUi
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.isLocalOrStub
 import eu.kanade.tachiyomi.source.online.HttpSource

@@ -17,10 +17,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.components.AppBarTitle
-import ephyra.presentation.components.DownloadDropdownMenu
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.components.AppBarTitle
+import ephyra.presentation.core.components.DownloadDropdownMenu
 import ephyra.feature.manga.presentation.DownloadAction
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR

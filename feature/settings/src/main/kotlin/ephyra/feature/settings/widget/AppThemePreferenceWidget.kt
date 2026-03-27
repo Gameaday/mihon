@@ -256,7 +256,7 @@ fun AppThemePreviewItem(
     }
 }
 
-import ephyra.presentation.util.LocalUiPreferences
+import ephyra.presentation.core.util.LocalUiPreferences
 import androidx.compose.runtime.CompositionLocalProvider
 
 @PreviewLightDark

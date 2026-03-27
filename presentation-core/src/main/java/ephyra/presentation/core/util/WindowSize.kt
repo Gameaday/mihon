@@ -1,4 +1,4 @@
-package ephyra.presentation.util
+package ephyra.presentation.core.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable

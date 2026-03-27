@@ -8,7 +8,7 @@ import ephyra.domain.ui.model.setAppCompatDelegateThemeMode
 import ephyra.feature.settings.widget.AppThemeModePreferenceWidget
 import ephyra.feature.settings.widget.AppThemePreferenceWidget
 import ephyra.presentation.core.util.collectAsState
-import ephyra.presentation.util.LocalUiPreferences
+import ephyra.presentation.core.util.LocalUiPreferences
 
 internal class ThemeStep : OnboardingStep {
 

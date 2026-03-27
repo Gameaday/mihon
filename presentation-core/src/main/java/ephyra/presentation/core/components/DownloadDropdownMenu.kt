@@ -1,4 +1,4 @@
-package ephyra.presentation.components
+package ephyra.presentation.core.components
 
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider

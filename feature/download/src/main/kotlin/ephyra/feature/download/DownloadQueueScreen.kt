@@ -49,11 +49,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.components.DropdownMenu
-import ephyra.presentation.components.NestedMenuItem
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.components.DropdownMenu
+import ephyra.presentation.core.components.NestedMenuItem
+import ephyra.presentation.core.util.Screen
 import ephyra.app.data.download.model.Download
 import kotlinx.collections.immutable.persistentListOf
 import sh.calvin.reorderable.ReorderableItem

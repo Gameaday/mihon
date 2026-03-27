@@ -42,8 +42,8 @@ import ephyra.feature.browse.presentation.components.BrowseSourceToolbar
 import ephyra.feature.browse.presentation.components.RemoveMangaDialog
 import ephyra.presentation.category.components.ChangeCategoryDialog
 import ephyra.presentation.manga.DuplicateMangaDialog
-import ephyra.presentation.util.AssistContentScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.AssistContentScreen
+import ephyra.presentation.core.util.Screen
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.browse.extension.details.SourcePreferencesScreen

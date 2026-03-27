@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.manga.model.downloadedFilter
 import ephyra.domain.manga.model.chaptersFiltered
-import ephyra.presentation.components.TabbedDialog
-import ephyra.presentation.components.TabbedDialogPaddings
+import ephyra.presentation.core.components.TabbedDialog
+import ephyra.presentation.core.components.TabbedDialogPaddings
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.core.common.preference.TriState
 import ephyra.domain.manga.model.Manga

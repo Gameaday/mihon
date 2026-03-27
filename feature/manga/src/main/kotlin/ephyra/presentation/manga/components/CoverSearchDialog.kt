@@ -38,8 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import ephyra.presentation.components.DropdownMenu
-import ephyra.presentation.util.rememberResourceBitmapPainter
+import ephyra.presentation.core.components.DropdownMenu
+import ephyra.presentation.core.util.rememberResourceBitmapPainter
 import ephyra.app.R
 import ephyra.feature.manga.CoverResult
 import ephyra.feature.manga.CoverSearchScreenModel

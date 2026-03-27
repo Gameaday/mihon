@@ -49,7 +49,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.presentation.track.components.TrackLogoIcon
 import ephyra.app.data.track.Tracker

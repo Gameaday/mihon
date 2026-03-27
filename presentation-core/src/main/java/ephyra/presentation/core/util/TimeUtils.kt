@@ -1,4 +1,4 @@
-package ephyra.presentation.util
+package ephyra.presentation.core.util
 
 import android.content.Context
 import android.text.format.DateUtils

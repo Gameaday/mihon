@@ -44,8 +44,8 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.util.Screen
 import ephyra.app.ui.manga.MangaScreen
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.domain.manga.model.Manga

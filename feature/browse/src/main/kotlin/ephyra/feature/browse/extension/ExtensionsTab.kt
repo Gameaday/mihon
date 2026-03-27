@@ -14,8 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.ExtensionScreen
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.TabContent
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.TabContent
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
 import ephyra.app.extension.model.Extension
 import ephyra.feature.browse.extension.details.ExtensionDetailsScreen

@@ -10,7 +10,7 @@ import ephyra.domain.base.BasePreferences
 import ephyra.presentation.more.onboarding.OnboardingScreen
 import ephyra.feature.settings.screen.SearchableSettings
 import ephyra.feature.settings.screen.SettingsDataScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.app.ui.setting.SettingsScreen
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState

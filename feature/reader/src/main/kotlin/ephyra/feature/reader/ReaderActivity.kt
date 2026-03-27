@@ -61,7 +61,7 @@ import ephyra.app.R
 import ephyra.app.R
 import ephyra.app.data.coil.TachiyomiImageDecoder
 import ephyra.core.common.notification.NotificationManager
-import ephyra.app.databinding.ReaderActivityBinding
+import ephyra.feature.reader.databinding.ReaderActivityBinding
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.AddToLibraryFirst
@@ -147,8 +147,8 @@ class ReaderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         overrideTransitionCompat(
             OVERRIDE_TRANSITION_OPEN,
-            R.anim.shared_axis_x_push_enter,
-            R.anim.shared_axis_x_push_exit,
+            ephyra.presentation.core.R.anim.shared_axis_x_push_enter,
+            ephyra.presentation.core.R.anim.shared_axis_x_push_exit,
         )
 
         enableEdgeToEdge()
@@ -388,8 +388,8 @@ class ReaderActivity : BaseActivity() {
         super.finish()
         overrideTransitionCompat(
             OVERRIDE_TRANSITION_CLOSE,
-            R.anim.shared_axis_x_pop_enter,
-            R.anim.shared_axis_x_pop_exit,
+            ephyra.presentation.core.R.anim.shared_axis_x_pop_enter,
+            ephyra.presentation.core.R.anim.shared_axis_x_pop_exit,
         )
     }
 

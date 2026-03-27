@@ -13,8 +13,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.SourceOptionsDialog
 import ephyra.feature.browse.presentation.SourcesScreen
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.TabContent
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.TabContent
 import ephyra.feature.browse.source.browse.BrowseSourceScreen
 import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
 import kotlinx.collections.immutable.persistentListOf

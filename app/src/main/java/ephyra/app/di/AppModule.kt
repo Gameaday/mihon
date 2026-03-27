@@ -147,7 +147,7 @@ val koinAppModule = module {
     single<ephyra.presentation.core.util.Navigator> { ephyra.app.util.NavigatorImpl() }
     single<ephyra.core.common.notification.NotificationManager> { ephyra.app.data.notification.NotificationManagerImpl(get()) }
     single<CoreThemingDelegate> { ThemingDelegateImpl(get()) }
-    single<CoreSecureActivityDelegate> { SecureActivityDelegateImpl(get(), get()) }
+    single<CoreSecureActivityDelegate> { ephyra.feature.security.SecureActivityDelegateImpl(get(), get()) }
     single { MangaCoverKeyer(get()) }
     single { MangaCoverFetcher.MangaFactory(lazy { get<okhttp3.Call.Factory>() }, get(), get()) }
     single { MangaCoverFetcher.MangaCoverFactory(lazy { get<okhttp3.Call.Factory>() }, get(), get()) }

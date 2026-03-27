@@ -46,7 +46,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastMap
-import ephyra.presentation.components.relativeDateText
+import ephyra.presentation.core.components.relativeDateText
 import ephyra.feature.manga.presentation.components.ChapterDownloadAction
 import ephyra.feature.manga.presentation.components.ChapterHeader
 import ephyra.feature.manga.presentation.components.ExpandableMangaDescription
@@ -57,7 +57,7 @@ import ephyra.feature.manga.presentation.components.MangaInfoBox
 import ephyra.feature.manga.presentation.components.MangaToolbar
 import ephyra.feature.manga.presentation.components.MissingChapterCountListItem
 import ephyra.feature.manga.presentation.components.SourceHealthBanner
-import ephyra.presentation.util.formatChapterNumber
+import ephyra.presentation.core.util.formatChapterNumber
 import ephyra.core.download.model.Download
 import eu.kanade.tachiyomi.source.getNameForMangaInfo
 import ephyra.feature.manga.ChapterList

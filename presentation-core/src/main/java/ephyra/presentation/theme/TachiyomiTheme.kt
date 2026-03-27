@@ -36,7 +36,7 @@ import ephyra.presentation.core.theme.EphyraThemeConfig
 import ephyra.presentation.core.theme.LocalBrandedTheme
 import ephyra.presentation.core.theme.NagareThemeConfig
 import ephyra.presentation.core.theme.toShapes
-import ephyra.presentation.util.LocalUiPreferences
+import ephyra.presentation.core.util.LocalUiPreferences
 
 @Composable
 fun TachiyomiTheme(

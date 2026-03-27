@@ -51,7 +51,7 @@ import ephyra.presentation.track.TrackInfoDialogHome
 import ephyra.presentation.track.TrackScoreSelector
 import ephyra.presentation.track.TrackStatusSelector
 import ephyra.presentation.track.TrackerSearch
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.app.data.track.DeletableTracker
 import ephyra.app.data.track.EnhancedTracker
 import ephyra.app.data.track.Tracker

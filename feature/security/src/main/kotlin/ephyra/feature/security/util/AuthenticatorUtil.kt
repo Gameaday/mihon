@@ -1,6 +1,7 @@
-package ephyra.app.util.system
+package ephyra.feature.security.util
 
 import android.content.Context
+import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.suspendCancellableCoroutine
 import ephyra.core.common.i18n.stringResource
+import ephyra.presentation.core.util.system.toast
 import ephyra.i18n.MR
 import kotlin.coroutines.resume
 

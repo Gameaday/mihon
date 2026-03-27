@@ -11,7 +11,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import org.koin.core.parameter.parametersOf
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.app.ui.browse.migration.search.MigrateSearchScreen
 import ephyra.app.ui.manga.MangaScreen
 import ephyra.presentation.core.util.system.toast

@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import ephyra.presentation.components.TabbedDialog
-import ephyra.presentation.components.TabbedDialogPaddings
+import ephyra.presentation.core.components.TabbedDialog
+import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.app.ui.updates.UpdatesSettingsScreenModel
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.core.common.preference.getAndSet

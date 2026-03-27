@@ -11,8 +11,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.MigrateSourceScreen
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.TabContent
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.TabContent
 import ephyra.feature.browse.migration.manga.MigrateMangaScreen
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR

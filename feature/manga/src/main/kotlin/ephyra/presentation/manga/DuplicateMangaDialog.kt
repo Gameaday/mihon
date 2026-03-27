@@ -56,8 +56,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMaxOfOrNull
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import ephyra.presentation.components.AdaptiveSheet
-import ephyra.presentation.components.TabbedDialogPaddings
+import ephyra.presentation.core.components.AdaptiveSheet
+import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.feature.manga.presentation.components.MangaCover
 import ephyra.feature.settings.LocalPreferenceMinHeight
 import ephyra.feature.settings.widget.TextPreferenceWidget

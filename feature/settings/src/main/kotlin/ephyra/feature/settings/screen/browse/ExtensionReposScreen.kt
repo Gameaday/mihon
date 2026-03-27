@@ -13,7 +13,7 @@ import ephyra.feature.settings.screen.browse.components.ExtensionRepoConflictDia
 import ephyra.feature.settings.screen.browse.components.ExtensionRepoCreateDialog
 import ephyra.feature.settings.screen.browse.components.ExtensionRepoDeleteDialog
 import ephyra.feature.settings.screen.browse.components.ExtensionReposScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.toImmutableSet

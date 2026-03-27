@@ -9,7 +9,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.ExtensionFilterScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import kotlinx.coroutines.flow.collectLatest
 import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR

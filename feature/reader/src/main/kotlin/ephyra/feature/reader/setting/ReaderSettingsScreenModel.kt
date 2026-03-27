@@ -1,7 +1,7 @@
 package ephyra.feature.reader.setting
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import ephyra.presentation.util.ioCoroutineScope
+import ephyra.presentation.core.util.ioCoroutineScope
 import ephyra.feature.reader.ReaderViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

@@ -13,8 +13,8 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.presentation.components.TabbedScreen
-import ephyra.presentation.util.Tab
+import ephyra.presentation.core.components.TabbedScreen
+import ephyra.presentation.core.util.Tab
 import ephyra.app.R
 import ephyra.feature.browse.extension.ExtensionsScreenModel
 import ephyra.feature.browse.extension.extensionsTab

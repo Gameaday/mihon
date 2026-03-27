@@ -35,8 +35,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import ephyra.domain.source.service.SourcePreferences
-import ephyra.presentation.util.Screen
-import ephyra.presentation.util.isTabletUi
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.isTabletUi
 import ephyra.feature.more.MoreTab
 import ephyra.feature.updates.UpdatesTab
 import ephyra.feature.library.LibraryTab

@@ -7,7 +7,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.MigrateSearchScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import org.koin.core.parameter.parametersOf
 import ephyra.feature.browse.source.globalsearch.SearchScreenModel
 import ephyra.app.ui.manga.MangaScreen

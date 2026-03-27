@@ -12,7 +12,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.feature.settings.Preference
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
-import ephyra.app.util.system.AuthenticatorUtil.authenticate
+import ephyra.feature.security.util.AuthenticatorUtil.authenticate
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.domain.extensionrepo.interactor.GetExtensionRepoCount
 import ephyra.core.common.i18n.stringResource

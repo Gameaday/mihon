@@ -14,7 +14,7 @@ import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
-import ephyra.presentation.util.formatChapterNumber
+import ephyra.presentation.core.util.formatChapterNumber
 import ephyra.app.R
 import ephyra.app.core.security.SecurityPreferences
 import ephyra.app.data.download.Downloader
