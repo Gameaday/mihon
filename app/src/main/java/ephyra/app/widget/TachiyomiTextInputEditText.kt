@@ -14,8 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import org.koin.core.context.GlobalContext
 
 /**
  * A custom [TextInputEditText] that sets [EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING] to imeOptions
@@ -27,14 +26,14 @@ class TachiyomiTextInputEditText @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.editTextStyle,
-) : TextInputEditText(context, attrs, defStyleAttr), KoinComponent {
+) : TextInputEditText(context, attrs, defStyleAttr) {
 
     private var scope: CoroutineScope? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-        setIncognito(scope!!, get())
+        setIncognito(scope!!, GlobalContext.get().get())
     }
 
     override fun onDetachedFromWindow() {

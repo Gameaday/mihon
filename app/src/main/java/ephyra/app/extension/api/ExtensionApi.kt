@@ -23,8 +23,6 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.app.extension.util.ExtensionLoader
 import ephyra.core.common.util.system.logcat
 import ephyra.app.core.security.SecurityPreferences
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 

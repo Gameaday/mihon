@@ -10,18 +10,18 @@ This document outlines the phased approach to fully modernize the Ephyra codebas
 
 ## Phase 2: Dependency Injection (Injekt to Koin)
 Migrate the legacy `Injekt` Service Locator to `Koin` Constructor Injection.
-- [ ] Identify all usages of `Injekt.get()`.
-- [ ] Replace global getters with constructor injection in `ScreenModel`s.
-- [ ] Ensure background workers and services are injected via Koin appropriately.
-- [ ] Remove `KoinJavaComponent.get()` and inline `KoinComponent` objects where they act as band-aids.
-- [ ] Fully remove `Injekt` dependency from the codebase.
+- [x] Identify all internal usages of `Injekt.get()`.
+- [x] Replace global getters with constructor injection in `ScreenModel`s.
+- [x] Ensure background workers and services are injected via Koin appropriately.
+- [x] Remove `KoinJavaComponent.get()` and inline `KoinComponent` objects where they act as band-aids.
+- [x] Remove internal `Injekt` dependencies (note: the `uy.kohesive.injekt.Injekt` shim must be kept for legacy extension compatibility).
 
 ## Phase 3: Synchronous Persistence to DataStore
 Replace blocking `SharedPreferences` operations with Flow-based `DataStore`.
-- [ ] Identify all synchronous read/write operations on the Main thread using legacy `AndroidPreferenceStore`.
-- [ ] Ensure preference classes implement `DataStorePreferenceStore`.
-- [ ] Refactor UI and business logic to collect preference flows rather than synchronous fetching.
-- [ ] Ensure `Dispatchers.IO` is strictly used for all disk I/O.
+- [x] Identify all synchronous read/write operations on the Main thread using legacy `AndroidPreferenceStore`.
+- [x] Ensure preference classes implement `DataStorePreferenceStore`.
+- [x] Refactor UI and business logic to collect preference flows rather than synchronous fetching.
+- [x] Ensure `Dispatchers.IO` is strictly used for all disk I/O.
 
 ## Phase 4: Business Logic Isolation (The Interactor Mandate)
 Move data access and business logic out of `ScreenModel`s into single-purpose Interactors.

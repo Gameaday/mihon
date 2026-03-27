@@ -42,9 +42,8 @@ import ephyra.app.widget.TachiyomiTextInputEditText.Companion.setIncognito
 import ephyra.domain.source.service.SourceManager
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.screens.LoadingScreen
+import org.koin.android.ext.android.inject
 import org.koin.compose.getKoin
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class SourcePreferencesScreen(val sourceId: Long) : Screen() {
 
@@ -120,7 +119,7 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
     }
 }
 
-class SourcePreferencesFragment : PreferenceFragmentCompat(), KoinComponent {
+class SourcePreferencesFragment : PreferenceFragmentCompat() {
     private val sourceManager: SourceManager by inject()
 
     override fun getContext(): Context? {

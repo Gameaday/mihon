@@ -58,10 +58,9 @@ import ephyra.presentation.core.components.material.NavigationRail
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.theme.MotionTokens
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import org.koin.compose.koinInject
 
-object HomeScreen : Screen(), KoinComponent {
+object HomeScreen : Screen() {
 
     private val librarySearchEvent = Channel<String>()
     private val openTabEvent = Channel<Tab>()
@@ -251,8 +250,8 @@ object HomeScreen : Screen(), KoinComponent {
             badge = {
                 when {
                     tab is UpdatesTab -> {
+                        val pref = koinInject<LibraryPreferences>()
                         val count by produceState(initialValue = 0) {
-                            val pref = get<LibraryPreferences>()
                             combine(
                                 pref.newShowUpdatesCount().changes(),
                                 pref.newUpdatesCount().changes(),
@@ -274,8 +273,9 @@ object HomeScreen : Screen(), KoinComponent {
                         }
                     }
                     BrowseTab::class.isInstance(tab) -> {
+                        val sourcePreferences = koinInject<SourcePreferences>()
                         val count by produceState(initialValue = 0) {
-                            get<SourcePreferences>().extensionUpdatesCount().changes()
+                            sourcePreferences.extensionUpdatesCount().changes()
                                 .collectLatest { value = it }
                         }
                         if (count > 0) {

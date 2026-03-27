@@ -3,10 +3,10 @@
 To successfully finalize the modernization of Ephyra, we must validate each area of the codebase against strict criteria to ensure the architecture is fully implemented and technical debt is resolved.
 
 ## Dependency Injection: Complete Conversion to Koin
-*   **Metric**: 0 instances of `Injekt.get()` across the codebase.
+*   **Metric**: 0 instances of `Injekt.get()` across the internal codebase (excluding the legacy compatibility shim itself).
 *   **Metric**: 0 instances of `KoinJavaComponent.get()`.
 *   **Metric**: No ad-hoc inline `KoinComponent` objects used as Service Locators.
-*   **Validation**: Search query `grep -rn "Injekt.get" .` and `grep -rn "KoinJavaComponent.get" .` return zero results. All application services, view models, and interactor dependencies are injected strictly via constructor injection.
+*   **Validation**: Search query `grep -rn "Injekt.get" .` and `grep -rn "KoinJavaComponent.get" .` return zero results in internal code. All application services, view models, and interactor dependencies are injected strictly via constructor injection. The `uy.kohesive.injekt.Injekt` shim must remain intact for external extensions.
 
 ## Synchronous Preferences: Complete Conversion to DataStore
 *   **Metric**: 0 instances of blocking disk I/O on the Main thread for preferences.

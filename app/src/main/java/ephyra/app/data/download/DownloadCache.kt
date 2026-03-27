@@ -53,8 +53,7 @@ import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.storage.service.StorageManager
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import org.koin.core.context.GlobalContext
 import java.io.File
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -517,7 +516,7 @@ private class MangaDirectory(
     var chapterDirs: MutableSet<String> = mutableSetOf(),
 )
 
-private object UniFileAsStringSerializer : KSerializer<UniFile?>, KoinComponent {
+private object UniFileAsStringSerializer : KSerializer<UniFile?> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UniFile", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: UniFile?) {
@@ -530,7 +529,7 @@ private object UniFileAsStringSerializer : KSerializer<UniFile?>, KoinComponent 
 
     override fun deserialize(decoder: Decoder): UniFile? {
         return if (decoder.decodeNotNullMark()) {
-            UniFile.fromUri(get<Application>(), decoder.decodeString().toUri())
+            UniFile.fromUri(GlobalContext.get().get<Application>(), decoder.decodeString().toUri())
         } else {
             decoder.decodeNull()
         }

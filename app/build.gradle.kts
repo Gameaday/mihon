@@ -6,6 +6,7 @@ import ephyra.buildlogic.getGitSha
 plugins {
     id("mihon.android.application")
     id("mihon.android.application.compose")
+    kotlin("android")
     kotlin("plugin.serialization")
     alias(libs.plugins.aboutLibraries)
 }

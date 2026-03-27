@@ -1,8 +1,6 @@
 package ephyra.app.ui.manga.track
 
 import org.koin.compose.koinInject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 import android.app.Application
 import android.content.Context

@@ -14,9 +14,10 @@ import ephyra.app.data.backup.models.StringPreferenceValue
 import ephyra.app.data.backup.models.StringSetPreferenceValue
 import ephyra.app.data.library.LibraryUpdateJob
 import eu.kanade.tachiyomi.source.sourcePreferences
-import ephyra.core.common.preference.AndroidPreferenceStore
+import ephyra.core.common.preference.DataStorePreferenceStore
 import ephyra.core.common.preference.PreferenceStore
 import ephyra.core.common.preference.plusAssign
+import ephyra.app.data.preference.SharedPreferencesDataStore
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.model.Category
 import ephyra.domain.download.service.DownloadPreferences
@@ -45,7 +46,7 @@ class PreferenceRestorer(
 
     suspend fun restoreSource(preferences: List<BackupSourcePreferences>) {
         preferences.forEach {
-            val sourcePrefs = AndroidPreferenceStore(context, sourcePreferences(it.sourceKey))
+            val sourcePrefs = DataStorePreferenceStore(SharedPreferencesDataStore(sourcePreferences(it.sourceKey)))
             restorePreferences(it.prefs, sourcePrefs)
         }
     }

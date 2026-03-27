@@ -3,7 +3,6 @@ import ephyra.buildlogic.configureTest
 
 plugins {
     id("com.android.library")
-    kotlin("android")
 
     id("mihon.code.lint")
 }

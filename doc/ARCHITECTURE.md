@@ -36,6 +36,7 @@ The transition from `AndroidPreferenceStore` (legacy SharedPreferences) to `Data
 ### 6. Host-Extension API Preservation
 As a host environment for dynamic, APK-based plugins, the re-architecture respects the **Public API Surface**.
 - **The Decision**: While internal modules move to the `ephyra.*` namespace, the `source-api` module strictly preserves the `eu.kanade.tachiyomi.source` namespace.
+- **Legacy Shims**: Certain legacy compatibility shims (such as `uy.kohesive.injekt.Injekt`) must be preserved exclusively to provide a stable API for legacy extensions. Internal codebase files must not use these shims, but they must exist for external plugins.
 - **The Rationale**: This creates a "Bridge" allowing the app to be modernized internally while maintaining 100% compatibility with thousands of external extensions.
 
 ### 7. R8/Proguard as Security & API Boundary
