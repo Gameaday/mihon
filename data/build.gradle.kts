@@ -2,7 +2,7 @@ plugins {
     id("mihon.library")
     kotlin("android")
     kotlin("plugin.serialization")
-    alias(libs.plugins.sqldelight)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -10,16 +10,6 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    sqldelight {
-        databases {
-            create("Database") {
-                packageName.set("tachiyomi.data")
-                dialect(libs.sqldelight.dialects.sql)
-                schemaOutputDirectory.set(project.file("./src/main/sqldelight"))
-            }
-        }
     }
 }
 
@@ -34,5 +24,8 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.core.common)
 
-    api(libs.bundles.sqldelight)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.room.paging)
+    ksp(libs.room.compiler)
 }

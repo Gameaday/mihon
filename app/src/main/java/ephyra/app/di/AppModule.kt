@@ -1,9 +1,6 @@
 package ephyra.app.di
 
-import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
-import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import androidx.room.*
 import ephyra.domain.track.store.DelayedTrackingStore
 import ephyra.app.BuildConfig
 import ephyra.app.data.cache.ChapterCache
@@ -43,14 +40,7 @@ import eu.kanade.tachiyomi.network.JavaScriptEngine
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.source.AndroidSourceManager
 import ephyra.core.common.storage.AndroidStorageFolderProvider
-import ephyra.data.AndroidDatabaseHandler
-import ephyra.data.Database
-import ephyra.data.DatabaseHandler
-import ephyra.data.DateColumnAdapter
-import ephyra.data.History
-import ephyra.data.Mangas
-import ephyra.data.StringListColumnAdapter
-import ephyra.data.UpdateStrategyColumnAdapter
+import ephyra.data.room.EphyraDatabase
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.storage.service.StorageManager
 import ephyra.source.local.image.LocalCoverManager
@@ -66,58 +56,31 @@ import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.module
 
 val koinAppModule = module {
-    single<SqlDriver> {
-        AndroidSqliteDriver(
-            schema = Database.Schema,
-            context = androidApplication(),
-            name = "tachiyomi.db",
-            factory = if (BuildConfig.DEBUG) {
-                FrameworkSQLiteOpenHelperFactory()
-            } else {
-                RequerySQLiteOpenHelperFactory()
-            },
-            callback = object : AndroidSqliteDriver.Callback(Database.Schema) {
-                override fun onConfigure(db: SupportSQLiteDatabase) {
-                    super.onConfigure(db)
-                    setPragma(db, "auto_vacuum = INCREMENTAL")
-                }
-                override fun onOpen(db: SupportSQLiteDatabase) {
-                    super.onOpen(db)
-                    setPragma(db, "foreign_keys = ON")
-                    setPragma(db, "journal_mode = WAL")
-                    setPragma(db, "synchronous = NORMAL")
-                    setPragma(db, "temp_store = MEMORY")
-                    setPragma(db, "cache_size = -8192")
-                    setPragma(db, "mmap_size = 67108864")
-                    setPragma(db, "incremental_vacuum(256)")
-                    Thread {
-                        try {
-                            setPragma(db, "wal_checkpoint(TRUNCATE)")
-                            setPragma(db, "optimize")
-                        } catch (_: Exception) {}
-                    }.apply { name = "db-maintenance" }.start()
-                }
-                private fun setPragma(db: SupportSQLiteDatabase, pragma: String) {
-                    val cursor = db.query("PRAGMA $pragma")
-                    cursor.moveToFirst()
-                    cursor.close()
-                }
-            },
-        )
-    }
-
     single {
-        Database(
-            driver = get(),
-            historyAdapter = History.Adapter(last_readAdapter = DateColumnAdapter),
-            mangasAdapter = Mangas.Adapter(
-                genreAdapter = StringListColumnAdapter,
-                update_strategyAdapter = UpdateStrategyColumnAdapter,
-            ),
+        Room.databaseBuilder(
+            context = androidApplication(),
+            klass = EphyraDatabase::class.java,
+            name = "tachiyomi.db"
         )
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onOpen(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    db.query("PRAGMA foreign_keys = ON").close()
+                    db.query("PRAGMA journal_mode = WAL").close()
+                    db.query("PRAGMA synchronous = NORMAL").close()
+                }
+            })
+            .build()
     }
 
-    single<DatabaseHandler> { AndroidDatabaseHandler(get(), get()) }
+    single { get<EphyraDatabase>().mangaDao() }
+    single { get<EphyraDatabase>().chapterDao() }
+    single { get<EphyraDatabase>().categoryDao() }
+    single { get<EphyraDatabase>().historyDao() }
+    single { get<EphyraDatabase>().trackDao() }
+    single { get<EphyraDatabase>().updateDao() }
+    single { get<EphyraDatabase>().extensionRepoDao() }
+
 
     single {
         Json {

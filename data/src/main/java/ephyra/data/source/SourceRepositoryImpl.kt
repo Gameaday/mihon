@@ -7,7 +7,7 @@ import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import ephyra.data.DatabaseHandler
+import ephyra.data.room.daos.MangaDao
 import ephyra.domain.source.model.SourceWithCount
 import ephyra.domain.source.model.StubSource
 import ephyra.domain.source.repository.SourcePagingSource
@@ -18,7 +18,7 @@ import ephyra.domain.source.model.Source as DomainSource
 
 class SourceRepositoryImpl(
     private val sourceManager: SourceManager,
-    private val handler: DatabaseHandler,
+    private val mangaDao: MangaDao,
     private val networkToLocalManga: NetworkToLocalManga,
 ) : SourceRepository {
 
@@ -42,11 +42,11 @@ class SourceRepositoryImpl(
 
     override fun getSourcesWithFavoriteCount(): Flow<List<Pair<DomainSource, Long>>> {
         return combine(
-            handler.subscribeToList { mangasQueries.getSourceIdWithFavoriteCount() },
+            mangaDao.getSourceIdWithFavoriteCount(),
             sourceManager.catalogueSources,
         ) { sourceIdWithFavoriteCount, _ -> sourceIdWithFavoriteCount }
-            .map {
-                it.map { (sourceId, count) ->
+            .map { list ->
+                list.map { (sourceId, count) ->
                     val source = sourceManager.getOrStub(sourceId)
                     val domainSource = mapSourceToDomainSource(source).copy(
                         isStub = source is StubSource,
@@ -57,10 +57,8 @@ class SourceRepositoryImpl(
     }
 
     override fun getSourcesWithNonLibraryManga(): Flow<List<SourceWithCount>> {
-        val sourceIdWithNonLibraryManga =
-            handler.subscribeToList { mangasQueries.getSourceIdsWithNonLibraryManga() }
-        return sourceIdWithNonLibraryManga.map { sourceId ->
-            sourceId.map { (sourceId, count) ->
+        return mangaDao.getSourceIdsWithNonLibraryManga().map { list ->
+            list.map { (sourceId, count) ->
                 val source = sourceManager.getOrStub(sourceId)
                 val domainSource = mapSourceToDomainSource(source).copy(
                     isStub = source is StubSource,

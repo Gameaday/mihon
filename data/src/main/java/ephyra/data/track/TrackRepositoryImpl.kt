@@ -1,43 +1,34 @@
 package ephyra.data.track
 
 import kotlinx.coroutines.flow.Flow
-import ephyra.data.DatabaseHandler
+import kotlinx.coroutines.flow.map
+import ephyra.data.room.daos.TrackDao
+import ephyra.data.room.entities.TrackEntity
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.repository.TrackRepository
 
 class TrackRepositoryImpl(
-    private val handler: DatabaseHandler,
+    private val trackDao: TrackDao,
 ) : TrackRepository {
 
     override suspend fun getTrackById(id: Long): Track? {
-        return handler.awaitOneOrNull { manga_syncQueries.getTrackById(id, TrackMapper::mapTrack) }
+        return trackDao.getTrackById(id)?.let(TrackMapper::mapTrack)
     }
 
     override suspend fun getTracksByMangaId(mangaId: Long): List<Track> {
-        return handler.awaitList {
-            manga_syncQueries.getTracksByMangaId(mangaId, TrackMapper::mapTrack)
-        }
+        return trackDao.getTracksByMangaId(mangaId).map(TrackMapper::mapTrack)
     }
 
     override fun getTracksAsFlow(): Flow<List<Track>> {
-        return handler.subscribeToList {
-            manga_syncQueries.getTracks(TrackMapper::mapTrack)
-        }
+        return trackDao.getTracksAsFlow().map { list -> list.map(TrackMapper::mapTrack) }
     }
 
     override fun getTracksByMangaIdAsFlow(mangaId: Long): Flow<List<Track>> {
-        return handler.subscribeToList {
-            manga_syncQueries.getTracksByMangaId(mangaId, TrackMapper::mapTrack)
-        }
+        return trackDao.getTracksByMangaIdAsFlow(mangaId).map { list -> list.map(TrackMapper::mapTrack) }
     }
 
     override suspend fun delete(mangaId: Long, trackerId: Long) {
-        handler.await {
-            manga_syncQueries.delete(
-                mangaId = mangaId,
-                syncId = trackerId,
-            )
-        }
+        trackDao.delete(mangaId, trackerId)
     }
 
     override suspend fun insert(track: Track) {
@@ -49,24 +40,24 @@ class TrackRepositoryImpl(
     }
 
     private suspend fun insertValues(vararg tracks: Track) {
-        handler.await(inTransaction = true) {
-            tracks.forEach { mangaTrack ->
-                manga_syncQueries.insert(
-                    mangaId = mangaTrack.mangaId,
-                    syncId = mangaTrack.trackerId,
-                    remoteId = mangaTrack.remoteId,
-                    libraryId = mangaTrack.libraryId,
-                    title = mangaTrack.title,
-                    lastChapterRead = mangaTrack.lastChapterRead,
-                    totalChapters = mangaTrack.totalChapters,
-                    status = mangaTrack.status,
-                    score = mangaTrack.score,
-                    remoteUrl = mangaTrack.remoteUrl,
-                    startDate = mangaTrack.startDate,
-                    finishDate = mangaTrack.finishDate,
-                    private = mangaTrack.private,
-                )
-            }
+        tracks.forEach { mangaTrack ->
+            val entity = TrackEntity(
+                id = mangaTrack.id,
+                mangaId = mangaTrack.mangaId,
+                syncId = mangaTrack.trackerId,
+                remoteId = mangaTrack.remoteId,
+                libraryId = mangaTrack.libraryId,
+                title = mangaTrack.title,
+                lastChapterRead = mangaTrack.lastChapterRead,
+                totalChapters = mangaTrack.totalChapters,
+                status = mangaTrack.status,
+                score = mangaTrack.score,
+                remoteUrl = mangaTrack.remoteUrl,
+                startDate = mangaTrack.startDate,
+                finishDate = mangaTrack.finishDate,
+                private = mangaTrack.private,
+            )
+            trackDao.insert(entity)
         }
     }
 }

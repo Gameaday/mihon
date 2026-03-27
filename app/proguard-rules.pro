@@ -5,6 +5,7 @@
 -keep,allowoptimization class ephyra.**
 
 # Keep common dependencies used in extensions
+# If you remove an extension dependency, shim to retain extension compatibility
 -keep,allowoptimization class androidx.preference.** { public protected *; }
 -keep,allowoptimization class kotlin.** { public protected *; }
 -keep,allowoptimization class kotlinx.coroutines.** { public protected *; }

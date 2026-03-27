@@ -1,79 +1,62 @@
 package ephyra.data.history
 
 import kotlinx.coroutines.flow.Flow
-import logcat.LogPriority
-import ephyra.core.common.util.system.logcat
-import ephyra.data.DatabaseHandler
+import kotlinx.coroutines.flow.map
+import ephyra.data.room.daos.HistoryDao
+import ephyra.data.room.entities.HistoryEntity
 import ephyra.domain.history.model.History
 import ephyra.domain.history.model.HistoryUpdate
 import ephyra.domain.history.model.HistoryWithRelations
 import ephyra.domain.history.repository.HistoryRepository
 
 class HistoryRepositoryImpl(
-    private val handler: DatabaseHandler,
+    private val historyDao: HistoryDao,
 ) : HistoryRepository {
 
     override fun getHistory(query: String): Flow<List<HistoryWithRelations>> {
-        return handler.subscribeToList {
-            historyViewQueries.history(query, HistoryMapper::mapHistoryWithRelations)
-        }
+        return historyDao.getHistory(query).map { list -> list.map(HistoryMapper::mapHistoryWithRelations) }
     }
 
     override suspend fun getLastHistory(): HistoryWithRelations? {
-        return handler.awaitOneOrNull {
-            historyViewQueries.getLatestHistory(HistoryMapper::mapHistoryWithRelations)
-        }
+        return historyDao.getLatestHistory()?.let(HistoryMapper::mapHistoryWithRelations)
     }
 
     override suspend fun getTotalReadDuration(): Long {
-        return handler.awaitOne { historyQueries.getReadDuration() }
+        return historyDao.getTotalReadDuration()
     }
 
     override suspend fun getHistoryByMangaId(mangaId: Long): List<History> {
-        return handler.awaitList { historyQueries.getHistoryByMangaId(mangaId, HistoryMapper::mapHistory) }
+        return historyDao.getHistoryByMangaId(mangaId).map(HistoryMapper::mapHistory)
     }
 
     override suspend fun resetHistory(historyId: Long) {
-        try {
-            handler.await { historyQueries.resetHistoryById(historyId) }
-        } catch (e: Exception) {
-            logcat(LogPriority.ERROR, throwable = e)
-        }
+        historyDao.resetHistory(historyId)
     }
 
     override suspend fun resetHistoryByMangaId(mangaId: Long) {
-        try {
-            handler.await { historyQueries.resetHistoryByMangaId(mangaId) }
-        } catch (e: Exception) {
-            logcat(LogPriority.ERROR, throwable = e)
-        }
+        historyDao.resetHistoryByMangaId(mangaId)
     }
 
     override suspend fun deleteAllHistory(): Boolean {
         return try {
-            handler.await { historyQueries.removeAllHistory() }
+            historyDao.removeAll()
             true
         } catch (e: Exception) {
-            logcat(LogPriority.ERROR, throwable = e)
             false
         }
     }
 
     override suspend fun upsertHistory(historyUpdate: HistoryUpdate) {
-        try {
-            handler.await {
-                historyQueries.upsert(
-                    historyUpdate.chapterId,
-                    historyUpdate.readAt,
-                    historyUpdate.sessionReadDuration,
-                )
-            }
-        } catch (e: Exception) {
-            logcat(LogPriority.ERROR, throwable = e)
-        }
+        val entity = HistoryEntity(
+            id = 0,
+            chapterId = historyUpdate.chapterId,
+            lastRead = historyUpdate.readAt,
+            timeRead = historyUpdate.readDuration,
+        )
+        historyDao.upsert(entity)
     }
 
     override suspend fun removeResettedHistory() {
-        handler.await { historyQueries.removeResettedHistory() }
+        historyDao.removeResettedHistory()
     }
 }

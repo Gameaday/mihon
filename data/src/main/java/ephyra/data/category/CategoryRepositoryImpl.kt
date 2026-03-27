@@ -1,98 +1,73 @@
 package ephyra.data.category
 
 import kotlinx.coroutines.flow.Flow
-import ephyra.data.Database
-import ephyra.data.DatabaseHandler
+import kotlinx.coroutines.flow.map
+import ephyra.data.room.daos.CategoryDao
+import ephyra.data.room.entities.CategoryEntity
 import ephyra.domain.category.model.Category
 import ephyra.domain.category.model.CategoryUpdate
 import ephyra.domain.category.repository.CategoryRepository
 
 class CategoryRepositoryImpl(
-    private val handler: DatabaseHandler,
+    private val categoryDao: CategoryDao,
 ) : CategoryRepository {
 
     override suspend fun get(id: Long): Category? {
-        return handler.awaitOneOrNull { categoriesQueries.getCategory(id, ::mapCategory) }
+        return categoryDao.getCategories().find { it.id == id }?.let(CategoryMapper::mapCategory)
     }
 
     override suspend fun getAll(): List<Category> {
-        return handler.awaitList { categoriesQueries.getCategories(::mapCategory) }
+        return categoryDao.getCategories().map(CategoryMapper::mapCategory)
     }
 
     override fun getAllAsFlow(): Flow<List<Category>> {
-        return handler.subscribeToList { categoriesQueries.getCategories(::mapCategory) }
+        return categoryDao.getCategoriesAsFlow().map { list -> list.map(CategoryMapper::mapCategory) }
     }
 
     override suspend fun getCategoriesByMangaId(mangaId: Long): List<Category> {
-        return handler.awaitList {
-            categoriesQueries.getCategoriesByMangaId(mangaId, ::mapCategory)
-        }
+        return categoryDao.getCategoriesByMangaId(mangaId).map(CategoryMapper::mapCategory)
     }
 
     override fun getCategoriesByMangaIdAsFlow(mangaId: Long): Flow<List<Category>> {
-        return handler.subscribeToList {
-            categoriesQueries.getCategoriesByMangaId(mangaId, ::mapCategory)
-        }
+        return categoryDao.getCategoriesByMangaIdAsFlow(mangaId).map { list -> list.map(CategoryMapper::mapCategory) }
     }
 
     override suspend fun insert(category: Category) {
-        handler.await {
-            categoriesQueries.insert(
-                name = category.name,
-                order = category.order,
-                flags = category.flags,
-            )
-        }
+        val entity = CategoryEntity(
+            id = 0,
+            name = category.name,
+            sort = category.order.toInt(),
+            flags = category.flags,
+        )
+        categoryDao.insert(entity)
     }
 
     override suspend fun updatePartial(update: CategoryUpdate) {
-        handler.await {
+        updatePartialBlocking(update)
+    }
+
+    override suspend fun updatePartial(updates: List<CategoryUpdate>) {
+        for (update in updates) {
             updatePartialBlocking(update)
         }
     }
 
-    override suspend fun updatePartial(updates: List<CategoryUpdate>) {
-        handler.await(inTransaction = true) {
-            for (update in updates) {
-                updatePartialBlocking(update)
-            }
-        }
-    }
-
-    private fun Database.updatePartialBlocking(update: CategoryUpdate) {
-        categoriesQueries.update(
-            name = update.name,
-            order = update.order,
-            flags = update.flags,
-            categoryId = update.id,
+    private suspend fun updatePartialBlocking(update: CategoryUpdate) {
+        val existing = get(update.id) ?: return
+        val updated = CategoryEntity(
+            id = update.id,
+            name = update.name ?: existing.name,
+            sort = (update.order ?: existing.order).toInt(),
+            flags = update.flags ?: existing.flags,
         )
+        categoryDao.update(updated)
     }
 
     override suspend fun updateAllFlags(flags: Long?) {
-        handler.await {
-            categoriesQueries.updateAllFlags(flags)
-        }
+        categoryDao.updateAllFlags(flags)
     }
 
     override suspend fun delete(categoryId: Long) {
-        handler.await {
-            categoriesQueries.delete(
-                categoryId = categoryId,
-            )
-        }
-    }
-
-    private fun mapCategory(
-        id: Long,
-        name: String,
-        order: Long,
-        flags: Long,
-    ): Category {
-        return Category(
-            id = id,
-            name = name,
-            order = order,
-            flags = flags,
-        )
+        categoryDao.delete(categoryId)
     }
 }

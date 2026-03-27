@@ -1,5 +1,6 @@
 package ephyra.data.track
 
+import ephyra.data.room.entities.TrackEntity
 import ephyra.domain.track.model.Track
 
 object TrackMapper {
@@ -33,5 +34,22 @@ object TrackMapper {
         startDate = startDate,
         finishDate = finishDate,
         private = private,
+    )
+
+    fun mapTrack(entity: TrackEntity): Track = mapTrack(
+        id = entity.id,
+        mangaId = entity.mangaId,
+        syncId = entity.syncId,
+        remoteId = entity.remoteId,
+        libraryId = entity.libraryId,
+        title = entity.title,
+        lastChapterRead = entity.lastChapterRead,
+        totalChapters = entity.totalChapters,
+        status = entity.status,
+        score = entity.score,
+        remoteUrl = entity.remoteUrl,
+        startDate = entity.startDate,
+        finishDate = entity.finishDate,
+        private = entity.private,
     )
 }

@@ -1,0 +1,54 @@
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: :data:assembleDebug
+Type-safe project accessors is an incubating feature.
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :buildSrc:compilePluginsBlocks UP-TO-DATE
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :buildSrc:generateScriptPluginAdapters UP-TO-DATE
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :data
+w: Deprecated Gradle Property 'kotlin.incremental.useClasspathSnapshot' Used
+The `kotlin.incremental.useClasspathSnapshot` deprecated property is used in your build.
+Solutions:
+ * It is unsupported, please stop using it.
+ * History based incremental compilation approach for JVM platform is removed. Kotlin Gradle plugin is now using a more efficient approach based on ABI snapshots.
+
+w: Deprecated Gradle Property 'kotlin.compiler.preciseCompilationResultsBackup' Used
+The `kotlin.compiler.preciseCompilationResultsBackup` deprecated property is used in your build.
+Solutions:
+ * It is unsupported, please stop using it.
+ * Backups of compilation outputs using the non-precise method have been deprecated and phased out. Only the precise backup method is now used, which is more efficient.
+
+
+
+[Incubating] Problems report is available at: file:///C:/Project/Android/Ephyra/build/reports/problems/problems-report.html
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+org/gradle/api/artifacts/SelfResolvingDependency
+> org.gradle.api.artifacts.SelfResolvingDependency
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+9 actionable tasks: 9 up-to-date
+BUILD FAILED in 1s
+Configuration cache entry stored.

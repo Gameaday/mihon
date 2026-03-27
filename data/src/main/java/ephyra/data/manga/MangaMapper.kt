@@ -8,6 +8,9 @@ import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaWithChapterCount
+import ephyra.data.room.entities.MangaEntity
+import ephyra.data.room.views.LibraryView
+import ephyra.data.room.views.UpdatesView
 
 object MangaMapper {
     fun mapManga(
@@ -78,6 +81,42 @@ object MangaMapper {
         deadSince = deadSince,
         contentType = ContentType.fromValue(contentType.toInt()),
         lockedFields = lockedFields,
+    )
+
+    fun mapManga(entity: MangaEntity): Manga = mapManga(
+        id = entity.id,
+        source = entity.source,
+        url = entity.url,
+        artist = entity.artist,
+        author = entity.author,
+        description = entity.description,
+        genre = entity.genre,
+        title = entity.title,
+        status = entity.status,
+        thumbnailUrl = entity.thumbnailUrl,
+        favorite = entity.favorite,
+        lastUpdate = entity.lastUpdate,
+        nextUpdate = entity.nextUpdate,
+        initialized = entity.initialized,
+        viewerFlags = entity.viewerFlags,
+        chapterFlags = entity.chapterFlags,
+        coverLastModified = entity.coverLastModified,
+        dateAdded = entity.dateAdded,
+        updateStrategy = entity.updateStrategy.let { UpdateStrategy.entries[it] },
+        calculateInterval = entity.calculateInterval.toLong(),
+        lastModifiedAt = entity.lastModifiedAt,
+        favoriteModifiedAt = entity.favoriteModifiedAt,
+        version = entity.version,
+        isSyncing = if (entity.isSyncing) 1L else 0L,
+        notes = entity.notes,
+        metadataSource = entity.metadataSource,
+        metadataUrl = entity.metadataUrl,
+        canonicalId = entity.canonicalId,
+        sourceStatus = entity.sourceStatus.toLong(),
+        alternativeTitles = entity.alternativeTitles,
+        deadSince = entity.deadSince,
+        contentType = entity.contentType.toLong(),
+        lockedFields = entity.lockedFields,
     )
 
     fun mapLibraryManga(
@@ -164,6 +203,49 @@ object MangaMapper {
         latestUpload = latestUpload,
         chapterFetchedAt = chapterFetchedAt,
         lastRead = lastRead,
+    )
+
+    fun mapLibraryManga(view: LibraryView): LibraryManga = mapLibraryManga(
+        id = view._id,
+        source = view.source,
+        url = view.url,
+        artist = view.artist,
+        author = view.author,
+        description = view.description,
+        genre = view.genre,
+        title = view.title,
+        status = view.status,
+        thumbnailUrl = view.thumbnail_url,
+        favorite = view.favorite,
+        lastUpdate = view.last_update,
+        nextUpdate = view.next_update,
+        initialized = view.initialized,
+        viewerFlags = view.viewer,
+        chapterFlags = view.chapter_flags,
+        coverLastModified = view.cover_last_modified,
+        dateAdded = view.date_added,
+        updateStrategy = view.update_strategy,
+        calculateInterval = view.calculate_interval.toLong(),
+        lastModifiedAt = view.last_modified_at,
+        favoriteModifiedAt = view.favorite_modified_at,
+        version = view.version,
+        isSyncing = if (view.is_syncing) 1L else 0L,
+        notes = view.notes,
+        metadataSource = view.metadata_source,
+        metadataUrl = view.metadata_url,
+        canonicalId = view.canonical_id,
+        sourceStatus = view.source_status.toLong(),
+        alternativeTitles = view.alternative_titles,
+        deadSince = view.dead_since,
+        contentType = view.content_type.toLong(),
+        lockedFields = view.locked_fields,
+        totalCount = view.totalCount,
+        readCount = view.readCount.toDouble(),
+        latestUpload = view.latestUpload,
+        chapterFetchedAt = view.chapterFetchedAt,
+        lastRead = view.lastRead,
+        bookmarkCount = view.bookmarkCount.toDouble(),
+        categories = view.categories,
     )
 
     fun mapMangaWithChapterCount(
