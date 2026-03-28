@@ -6,6 +6,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.core.graphics.alpha
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
@@ -51,6 +53,7 @@ internal fun ColumnScope.ColorFilterPage(screenModel: ReaderSettingsScreenModel)
         label = stringResource(MR.strings.pref_custom_color_filter),
         pref = screenModel.preferences.colorFilter(),
     )
+    val scope = rememberCoroutineScope()
     if (colorFilter) {
         val colorFilterValue by screenModel.preferences.colorFilterValue().collectAsState()
         SliderItem(
@@ -59,8 +62,10 @@ internal fun ColumnScope.ColorFilterPage(screenModel: ReaderSettingsScreenModel)
             steps = 0,
             label = stringResource(MR.strings.color_filter_r_value),
             onChange = { newRValue ->
-                screenModel.preferences.colorFilterValue().getAndSet {
-                    getColorValue(it, newRValue, RED_MASK, 16)
+                scope.launch {
+                    screenModel.preferences.colorFilterValue().getAndSet {
+                        getColorValue(it, newRValue, RED_MASK, 16)
+                    }
                 }
             },
             pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -71,8 +76,10 @@ internal fun ColumnScope.ColorFilterPage(screenModel: ReaderSettingsScreenModel)
             steps = 0,
             label = stringResource(MR.strings.color_filter_g_value),
             onChange = { newGValue ->
-                screenModel.preferences.colorFilterValue().getAndSet {
-                    getColorValue(it, newGValue, GREEN_MASK, 8)
+                scope.launch {
+                    screenModel.preferences.colorFilterValue().getAndSet {
+                        getColorValue(it, newGValue, GREEN_MASK, 8)
+                    }
                 }
             },
             pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -83,8 +90,10 @@ internal fun ColumnScope.ColorFilterPage(screenModel: ReaderSettingsScreenModel)
             steps = 0,
             label = stringResource(MR.strings.color_filter_b_value),
             onChange = { newBValue ->
-                screenModel.preferences.colorFilterValue().getAndSet {
-                    getColorValue(it, newBValue, BLUE_MASK, 0)
+                scope.launch {
+                    screenModel.preferences.colorFilterValue().getAndSet {
+                        getColorValue(it, newBValue, BLUE_MASK, 0)
+                    }
                 }
             },
             pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -95,8 +104,10 @@ internal fun ColumnScope.ColorFilterPage(screenModel: ReaderSettingsScreenModel)
             steps = 0,
             label = stringResource(MR.strings.color_filter_a_value),
             onChange = { newAValue ->
-                screenModel.preferences.colorFilterValue().getAndSet {
-                    getColorValue(it, newAValue, ALPHA_MASK, 24)
+                scope.launch {
+                    screenModel.preferences.colorFilterValue().getAndSet {
+                        getColorValue(it, newAValue, ALPHA_MASK, 24)
+                    }
                 }
             },
             pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
