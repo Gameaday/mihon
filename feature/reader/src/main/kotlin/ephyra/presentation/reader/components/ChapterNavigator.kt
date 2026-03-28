@@ -106,7 +106,7 @@ fun ChapterNavigator(
                         }
 
                         val interactionSource = remember { MutableInteractionSource() }
-                        val sliderDragged by interactionSource.collectIsDraggedAsState()
+                        val sliderDragged: Boolean by interactionSource.collectIsDraggedAsState()
                         LaunchedEffect(currentPage) {
                             if (sliderDragged) {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)

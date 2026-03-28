@@ -38,6 +38,7 @@ dependencies {
     
     implementation(libs.subsamplingscaleimageview)
     implementation(libs.image.decoder)
+    implementation(libs.unifile)
 }
 
 

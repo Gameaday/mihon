@@ -7,8 +7,8 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ephyra.domain.base.BasePreferences
-import ephyra.domain.chapter.model.toDbChapter
+import ephyra.domain.chapter.model.Chapter
+import ephyra.data.mappers.toDbChapter
 import ephyra.domain.manga.interactor.SetMangaViewerFlags
 import ephyra.domain.manga.model.readerOrientation
 import ephyra.domain.manga.model.readingMode
@@ -175,8 +175,8 @@ class ReaderViewModel @JvmOverloads constructor(
 
     private var chapterToDownload: Download? = null
 
-    private var unfilteredChapterListCache: List<ephyra.domain.chapter.model.Chapter>? = null
-    private suspend fun getUnfilteredChapterList(): List<ephyra.domain.chapter.model.Chapter> {
+    private var unfilteredChapterListCache: List<Chapter>? = null
+    private suspend fun getUnfilteredChapterList(): List<Chapter> {
         if (unfilteredChapterListCache == null) {
             val manga = manga!!
             unfilteredChapterListCache = getChaptersByMangaId.await(manga.id, applyScanlatorFilter = false)
@@ -273,7 +273,7 @@ class ReaderViewModel @JvmOverloads constructor(
     }
 
     private val incognitoMode: Boolean by lazy { getIncognitoState.await(manga?.source) }
-    private val downloadAheadAmount = downloadPreferences.autoDownloadWhileReading().get()
+    private suspend fun downloadAheadAmount(): Int = downloadPreferences.autoDownloadWhileReading().get()
 
     init {
         // To save state
@@ -288,7 +288,7 @@ class ReaderViewModel @JvmOverloads constructor(
                     // value in sync with real progress via onPageSelected().
                     hasAppliedSavedPageIndex = true
                 } else if (!currentChapter.chapter.read) {
-                    currentChapter.requestedPage = currentChapter.chapter.last_page_read
+                    currentChapter.requestedPage = currentChapter.chapter.lastPageRead.toInt()
                 }
                 chapterId = currentChapter.chapter.id!!
             }
@@ -606,7 +606,6 @@ class ReaderViewModel @JvmOverloads constructor(
     }
 
     private fun downloadNextChapters() {
-        if (downloadAheadAmount == 0) return
         val manga = manga ?: return
 
         // Only download ahead if current + next chapter is already downloaded too to avoid jank
@@ -614,6 +613,8 @@ class ReaderViewModel @JvmOverloads constructor(
         val nextChapter = state.value.viewerChapters?.nextChapter?.chapter ?: return
 
         viewModelScope.launchIO {
+            val downloadAheadAmount = downloadAheadAmount()
+            if (downloadAheadAmount == 0) return@launchIO
             // Ensure the DownloadCache has finished reading its on-disk snapshot before
             // querying it. On the warm path this is a non-suspending check; on a cold
             // start it waits for the brief disk-cache read to avoid a false negative that
@@ -699,10 +700,10 @@ class ReaderViewModel @JvmOverloads constructor(
         chapterPageIndex = pageIndex
 
         if (!incognitoMode && page.status !is Page.State.Error) {
-            val prevLastPageRead = readerChapter.chapter.last_page_read
+            val prevLastPageRead = readerChapter.chapter.lastPageRead
             val prevRead = readerChapter.chapter.read
 
-            readerChapter.chapter.last_page_read = pageIndex
+            readerChapter.chapter.lastPageRead = pageIndex.toLong()
 
             // A page is the effective last page when it literally is the last page in the
             // chapter's page list, OR when all subsequent pages are hidden (absorbed stubs
@@ -716,14 +717,14 @@ class ReaderViewModel @JvmOverloads constructor(
 
             // Skip the DB write when neither lastPageRead nor read changed — a memory
             // equality check is cheaper than a SQL UPDATE and avoids unnecessary I/O.
-            if (readerChapter.chapter.last_page_read != prevLastPageRead ||
+            if (readerChapter.chapter.lastPageRead != prevLastPageRead ||
                 readerChapter.chapter.read != prevRead
             ) {
                 updateChapter.await(
                     ChapterUpdate(
                         id = readerChapter.chapter.id!!,
                         read = readerChapter.chapter.read,
-                        lastPageRead = readerChapter.chapter.last_page_read.toLong(),
+                        lastPageRead = readerChapter.chapter.lastPageRead,
                     ),
                 )
             }
@@ -744,7 +745,7 @@ class ReaderViewModel @JvmOverloads constructor(
                 if (
                     !chapter.read &&
                     chapter.isRecognizedNumber &&
-                    chapter.chapterNumber.toFloat() == readerChapter.chapter.chapter_number
+                    chapter.chapterNumber == readerChapter.chapter.chapterNumber
                 ) {
                     ChapterUpdate(id = chapter.id, read = true)
                 } else {
@@ -851,7 +852,7 @@ class ReaderViewModel @JvmOverloads constructor(
      * genre keywords and publishing type to suggest continuous vertical
      * scrolling — matching Jellyfin's content-aware reader behaviour.
      */
-    fun getMangaReadingMode(resolveDefault: Boolean = true): Int {
+    suspend fun getMangaReadingMode(resolveDefault: Boolean = true): Int {
         val default = readerPreferences.defaultReadingMode().get()
         val readingMode = ReadingMode.fromPreference(manga?.readingMode?.toInt())
         return when {
@@ -879,7 +880,7 @@ class ReaderViewModel @JvmOverloads constructor(
             if (currChapters != null) {
                 // Save current page
                 val currChapter = currChapters.currChapter
-                currChapter.requestedPage = currChapter.chapter.last_page_read
+                currChapter.requestedPage = currChapter.chapter.lastPageRead.toInt()
 
                 mutableState.update {
                     it.copy(
@@ -895,7 +896,7 @@ class ReaderViewModel @JvmOverloads constructor(
     /**
      * Returns the orientation type used by this manga or the default one.
      */
-    fun getMangaOrientation(resolveDefault: Boolean = true): Int {
+    suspend fun getMangaOrientation(resolveDefault: Boolean = true): Int {
         val default = readerPreferences.defaultOrientationType().get()
         val orientation = ReaderOrientation.fromPreference(manga?.readerOrientation?.toInt())
         return when {

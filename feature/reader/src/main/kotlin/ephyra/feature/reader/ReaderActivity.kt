@@ -57,11 +57,8 @@ import ephyra.presentation.reader.ReaderPageIndicator
 import ephyra.presentation.reader.ReadingModeSelectDialog
 import ephyra.presentation.reader.appbars.ReaderAppBars
 import ephyra.presentation.reader.settings.ReaderSettingsDialog
-import ephyra.app.R
-import ephyra.app.R
-import ephyra.app.data.coil.TachiyomiImageDecoder
-import ephyra.core.common.notification.NotificationManager
-import ephyra.app.databinding.ReaderActivityBinding
+import ephyra.feature.reader.R
+import ephyra.feature.reader.databinding.ReaderActivityBinding
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.AddToLibraryFirst
@@ -243,8 +240,8 @@ class ReaderActivity : BaseActivity() {
     }
 
     private fun ReaderActivityBinding.setComposeOverlay(): Unit = composeOverlay.setComposeContent {
-        val state by viewModel.state.collectAsStateWithLifecycle()
-        val showPageNumber by readerPreferences.showPageNumber().collectAsStateWithLifecycle()
+        val state: ReaderViewModel.State by viewModel.state.collectAsStateWithLifecycle()
+        val showPageNumber: Boolean by readerPreferences.showPageNumber().collectAsStateWithLifecycle()
         val settingsScreenModel = remember {
             ReaderSettingsScreenModel(
                 readerState = viewModel.state,
@@ -301,8 +298,10 @@ class ReaderActivity : BaseActivity() {
                     screenModel = settingsScreenModel,
                     onChange = { stringRes ->
                         menuToggleToast?.cancel()
-                        if (!readerPreferences.showReadingMode().get()) {
-                            menuToggleToast = toast(stringRes)
+                        lifecycleScope.launch {
+                            if (!readerPreferences.showReadingMode().get()) {
+                                menuToggleToast = toast(stringRes)
+                            }
                         }
                     },
                 )
@@ -423,11 +422,11 @@ class ReaderActivity : BaseActivity() {
 
     @Composable
     private fun ContentOverlay(state: ReaderViewModel.State) {
-        val flashOnPageChange by readerPreferences.flashOnPageChange().collectAsStateWithLifecycle()
+        val flashOnPageChange: Boolean by readerPreferences.flashOnPageChange().collectAsStateWithLifecycle()
 
-        val colorOverlayEnabled by readerPreferences.colorFilter().collectAsStateWithLifecycle()
-        val colorOverlay by readerPreferences.colorFilterValue().collectAsStateWithLifecycle()
-        val colorOverlayMode by readerPreferences.colorFilterMode().collectAsStateWithLifecycle()
+        val colorOverlayEnabled: Boolean by readerPreferences.colorFilter().collectAsStateWithLifecycle()
+        val colorOverlay: Int by readerPreferences.colorFilterValue().collectAsStateWithLifecycle()
+        val colorOverlayMode: Int by readerPreferences.colorFilterMode().collectAsStateWithLifecycle()
         val colorOverlayBlendMode = remember(colorOverlayMode) {
             ReaderPreferences.ColorFilterMode.getOrNull(colorOverlayMode)?.second
         }
@@ -451,8 +450,8 @@ class ReaderActivity : BaseActivity() {
 
         val isHttpSource = viewModel.getSource() is HttpSource
 
-        val cropBorderPaged by readerPreferences.cropBorders().collectAsStateWithLifecycle()
-        val cropBorderWebtoon by readerPreferences.cropBordersWebtoon().collectAsStateWithLifecycle()
+        val cropBorderPaged: Boolean by readerPreferences.cropBorders().collectAsStateWithLifecycle()
+        val cropBorderWebtoon: Boolean by readerPreferences.cropBordersWebtoon().collectAsStateWithLifecycle()
         val isPagerType = ReadingMode.isPagerType(viewModel.getMangaReadingMode())
         val cropEnabled = if (isPagerType) cropBorderPaged else cropBorderWebtoon
 
@@ -506,8 +505,12 @@ class ReaderActivity : BaseActivity() {
         viewModel.showMenus(visible)
         if (visible) {
             windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
-        } else if (readerPreferences.fullscreen().get()) {
-            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+            lifecycleScope.launch {
+                if (readerPreferences.fullscreen().get()) {
+                    windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+                }
+            }
         }
     }
 
@@ -533,11 +536,15 @@ class ReaderActivity : BaseActivity() {
             binding.viewerContainer.removeAllViews()
         }
         viewModel.onViewerLoaded(newViewer)
-        updateViewerInset(readerPreferences.fullscreen().get(), readerPreferences.drawUnderCutout().get())
+        lifecycleScope.launch {
+            updateViewerInset(readerPreferences.fullscreen().get(), readerPreferences.drawUnderCutout().get())
+        }
         binding.viewerContainer.addView(newViewer.getView())
 
-        if (readerPreferences.showReadingMode().get()) {
-            showReadingModeToast(viewModel.getMangaReadingMode())
+        lifecycleScope.launch {
+            if (readerPreferences.showReadingMode().get()) {
+                showReadingModeToast(viewModel.getMangaReadingMode())
+            }
         }
 
         loadingIndicator = ReaderProgressIndicator(this)
