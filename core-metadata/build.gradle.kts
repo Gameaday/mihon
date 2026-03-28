@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "tachiyomi.core.metadata"
+    namespace = "ephyra.core.metadata"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

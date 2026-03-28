@@ -177,4 +177,4 @@ jobs:
             ephyra-x86_64-${{ needs.get_tag.outputs.tag }}.apk
           draft: true
           prerelease: false
-          token: ${{ secrets.MIHON_BOT_TOKEN }}
+          token: ${{ secrets.EPHYRA_BOT_TOKEN }}

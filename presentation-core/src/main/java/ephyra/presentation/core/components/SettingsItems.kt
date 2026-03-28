@@ -48,7 +48,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.preference.Preference
 import ephyra.core.common.preference.TriState
@@ -138,10 +140,11 @@ fun BaseSortItem(label: String, icon: ImageVector?, onClick: () -> Unit) {
 @Composable
 fun CheckboxItem(label: String, pref: Preference<Boolean>) {
     val checked by pref.collectAsState()
+    val scope = rememberCoroutineScope()
     CheckboxItem(
         label = label,
         checked = checked,
-        onClick = { pref.toggle() },
+        onClick = { scope.launch { pref.toggle() } },
     )
 }
 

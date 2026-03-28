@@ -162,12 +162,7 @@ object AboutScreen : Screen() {
                             label = stringResource(MR.strings.website),
                             icon = Icons.Outlined.Public,
                             url = "https://github.com/Gameaday/Ephyra",
-                        )
-                        LinkIcon(
-                            label = "Discord",
-                            icon = CustomIcons.Discord,
-                            url = "https://discord.gg/mihon",
-                        )
+                        )          
                         LinkIcon(
                             label = "GitHub",
                             icon = CustomIcons.Github,

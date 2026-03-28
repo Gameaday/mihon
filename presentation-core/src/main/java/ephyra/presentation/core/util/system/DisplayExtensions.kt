@@ -22,7 +22,7 @@ fun Configuration.isTabletUi(): Boolean {
 // TODO: move the logic to `isTabletUi()` when main activity is rewritten in Compose
 fun Context.prepareTabletUiContext(preferences: UiPreferences): Context {
     val configuration = resources.configuration
-    val expected = when (preferences.tabletUiMode().get()) {
+    val expected = when (preferences.tabletUiMode().getSync()) {
         TabletUiMode.AUTOMATIC ->
             configuration.smallestScreenWidthDp >= when (configuration.orientation) {
                 Configuration.ORIENTATION_PORTRAIT -> TABLET_UI_MIN_SCREEN_WIDTH_PORTRAIT_DP

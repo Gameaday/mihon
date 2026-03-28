@@ -3,7 +3,8 @@ package ephyra.presentation.theme
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -36,7 +37,8 @@ import ephyra.presentation.core.theme.EphyraThemeConfig
 import ephyra.presentation.core.theme.LocalBrandedTheme
 import ephyra.presentation.core.theme.NagareThemeConfig
 import ephyra.presentation.core.theme.toShapes
-import ephyra.presentation.util.LocalUiPreferences
+import ephyra.presentation.core.util.LocalUiPreferences
+import ephyra.presentation.core.util.collectAsState
 
 @Composable
 fun TachiyomiTheme(
@@ -45,9 +47,11 @@ fun TachiyomiTheme(
     content: @Composable () -> Unit,
 ) {
     val uiPreferences = LocalUiPreferences.current
+    val currentAppTheme by uiPreferences.appTheme().collectAsState()
+    val currentAmoled by uiPreferences.themeDarkAmoled().collectAsState()
     BaseTachiyomiTheme(
-        appTheme = appTheme ?: uiPreferences.appTheme().get(),
-        isAmoled = amoled ?: uiPreferences.themeDarkAmoled().get(),
+        appTheme = appTheme ?: currentAppTheme,
+        isAmoled = amoled ?: currentAmoled,
         content = content,
     )
 }
@@ -71,7 +75,7 @@ private fun BaseTachiyomiTheme(
     val shapes = remember(brandedConfig) { brandedConfig.toShapes() }
 
     CompositionLocalProvider(LocalBrandedTheme provides brandedConfig) {
-        MaterialExpressiveTheme(
+        MaterialTheme(
             colorScheme = remember(appTheme, isDark, isAmoled) {
                 getThemeColorScheme(
                     context = context,

@@ -1,4 +1,4 @@
-package ephyra.core.metadata.tachiyomi
+package ephyra.core.metadata.ephyra
 
 import kotlinx.serialization.Serializable
 

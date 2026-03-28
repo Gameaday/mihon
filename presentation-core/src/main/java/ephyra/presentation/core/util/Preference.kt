@@ -17,5 +17,5 @@ import ephyra.core.common.preference.Preference
 @Composable
 fun <T> Preference<T>.collectAsState(): State<T> {
     val flow = remember(this) { changes() }
-    return flow.collectAsStateWithLifecycle(initialValue = get())
+    return flow.collectAsStateWithLifecycle(initialValue = getSync())
 }

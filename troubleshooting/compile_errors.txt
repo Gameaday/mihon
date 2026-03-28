@@ -198,7 +198,7 @@ Evaluating project ':core' using build file '/home/c/Github/Android/Ephyra/core/
 
 > Configure project :core:common
 Evaluating project ':core:common' using build file '/home/c/Github/Android/Ephyra/core/common/build.gradle.kts'.
-Resolved plugin [id: 'mihon.library']
+Resolved plugin [id: 'ephyra.library']
 Resolved plugin [id: 'org.jetbrains.kotlin.android']
 Resolved plugin [id: 'org.jetbrains.kotlin.plugin.serialization']
 Using default execution profile
@@ -238,7 +238,7 @@ Path is not watched: /home/c/Github/Android/Ephyra/buildSrc/build/generated-sour
 
 > Configure project :i18n
 Evaluating project ':i18n' using build file '/home/c/Github/Android/Ephyra/i18n/build.gradle.kts'.
-Resolved plugin [id: 'mihon.library']
+Resolved plugin [id: 'ephyra.library']
 Resolved plugin [id: 'org.jetbrains.kotlin.multiplatform']
 Resolved plugin [id: 'dev.icerock.mobile.multiplatform-resources', version: '0.26.1']
 Using default execution profile
@@ -391,11 +391,11 @@ Task ':core:common:parseDebugLocalResources' is not up-to-date because:
 Loaded cache entry for task ':core:common:parseDebugLocalResources' with cache key bfdb845e902a1c2f82d0a84459c160a5
 
 > Task :i18n:generateLocalesConfig
-Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/mihon/android/res/xml/locales_config.xml
+Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/ephyra/android/res/xml/locales_config.xml
 Caching disabled for task ':i18n:generateLocalesConfig' because:
   Caching has not been enabled for the task
 Task ':i18n:generateLocalesConfig' is not up-to-date because:
-  Output property 'outputXmlFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/mihon/android/res/xml/locales_config.xml has been removed.
+  Output property 'outputXmlFile' file /home/c/Github/Android/Ephyra/i18n/build/generated/ephyra/android/res/xml/locales_config.xml has been removed.
 
 > Task :i18n:generateMRcommonMain FROM-CACHE
 Deleting stale output file: /home/c/Github/Android/Ephyra/i18n/build/generated/moko-resources/metadata/commonMain-metadata.json

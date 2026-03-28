@@ -53,6 +53,9 @@ dependencies {
     implementation(libs.materialKolor)
     implementation(platform(libs.coil.bom))
     implementation(libs.bundles.coil)
+    implementation(libs.koin.android)
+    implementation(libs.unifile)
+    implementation(libs.shizuku.api)
     implementation(libs.okio)
 }
 

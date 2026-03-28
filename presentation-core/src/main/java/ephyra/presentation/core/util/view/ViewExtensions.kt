@@ -21,7 +21,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import ephyra.presentation.theme.TachiyomiTheme
-import ephyra.app.R
+import androidx.appcompat.R
 
 inline fun ComponentActivity.setComposeContent(
     parent: CompositionContext? = null,
