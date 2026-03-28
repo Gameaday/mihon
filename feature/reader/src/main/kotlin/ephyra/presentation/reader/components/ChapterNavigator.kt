@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -41,6 +42,7 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Slider
 import ephyra.presentation.core.i18n.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterNavigator(
     isRtl: Boolean,
