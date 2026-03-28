@@ -23,6 +23,7 @@ dependencies {
 
     api(libs.koin.core)
     api(libs.logcat)
+    implementation(libs.material)
 
     api(libs.okhttp.core)
     api(libs.okhttp.logging)

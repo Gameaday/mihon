@@ -22,6 +22,7 @@ kotlin {
 dependencies {
     implementation(projects.sourceApi)
     implementation(projects.core.common)
+    api(projects.i18n)
 
     implementation(platform(kotlinx.coroutines.bom))
     implementation(kotlinx.bundles.coroutines)

@@ -1,6 +1,7 @@
 package ephyra.presentation.core.data.coil
 
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import coil3.ImageLoader
 import coil3.asImage
 import coil3.decode.DecodeResult
@@ -13,6 +14,7 @@ import coil3.request.bitmapConfig
 import okio.BufferedSource
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.decoder.ImageDecoder
+
 
 /**
  * A [Decoder] that uses the native [ImageDecoder] library to decode JXL images,
