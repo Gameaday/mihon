@@ -27,7 +27,7 @@ object Injekt {
     fun <T : Any> get(
         clazz: KClass<T>,
         qualifier: String? = null,
-        noinline parameters: (() -> Any)? = null,
+        parameters: (() -> Any)? = null,
     ): T {
         return GlobalContext.get().get(
             clazz = clazz,

@@ -2,6 +2,7 @@ import ephyra.buildlogic.Config
 import ephyra.buildlogic.getBuildTime
 import ephyra.buildlogic.getCommitCount
 import ephyra.buildlogic.getGitSha
+import ephyra.buildlogic.tasks.LocalesConfigTask
 
 plugins {
     id("ephyra.android.application")
@@ -310,7 +311,15 @@ dependencies {
     testImplementation(kotlinx.coroutines.test)
 }
 
+val generateLocalesConfig = tasks.register<LocalesConfigTask>("generateLocalesConfig") {
+    mokoResourcesDir.set(project(":i18n").file("src/commonMain/moko-resources/"))
+    outputDir.set(layout.buildDirectory.dir("generated/res/locales_config"))
+}
+
 androidComponents {
+    onVariants { variant ->
+        variant.sources.res?.addGeneratedSourceDirectory(generateLocalesConfig, LocalesConfigTask::outputDir)
+    }
     onVariants(selector().withFlavor("default" to "standard")) {
         // Only excluding in standard flavor because this breaks
         // Layout Inspector's Compose tree

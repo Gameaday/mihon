@@ -4,7 +4,7 @@ compose-bom = "2026.02.00"
 
 # Non-BOM AndroidX Versions
 activity-compose = "1.13.0"
-glance = "1.2.0"
+glance = "1.2.0-rc01"
 
 [libraries]
 # ---------------------------------------------------------

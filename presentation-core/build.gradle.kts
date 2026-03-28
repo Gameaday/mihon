@@ -50,6 +50,8 @@ dependencies {
     implementation(kotlinx.immutables)
     implementation(androidx.lifecycle.runtime.compose)
     implementation(libs.image.decoder)
+    implementation(libs.materialKolor)
+    implementation(platform(libs.coil.bom))
     implementation(libs.bundles.coil)
     implementation(libs.okio)
 }

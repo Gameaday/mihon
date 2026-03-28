@@ -52,7 +52,7 @@ interface Preference<T> {
     }
 }
 
-suspend fun <reified T, R : T> Preference<T>.getAndSet(crossinline block: (T) -> R) = set(
+suspend fun <T, R : T> Preference<T>.getAndSet(block: (T) -> R) = set(
     block(get()),
 )
 

@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
@@ -15,8 +15,8 @@ abstract class LocalesConfigTask : DefaultTask() {
     @get:InputDirectory
     abstract val mokoResourcesDir: DirectoryProperty
 
-    @get:OutputFile
-    abstract val outputXmlFile: RegularFileProperty
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
 
     private val emptyResourcesElement = "<resources>\\s*</resources>|<resources\\s*/>".toRegex()
 
@@ -41,7 +41,8 @@ abstract class LocalesConfigTask : DefaultTask() {
         |</locale-config>
         """.trimMargin()
 
-        outputXmlFile.get().asFile.apply {
+        val outputFile = outputDir.file("xml/locales_config.xml").get().asFile
+        outputFile.apply {
             parentFile.mkdirs()
             writeText(content)
         }
@@ -51,6 +52,6 @@ abstract class LocalesConfigTask : DefaultTask() {
 fun Project.getLocalesConfigTask(outputResourceDir: File): TaskProvider<LocalesConfigTask> {
     return tasks.register("generateLocalesConfig", LocalesConfigTask::class.java) {
         mokoResourcesDir.set(file("$projectDir/src/commonMain/moko-resources/"))
-        outputXmlFile.set(outputResourceDir.resolve("xml/locales_config.xml"))
+        outputDir.set(outputResourceDir)
     }
 }

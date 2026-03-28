@@ -152,7 +152,7 @@ class DataStorePreferenceStore(
             dataStore.data.map { it[prefsKey] ?: defaultValue }.distinctUntilChanged()
 
         override fun stateIn(scope: CoroutineScope): StateFlow<T> =
-            changes().stateIn(scope, SharingStarted.Eagerly, get())
+            changes().stateIn(scope, SharingStarted.Eagerly, getSync())
     }
 
     /**
@@ -193,6 +193,6 @@ class DataStorePreferenceStore(
         }.distinctUntilChanged()
 
         override fun stateIn(scope: CoroutineScope): StateFlow<T> =
-            changes().stateIn(scope, SharingStarted.Eagerly, get())
+            changes().stateIn(scope, SharingStarted.Eagerly, getSync())
     }
 }
