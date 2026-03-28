@@ -152,4 +152,5 @@ internal fun Project.configureTest() {
     }
 }
 
-val Project.generatedBuildDir: File get() = project.layout.buildDirectory.asFile.get().resolve("generated/mihon")
+val Project.generatedBuildDir: File get() = project.layout.buildDirectory.asFile.get().resolve("generated/ephyra")
+

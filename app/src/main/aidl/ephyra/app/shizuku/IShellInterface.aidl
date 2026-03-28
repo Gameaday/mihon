@@ -1,4 +1,4 @@
-package mihon.app.shizuku;
+package ephyra.app.shizuku;
 
 interface IShellInterface {
     void install(in AssetFileDescriptor apk) = 1;

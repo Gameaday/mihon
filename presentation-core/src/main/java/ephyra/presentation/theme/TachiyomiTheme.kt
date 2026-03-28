@@ -168,13 +168,13 @@ private fun buildBrandedTypography(config: BrandedThemeConfig): Typography {
  *
  * Only branded themes (Ephyra, Nagare, Atolla) have custom configs.
  * All other themes use the default config which preserves the existing
- * Mihon shape system.
+ * Ephyra shape system.
  */
 private fun getBrandedThemeConfig(appTheme: AppTheme): BrandedThemeConfig = when (appTheme) {
     AppTheme.EPHYRA -> EphyraThemeConfig
     AppTheme.NAGARE -> NagareThemeConfig
     AppTheme.ATOLLA -> AtollaThemeConfig
-    else -> BrandedThemeConfig() // Default — uses MihonShapes radii
+    else -> BrandedThemeConfig() // Default — uses EphyraShapes radii
 }
 
 private val colorSchemes: Map<AppTheme, BaseColorScheme> = mapOf(
@@ -195,3 +195,4 @@ private val colorSchemes: Map<AppTheme, BaseColorScheme> = mapOf(
     AppTheme.NAGARE to NagareColorScheme,
     AppTheme.ATOLLA to AtollaColorScheme,
 )
+

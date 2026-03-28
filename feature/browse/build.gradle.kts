@@ -1,6 +1,6 @@
 plugins {
-    id("mihon.library")
-    id("mihon.library.compose")
+    id("ephyra.library")
+    id("ephyra.library.compose")
 
     id("com.google.devtools.ksp")
 }
@@ -25,4 +25,5 @@ dependencies {
 
     testImplementation(libs.bundles.test)
 }
+
 

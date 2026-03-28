@@ -4,8 +4,8 @@ import ephyra.buildlogic.getCommitCount
 import ephyra.buildlogic.getGitSha
 
 plugins {
-    id("mihon.android.application")
-    id("mihon.android.application.compose")
+    id("ephyra.android.application")
+    id("ephyra.android.application.compose")
     kotlin("plugin.serialization")
     alias(libs.plugins.aboutLibraries)
 }

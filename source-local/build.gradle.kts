@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import ephyra.buildlogic.AndroidConfig
 
 plugins {
-    id("mihon.library.multiplatform")
+    id("ephyra.library.multiplatform")
     kotlin("plugin.serialization")
 }
 

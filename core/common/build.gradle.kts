@@ -1,5 +1,5 @@
 plugins {
-    id("mihon.library")
+    id("ephyra.library")
 
     kotlin("plugin.serialization")
 }
@@ -50,4 +50,5 @@ dependencies {
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
+
 

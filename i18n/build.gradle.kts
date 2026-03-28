@@ -3,7 +3,7 @@ import ephyra.buildlogic.generatedBuildDir
 import ephyra.buildlogic.tasks.getLocalesConfigTask
 
 plugins {
-    id("mihon.library.multiplatform")
+    id("ephyra.library.multiplatform")
     kotlin("plugin.serialization")
     alias(libs.plugins.moko)
 }
@@ -41,3 +41,4 @@ val localesConfigTask = project.getLocalesConfigTask(generatedAndroidResourceDir
 tasks.matching { it.name == "preBuild" }.configureEach {
     dependsOn(localesConfigTask)
 }
+

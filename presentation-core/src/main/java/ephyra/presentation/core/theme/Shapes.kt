@@ -9,13 +9,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 /**
- * Default expressive shape system for Mihon.
+ * Default expressive shape system for Ephyra.
  *
  * Uses larger, more organic corner radii than Material 3 defaults to create
  * a softer, more distinctive visual identity. Branded themes (Ephyra, Nagare,
  * Atolla) override the global shapes via [BrandedThemeConfig.toShapes].
  */
-val MihonShapes = Shapes(
+val EphyraShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
     small = RoundedCornerShape(12.dp),
     medium = RoundedCornerShape(16.dp),
@@ -74,3 +74,4 @@ val MaterialTheme.shapeTokens: ShapeTokens
     @Composable
     @ReadOnlyComposable
     get() = ShapeTokens
+

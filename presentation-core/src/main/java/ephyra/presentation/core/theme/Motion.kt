@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 
 /**
- * Material Expressive motion tokens for Mihon.
+ * Material Expressive motion tokens for Ephyra.
  *
  * Provides consistent animation durations and easing curves aligned with
  * Material 3 Expressive motion guidelines. These tokens replace hard-coded
@@ -82,3 +82,4 @@ val MaterialTheme.motion: MotionTokens
     @Composable
     @ReadOnlyComposable
     get() = MotionTokens
+

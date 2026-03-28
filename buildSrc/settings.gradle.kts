@@ -15,4 +15,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "mihon-buildSrc"
+rootProject.name = "ephyra-buildSrc"
+

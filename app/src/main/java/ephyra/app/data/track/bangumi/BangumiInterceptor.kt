@@ -39,7 +39,7 @@ class BangumiInterceptor(
         return originalRequest.newBuilder()
             .header(
                 "User-Agent",
-                "antsylich/Mihon/v${BuildConfig.VERSION_NAME} (Android) (http://github.com/Gameaday/Ephyra)",
+                "Gameaday/Ephyra/v${BuildConfig.VERSION_NAME} (Android) (http://github.com/Gameaday/Ephyra)",
             )
             .apply {
                 addHeader("Authorization", "Bearer ${currAuth.accessToken}")

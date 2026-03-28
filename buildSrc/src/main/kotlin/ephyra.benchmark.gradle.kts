@@ -5,7 +5,7 @@ import ephyra.buildlogic.configureTest
 plugins {
     id("com.android.test")
 
-    id("mihon.code.lint")
+    id("ephyra.code.lint")
 }
 
 extensions.configure<TestExtension> {
@@ -13,3 +13,4 @@ extensions.configure<TestExtension> {
 }
 
 configureTest()
+

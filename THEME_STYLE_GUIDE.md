@@ -17,7 +17,7 @@ read design tokens (shape, spacing, alpha, typography weight) from this
 config so that the visual identity changes *beyond just color*.
 
 All non-branded themes (Default, Catppuccin, Nord, etc.) use the default
-config, which matches the existing `MihonShapes` radii and standard M3 values.
+config, which matches the existing `Shapes` radii and standard M3 values.
 
 ---
 

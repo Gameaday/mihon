@@ -6,7 +6,7 @@ import me.zhanghai.android.libarchive.ArchiveException
 import java.io.InputStream
 import java.nio.ByteBuffer
 import kotlin.concurrent.Volatile
-import ephyra.core.archive.ArchiveEntry as MihonArchiveEntry
+import ephyra.core.archive.ArchiveEntry as EphyraArchiveEntry
 
 internal class ArchiveInputStream(buffer: Long, size: Long) : InputStream() {
     private val lock = Any()
@@ -56,11 +56,12 @@ internal class ArchiveInputStream(buffer: Long, size: Long) : InputStream() {
         Archive.readFree(archive)
     }
 
-    fun getNextEntry(): MihonArchiveEntry? {
+    fun getNextEntry(): EphyraArchiveEntry? {
         return Archive.readNextHeader(archive).takeUnless { it == 0L }?.let { entry ->
             val name = ArchiveEntry.pathnameUtf8(entry) ?: ArchiveEntry.pathname(entry)?.decodeToString() ?: return null
             val isFile = ArchiveEntry.filetype(entry) == ArchiveEntry.AE_IFREG
-            MihonArchiveEntry(name, isFile)
+            EphyraArchiveEntry(name, isFile)
         }
     }
 }
+

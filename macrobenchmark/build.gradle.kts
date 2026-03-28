@@ -1,5 +1,5 @@
 plugins {
-    id("mihon.benchmark")
+    id("ephyra.benchmark")
 }
 
 android {
@@ -37,4 +37,5 @@ androidComponents {
         it.enable = it.buildType == "benchmark"
     }
 }
+
 

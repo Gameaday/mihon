@@ -4,9 +4,10 @@ import ephyra.buildlogic.configureCompose
 plugins {
     id("com.android.library")
 
-    id("mihon.code.lint")
+    id("ephyra.code.lint")
 }
 
 extensions.configure<LibraryExtension> {
     configureCompose(this)
 }
+

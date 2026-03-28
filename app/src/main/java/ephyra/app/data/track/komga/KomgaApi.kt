@@ -25,7 +25,7 @@ class KomgaApi(
 
     private val headers: Headers by lazy {
         Headers.Builder()
-            .add("User-Agent", "Mihon v${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})")
+            .add("User-Agent", "Ephyra v${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})")
             .build()
     }
 
@@ -109,3 +109,4 @@ class KomgaApi(
         private const val READLIST_API = "/api/v1/readlists"
     }
 }
+

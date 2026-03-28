@@ -1,12 +1,12 @@
 import ephyra.buildlogic.Config
 
 plugins {
-    id("mihon.library")
+    id("ephyra.library")
 
 }
 
 android {
-    namespace = "mihon.telemetry"
+    namespace = "ephyra.telemetry"
 
     sourceSets {
         getByName("main") {
@@ -27,4 +27,5 @@ dependencies {
         implementation(libs.firebase.crashlytics)
     }
 }
+
 

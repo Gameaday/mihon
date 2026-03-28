@@ -34,7 +34,7 @@ class MyAnimeListInterceptor(
         val authRequest = originalRequest.newBuilder()
             .addHeader("Authorization", "Bearer ${oauth!!.accessToken}")
             // TODO(antsy): Add back custom user agent when they stop blocking us for no apparent reason
-            // .header("User-Agent", "Mihon v${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})")
+            // .header("User-Agent", "Ephyra v${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})")
             .build()
 
         return chain.proceed(authRequest)
@@ -83,3 +83,4 @@ class MyAnimeListInterceptor(
 
 class MALTokenRefreshFailed : IOException("MAL: Failed to refresh account token")
 class MALTokenExpired : IOException("MAL: Login has expired")
+

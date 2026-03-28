@@ -99,7 +99,7 @@ data class ComicInfo(
     val manga: Manga?,
     val publishingStatus: PublishingStatusTachiyomi?,
     val categories: CategoriesTachiyomi?,
-    val source: SourceMihon?,
+    val source: SourceEphyra?,
 ) {
     @XmlElement(false)
     @XmlSerialName("xmlns:xsd", "", "")
@@ -199,8 +199,8 @@ data class ComicInfo(
     data class CategoriesTachiyomi(@XmlValue(true) val value: String = "")
 
     @Serializable
-    @XmlSerialName("SourceMihon", "http://www.w3.org/2001/XMLSchema", "mh")
-    data class SourceMihon(@XmlValue(true) val value: String = "")
+    @XmlSerialName("SourceEphyra", "http://www.w3.org/2001/XMLSchema", "mh")
+    data class SourceEphyra(@XmlValue(true) val value: String = "")
 }
 
 enum class ComicInfoPublishingStatus(
@@ -228,3 +228,4 @@ enum class ComicInfoPublishingStatus(
         }
     }
 }
+

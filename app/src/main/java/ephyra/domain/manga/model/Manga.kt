@@ -105,7 +105,7 @@ fun getComicInfo(
         ComicInfoPublishingStatus.toComicInfoValue(manga.status),
     ),
     categories = categories?.let { ComicInfo.CategoriesTachiyomi(it.joinToString()) },
-    source = ComicInfo.SourceMihon(sourceName),
+    source = ComicInfo.SourceEphyra(sourceName),
     languageISO = sourceLang?.takeIf { it.isNotBlank() && it != "all" }
         ?.let { ComicInfo.LanguageISO(it) },
     manga = determineMangaField(manga),
@@ -141,3 +141,4 @@ private fun determineMangaField(manga: Manga): ComicInfo.Manga? {
         }
     }
 }
+

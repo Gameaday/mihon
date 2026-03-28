@@ -1,7 +1,7 @@
 import ephyra.buildlogic.AndroidConfig
 
 plugins {
-    id("mihon.library.multiplatform")
+    id("ephyra.library.multiplatform")
     kotlin("plugin.serialization")
     id("com.google.devtools.ksp")
 }

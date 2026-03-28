@@ -30,9 +30,10 @@ Before you start, please note that the ability to use following technologies is 
 
 # Translations
 
-Translations follow the upstream Mihon project via Weblate.
+Translations follow the upstream Ephyra project via Weblate.
 
 
 # Upstream project
 
-This fork is based on [mihonapp/mihon](https://github.com/mihonapp/mihon). Forks of this project are allowed so long as they abide by [the project's LICENSE](https://github.com/mihonapp/mihon/blob/main/LICENSE).
+This fork is based on [ephyraapp/ephyra](https://github.com/mihonapp/mihon). Forks of this project are allowed so long as they abide by [the project's LICENSE](https://github.com/mihonapp/mihon/blob/main/LICENSE).
+

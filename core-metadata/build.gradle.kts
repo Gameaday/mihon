@@ -1,5 +1,5 @@
 plugins {
-    id("mihon.library")
+    id("ephyra.library")
     kotlin("plugin.serialization")
 }
 
@@ -17,4 +17,5 @@ dependencies {
 
     implementation(kotlinx.bundles.serialization)
 }
+
 

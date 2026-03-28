@@ -1,11 +1,11 @@
 plugins {
-    id("mihon.library")
+    id("ephyra.library")
 
     kotlin("plugin.serialization")
 }
 
 android {
-    namespace = "mihon.core.archive"
+    namespace = "ephyra.core.archive"
 }
 
 dependencies {
@@ -13,4 +13,5 @@ dependencies {
     implementation(libs.libarchive)
     implementation(libs.unifile)
 }
+
 

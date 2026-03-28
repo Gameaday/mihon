@@ -1,5 +1,5 @@
 plugins {
-    id("mihon.library")
+    id("ephyra.library")
 
 }
 
@@ -17,4 +17,5 @@ dependencies {
     implementation(libs.logcat)
     implementation(libs.unifile)
 }
+
 

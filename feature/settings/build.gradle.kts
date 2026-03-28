@@ -1,6 +1,6 @@
 plugins {
-    id("mihon.library")
-    id("mihon.library.compose")
+    id("ephyra.library")
+    id("ephyra.library.compose")
 
 }
 
@@ -18,4 +18,5 @@ dependencies {
     implementation(libs.bundles.voyager)
     implementation(libs.koin.android)
 }
+
 

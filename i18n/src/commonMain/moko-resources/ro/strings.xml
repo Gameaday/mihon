@@ -342,7 +342,7 @@
     <string name="add_tracking">Urmărește</string>
     <string name="in_library">În bibliotecă</string>
     <string name="add_to_library">Adaugă în bibliotecă</string>
-    <string name="information_webview_required">WebView este necesar pentru Mihon</string>
+    <string name="information_webview_required">WebView este necesar pentru Ephyra</string>
     <string name="recent_manga_time">Ch. %1$s - %2$s</string>
     <string name="manga_info_collapse">Mai puțin</string>
     <string name="manga_info_expand">Mai mult</string>
@@ -906,3 +906,4 @@
     <string name="pref_disallow_non_ascii_filenames">Nu permiteți nume de fișiere non-ASCII</string>
     <string name="pref_disallow_non_ascii_filenames_details">Asigurți compatibilitatea cu anumite medii de stocare care nu suportă Unicode. Când această opțiune este activată, va trebui să redenumiți manual directoarele sursă și cele de manga, înlocuind caracterele non-ASCII cu reprezentările lor hexadecimale UTF-8 cu litere mici. Fișierele capitolelor nu trebuie redenumite.</string>
 </resources>
+
