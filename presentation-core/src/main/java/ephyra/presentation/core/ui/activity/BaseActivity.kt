@@ -18,8 +18,8 @@ import org.koin.android.ext.android.inject
  */
 open class BaseActivity :
     AppCompatActivity(),
-    SecureActivityDelegate by org.koin.android.ext.android.get(SecureActivityDelegate::class.java),
-    ThemingDelegate by org.koin.android.ext.android.get(ThemingDelegate::class.java) {
+    SecureActivityDelegate by org.koin.java.KoinJavaComponent.get(SecureActivityDelegate::class.java),
+    ThemingDelegate by org.koin.java.KoinJavaComponent.get(ThemingDelegate::class.java) {
 
     private val uiPreferences: UiPreferences by inject()
 

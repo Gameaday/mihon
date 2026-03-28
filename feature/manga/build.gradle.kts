@@ -18,6 +18,10 @@ dependencies {
     api(projects.i18n)
     api(projects.presentationCore)
 
+    implementation(compose.material3.core)
+    implementation(compose.ui.tooling.preview)
+    debugImplementation(compose.ui.tooling)
+
     implementation(libs.logcat)
     implementation(libs.bundles.voyager)
     implementation(libs.koin.annotations)

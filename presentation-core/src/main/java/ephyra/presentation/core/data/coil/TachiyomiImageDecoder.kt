@@ -1,7 +1,6 @@
 package ephyra.presentation.core.data.coil
 
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import coil3.ImageLoader
 import coil3.asImage
 import coil3.decode.DecodeResult
@@ -13,7 +12,8 @@ import coil3.request.Options
 import coil3.request.bitmapConfig
 import okio.BufferedSource
 import ephyra.core.common.util.system.ImageUtil
-import ephyra.decoder.ImageDecoder
+import coil3.size.pxOrElse
+import tachiyomi.decoder.ImageDecoder
 
 
 /**
@@ -35,8 +35,8 @@ class TachiyomiImageDecoder(private val resources: ImageSource, private val opti
         val srcWidth = decoder.width
         val srcHeight = decoder.height
 
-        val dstWidth = options.size.widthPx(options.scale) { srcWidth }
-        val dstHeight = options.size.heightPx(options.scale) { srcHeight }
+        val dstWidth = options.size.width.pxOrElse { srcWidth }
+        val dstHeight = options.size.height.pxOrElse { srcHeight }
 
         val sampleSize = DecodeUtils.calculateInSampleSize(
             srcWidth = srcWidth,
