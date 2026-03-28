@@ -29,6 +29,7 @@ dependencies {
     debugImplementation(compose.ui.tooling)
 
     implementation(androidx.lifecycle.runtime.compose)
+    implementation(kotlinx.immutables)
     implementation(libs.bundles.voyager)
     implementation(libs.koin.android)
     
