@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.state.ToggleableState
+import ephyra.core.common.preference.CheckboxState
 import ephyra.core.common.preference.Preference
 
 /**
@@ -18,4 +20,12 @@ import ephyra.core.common.preference.Preference
 fun <T> Preference<T>.collectAsState(): State<T> {
     val flow = remember(this) { changes() }
     return flow.collectAsStateWithLifecycle(initialValue = getSync())
+}
+
+fun <T> CheckboxState.TriState<T>.asToggleableState(): ToggleableState {
+    return when (this) {
+        is CheckboxState.TriState.Include -> ToggleableState.On
+        is CheckboxState.TriState.Exclude -> ToggleableState.Indeterminate
+        is CheckboxState.TriState.None -> ToggleableState.Off
+    }
 }

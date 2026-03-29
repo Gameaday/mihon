@@ -57,6 +57,8 @@ dependencies {
     api(androidx.lifecycle.runtime.compose)
     api(libs.image.decoder)
     api(libs.materialKolor)
+    api(libs.compose.materialmotion)
+    api(libs.reorderable)
     api(platform(libs.coil.bom))
     api(libs.bundles.coil)
     api(libs.bundles.voyager)

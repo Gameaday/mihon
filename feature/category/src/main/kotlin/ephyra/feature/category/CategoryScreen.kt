@@ -9,14 +9,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.feature.category.CategoryScreen
-import ephyra.presentation.category.CategoryScreen
-import ephyra.presentation.category.components.CategoryCreateDialog
-import ephyra.presentation.category.components.CategoryDeleteDialog
-import ephyra.presentation.category.components.CategoryRenameDialog
+import ephyra.feature.category.presentation.CategoryScreen
+import ephyra.feature.category.presentation.components.CategoryCreateDialog
+import ephyra.feature.category.presentation.components.CategoryDeleteDialog
+import ephyra.feature.category.presentation.components.CategoryRenameDialog
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.system.toast
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.collectLatest
 

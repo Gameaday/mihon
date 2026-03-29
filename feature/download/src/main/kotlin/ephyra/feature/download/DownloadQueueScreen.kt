@@ -23,10 +23,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallExtendedFloatingActionButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -49,23 +49,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.core.download.model.Download
+import ephyra.domain.download.model.Download
 import ephyra.i18n.MR
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.components.DropdownMenu
-import ephyra.presentation.components.NestedMenuItem
+import ephyra.presentation.core.components.material.AppBar
+import ephyra.presentation.core.components.material.AppBarActions
+import ephyra.presentation.core.components.material.DropdownMenu
+import ephyra.presentation.core.components.material.NestedMenuItem
 import ephyra.presentation.core.components.Pill
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.EmptyScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import kotlinx.collections.immutable.persistentListOf
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 object DownloadQueueScreen : Screen() {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -200,7 +201,7 @@ object DownloadQueueScreen : Screen() {
             },
             floatingActionButton = {
                 val isRunning by screenModel.isDownloaderRunning.collectAsStateWithLifecycle()
-                SmallExtendedFloatingActionButton(
+                ExtendedFloatingActionButton(
                     text = {
                         val id = if (isRunning) MR.strings.action_pause else MR.strings.action_resume
                         Text(text = stringResource(id))
@@ -217,10 +218,7 @@ object DownloadQueueScreen : Screen() {
                         }
                     },
                     expanded = fabExpanded,
-                    modifier = Modifier.animateFloatingActionButton(
-                        visible = downloadList.isNotEmpty(),
-                        alignment = Alignment.BottomEnd,
-                    ),
+                    modifier = Modifier, // TODO: Add animation if needed
                 )
             },
         ) { contentPadding ->
