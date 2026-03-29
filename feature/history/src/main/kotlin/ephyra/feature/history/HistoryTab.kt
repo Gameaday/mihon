@@ -7,34 +7,34 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.presentation.category.components.ChangeCategoryDialog
-import ephyra.presentation.history.HistoryScreen
-import ephyra.presentation.history.components.HistoryDeleteAllDialog
-import ephyra.presentation.history.components.HistoryDeleteDialog
-import ephyra.presentation.manga.DuplicateMangaDialog
-import ephyra.presentation.util.Tab
 import ephyra.app.R
 import ephyra.app.ui.category.CategoryScreen
 import ephyra.app.ui.main.MainActivity
 import ephyra.app.ui.manga.MangaScreen
 import ephyra.app.ui.reader.ReaderActivity
+import ephyra.core.common.i18n.stringResource
+import ephyra.domain.chapter.model.Chapter
+import ephyra.feature.migration.dialog.MigrateMangaDialog
+import ephyra.i18n.MR
+import ephyra.presentation.category.components.ChangeCategoryDialog
+import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.history.HistoryScreen
+import ephyra.presentation.history.components.HistoryDeleteAllDialog
+import ephyra.presentation.history.components.HistoryDeleteDialog
+import ephyra.presentation.manga.DuplicateMangaDialog
+import ephyra.presentation.util.Tab
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
-import ephyra.feature.migration.dialog.MigrateMangaDialog
-import ephyra.core.common.i18n.stringResource
-import ephyra.domain.chapter.model.Chapter
-import ephyra.i18n.MR
-import ephyra.presentation.core.i18n.stringResource
 
 data object HistoryTab : Tab {
 

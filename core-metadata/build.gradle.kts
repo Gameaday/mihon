@@ -17,5 +17,3 @@ dependencies {
 
     implementation(kotlinx.bundles.serialization)
 }
-
-

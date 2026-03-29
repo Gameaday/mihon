@@ -1,7 +1,6 @@
 package ephyra.core.download
 
 import android.content.Context
-import ephyra.domain.download.model.Download
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.storage.extension
 import ephyra.core.common.util.lang.launchIO
@@ -10,6 +9,7 @@ import ephyra.core.common.util.system.logcat
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.chapter.model.Chapter
+import ephyra.domain.download.model.Download
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.model.Manga
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import logcat.LogPriority
-
 import ephyra.domain.download.service.DownloadManager as IDownloadManager
 
 /**
@@ -385,7 +384,12 @@ class DownloadManager(
 
         @Suppress("DEPRECATION")
         val disallowNonAscii = downloadPreferences.downloadOnlyOverWifi().getSync() // Placeholder
-        var newName = provider.getChapterDirName(newChapter.name, newChapter.scanlator, newChapter.url, disallowNonAscii)
+        var newName = provider.getChapterDirName(
+            newChapter.name,
+            newChapter.scanlator,
+            newChapter.url,
+            disallowNonAscii,
+        )
         if (oldDownload.isFile && oldDownload.extension == "cbz") {
             newName += ".cbz"
         }

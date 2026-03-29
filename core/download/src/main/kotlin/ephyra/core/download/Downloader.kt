@@ -2,32 +2,32 @@ package ephyra.core.download
 
 import android.content.Context
 import com.hippo.unifile.UniFile
-import ephyra.data.cache.ChapterCache
-import ephyra.domain.download.model.Download
-import ephyra.domain.download.service.DownloadNotifier
-import ephyra.core.common.util.storage.DiskUtil
-import ephyra.core.common.util.storage.DiskUtil.NOMEDIA_FILE
-import ephyra.core.common.util.storage.saveTo
-import ephyra.core.common.util.system.encoder
 import ephyra.core.archive.ZipWriter
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.storage.extension
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.storage.DiskUtil
+import ephyra.core.common.util.storage.DiskUtil.NOMEDIA_FILE
+import ephyra.core.common.util.storage.saveTo
 import ephyra.core.common.util.system.ImageUtil
+import ephyra.core.common.util.system.encoder
 import ephyra.core.common.util.system.logcat
 import ephyra.core.metadata.comicinfo.COMIC_INFO_FILE
 import ephyra.core.metadata.comicinfo.ComicInfo
+import ephyra.data.cache.ChapterCache
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.model.toSChapter
+import ephyra.domain.download.model.Download
+import ephyra.domain.download.service.DownloadNotifier
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.getComicInfo
+import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.interactor.GetTracks
-import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.source.UnmeteredSource
 import eu.kanade.tachiyomi.source.model.Page
@@ -675,7 +675,8 @@ class Downloader(
                     fileAspectRatios[idx] = ar
                     validRatios.add(ar)
                 }
-            } catch (_: Exception) { /* skip */
+            } catch (_: Exception) {
+                /* skip */
             }
         }
         val dominantAR = if (validRatios.isNotEmpty()) {

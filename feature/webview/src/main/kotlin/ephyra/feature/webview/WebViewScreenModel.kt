@@ -3,17 +3,17 @@ package ephyra.feature.webview
 import android.content.Context
 import androidx.core.net.toUri
 import cafe.adriel.voyager.core.model.ScreenModel
-import org.koin.core.annotation.Factory
-import org.koin.core.annotation.InjectedParam
-import eu.kanade.tachiyomi.network.NetworkHelper
-import eu.kanade.tachiyomi.source.online.HttpSource
+import ephyra.core.common.util.system.logcat
+import ephyra.domain.source.service.SourceManager
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.source.online.HttpSource
 import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import ephyra.core.common.util.system.logcat
-import ephyra.domain.source.service.SourceManager
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.InjectedParam
 
 @Factory
 class WebViewScreenModel(

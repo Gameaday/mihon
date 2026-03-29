@@ -228,4 +228,3 @@ enum class ComicInfoPublishingStatus(
         }
     }
 }
-

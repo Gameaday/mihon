@@ -1,9 +1,9 @@
 package ephyra.core.download.util
 
-import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.service.getChapterSort
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.applyFilter
 import ephyra.domain.manga.model.downloadedFilter

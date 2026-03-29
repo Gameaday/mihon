@@ -1,8 +1,8 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
-    id("com.google.devtools.ksp")
+    // Use the native compiler plugin to resolve the KSP errors
+    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -10,17 +10,11 @@ android {
 }
 
 dependencies {
-    api(projects.core.common)
-    api(projects.domain)
-    api(projects.data)
-    api(projects.sourceApi)
-    api(projects.i18n)
-    api(projects.presentationCore)
+    implementation(projects.core.common)
+    implementation(projects.domain)
+    implementation(projects.presentationCore)
 
-    implementation(libs.logcat)
-    implementation(libs.bundles.voyager)
+    // Koin
+    implementation(libs.koin.core)
     implementation(libs.koin.annotations)
-    ksp(libs.koin.ksp.compiler)
-
-    testImplementation(libs.bundles.test)
 }

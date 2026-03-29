@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.util.fastMap
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -14,11 +14,11 @@ import ephyra.presentation.category.CategoryScreen
 import ephyra.presentation.category.components.CategoryCreateDialog
 import ephyra.presentation.category.components.CategoryDeleteDialog
 import ephyra.presentation.category.components.CategoryRenameDialog
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.system.toast
+import ephyra.presentation.util.Screen
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.collectLatest
-import ephyra.presentation.core.screens.LoadingScreen
 
 class CategoryScreen : Screen() {
 

@@ -7,22 +7,22 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.net.toUri
-import ephyra.presentation.webview.WebViewScreenContent
 import ephyra.app.R
-import eu.kanade.tachiyomi.network.NetworkHelper
-import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.core.common.util.system.WebViewUtil
+import ephyra.core.common.util.system.logcat
+import ephyra.domain.source.service.SourceManager
+import ephyra.i18n.MR
+import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast
 import ephyra.presentation.core.util.view.overrideTransitionCompat
 import ephyra.presentation.core.util.view.setComposeContent
+import ephyra.presentation.webview.WebViewScreenContent
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.source.online.HttpSource
 import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import ephyra.core.common.util.system.logcat
-import ephyra.domain.source.service.SourceManager
-import ephyra.i18n.MR
 import org.koin.android.ext.android.inject
 
 class WebViewActivity : BaseActivity() {

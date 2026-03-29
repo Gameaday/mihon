@@ -1,14 +1,14 @@
 package ephyra.data.release
 
 import android.os.Build
+import ephyra.domain.release.interactor.GetApplicationRelease
+import ephyra.domain.release.model.Release
+import ephyra.domain.release.service.ReleaseService
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
-import ephyra.domain.release.interactor.GetApplicationRelease
-import ephyra.domain.release.model.Release
-import ephyra.domain.release.service.ReleaseService
 
 class ReleaseServiceImpl(
     private val networkService: NetworkHelper,

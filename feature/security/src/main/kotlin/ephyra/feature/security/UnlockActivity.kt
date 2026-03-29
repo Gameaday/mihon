@@ -7,10 +7,10 @@ import ephyra.app.ui.base.activity.BaseActivity
 import ephyra.app.ui.base.delegate.SecureActivityDelegate
 import ephyra.app.util.system.AuthenticatorUtil
 import ephyra.app.util.system.AuthenticatorUtil.startAuthentication
-import logcat.LogPriority
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.logcat
 import ephyra.i18n.MR
+import logcat.LogPriority
 
 /**
  * Blank activity with a BiometricPrompt.

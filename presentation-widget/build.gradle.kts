@@ -1,7 +1,6 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
 }
 
 android {
@@ -26,7 +25,4 @@ dependencies {
 
     implementation(platform(libs.coil.bom))
     implementation(libs.coil.core)
-
 }
-
-

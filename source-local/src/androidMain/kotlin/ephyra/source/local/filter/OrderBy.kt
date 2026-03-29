@@ -1,9 +1,9 @@
 package ephyra.source.local.filter
 
 import android.content.Context
-import eu.kanade.tachiyomi.source.model.Filter
 import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
+import eu.kanade.tachiyomi.source.model.Filter
 
 sealed class OrderBy(context: Context, selection: Selection) : Filter.Sort(
     context.stringResource(MR.strings.local_filter_order_by),

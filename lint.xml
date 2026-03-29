@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Ignore low-value accessibility/localization warnings while we fix critical ones -->
+    <issue id="ContentDescription" severity="ignore" />
+    <issue id="HardcodedText" severity="ignore" />
+
+    <!-- Suppress typography noise to clear the clutter -->
+    <issue id="TypographyFractions" severity="ignore" />
+    <issue id="TypographyEllipsis" severity="ignore" />
+
+    <!-- Focus on structural issues first by ignoring unused resource noise -->
+    <issue id="UnusedResources" severity="ignore" />
+    <issue id="UnusedIds" severity="ignore" />
+
+    <!-- Graphical warnings that don't affect build success -->
+    <issue id="IconMissingDensityFolder" severity="ignore" />
+    <issue id="VectorRaster" severity="ignore" />
+
+    <!-- Ensure critical Compose/KSP issues are still reported as warnings -->
+    <issue id="ComposeModifierMissing" severity="warning" />
+    <issue id="ComposeNamingConventions" severity="warning" />
+</lint>

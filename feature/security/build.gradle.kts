@@ -2,7 +2,7 @@ plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
 
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    // Internal project dependencies
     api(projects.core.common)
     api(projects.domain)
     api(projects.data)
@@ -17,10 +18,14 @@ dependencies {
     api(projects.i18n)
     api(projects.presentationCore)
 
+    // Third-party libraries
     implementation(libs.logcat)
     implementation(libs.bundles.voyager)
-    implementation(libs.koin.annotations)
-    ksp(libs.koin.ksp.compiler)
 
+    // Dependency Injection (Koin 4.2.0)
+    implementation(libs.koin.core)
+    implementation(libs.koin.annotations)
+
+    // Testing
     testImplementation(libs.bundles.test)
 }

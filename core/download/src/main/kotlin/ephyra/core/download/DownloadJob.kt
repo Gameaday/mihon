@@ -10,14 +10,14 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import ephyra.app.core.common.R
-import ephyra.data.notification.Notifications
+import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.NetworkState
 import ephyra.core.common.util.system.activeNetworkState
 import ephyra.core.common.util.system.networkStateFlow
 import ephyra.core.common.util.system.notificationBuilder
 import ephyra.core.common.util.system.setForegroundSafely
+import ephyra.data.notification.Notifications
 import ephyra.domain.download.service.DownloadPreferences
-import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow

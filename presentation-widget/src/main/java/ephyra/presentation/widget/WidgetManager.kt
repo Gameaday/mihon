@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.LifecycleCoroutineScope
 import ephyra.core.common.core.security.SecurityPreferences
+import ephyra.core.common.util.system.logcat
+import ephyra.domain.updates.interactor.GetUpdates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -11,8 +13,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority
-import ephyra.core.common.util.system.logcat
-import ephyra.domain.updates.interactor.GetUpdates
 
 class WidgetManager(
     private val getUpdates: GetUpdates,

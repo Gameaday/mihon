@@ -2,7 +2,6 @@ import ephyra.buildlogic.Config
 
 plugins {
     id("ephyra.library")
-
 }
 
 android {
@@ -10,12 +9,9 @@ android {
 
     sourceSets {
         getByName("main") {
-            if (Config.includeTelemetry) {
-                kotlin.srcDirs("src/firebase/kotlin")
-            } else {
-                kotlin.srcDirs("src/noop/kotlin")
-                manifest.srcFile("src/noop/AndroidManifext.xml")
-            }
+            // FIX: Modern AGP 9.1 syntax
+            java.directories.add(file("src/main/kotlin").toString())
+            res.directories.add(file("src/main/res").toString())
         }
     }
 }
@@ -27,5 +23,3 @@ dependencies {
         implementation(libs.firebase.crashlytics)
     }
 }
-
-

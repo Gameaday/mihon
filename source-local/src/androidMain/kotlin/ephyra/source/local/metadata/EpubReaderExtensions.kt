@@ -1,8 +1,8 @@
 package ephyra.source.local.metadata
 
+import ephyra.core.archive.EpubReader
 import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
-import ephyra.core.archive.EpubReader
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale

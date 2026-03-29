@@ -1,8 +1,8 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
-    id("com.google.devtools.ksp")
+    // Use the native compiler plugin instead of KSP to save memory
+    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -10,21 +10,27 @@ android {
 }
 
 dependencies {
-    api(projects.core.common)
-    api(projects.domain)
-    api(projects.data)
-    api(projects.sourceApi)
-    api(projects.i18n)
-    api(projects.presentationCore)
+    // Internal project dependencies
+    implementation(projects.core.common)
+    implementation(projects.domain)
+    implementation(projects.data)
+    implementation(projects.sourceApi)
+    implementation(projects.i18n)
+    implementation(projects.presentationCore)
 
+    // Jetpack Compose
     implementation(compose.material3.core)
     implementation(compose.ui.tooling.preview)
     debugImplementation(compose.ui.tooling)
 
+    // Third-party libraries
     implementation(libs.logcat)
     implementation(libs.bundles.voyager)
-    implementation(libs.koin.annotations)
-    ksp(libs.koin.ksp.compiler)
 
+    // Dependency Injection (Koin)
+    implementation(libs.koin.core)
+    implementation(libs.koin.annotations)
+
+    // Testing
     testImplementation(libs.bundles.test)
 }
