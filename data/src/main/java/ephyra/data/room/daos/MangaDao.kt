@@ -93,10 +93,10 @@ interface MangaDao {
     }
 
     @Query("SELECT source, count(*) as count FROM mangas WHERE favorite = 1 GROUP BY source")
-    fun getSourceIdWithFavoriteCount(): kotlinx.coroutines.flow.Flow<List<SourceWithCountRecord>>
+    fun getSourceIdWithFavoriteCount(): Flow<List<SourceWithCountRecord>>
 
     @Query("SELECT source, count(*) as count FROM mangas WHERE favorite = 0 AND _id IN (SELECT DISTINCT manga_id FROM chapters WHERE read = 1) GROUP BY source")
-    fun getSourceIdsWithNonLibraryManga(): kotlinx.coroutines.flow.Flow<List<SourceWithCountRecord>>
+    fun getSourceIdsWithNonLibraryManga(): Flow<List<SourceWithCountRecord>>
 
     @Transaction
     suspend fun upsert(manga: MangaEntity): Long {

@@ -51,7 +51,7 @@ class TrackerListImporter(
         var skipped = 0
         var failed = 0
 
-        for ((trackSearch, listStatus) in listItems) {
+        for ((trackSearch, _) in listItems) {
             try {
                 // val result = importSingleEntry(mal, trackSearch, listStatus)
                 // if (result) imported++ else skipped++

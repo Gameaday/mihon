@@ -222,12 +222,12 @@ import org.koin.android.ext.android.inject
 class MainActivity : BaseActivity() {
 
     private val libraryPreferences: LibraryPreferences by inject()
-    private val preferences: ephyra.domain.base.BasePreferences by inject()
+    private val preferences: BasePreferences by inject()
 
     private val downloadCache: ephyra.app.data.download.DownloadCache by inject()
     private val chapterCache: ephyra.app.data.cache.ChapterCache by inject()
 
-    private val getIncognitoState: ephyra.domain.source.interactor.GetIncognitoState by inject()
+    private val getIncognitoState: GetIncognitoState by inject()
     private val uiPreferences: ephyra.domain.ui.UiPreferences by inject()
     private val privacyPreferences: ephyra.app.core.security.PrivacyPreferences by inject()
     private val storagePreferences: ephyra.domain.storage.service.StoragePreferences by inject()

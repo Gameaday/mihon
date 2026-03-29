@@ -1,6 +1,6 @@
 [versions]
 # Jetpack Compose BOM
-compose-bom = "2026.02.00"
+compose-bom = "2026.03.01"
 
 # Non-BOM AndroidX Versions
 activity-compose = "1.13.0"

@@ -4,12 +4,6 @@ import ephyra.core.common.util.lang.convertEpochMillisZone
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withNonCancellableContext
 import ephyra.core.common.util.system.logcat
-import ephyra.data.database.models.Track as DbTrack
-import ephyra.domain.track.service.EnhancedTracker
-import ephyra.domain.track.service.Tracker
-import ephyra.domain.track.service.TrackerManager
-import ephyra.domain.track.model.TrackSearch
-import ephyra.domain.track.model.Track
 import ephyra.domain.chapter.interactor.GetChaptersByMangaId
 import ephyra.domain.history.interactor.GetHistory
 import ephyra.domain.manga.model.ContentType
@@ -18,8 +12,10 @@ import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.model.mergedAlternativeTitles
 import ephyra.domain.manga.repository.MangaRepository
 import ephyra.domain.track.interactor.AddTracks.Companion.TRACKER_CANONICAL_PREFIXES
-import ephyra.domain.track.model.toDbTrack
-import ephyra.domain.track.model.toDomainTrack
+import ephyra.domain.track.model.Track
+import ephyra.domain.track.service.EnhancedTracker
+import ephyra.domain.track.service.Tracker
+import ephyra.domain.track.service.TrackerManager
 import eu.kanade.tachiyomi.source.Source
 import logcat.LogPriority
 import java.time.ZoneOffset
@@ -52,7 +48,7 @@ class AddTracks(
             // Only TrackSearch instances carry alt titles — enhanced trackers pass plain Track.
             // NOTE: Since Track is now a data class, we can't just check if it's TrackSearch.
             // But we can check if it came from a search result that had alt titles if we had that info.
-            // For now, assume if it has remoteId it might have alt titles elsewhere or we skip this here.
+            // For now, assume if it has remoteId it might have alt titles elsewhere, or we skip this here.
 
             var currentTrack = item
 

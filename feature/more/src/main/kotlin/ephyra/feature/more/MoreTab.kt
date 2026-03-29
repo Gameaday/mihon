@@ -55,7 +55,7 @@ data object MoreTab : Tab {
 
     @Composable
     override fun Content() {
-        val context = LocalContext.current
+        LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<MoreScreenModel>()
         val downloadQueueState by screenModel.downloadQueueState.collectAsStateWithLifecycle()

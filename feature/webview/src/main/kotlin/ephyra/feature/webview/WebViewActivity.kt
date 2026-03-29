@@ -37,7 +37,7 @@ class WebViewActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         overrideTransitionCompat(
-            Activity.OVERRIDE_TRANSITION_OPEN,
+            OVERRIDE_TRANSITION_OPEN,
             R.anim.shared_axis_x_push_enter,
             R.anim.shared_axis_x_push_exit,
         )
@@ -83,7 +83,7 @@ class WebViewActivity : BaseActivity() {
     override fun finish() {
         super.finish()
         overrideTransitionCompat(
-            Activity.OVERRIDE_TRANSITION_CLOSE,
+            OVERRIDE_TRANSITION_CLOSE,
             R.anim.shared_axis_x_pop_enter,
             R.anim.shared_axis_x_pop_exit,
         )
