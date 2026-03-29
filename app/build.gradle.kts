@@ -8,8 +8,8 @@ plugins {
     id("ephyra.android.application")
     id("ephyra.android.application.compose")
     kotlin("plugin.serialization")
-    alias(libs.plugins.aboutLibraries)
     alias(libs.plugins.koin.compiler)
+    alias(libs.plugins.aboutLibraries)
 }
 
 if (Config.includeTelemetry) {
