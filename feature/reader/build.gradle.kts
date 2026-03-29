@@ -13,15 +13,15 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.common)
-    implementation(projects.core.domain)
-    implementation(projects.core.data)
-    implementation(projects.domain)
-    implementation(projects.data)
-    implementation(projects.sourceApi)
-    implementation(projects.sourceLocal)
-    implementation(projects.i18n)
-    implementation(projects.presentationCore)
+    api(projects.core.common)
+    api(projects.core.domain)
+    api(projects.core.data)
+    api(projects.domain)
+    api(projects.data)
+    api(projects.sourceApi)
+    api(projects.sourceLocal)
+    api(projects.i18n)
+    api(projects.presentationCore)
 
     implementation(libs.logcat)
     implementation(compose.activity)
@@ -35,7 +35,8 @@ dependencies {
 
     implementation(androidx.lifecycle.runtime.compose)
     implementation(kotlinx.immutables)
-    implementation(libs.bundles.voyager)
+    api(libs.bundles.voyager)
+    api(libs.koin.core)
     implementation(libs.koin.android)
 
     implementation(libs.subsamplingscaleimageview)
@@ -43,5 +44,3 @@ dependencies {
     implementation(libs.unifile)
     implementation(libs.material)
 }
-
-

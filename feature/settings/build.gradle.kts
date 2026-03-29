@@ -9,11 +9,11 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.common)
-    implementation(projects.domain)
-    implementation(projects.data)
-    implementation(projects.i18n)
-    implementation(projects.presentationCore)
+    api(projects.core.common)
+    api(projects.domain)
+    api(projects.data)
+    api(projects.i18n)
+    api(projects.presentationCore)
 
     implementation(compose.material3.core)
     implementation(compose.material.icons)
@@ -21,8 +21,7 @@ dependencies {
     implementation(compose.ui.tooling.preview)
     debugImplementation(compose.ui.tooling)
 
-    implementation(libs.bundles.voyager)
+    api(libs.bundles.voyager)
+    api(libs.koin.core)
     implementation(libs.koin.android)
 }
-
-

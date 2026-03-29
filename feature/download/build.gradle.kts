@@ -10,11 +10,12 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.common)
-    implementation(projects.domain)
-    implementation(projects.presentationCore)
+    // Internal project dependencies
+    api(projects.core.common)
+    api(projects.domain)
+    api(projects.presentationCore)
 
-    // Koin
-    implementation(libs.koin.core)
+    // Dependency Injection (Koin)
+    api(libs.koin.core)
     implementation(libs.koin.annotations)
 }

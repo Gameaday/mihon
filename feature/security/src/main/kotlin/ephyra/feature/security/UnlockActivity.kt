@@ -1,7 +1,9 @@
 package ephyra.feature.security
 
+import android.hardware.biometrics.BiometricPrompt
 import android.os.Bundle
 import androidx.biometric.BiometricPrompt
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.fragment.app.FragmentActivity
 import ephyra.app.ui.base.activity.BaseActivity
 import ephyra.app.ui.base.delegate.SecureActivityDelegate

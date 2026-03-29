@@ -20,10 +20,10 @@ dependencies {
 
     // Third-party libraries
     implementation(libs.logcat)
-    implementation(libs.bundles.voyager)
+    api(libs.bundles.voyager)
 
     // Dependency Injection (Koin 4.2.0)
-    implementation(libs.koin.core)
+    api(libs.koin.core)
     implementation(libs.koin.annotations)
 
     // Testing

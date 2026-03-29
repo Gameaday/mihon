@@ -11,12 +11,12 @@ android {
 
 dependencies {
     // Internal project dependencies
-    implementation(projects.core.common)
-    implementation(projects.domain)
-    implementation(projects.data)
-    implementation(projects.sourceApi)
-    implementation(projects.i18n)
-    implementation(projects.presentationCore)
+    api(projects.core.common)
+    api(projects.domain)
+    api(projects.data)
+    api(projects.sourceApi)
+    api(projects.i18n)
+    api(projects.presentationCore)
 
     // Jetpack Compose
     implementation(compose.material3.core)
@@ -25,10 +25,9 @@ dependencies {
 
     // Third-party libraries
     implementation(libs.logcat)
-    implementation(libs.bundles.voyager)
+    api(libs.bundles.voyager)
 
     // Dependency Injection (Koin)
-    implementation(libs.koin.core)
+    api(libs.koin.core)
     implementation(libs.koin.annotations)
-
 }
