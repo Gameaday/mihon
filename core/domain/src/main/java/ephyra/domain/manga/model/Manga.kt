@@ -7,8 +7,8 @@ import ephyra.data.cache.CoverCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga
-import ephyra.feature.reader.setting.ReaderOrientation
-import ephyra.feature.reader.setting.ReadingMode
+import ephyra.domain.reader.model.ReaderOrientation
+import ephyra.domain.reader.model.ReadingMode
 import eu.kanade.tachiyomi.source.model.SManga
 
 // TODO: move these into the domain model

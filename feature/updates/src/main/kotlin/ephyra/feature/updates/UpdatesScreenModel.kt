@@ -14,9 +14,9 @@ import ephyra.core.util.insertSeparators
 import ephyra.domain.chapter.interactor.SetReadStatus
 import ephyra.presentation.manga.components.ChapterDownloadAction
 import ephyra.presentation.updates.UpdatesUiModel
-import ephyra.app.data.download.DownloadCache
-import ephyra.app.data.download.DownloadManager
-import ephyra.app.data.download.model.Download
+import ephyra.data.download.DownloadCache
+import ephyra.data.download.DownloadManager
+import ephyra.data.download.model.Download
 import ephyra.app.data.library.LibraryUpdateJob
 import ephyra.app.util.lang.toLocalDate
 import kotlinx.collections.immutable.PersistentList

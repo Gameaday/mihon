@@ -8,22 +8,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ephyra.domain.chapter.model.Chapter
-import ephyra.data.mappers.toDbChapter
+import ephyra.domain.chapter.model.toDbChapter
 import ephyra.domain.manga.interactor.SetMangaViewerFlags
 import ephyra.domain.manga.model.readerOrientation
 import ephyra.domain.manga.model.readingMode
 import ephyra.domain.source.interactor.GetIncognitoState
 import ephyra.domain.track.interactor.TrackChapter
 import ephyra.domain.track.service.TrackPreferences
-import ephyra.app.data.cache.ChapterCache
-import ephyra.app.data.cache.CoverCache
-import ephyra.app.data.database.models.toDomainChapter
-import ephyra.app.data.download.DownloadManager
-import ephyra.app.data.download.DownloadProvider
-import ephyra.app.data.download.model.Download
-import ephyra.app.data.saver.Image
-import ephyra.app.data.saver.ImageSaver
-import ephyra.app.data.saver.Location
+import ephyra.data.cache.ChapterCache
+import ephyra.data.cache.CoverCache
+import ephyra.data.database.models.toDomainChapter
+import ephyra.data.download.DownloadManager
+import ephyra.data.download.DownloadProvider
+import ephyra.data.download.model.Download
+import ephyra.data.saver.Image
+import ephyra.data.saver.ImageSaver
+import ephyra.data.saver.Location
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.reader.loader.ChapterLoader
@@ -32,17 +32,17 @@ import ephyra.feature.reader.model.InsertPage
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.model.ViewerChapters
-import ephyra.feature.reader.setting.ReaderOrientation
+import ephyra.domain.reader.model.ReaderOrientation
 import ephyra.feature.reader.setting.ReaderPreferences
-import ephyra.feature.reader.setting.ReadingMode
+import ephyra.domain.reader.model.ReadingMode
 import ephyra.feature.reader.viewer.Viewer
 import ephyra.app.util.chapter.filterDownloaded
 import ephyra.app.util.chapter.removeDuplicates
-import ephyra.app.util.editCover
-import ephyra.app.util.lang.byteSize
-import ephyra.app.util.storage.DiskUtil
-import ephyra.app.util.storage.cacheImageDir
-import ephyra.app.util.system.DeviceUtil
+import ephyra.presentation.core.util.manga.editCover
+import ephyra.core.common.util.lang.byteSize
+import ephyra.core.common.util.storage.DiskUtil
+import ephyra.core.common.util.storage.cacheImageDir
+import ephyra.core.common.util.system.DeviceUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -77,8 +77,6 @@ import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
-import ephyra.domain.manga.model.readerOrientation
-import ephyra.domain.manga.model.readingMode
 import ephyra.domain.source.service.SourceManager
 import ephyra.source.local.image.LocalCoverManager
 import ephyra.source.local.isLocal
@@ -97,7 +95,7 @@ class ReaderViewModel @JvmOverloads constructor(
     private val downloadProvider: DownloadProvider,
     private val imageSaver: ImageSaver,
     val readerPreferences: ReaderPreferences,
-    private val basePreferences: BasePreferences,
+    private val basePreferences: ephyra.domain.base.BasePreferences,
     private val downloadPreferences: DownloadPreferences,
     private val trackPreferences: TrackPreferences,
     private val trackChapter: TrackChapter,
@@ -710,10 +708,10 @@ class ReaderViewModel @JvmOverloads constructor(
         chapterPageIndex = pageIndex
 
         if (!incognitoMode && page.status !is Page.State.Error) {
-            val prevLastPageRead = readerChapter.chapter.lastPageRead
+            val prevLastPageRead = readerChapter.chapter.last_page_read
             val prevRead = readerChapter.chapter.read
 
-            readerChapter.chapter.lastPageRead = pageIndex.toLong()
+            readerChapter.chapter.last_page_read = pageIndex
 
             // A page is the effective last page when it literally is the last page in the
             // chapter's page list, OR when all subsequent pages are hidden (absorbed stubs
@@ -727,14 +725,14 @@ class ReaderViewModel @JvmOverloads constructor(
 
             // Skip the DB write when neither lastPageRead nor read changed — a memory
             // equality check is cheaper than a SQL UPDATE and avoids unnecessary I/O.
-            if (readerChapter.chapter.lastPageRead != prevLastPageRead ||
+            if (readerChapter.chapter.last_page_read != prevLastPageRead ||
                 readerChapter.chapter.read != prevRead
             ) {
                 updateChapter.await(
                     ChapterUpdate(
                         id = readerChapter.chapter.id!!,
                         read = readerChapter.chapter.read,
-                        lastPageRead = readerChapter.chapter.lastPageRead,
+                        lastPageRead = readerChapter.chapter.last_page_read.toLong(),
                     ),
                 )
             }
@@ -755,7 +753,7 @@ class ReaderViewModel @JvmOverloads constructor(
                 if (
                     !chapter.read &&
                     chapter.isRecognizedNumber &&
-                    chapter.chapterNumber == readerChapter.chapter.chapterNumber
+                    chapter.chapterNumber == readerChapter.chapter.chapter_number.toDouble()
                 ) {
                     ChapterUpdate(id = chapter.id, read = true)
                 } else {
@@ -856,14 +854,17 @@ class ReaderViewModel @JvmOverloads constructor(
         }
     }
 
+    private val defaultReadingMode = readerPreferences.defaultReadingMode().stateIn(viewModelScope)
+    private val defaultOrientation = readerPreferences.defaultOrientationType().stateIn(viewModelScope)
+
     /**
      * Returns the viewer position used by this manga or the default one.
      * When reading mode is DEFAULT, auto-detects webtoon content from
      * genre keywords and publishing type to suggest continuous vertical
      * scrolling — matching Jellyfin's content-aware reader behaviour.
      */
-    suspend fun getMangaReadingMode(resolveDefault: Boolean = true): Int {
-        val default = readerPreferences.defaultReadingMode().get()
+    fun getMangaReadingMode(resolveDefault: Boolean = true): Int {
+        val default = defaultReadingMode.value
         val readingMode = ReadingMode.fromPreference(manga?.readingMode?.toInt())
         return when {
             resolveDefault && readingMode == ReadingMode.DEFAULT -> {
@@ -891,7 +892,7 @@ class ReaderViewModel @JvmOverloads constructor(
             if (currChapters != null) {
                 // Save current page
                 val currChapter = currChapters.currChapter
-                currChapter.requestedPage = currChapter.chapter.lastPageRead.toInt()
+                currChapter.requestedPage = currChapter.chapter.last_page_read
 
                 mutableState.update {
                     it.copy(
@@ -907,8 +908,8 @@ class ReaderViewModel @JvmOverloads constructor(
     /**
      * Returns the orientation type used by this manga or the default one.
      */
-    suspend fun getMangaOrientation(resolveDefault: Boolean = true): Int {
-        val default = readerPreferences.defaultOrientationType().get()
+    fun getMangaOrientation(resolveDefault: Boolean = true): Int {
+        val default = defaultOrientation.value
         val orientation = ReaderOrientation.fromPreference(manga?.readerOrientation?.toInt())
         return when {
             resolveDefault && orientation == ReaderOrientation.DEFAULT -> default

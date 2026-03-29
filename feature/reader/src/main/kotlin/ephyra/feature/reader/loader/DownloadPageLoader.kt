@@ -3,9 +3,9 @@ package ephyra.feature.reader.loader
 import android.app.Application
 import android.net.Uri
 import com.hippo.unifile.UniFile
-import ephyra.app.data.database.models.toDomainChapter
-import ephyra.app.data.download.DownloadManager
-import ephyra.app.data.download.DownloadProvider
+import ephyra.data.database.models.toDomainChapter
+import ephyra.data.download.DownloadManager
+import ephyra.data.download.DownloadProvider
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.model.ReaderChapter

@@ -17,7 +17,8 @@ import ephyra.domain.manga.model.readerOrientation
 import ephyra.presentation.components.AdaptiveSheet
 import ephyra.presentation.reader.components.ModeSelectionDialog
 import ephyra.presentation.theme.TachiyomiPreviewTheme
-import ephyra.feature.reader.setting.ReaderOrientation
+import ephyra.domain.reader.model.ReaderOrientation
+import ephyra.feature.reader.setting.icon
 import ephyra.feature.reader.setting.ReaderSettingsScreenModel
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.SettingsIconGrid

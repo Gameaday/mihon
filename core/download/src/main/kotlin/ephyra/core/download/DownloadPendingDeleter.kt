@@ -1,4 +1,4 @@
-package ephyra.app.data.download
+package ephyra.data.download
 
 import android.content.Context
 import androidx.core.content.edit

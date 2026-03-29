@@ -1,6 +1,6 @@
 package ephyra.app.data.track.mangaupdates.dto
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.mangaupdates.MangaUpdates.Companion.READING_LIST
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

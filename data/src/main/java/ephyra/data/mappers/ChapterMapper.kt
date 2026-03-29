@@ -1,8 +1,8 @@
 package ephyra.data.mappers
 
-import ephyra.app.data.database.models.ChapterImpl
+import ephyra.data.database.models.ChapterImpl
 import ephyra.domain.chapter.model.Chapter
-import ephyra.app.data.database.models.Chapter as DbChapter
+import ephyra.data.database.models.Chapter as DbChapter
 
 fun Chapter.toDbChapter(): DbChapter = ChapterImpl().also {
     it.id = id

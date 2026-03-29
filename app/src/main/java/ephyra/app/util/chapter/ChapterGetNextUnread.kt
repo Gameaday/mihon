@@ -1,6 +1,6 @@
 package ephyra.app.util.chapter
 
-import ephyra.app.data.download.DownloadManager
+import ephyra.data.download.DownloadManager
 import ephyra.app.ui.manga.ChapterList
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.model.applyFilters

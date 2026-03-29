@@ -15,7 +15,7 @@ import logcat.LogPriority
 import rikka.sui.Sui
 import ephyra.core.common.util.system.logcat
 import ephyra.i18n.MR
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import java.io.File
 
 /**

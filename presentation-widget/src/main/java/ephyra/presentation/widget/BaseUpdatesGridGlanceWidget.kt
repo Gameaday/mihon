@@ -28,8 +28,8 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.size.Precision
 import coil3.size.Scale
-import ephyra.app.core.security.SecurityPreferences
-import ephyra.app.util.system.dpToPx
+import ephyra.core.common.core.security.SecurityPreferences
+import ephyra.core.common.util.system.dpToPx
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.map

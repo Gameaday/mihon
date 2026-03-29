@@ -1,6 +1,6 @@
 package ephyra.app.data.track.kitsu
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 
 fun Track.toApiStatus() = when (status) {
     Kitsu.READING -> "current"

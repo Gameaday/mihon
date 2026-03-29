@@ -12,7 +12,7 @@ import ephyra.app.R
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.presentation.core.ui.activity.BaseActivity
-import ephyra.app.util.system.WebViewUtil
+import ephyra.core.common.util.system.WebViewUtil
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast

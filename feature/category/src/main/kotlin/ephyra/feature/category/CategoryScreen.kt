@@ -15,7 +15,7 @@ import ephyra.presentation.category.components.CategoryCreateDialog
 import ephyra.presentation.category.components.CategoryDeleteDialog
 import ephyra.presentation.category.components.CategoryRenameDialog
 import ephyra.presentation.util.Screen
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.collectLatest
 import ephyra.presentation.core.screens.LoadingScreen

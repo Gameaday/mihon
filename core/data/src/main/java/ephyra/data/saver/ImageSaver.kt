@@ -1,4 +1,4 @@
-package ephyra.app.data.saver
+package ephyra.data.saver
 
 import android.content.ContentUris
 import android.content.Context
@@ -9,9 +9,9 @@ import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import androidx.core.content.contentValuesOf
 import androidx.core.net.toUri
-import ephyra.app.util.storage.DiskUtil
-import ephyra.app.util.storage.cacheImageDir
-import ephyra.app.util.storage.getUriCompat
+import ephyra.core.common.util.storage.DiskUtil
+import ephyra.core.common.util.storage.cacheImageDir
+import ephyra.core.common.util.storage.getUriCompat
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat

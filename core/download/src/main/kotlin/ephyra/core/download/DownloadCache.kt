@@ -1,4 +1,4 @@
-package ephyra.app.data.download
+package ephyra.data.download
 
 import android.app.Application
 import android.content.Context

@@ -3,7 +3,7 @@ package ephyra.app.extension.api
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import ephyra.app.R
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.notification.Notifications
 import ephyra.app.util.system.cancelNotification

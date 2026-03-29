@@ -20,7 +20,8 @@ import ephyra.presentation.components.AdaptiveSheet
 import ephyra.presentation.reader.components.ModeSelectionDialog
 import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.feature.reader.setting.ReaderSettingsScreenModel
-import ephyra.feature.reader.setting.ReadingMode
+import ephyra.domain.reader.model.ReadingMode
+import ephyra.feature.reader.setting.iconRes
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.SettingsIconGrid
 import ephyra.presentation.core.components.material.IconToggleButton

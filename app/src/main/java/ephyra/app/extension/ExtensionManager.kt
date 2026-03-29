@@ -2,7 +2,7 @@ package ephyra.app.extension
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.app.extension.api.ExtensionApi
 import ephyra.app.extension.api.ExtensionUpdateNotifier
 import ephyra.app.extension.model.Extension

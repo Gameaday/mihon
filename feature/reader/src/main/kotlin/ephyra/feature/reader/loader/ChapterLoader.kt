@@ -2,13 +2,13 @@ package ephyra.feature.reader.loader
 
 import android.app.Application
 import android.content.Context
-import ephyra.app.data.cache.ChapterCache
-import ephyra.app.data.download.DownloadManager
-import ephyra.app.data.download.DownloadProvider
+import ephyra.data.cache.ChapterCache
+import ephyra.data.download.DownloadManager
+import ephyra.data.download.DownloadProvider
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.reader.model.ReaderChapter
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.archive.archiveReader
 import ephyra.core.archive.epubReader
 import ephyra.core.common.i18n.stringResource

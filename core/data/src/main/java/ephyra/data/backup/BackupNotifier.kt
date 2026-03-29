@@ -5,10 +5,10 @@ import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import com.hippo.unifile.UniFile
 import ephyra.app.R
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.notification.Notifications
-import ephyra.app.util.storage.getUriCompat
+import ephyra.core.common.util.storage.getUriCompat
 import ephyra.app.util.system.cancelNotification
 import ephyra.app.util.system.notificationBuilder
 import ephyra.app.util.system.notify

@@ -11,7 +11,6 @@ dependencies {
     implementation(projects.core.common)
     implementation(projects.sourceApi)
     implementation(projects.data)
-    implementation(projects.feature.manga)
     implementation(androidx.workmanager)
     implementation(libs.sqldelight.coroutines)
 

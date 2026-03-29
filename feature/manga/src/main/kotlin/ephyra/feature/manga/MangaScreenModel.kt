@@ -15,7 +15,7 @@ import ephyra.app.data.track.EnhancedTracker
 import ephyra.app.ui.reader.setting.ReaderPreferences
 import ephyra.app.util.chapter.getNextUnread
 import ephyra.app.util.removeCovers
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.preference.CheckboxState
 import ephyra.core.common.preference.TriState

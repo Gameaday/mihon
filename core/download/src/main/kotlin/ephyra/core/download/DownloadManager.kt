@@ -1,7 +1,7 @@
-package ephyra.app.data.download
+package ephyra.data.download
 
 import android.content.Context
-import ephyra.app.data.download.model.Download
+import ephyra.data.download.model.Download
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.storage.extension
 import ephyra.core.common.util.lang.launchIO

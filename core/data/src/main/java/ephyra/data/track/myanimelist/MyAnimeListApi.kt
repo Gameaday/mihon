@@ -2,7 +2,7 @@ package ephyra.app.data.track.myanimelist
 
 import android.net.Uri
 import androidx.core.net.toUri
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.model.TrackSearch
 import ephyra.app.data.track.myanimelist.dto.MALListItem
 import ephyra.app.data.track.myanimelist.dto.MALListItemStatus

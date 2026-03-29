@@ -18,7 +18,7 @@ import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.feature.reader.viewer.ReaderProgressIndicator
 import ephyra.app.ui.webview.WebViewActivity
-import ephyra.app.util.system.dpToPx
+import ephyra.core.common.util.system.dpToPx
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest

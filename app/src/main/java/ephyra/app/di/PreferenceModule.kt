@@ -1,7 +1,7 @@
 package ephyra.app.di
 
-import ephyra.app.core.security.PrivacyPreferences
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.core.common.core.security.PrivacyPreferences
+import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.app.util.system.isDebugBuildType
 import ephyra.core.common.preference.DataStorePreferenceStore
 import ephyra.core.common.preference.PreferenceStore

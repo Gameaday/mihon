@@ -3,7 +3,7 @@ package ephyra.app.data.track.kitsu
 import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.R
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.BaseTracker
 import ephyra.app.data.track.DeletableTracker
 import ephyra.app.data.track.kitsu.dto.KitsuOAuth

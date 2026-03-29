@@ -11,7 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.WebtoonLayoutManager
-import ephyra.app.data.download.DownloadManager
+import ephyra.data.download.DownloadManager
 import ephyra.feature.reader.ReaderActivity
 import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.ReaderPage
@@ -19,7 +19,7 @@ import ephyra.feature.reader.model.ViewerChapters
 import ephyra.feature.reader.setting.ReaderPreferences
 import ephyra.feature.reader.viewer.Viewer
 import ephyra.feature.reader.viewer.ViewerNavigation.NavigationRegion
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import ephyra.core.common.util.system.logcat

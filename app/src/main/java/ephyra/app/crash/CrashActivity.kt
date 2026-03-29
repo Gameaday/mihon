@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.WindowCompat
 import ephyra.app.ui.main.MainActivity
-import ephyra.app.util.view.setComposeContent
+import ephyra.presentation.core.util.view.setComposeContent
 import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.presentation.crash.CrashScreen
 

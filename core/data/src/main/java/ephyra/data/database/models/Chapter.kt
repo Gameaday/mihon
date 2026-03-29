@@ -1,6 +1,6 @@
 @file:Suppress("PropertyName")
 
-package ephyra.app.data.database.models
+package ephyra.data.database.models
 
 import eu.kanade.tachiyomi.source.model.SChapter
 import java.io.Serializable

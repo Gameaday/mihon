@@ -12,7 +12,7 @@ import com.google.android.material.progressindicator.CircularProgressIndicator
 import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.viewer.ReaderTransitionView
-import ephyra.app.util.system.dpToPx
+import ephyra.core.common.util.system.dpToPx
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest

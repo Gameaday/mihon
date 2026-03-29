@@ -1,4 +1,4 @@
-package ephyra.app.util.lang
+package ephyra.core.common.util.lang
 
 import java.io.InputStream
 import java.security.MessageDigest

@@ -21,7 +21,7 @@ import ephyra.presentation.util.Screen
 import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.create.BackupCreator
 import ephyra.app.data.backup.create.BackupOptions
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.update

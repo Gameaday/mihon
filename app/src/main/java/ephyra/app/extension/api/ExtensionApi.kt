@@ -1,7 +1,7 @@
 package ephyra.app.extension.api
 
 import android.content.Context
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.LoadResult
 import ephyra.app.extension.util.ExtensionLoader

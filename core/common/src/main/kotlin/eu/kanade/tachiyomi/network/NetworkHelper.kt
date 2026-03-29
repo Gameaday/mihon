@@ -1,7 +1,7 @@
 package eu.kanade.tachiyomi.network
 
 import android.content.Context
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor
 import eu.kanade.tachiyomi.network.interceptor.IgnoreGzipInterceptor
 import eu.kanade.tachiyomi.network.interceptor.UncaughtExceptionInterceptor

@@ -51,10 +51,10 @@ import ephyra.feature.settings.widget.PrefsHorizontalPadding
 import ephyra.presentation.util.relativeTimeSpanString
 import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.restore.BackupRestoreJob
-import ephyra.app.data.cache.ChapterCache
+import ephyra.data.cache.ChapterCache
 import ephyra.app.data.export.LibraryExporter
 import ephyra.app.data.export.LibraryExporter.ExportOptions
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf

@@ -1,7 +1,7 @@
 package eu.kanade.tachiyomi.source
 
 import android.content.Context
-import ephyra.app.data.download.DownloadManager
+import ephyra.data.download.DownloadManager
 import ephyra.app.extension.ExtensionManager
 import ephyra.core.common.i18n.stringResource
 import ephyra.domain.source.model.StubSource

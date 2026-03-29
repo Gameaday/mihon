@@ -2,7 +2,7 @@ package ephyra.app.data.track
 
 import android.app.Application
 import androidx.annotation.CallSuper
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat

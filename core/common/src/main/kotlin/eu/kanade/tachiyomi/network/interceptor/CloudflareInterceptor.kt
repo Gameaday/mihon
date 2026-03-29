@@ -9,7 +9,7 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import ephyra.app.util.system.isOutdated
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.AndroidCookieJar

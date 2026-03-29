@@ -54,7 +54,7 @@ import ephyra.presentation.components.AppBarActions
 import ephyra.presentation.components.DropdownMenu
 import ephyra.presentation.components.NestedMenuItem
 import ephyra.presentation.util.Screen
-import ephyra.app.data.download.model.Download
+import ephyra.data.download.model.Download
 import kotlinx.collections.immutable.persistentListOf
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState

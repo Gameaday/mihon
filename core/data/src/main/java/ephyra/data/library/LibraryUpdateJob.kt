@@ -17,10 +17,10 @@ import androidx.work.WorkInfo
 import androidx.work.WorkQuery
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import ephyra.app.data.cache.CoverCache
-import ephyra.app.data.download.DownloadManager
+import ephyra.data.cache.CoverCache
+import ephyra.data.download.DownloadManager
 import ephyra.app.data.notification.Notifications
-import ephyra.app.util.storage.getUriCompat
+import ephyra.core.common.util.storage.getUriCompat
 import ephyra.app.util.system.isPowerSaveMode
 import ephyra.app.util.system.isRunning
 import ephyra.app.util.system.setForegroundSafely

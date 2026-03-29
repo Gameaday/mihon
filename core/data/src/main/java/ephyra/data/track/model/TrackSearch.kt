@@ -2,7 +2,7 @@
 
 package ephyra.app.data.track.model
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 
 class TrackSearch : Track {
 

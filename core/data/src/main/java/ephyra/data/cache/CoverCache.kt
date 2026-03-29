@@ -1,7 +1,7 @@
-package ephyra.app.data.cache
+package ephyra.data.cache
 
 import android.content.Context
-import ephyra.app.util.storage.DiskUtil
+import ephyra.core.common.util.storage.DiskUtil
 import ephyra.domain.manga.model.Manga
 import java.io.File
 import java.io.IOException

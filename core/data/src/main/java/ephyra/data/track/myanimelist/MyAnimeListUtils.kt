@@ -1,6 +1,6 @@
 package ephyra.app.data.track.myanimelist
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 
 fun Track.toMyAnimeListStatus() = when (status) {
     MyAnimeList.READING -> "reading"

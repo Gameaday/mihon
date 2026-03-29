@@ -11,7 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewpager.widget.ViewPager
 import ephyra.app.R
-import ephyra.app.data.download.DownloadManager
+import ephyra.data.download.DownloadManager
 import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.ReaderActivity
 import ephyra.feature.reader.model.ChapterTransition

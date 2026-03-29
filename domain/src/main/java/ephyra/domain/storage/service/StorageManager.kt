@@ -3,7 +3,7 @@ package ephyra.domain.storage.service
 import android.content.Context
 import androidx.core.net.toUri
 import com.hippo.unifile.UniFile
-import ephyra.app.util.storage.DiskUtil
+import ephyra.core.common.util.storage.DiskUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel

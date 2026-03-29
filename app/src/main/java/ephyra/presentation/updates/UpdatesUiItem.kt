@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import ephyra.app.data.download.model.Download
+import ephyra.data.download.model.Download
 import ephyra.app.ui.updates.UpdatesItem
 import ephyra.domain.updates.model.UpdatesWithRelations
 import ephyra.i18n.MR

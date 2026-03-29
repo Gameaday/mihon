@@ -3,7 +3,7 @@ package ephyra.presentation.widget
 import android.content.Context
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.LifecycleCoroutineScope
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.core.common.core.security.SecurityPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged

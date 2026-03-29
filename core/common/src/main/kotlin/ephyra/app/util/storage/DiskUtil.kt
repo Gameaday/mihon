@@ -1,4 +1,4 @@
-package ephyra.app.util.storage
+package ephyra.core.common.util.storage
 
 import android.content.Context
 import android.media.MediaScannerConnection
@@ -7,7 +7,7 @@ import android.os.Environment
 import android.os.StatFs
 import androidx.core.content.ContextCompat
 import com.hippo.unifile.UniFile
-import ephyra.app.util.lang.Hash
+import ephyra.core.common.util.lang.Hash
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.CharBuffer

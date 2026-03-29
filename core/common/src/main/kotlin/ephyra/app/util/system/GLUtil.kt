@@ -1,4 +1,4 @@
-package ephyra.app.util.system
+package ephyra.core.common.util.system
 
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig

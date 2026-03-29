@@ -1,8 +1,8 @@
 package ephyra.domain.manga.model
 
 import ephyra.domain.manga.model.Manga
-import ephyra.feature.reader.setting.ReaderOrientation
-import ephyra.feature.reader.setting.ReadingMode
+import ephyra.domain.reader.model.ReaderOrientation
+import ephyra.domain.reader.model.ReadingMode
 
 val Manga.readingMode: Long
     get() = viewerFlags and ReadingMode.MASK.toLong()

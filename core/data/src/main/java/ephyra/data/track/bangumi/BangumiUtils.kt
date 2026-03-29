@@ -1,6 +1,6 @@
 package ephyra.app.data.track.bangumi
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 
 fun Track.toApiStatus() = when (status) {
     Bangumi.PLAN_TO_READ -> 1

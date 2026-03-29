@@ -1,6 +1,6 @@
 package ephyra.app.util.chapter
 
-import ephyra.app.data.download.DownloadCache
+import ephyra.data.download.DownloadCache
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga
 import ephyra.source.local.isLocal

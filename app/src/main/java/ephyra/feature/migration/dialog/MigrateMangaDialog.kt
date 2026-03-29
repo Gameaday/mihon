@@ -21,8 +21,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
-import ephyra.app.data.cache.CoverCache
-import ephyra.app.data.download.DownloadManager
+import ephyra.data.cache.CoverCache
+import ephyra.data.download.DownloadManager
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.domain.manga.model.Manga

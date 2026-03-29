@@ -1,6 +1,6 @@
 package ephyra.feature.reader.viewer
 
-import ephyra.app.data.database.models.toDomainChapter
+import ephyra.data.database.models.toDomainChapter
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.domain.chapter.service.calculateChapterGap as domainCalculateChapterGap
 

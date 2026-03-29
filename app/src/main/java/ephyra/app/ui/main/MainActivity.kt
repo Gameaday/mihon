@@ -170,8 +170,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.app.BuildConfig
-import ephyra.app.data.cache.ChapterCache
-import ephyra.app.data.download.DownloadCache
+import ephyra.data.cache.ChapterCache
+import ephyra.data.download.DownloadCache
 import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.updater.AppUpdateChecker
 import ephyra.app.data.updater.RELEASE_URL
@@ -186,7 +186,7 @@ import ephyra.app.ui.more.NewUpdateScreen
 import ephyra.app.ui.more.OnboardingScreen
 import ephyra.app.util.system.isNavigationBarNeedsScrim
 import ephyra.app.util.system.updaterEnabled
-import ephyra.app.util.view.setComposeContent
+import ephyra.presentation.core.util.view.setComposeContent
 import ephyra.core.common.Constants
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.system.logcat

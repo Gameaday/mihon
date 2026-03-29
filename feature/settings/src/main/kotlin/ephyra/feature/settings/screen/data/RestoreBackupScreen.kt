@@ -30,7 +30,7 @@ import ephyra.presentation.util.Screen
 import ephyra.app.data.backup.BackupFileValidator
 import ephyra.app.data.backup.restore.BackupRestoreJob
 import ephyra.app.data.backup.restore.RestoreOptions
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import kotlinx.coroutines.flow.update
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.LabeledCheckbox

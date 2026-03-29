@@ -6,11 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import ephyra.app.core.security.SecurityPreferences
+import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.app.ui.security.UnlockActivity
 import ephyra.app.util.system.AuthenticatorUtil
 import ephyra.app.util.system.AuthenticatorUtil.isAuthenticationSupported
-import ephyra.app.util.view.overrideTransitionCompat
+import ephyra.presentation.core.util.view.overrideTransitionCompat
 import ephyra.app.util.view.setSecureScreen
 import ephyra.domain.base.BasePreferences
 import kotlinx.coroutines.flow.combine

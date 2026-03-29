@@ -1,4 +1,4 @@
-package ephyra.app.util.lang
+package ephyra.core.common.util.lang
 
 import androidx.core.text.parseAsHtml
 import java.nio.charset.StandardCharsets

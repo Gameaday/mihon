@@ -29,7 +29,7 @@ import ephyra.domain.extension.interactor.TrustExtension
 import ephyra.feature.settings.Preference
 import ephyra.feature.settings.screen.advanced.ClearDatabaseScreen
 import ephyra.feature.settings.screen.debug.DebugInfoScreen
-import ephyra.app.data.download.DownloadCache
+import ephyra.data.download.DownloadCache
 import ephyra.app.data.library.MetadataUpdateJob
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.network.NetworkPreferences
@@ -47,7 +47,7 @@ import eu.kanade.tachiyomi.network.PREF_DOH_QUAD9
 import eu.kanade.tachiyomi.network.PREF_DOH_SHECAN
 import ephyra.app.ui.more.OnboardingScreen
 import ephyra.app.util.CrashLogUtil
-import ephyra.app.util.system.GLUtil
+import ephyra.core.common.util.system.GLUtil
 import ephyra.app.util.system.isReleaseBuildType
 import ephyra.app.util.system.isShizukuInstalled
 import ephyra.app.util.system.powerManager

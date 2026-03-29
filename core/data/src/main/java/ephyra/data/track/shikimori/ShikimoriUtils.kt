@@ -1,6 +1,6 @@
 package ephyra.app.data.track.shikimori
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 
 fun Track.toShikimoriStatus() = when (status) {
     Shikimori.READING -> "watching"

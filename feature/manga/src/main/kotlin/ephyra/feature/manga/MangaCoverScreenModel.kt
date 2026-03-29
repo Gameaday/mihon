@@ -10,13 +10,13 @@ import coil3.asDrawable
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.size.Size
-import ephyra.app.data.cache.CoverCache
-import ephyra.app.data.saver.Image
-import ephyra.app.data.saver.ImageSaver
-import ephyra.app.data.saver.Location
-import ephyra.app.util.editCover
-import ephyra.app.util.system.encoder
-import ephyra.app.util.system.getBitmapOrNull
+import ephyra.data.cache.CoverCache
+import ephyra.data.saver.Image
+import ephyra.data.saver.ImageSaver
+import ephyra.data.saver.Location
+import ephyra.presentation.core.util.manga.editCover
+import ephyra.presentation.core.util.system.encoder
+import ephyra.presentation.core.util.system.getBitmapOrNull
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withIOContext
@@ -29,6 +29,7 @@ import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
 import ephyra.presentation.core.util.system.toShareIntent
+import ephyra.source.local.image.LocalCoverManager
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.network.await
 import eu.kanade.tachiyomi.source.online.HttpSource
@@ -36,7 +37,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority
 import okhttp3.Request
-import okhttp3.internal.platform.PlatformRegistry.applicationContext
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
 
@@ -51,6 +51,7 @@ class MangaCoverScreenModel(
     private val sourceManager: SourceManager,
     private val networkHelper: NetworkHelper,
     private val application: Application,
+    private val localCoverManager: LocalCoverManager,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) : StateScreenModel<Manga?>(null) {
 
@@ -147,7 +148,7 @@ class MangaCoverScreenModel(
         screenModelScope.launchIO {
             context.contentResolver.openInputStream(data)?.use {
                 try {
-                    manga.editCover(applicationContext, it, updateManga, coverCache)
+                    manga.editCover(localCoverManager, it, updateManga, coverCache)
                     notifyCoverUpdated(context)
                 } catch (e: Exception) {
                     notifyFailedCoverUpdate(context, e)
@@ -199,7 +200,7 @@ class MangaCoverScreenModel(
                         throw IllegalStateException("Failed to download cover: ${resp.code}")
                     }
                     resp.body.byteStream().use { input ->
-                        manga.editCover(applicationContext, input, updateManga, coverCache)
+                        manga.editCover(localCoverManager, input, updateManga, coverCache)
                     }
                 }
                 notifyCoverUpdated(context)

@@ -3,7 +3,7 @@ package ephyra.app.data.track
 import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import dev.icerock.moko.resources.StringResource
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.model.TrackSearch
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow

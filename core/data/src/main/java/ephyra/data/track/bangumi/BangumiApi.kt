@@ -2,7 +2,7 @@ package ephyra.app.data.track.bangumi
 
 import android.net.Uri
 import androidx.core.net.toUri
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.bangumi.dto.BGMCollectionResponse
 import ephyra.app.data.track.bangumi.dto.BGMOAuth
 import ephyra.app.data.track.bangumi.dto.BGMSearchResult

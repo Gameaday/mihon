@@ -16,8 +16,8 @@ import coil3.request.ImageRequest
 import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
 import ephyra.app.R
-import ephyra.app.core.security.SecurityPreferences
-import ephyra.app.data.download.Downloader
+import ephyra.core.common.core.security.SecurityPreferences
+import ephyra.data.download.Downloader
 import ephyra.app.data.notification.NotificationHandler
 import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.notification.Notifications

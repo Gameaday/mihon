@@ -25,8 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ephyra.presentation.reader.components.ChapterNavigator
-import ephyra.feature.reader.setting.ReaderOrientation
-import ephyra.feature.reader.setting.ReadingMode
+import ephyra.domain.reader.model.ReaderOrientation
+import ephyra.domain.reader.model.ReadingMode
 import ephyra.feature.reader.viewer.Viewer
 import ephyra.feature.reader.viewer.pager.R2LPagerViewer
 import ephyra.presentation.core.components.material.padding

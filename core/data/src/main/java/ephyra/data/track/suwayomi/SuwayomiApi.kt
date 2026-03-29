@@ -1,7 +1,7 @@
 package ephyra.app.data.track.suwayomi
 
 import android.content.SharedPreferences
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.model.TrackSearch
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.source.service.SourceManager

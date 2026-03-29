@@ -1,7 +1,7 @@
 package ephyra.feature.settings.screen
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import ephyra.app.data.download.DownloadCache
+import ephyra.data.download.DownloadCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.extension.interactor.TrustExtension
 import ephyra.domain.library.service.LibraryPreferences

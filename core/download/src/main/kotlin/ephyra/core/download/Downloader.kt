@@ -1,14 +1,14 @@
-package ephyra.app.data.download
+package ephyra.data.download
 
 import android.content.Context
 import com.hippo.unifile.UniFile
-import ephyra.app.data.cache.ChapterCache
-import ephyra.app.data.download.Downloader.Companion.BOUNDARY_PAGES
-import ephyra.app.data.download.model.Download
+import ephyra.data.cache.ChapterCache
+import ephyra.data.download.Downloader.Companion.BOUNDARY_PAGES
+import ephyra.data.download.model.Download
 import ephyra.app.data.library.LibraryUpdateNotifier
 import ephyra.app.data.notification.NotificationHandler
-import ephyra.app.util.storage.DiskUtil
-import ephyra.app.util.storage.DiskUtil.NOMEDIA_FILE
+import ephyra.core.common.util.storage.DiskUtil
+import ephyra.core.common.util.storage.DiskUtil.NOMEDIA_FILE
 import ephyra.app.util.storage.saveTo
 import ephyra.app.util.system.encoder
 import ephyra.core.archive.ZipWriter

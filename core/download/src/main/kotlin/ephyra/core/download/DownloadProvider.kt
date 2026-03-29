@@ -1,9 +1,9 @@
-package ephyra.app.data.download
+package ephyra.data.download
 
 import android.content.Context
 import com.hippo.unifile.UniFile
-import ephyra.app.util.lang.Hash.md5
-import ephyra.app.util.storage.DiskUtil
+import ephyra.core.common.util.lang.Hash.md5
+import ephyra.core.common.util.storage.DiskUtil
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.storage.displayablePath
 import ephyra.core.common.util.system.logcat

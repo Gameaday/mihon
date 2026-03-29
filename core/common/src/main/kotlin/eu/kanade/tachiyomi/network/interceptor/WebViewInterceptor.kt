@@ -4,10 +4,10 @@ import android.content.Context
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.Toast
-import ephyra.app.util.system.DeviceUtil
-import ephyra.app.util.system.WebViewUtil
+import ephyra.core.common.util.system.DeviceUtil
+import ephyra.core.common.util.system.WebViewUtil
 import ephyra.app.util.system.setDefaultSettings
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.util.lang.launchUI
 import ephyra.i18n.MR
 import okhttp3.Headers

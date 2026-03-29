@@ -1,4 +1,4 @@
-package ephyra.app.core.security
+package ephyra.core.common.core.security
 
 import ephyra.core.common.preference.PreferenceStore
 

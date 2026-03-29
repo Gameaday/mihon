@@ -1,13 +1,13 @@
 package ephyra.feature.reader.loader
 
-import ephyra.app.data.cache.ChapterCache
-import ephyra.app.data.database.models.toDomainChapter
+import ephyra.data.cache.ChapterCache
+import ephyra.data.database.models.toDomainChapter
 import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

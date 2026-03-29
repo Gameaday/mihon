@@ -6,7 +6,7 @@ import android.os.Bundle
 import ephyra.app.data.track.TrackerManager
 import ephyra.app.ui.base.activity.BaseActivity
 import ephyra.app.ui.main.MainActivity
-import ephyra.app.util.view.setComposeContent
+import ephyra.presentation.core.util.view.setComposeContent
 import ephyra.presentation.core.screens.LoadingScreen
 import org.koin.android.ext.android.inject
 

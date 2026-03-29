@@ -21,7 +21,7 @@ import androidx.core.graphics.get
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import com.hippo.unifile.UniFile
-import ephyra.app.util.system.GLUtil
+import ephyra.core.common.util.system.GLUtil
 import ephyra.core.common.util.system.ImageUtil.STUB_MAX_HEIGHT_FRACTION
 import ephyra.core.common.util.system.ImageUtil.STUB_MIN_HEIGHT_FRACTION
 import logcat.LogPriority

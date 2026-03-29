@@ -26,7 +26,7 @@ import ephyra.presentation.components.AppBar
 import ephyra.presentation.manga.components.BaseMangaListItem
 import ephyra.presentation.util.Screen
 import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.util.system.toast
+import ephyra.presentation.core.util.system.toast
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.core.parameter.parametersOf
 import ephyra.feature.migration.config.MigrationConfigScreen

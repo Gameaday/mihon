@@ -13,8 +13,8 @@ import ephyra.feature.settings.Preference
 import ephyra.feature.settings.PreferenceScaffold
 import ephyra.feature.settings.screen.about.AboutScreen
 import ephyra.presentation.util.Screen
-import ephyra.app.util.system.DeviceUtil
-import ephyra.app.util.system.WebViewUtil
+import ephyra.core.common.util.system.DeviceUtil
+import ephyra.core.common.util.system.WebViewUtil
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.guava.await

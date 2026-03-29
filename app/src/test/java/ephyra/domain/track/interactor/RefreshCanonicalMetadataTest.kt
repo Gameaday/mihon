@@ -1,6 +1,6 @@
 package ephyra.domain.track.interactor
 
-import ephyra.app.data.cache.CoverCache
+import ephyra.data.cache.CoverCache
 import ephyra.app.data.track.Tracker
 import ephyra.app.data.track.TrackerManager
 import ephyra.app.data.track.model.TrackSearch

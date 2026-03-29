@@ -2,7 +2,7 @@ package ephyra.app.data.track.shikimori
 
 import android.net.Uri
 import androidx.core.net.toUri
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.model.TrackSearch
 import ephyra.app.data.track.shikimori.dto.SMAddMangaResponse
 import ephyra.app.data.track.shikimori.dto.SMManga

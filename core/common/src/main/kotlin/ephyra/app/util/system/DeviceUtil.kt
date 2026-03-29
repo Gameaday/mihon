@@ -1,4 +1,4 @@
-package ephyra.app.util.system
+package ephyra.core.common.util.system
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager

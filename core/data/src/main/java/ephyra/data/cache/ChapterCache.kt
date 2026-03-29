@@ -1,13 +1,13 @@
-package ephyra.app.data.cache
+package ephyra.data.cache
 
 import android.content.Context
 import android.text.format.Formatter
 import coil3.disk.DiskCache
-import ephyra.app.data.cache.ChapterCache.Companion.CACHE_SIZE_HIGH
-import ephyra.app.data.cache.ChapterCache.Companion.CACHE_SIZE_LOW
-import ephyra.app.data.cache.ChapterCache.Companion.CACHE_SIZE_MEDIUM
-import ephyra.app.util.storage.DiskUtil
-import ephyra.app.util.system.DeviceUtil
+import ephyra.data.cache.ChapterCache.Companion.CACHE_SIZE_HIGH
+import ephyra.data.cache.ChapterCache.Companion.CACHE_SIZE_LOW
+import ephyra.data.cache.ChapterCache.Companion.CACHE_SIZE_MEDIUM
+import ephyra.core.common.util.storage.DiskUtil
+import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.chapter.model.Chapter
 import eu.kanade.tachiyomi.source.model.Page

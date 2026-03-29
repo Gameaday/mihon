@@ -1,6 +1,6 @@
 @file:Suppress("PropertyName")
 
-package ephyra.app.data.database.models
+package ephyra.data.database.models
 
 class ChapterImpl : Chapter {
 

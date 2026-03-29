@@ -1,6 +1,6 @@
 package ephyra.app.data.track.shikimori.dto
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.shikimori.ShikimoriApi
 import ephyra.app.data.track.shikimori.toTrackStatus
 import kotlinx.serialization.Serializable

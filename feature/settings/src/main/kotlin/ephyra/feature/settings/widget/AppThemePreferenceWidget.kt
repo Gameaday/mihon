@@ -47,7 +47,7 @@ import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.AppTheme
 import ephyra.presentation.manga.components.MangaCover
 import ephyra.presentation.theme.TachiyomiTheme
-import ephyra.app.util.system.DeviceUtil
+import ephyra.core.common.util.system.DeviceUtil
 import ephyra.app.util.system.isDynamicColorAvailable
 import ephyra.core.common.preference.InMemoryPreferenceStore
 import ephyra.i18n.MR

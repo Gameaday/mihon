@@ -2,7 +2,7 @@ package ephyra.app.data.track.anilist
 
 import android.net.Uri
 import androidx.core.net.toUri
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.anilist.dto.ALAddMangaResult
 import ephyra.app.data.track.anilist.dto.ALCurrentUserResult
 import ephyra.app.data.track.anilist.dto.ALMediaResult

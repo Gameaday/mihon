@@ -21,7 +21,7 @@ import ephyra.domain.source.interactor.GetIncognitoState
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.presentation.util.ioCoroutineScope
-import ephyra.app.data.cache.CoverCache
+import ephyra.data.cache.CoverCache
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.model.FilterList
 import ephyra.app.util.removeCovers

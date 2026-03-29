@@ -1,4 +1,4 @@
-package ephyra.app.data.download.model
+package ephyra.data.download.model
 
 import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.chapter.model.Chapter

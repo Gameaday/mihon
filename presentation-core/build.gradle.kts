@@ -30,6 +30,9 @@ kotlin {
 dependencies {
     api(projects.core.common)
     api(projects.domain)
+    api(projects.core.domain)
+    api(projects.core.data)
+    api(projects.sourceLocal)
     api(projects.i18n)
 
     // Compose
@@ -53,7 +56,9 @@ dependencies {
     implementation(libs.materialKolor)
     implementation(platform(libs.coil.bom))
     implementation(libs.bundles.coil)
+    implementation(libs.bundles.voyager)
     implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
     implementation(libs.unifile)
     implementation(libs.shizuku.api)
     implementation(libs.okio)

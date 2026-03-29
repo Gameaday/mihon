@@ -9,7 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkQuery
 import androidx.work.WorkerParameters
-import ephyra.app.data.cache.CoverCache
+import ephyra.data.cache.CoverCache
 import ephyra.app.data.notification.Notifications
 import ephyra.app.util.system.isRunning
 import ephyra.app.util.system.setForegroundSafely

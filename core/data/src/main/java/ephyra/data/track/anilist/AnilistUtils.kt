@@ -1,6 +1,6 @@
 package ephyra.app.data.track.anilist
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.domain.track.model.Track as DomainTrack
 

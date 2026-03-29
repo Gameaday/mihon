@@ -1,6 +1,6 @@
 package ephyra.app.data.track.anilist.dto
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.TrackerManager
 import ephyra.app.data.track.anilist.Anilist
 import ephyra.app.data.track.anilist.AnilistApi

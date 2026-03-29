@@ -23,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
-import ephyra.app.data.download.model.Download
+import ephyra.data.download.model.Download
 import ephyra.app.ui.updates.UpdatesItem
 import ephyra.app.ui.updates.UpdatesScreenModel
 import ephyra.i18n.MR

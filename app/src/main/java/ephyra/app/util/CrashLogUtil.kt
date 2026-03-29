@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Build
 import ephyra.app.BuildConfig
 import ephyra.app.extension.ExtensionManager
-import ephyra.app.util.storage.getUriCompat
-import ephyra.app.util.system.WebViewUtil
+import ephyra.core.common.util.storage.getUriCompat
+import ephyra.core.common.util.system.WebViewUtil
 import ephyra.core.common.util.lang.withNonCancellableContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.presentation.core.util.system.createFileInCacheDir

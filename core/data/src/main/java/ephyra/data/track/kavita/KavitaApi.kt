@@ -1,6 +1,6 @@
 package ephyra.app.data.track.kavita
 
-import ephyra.app.data.database.models.Track
+import ephyra.data.database.models.Track
 import ephyra.app.data.track.model.TrackSearch
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat

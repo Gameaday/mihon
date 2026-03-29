@@ -1,12 +1,12 @@
-package ephyra.app.data.download
+package ephyra.data.download
 
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import ephyra.app.R
-import ephyra.app.core.security.SecurityPreferences
-import ephyra.app.data.download.model.Download
+import ephyra.core.common.core.security.SecurityPreferences
+import ephyra.data.download.model.Download
 import ephyra.app.data.notification.NotificationHandler
 import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.notification.Notifications

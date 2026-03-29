@@ -12,7 +12,7 @@ import coil3.fetch.SourceFetchResult
 import coil3.getOrDefault
 import coil3.request.Options
 import com.hippo.unifile.UniFile
-import ephyra.app.data.cache.CoverCache
+import ephyra.data.cache.CoverCache
 import ephyra.app.data.coil.MangaCoverFetcher.Companion.USE_CUSTOM_COVER_KEY
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.manga.model.Manga

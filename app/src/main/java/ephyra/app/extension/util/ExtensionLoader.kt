@@ -7,8 +7,8 @@ import android.content.pm.PackageManager
 import androidx.core.content.pm.PackageInfoCompat
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.LoadResult
-import ephyra.app.util.lang.Hash
-import ephyra.app.util.storage.copyAndSetReadOnlyTo
+import ephyra.core.common.util.lang.Hash
+import ephyra.core.common.util.storage.copyAndSetReadOnlyTo
 import ephyra.app.util.system.ChildFirstPathClassLoader
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.extension.interactor.TrustExtension

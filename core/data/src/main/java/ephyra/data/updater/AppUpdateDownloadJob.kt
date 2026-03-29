@@ -11,7 +11,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import ephyra.app.data.notification.Notifications
-import ephyra.app.util.storage.getUriCompat
+import ephyra.core.common.util.storage.getUriCompat
 import ephyra.app.util.storage.saveTo
 import ephyra.app.util.system.setForegroundSafely
 import ephyra.app.util.system.workManager

@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ephyra.presentation.theme.TachiyomiPreviewTheme
-import ephyra.app.data.database.models.toDomainChapter
+import ephyra.data.database.models.toDomainChapter
 import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.ReaderChapter
 import kotlinx.collections.immutable.persistentMapOf

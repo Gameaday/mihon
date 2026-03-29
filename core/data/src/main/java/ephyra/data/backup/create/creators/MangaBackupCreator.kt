@@ -10,7 +10,7 @@ import ephyra.data.DatabaseHandler
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.history.interactor.GetHistory
 import ephyra.domain.manga.model.Manga
-import ephyra.feature.reader.setting.ReadingMode
+import ephyra.domain.reader.model.ReadingMode
 
 class MangaBackupCreator(
     private val handler: DatabaseHandler,

@@ -7,7 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
 import ephyra.app.data.backup.restore.BackupRestoreJob
-import ephyra.app.data.download.DownloadManager
+import ephyra.data.download.DownloadManager
 import ephyra.app.data.library.LibraryUpdateJob
 import ephyra.app.data.updater.AppUpdateDownloadJob
 import ephyra.app.ui.main.MainActivity

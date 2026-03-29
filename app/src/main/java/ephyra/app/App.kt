@@ -23,7 +23,7 @@ import coil3.request.allowRgb565
 import coil3.request.bitmapConfig
 import coil3.request.crossfade
 import coil3.util.DebugLogger
-import ephyra.app.core.security.PrivacyPreferences
+import ephyra.core.common.core.security.PrivacyPreferences
 import ephyra.app.crash.CrashActivity
 import ephyra.app.crash.GlobalExceptionHandler
 import ephyra.app.data.coil.BufferedSourceFetcher
@@ -36,9 +36,9 @@ import ephyra.app.di.koinAppModule_UI
 import ephyra.app.di.koinDomainModule
 import ephyra.app.di.koinPreferenceModule
 import ephyra.app.ui.base.delegate.SecureActivityDelegate
-import ephyra.app.util.system.DeviceUtil
-import ephyra.app.util.system.GLUtil
-import ephyra.app.util.system.WebViewUtil
+import ephyra.core.common.util.system.DeviceUtil
+import ephyra.core.common.util.system.GLUtil
+import ephyra.core.common.util.system.WebViewUtil
 import ephyra.app.util.system.animatorDurationScale
 import ephyra.app.util.system.cancelNotification
 import ephyra.app.util.system.notify
