@@ -1,11 +1,11 @@
 package ephyra.data.updates
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import ephyra.core.common.util.lang.toLong
 import ephyra.data.room.daos.UpdateDao
 import ephyra.domain.updates.model.UpdatesWithRelations
 import ephyra.domain.updates.repository.UpdatesRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class UpdatesRepositoryImpl(
     private val updateDao: UpdateDao,

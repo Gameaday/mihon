@@ -7,23 +7,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.net.toUri
-import ephyra.presentation.webview.WebViewScreenContent
-import ephyra.app.R
-import eu.kanade.tachiyomi.network.NetworkHelper
-import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.core.common.util.system.WebViewUtil
+import ephyra.core.common.util.system.logcat
+import ephyra.domain.source.service.SourceManager
+import ephyra.i18n.MR
+import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast
 import ephyra.presentation.core.util.view.overrideTransitionCompat
 import ephyra.presentation.core.util.view.setComposeContent
+import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.source.online.HttpSource
 import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import ephyra.core.common.util.system.logcat
-import ephyra.domain.source.service.SourceManager
-import ephyra.i18n.MR
 import org.koin.android.ext.android.inject
+import ephyra.presentation.core.R
+
 
 class WebViewActivity : BaseActivity() {
 
@@ -37,7 +37,7 @@ class WebViewActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         overrideTransitionCompat(
-            Activity.OVERRIDE_TRANSITION_OPEN,
+            OVERRIDE_TRANSITION_OPEN,
             R.anim.shared_axis_x_push_enter,
             R.anim.shared_axis_x_push_exit,
         )
@@ -83,7 +83,7 @@ class WebViewActivity : BaseActivity() {
     override fun finish() {
         super.finish()
         overrideTransitionCompat(
-            Activity.OVERRIDE_TRANSITION_CLOSE,
+            OVERRIDE_TRANSITION_CLOSE,
             R.anim.shared_axis_x_pop_enter,
             R.anim.shared_axis_x_pop_exit,
         )

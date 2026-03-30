@@ -17,10 +17,10 @@ import ephyra.feature.settings.screen.SettingsDataScreen
 import ephyra.feature.settings.screen.SettingsMainScreen
 import ephyra.feature.settings.screen.SettingsTrackingScreen
 import ephyra.feature.settings.screen.about.AboutScreen
-import ephyra.presentation.util.DefaultNavigatorScreenTransition
-import ephyra.presentation.util.LocalBackPress
-import ephyra.presentation.util.Screen
-import ephyra.presentation.util.isTabletUi
+import ephyra.presentation.core.util.DefaultNavigatorScreenTransition
+import ephyra.presentation.core.util.LocalBackPress
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.isTabletUi
 import ephyra.presentation.core.components.TwoPanelBox
 
 class SettingsScreen(

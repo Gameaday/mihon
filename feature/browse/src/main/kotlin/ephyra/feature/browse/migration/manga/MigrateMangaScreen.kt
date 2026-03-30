@@ -22,9 +22,9 @@ import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.components.AppBar
+import import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.manga.components.BaseMangaListItem
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.app.ui.manga.MangaScreen
 import ephyra.presentation.core.util.system.toast
 import kotlinx.coroutines.flow.collectLatest

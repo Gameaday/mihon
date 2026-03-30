@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import ephyra.presentation.util.formattedMessage
+import ephyra.presentation.core.util.formattedMessage
 import ephyra.app.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.model.ReaderPage

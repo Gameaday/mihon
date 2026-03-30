@@ -1,9 +1,9 @@
 package ephyra.data.history
 
-import ephyra.domain.history.model.History
-import ephyra.domain.history.model.HistoryWithRelations
 import ephyra.data.room.entities.HistoryEntity
 import ephyra.data.room.views.HistoryView
+import ephyra.domain.history.model.History
+import ephyra.domain.history.model.HistoryWithRelations
 import ephyra.domain.manga.model.MangaCover
 import java.util.Date
 

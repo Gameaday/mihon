@@ -16,9 +16,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.core.download.DownloadManager
 import ephyra.app.ui.setting.SettingsScreen
 import ephyra.core.common.util.lang.launchIO
+import ephyra.core.download.DownloadManager
 import ephyra.core.preference.asState
 import ephyra.domain.base.BasePreferences
 import ephyra.feature.category.CategoryScreen
@@ -27,7 +27,7 @@ import ephyra.feature.stats.StatsScreen
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.more.MoreScreen
-import ephyra.presentation.util.Tab
+import ephyra.presentation.core.util.Tab
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,7 +55,7 @@ data object MoreTab : Tab {
 
     @Composable
     override fun Content() {
-        val context = LocalContext.current
+        LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<MoreScreenModel>()
         val downloadQueueState by screenModel.downloadQueueState.collectAsStateWithLifecycle()

@@ -44,3 +44,12 @@ dependencies {
     api(libs.koin.core)
     api(kotlinx.coroutines.core)
 }
+// Suppress warnings for the following:
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
+        )
+    }
+}

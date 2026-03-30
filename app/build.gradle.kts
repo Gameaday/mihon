@@ -8,6 +8,7 @@ plugins {
     id("ephyra.android.application")
     id("ephyra.android.application.compose")
     kotlin("plugin.serialization")
+    alias(libs.plugins.koin.compiler)
     alias(libs.plugins.aboutLibraries)
 }
 
@@ -105,8 +106,8 @@ android {
     }
 
     sourceSets {
-        getByName("preview").res.srcDirs("src/debug/res")
-        getByName("benchmark").res.srcDirs("src/debug/res")
+        getByName("preview").res.directories.add(file("src/debug/res").toString())
+        getByName("benchmark").res.directories.add(file("src/debug/res").toString())
     }
 
     splits {
@@ -157,13 +158,7 @@ android {
 
         // Disable some unused things
         dataBinding = false
-        renderScript = false
         shaders = false
-    }
-
-    lint {
-        abortOnError = false
-        checkReleaseBuilds = false
     }
 }
 

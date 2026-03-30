@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+    <!-- Background -->
+    <path
+        android:fillColor="#00A4DC"
+        android:pathData="M0,0h192v192H0z" />
+    <!-- Jellyfin-inspired media server icon (book/media shape) -->
+    <path
+        android:fillAlpha="0.2"
+        android:fillColor="#FFFFFF"
+        android:pathData="M96,32 C64,32 38,52 38,80 C38,108 64,128 96,128 C128,128 154,108 154,80 C154,52 128,32 96,32Z" />
+    <!-- Stylized open book / media shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M56,60 L56,140 L96,124 L136,140 L136,60 L96,76Z" />
+    <!-- Center divider -->
+    <path
+        android:pathData="M96,76 L96,124"
+        android:strokeWidth="3"
+        android:strokeColor="#00A4DC" />
+</vector>

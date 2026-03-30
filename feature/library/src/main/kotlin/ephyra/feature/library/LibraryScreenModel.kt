@@ -13,7 +13,7 @@ import ephyra.core.util.fastFilterNot
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.chapter.interactor.SetReadStatus
 import ephyra.domain.manga.interactor.UpdateManga
-import ephyra.presentation.components.SEARCH_DEBOUNCE_MILLIS
+import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
 import ephyra.feature.library.presentation.components.LibraryToolbarTitle
 import ephyra.presentation.manga.DownloadAction
 import ephyra.data.cache.CoverCache

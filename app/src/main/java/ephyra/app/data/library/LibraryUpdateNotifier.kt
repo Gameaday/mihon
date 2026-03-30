@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import coil3.asDrawable
 import coil3.imageLoader
 import coil3.request.ImageRequest
@@ -29,13 +28,12 @@ import ephyra.core.common.util.system.notify
 import ephyra.core.common.Constants
 import ephyra.core.common.i18n.pluralStringResource
 import ephyra.core.common.i18n.stringResource
-import ephyra.core.common.util.lang.launchUI
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
-import ephyra.presentation.util.formatChapterNumber
+import ephyra.presentation.core.util.formatChapterNumber
 import eu.kanade.tachiyomi.source.UnmeteredSource
 import java.math.RoundingMode
 import java.text.NumberFormat

@@ -57,8 +57,8 @@ import ephyra.app.R
 import ephyra.domain.manga.model.Manga
 import ephyra.feature.migration.list.models.MigratingManga
 import ephyra.i18n.MR
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.core.components.Badge
 import ephyra.presentation.core.components.BadgeGroup
 import ephyra.presentation.core.components.FastScrollLazyColumn
@@ -69,9 +69,9 @@ import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.theme.MotionTokens
 import ephyra.presentation.core.util.plus
 import ephyra.presentation.manga.components.MangaCover
-import ephyra.presentation.util.animateItemFastScroll
-import ephyra.presentation.util.formatChapterNumber
-import ephyra.presentation.util.rememberResourceBitmapPainter
+import ephyra.presentation.core.util.animateItemFastScroll
+import ephyra.presentation.core.util.formatChapterNumber
+import ephyra.presentation.core.util.rememberResourceBitmapPainter
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

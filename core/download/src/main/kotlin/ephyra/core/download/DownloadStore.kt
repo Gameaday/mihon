@@ -2,8 +2,8 @@ package ephyra.core.download
 
 import android.content.Context
 import androidx.core.content.edit
-import ephyra.domain.download.model.Download
 import ephyra.domain.chapter.interactor.GetChapter
+import ephyra.domain.download.model.Download
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager

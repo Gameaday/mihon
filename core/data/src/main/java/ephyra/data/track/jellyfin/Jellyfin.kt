@@ -378,7 +378,7 @@ class Jellyfin(
         return track.remoteUrl.contains("/Items/")
     }
 
-    override fun migrateTrack(track: Track, manga: ephyra.domain.manga.model.Manga, newSource: Source): Track? {
+    override fun migrateTrack(track: Track, manga: ephyra.domain.manga.model.Manga, newSource: Source): Track {
         return track
     }
 
@@ -446,7 +446,7 @@ class Jellyfin(
         }
     }
 
-    private suspend fun pullRemoteProgress(track: DbTrack, remoteTrack: ephyra.data.track.model.TrackSearch? = null) = syncMutex.withLock {
+    private suspend fun pullRemoteProgress(track: DbTrack, remoteTrack: TrackSearch? = null) = syncMutex.withLock {
         val remote = remoteTrack ?: run {
             val serverUrl = resolveServerUrl(track.tracking_url)
             val itemId = api.getItemIdFromUrl(track.tracking_url)

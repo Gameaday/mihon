@@ -1,14 +1,14 @@
 package ephyra.data.source
 
 import androidx.paging.PagingState
-import eu.kanade.tachiyomi.source.CatalogueSource
-import eu.kanade.tachiyomi.source.model.FilterList
-import eu.kanade.tachiyomi.source.model.MangasPage
-import ephyra.domain.manga.model.toDomainManga
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.manga.interactor.NetworkToLocalManga
 import ephyra.domain.manga.model.Manga
+import ephyra.domain.manga.model.toDomainManga
 import ephyra.domain.source.repository.SourcePagingSource
+import eu.kanade.tachiyomi.source.CatalogueSource
+import eu.kanade.tachiyomi.source.model.FilterList
+import eu.kanade.tachiyomi.source.model.MangasPage
 
 class SourceSearchPagingSource(
     source: CatalogueSource,

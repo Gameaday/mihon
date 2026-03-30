@@ -57,8 +57,8 @@ import androidx.compose.ui.unit.dp
 import ephyra.app.R
 import ephyra.feature.manga.presentation.DownloadAction
 import ephyra.i18n.MR
-import ephyra.presentation.components.DownloadDropdownMenu
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.DownloadDropdownMenu
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.core.i18n.stringResource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

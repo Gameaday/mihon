@@ -1,16 +1,16 @@
 package ephyra.data.manga
 
-import eu.kanade.tachiyomi.source.model.UpdateStrategy
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.Json
+import ephyra.data.room.entities.MangaEntity
+import ephyra.data.room.views.LibraryView
+import ephyra.data.room.views.UpdatesView
 import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaWithChapterCount
-import ephyra.data.room.entities.MangaEntity
-import ephyra.data.room.views.LibraryView
-import ephyra.data.room.views.UpdatesView
+import eu.kanade.tachiyomi.source.model.UpdateStrategy
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 
 object MangaMapper {
     fun mapManga(

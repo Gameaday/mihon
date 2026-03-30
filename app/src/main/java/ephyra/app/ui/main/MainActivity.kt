@@ -198,16 +198,16 @@ import ephyra.domain.source.interactor.GetIncognitoState
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
 import ephyra.feature.settings.screen.data.RestoreBackupScreen
 import ephyra.i18n.MR
-import ephyra.presentation.components.AppStateBanners
-import ephyra.presentation.components.DownloadedOnlyBannerBackgroundColor
-import ephyra.presentation.components.IncognitoModeBannerBackgroundColor
-import ephyra.presentation.components.IndexingBannerBackgroundColor
+import ephyra.presentation.core.components.AppStateBanners
+import ephyra.presentation.core.components.DownloadedOnlyBannerBackgroundColor
+import ephyra.presentation.core.components.IncognitoModeBannerBackgroundColor
+import ephyra.presentation.core.components.IndexingBannerBackgroundColor
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.presentation.core.util.system.openInBrowser
-import ephyra.presentation.util.AssistContentScreen
-import ephyra.presentation.util.DefaultNavigatorScreenTransition
+import ephyra.presentation.core.util.AssistContentScreen
+import ephyra.presentation.core.util.DefaultNavigatorScreenTransition
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -222,12 +222,12 @@ import org.koin.android.ext.android.inject
 class MainActivity : BaseActivity() {
 
     private val libraryPreferences: LibraryPreferences by inject()
-    private val preferences: ephyra.domain.base.BasePreferences by inject()
+    private val preferences: BasePreferences by inject()
 
     private val downloadCache: ephyra.app.data.download.DownloadCache by inject()
     private val chapterCache: ephyra.app.data.cache.ChapterCache by inject()
 
-    private val getIncognitoState: ephyra.domain.source.interactor.GetIncognitoState by inject()
+    private val getIncognitoState: GetIncognitoState by inject()
     private val uiPreferences: ephyra.domain.ui.UiPreferences by inject()
     private val privacyPreferences: ephyra.app.core.security.PrivacyPreferences by inject()
     private val storagePreferences: ephyra.domain.storage.service.StoragePreferences by inject()

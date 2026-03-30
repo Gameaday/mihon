@@ -21,11 +21,11 @@ import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import kotlinx.collections.immutable.ImmutableList
 import ephyra.core.common.Constants
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.widget.util.calculateRowAndColumnCount
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun UpdatesWidget(

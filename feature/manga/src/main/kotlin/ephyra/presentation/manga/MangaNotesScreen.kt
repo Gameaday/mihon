@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import ephyra.feature.manga.notes.MangaNotesScreen
 import ephyra.feature.manga.presentation.components.MangaNotesTextArea
 import ephyra.i18n.MR
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarTitle
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarTitle
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 

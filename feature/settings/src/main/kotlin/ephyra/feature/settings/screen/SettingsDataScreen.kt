@@ -48,7 +48,7 @@ import ephyra.feature.settings.screen.data.RestoreBackupScreen
 import ephyra.feature.settings.screen.data.StorageInfo
 import ephyra.feature.settings.widget.BasePreferenceWidget
 import ephyra.feature.settings.widget.PrefsHorizontalPadding
-import ephyra.presentation.util.relativeTimeSpanString
+import ephyra.presentation.core.util.relativeTimeSpanString
 import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.restore.BackupRestoreJob
 import ephyra.data.cache.ChapterCache

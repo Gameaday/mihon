@@ -10,12 +10,10 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -45,6 +43,14 @@ internal fun Project.configureAndroid(commonExtension: CommonExtension) {
                 targetCompatibility = AndroidConfig.JavaVersion
                 isCoreLibraryDesugaringEnabled = true
             }
+            commonExtension.lint {
+                abortOnError = false
+                checkReleaseBuilds = false
+                lintConfig = rootProject.file("lint.xml")
+                baseline = file("lint-baseline.xml")
+                checkDependencies = true
+                ignoreTestSources = true
+            }
         }
 
         is LibraryExtension -> {
@@ -55,6 +61,14 @@ internal fun Project.configureAndroid(commonExtension: CommonExtension) {
                 targetCompatibility = AndroidConfig.JavaVersion
                 isCoreLibraryDesugaringEnabled = true
             }
+            commonExtension.lint {
+                abortOnError = false
+                checkReleaseBuilds = false
+                lintConfig = rootProject.file("lint.xml")
+                baseline = file("lint-baseline.xml")
+                checkDependencies = true
+                ignoreTestSources = true
+            }
         }
 
         is TestExtension -> {
@@ -64,6 +78,14 @@ internal fun Project.configureAndroid(commonExtension: CommonExtension) {
                 sourceCompatibility = AndroidConfig.JavaVersion
                 targetCompatibility = AndroidConfig.JavaVersion
                 isCoreLibraryDesugaringEnabled = true
+            }
+            commonExtension.lint {
+                abortOnError = false
+                checkReleaseBuilds = false
+                lintConfig = rootProject.file("lint.xml")
+                baseline = file("lint-baseline.xml")
+                checkDependencies = true
+                ignoreTestSources = true
             }
         }
     }
@@ -96,7 +118,14 @@ internal fun Project.configureAndroidMultiplatform(androidExtension: KotlinMulti
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
-        // Additional common configs could go here if needed
+        lint {
+            abortOnError = false
+            checkReleaseBuilds = false
+            lintConfig = rootProject.file("lint.xml")
+            baseline = file("lint-baseline.xml")
+            checkDependencies = true
+            ignoreTestSources = true
+        }
     }
 
     tasks.withType<KotlinCompile>().configureEach {
@@ -114,7 +143,7 @@ internal fun Project.configureAndroidMultiplatform(androidExtension: KotlinMulti
 }
 
 internal fun Project.configureCompose(commonExtension: CommonExtension) {
-    pluginManager.apply(kotlinxCatalog.getPlugin("compose-compiler").pluginId)
+    pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
     when (commonExtension) {
         is ApplicationExtension -> {
@@ -164,4 +193,3 @@ internal fun Project.configureTest() {
 }
 
 val Project.generatedBuildDir: File get() = project.layout.buildDirectory.asFile.get().resolve("generated/ephyra")
-

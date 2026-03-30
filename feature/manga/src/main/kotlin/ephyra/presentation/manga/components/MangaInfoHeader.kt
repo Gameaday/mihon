@@ -95,7 +95,7 @@ import ephyra.domain.manga.model.LockedField
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.SourceStatus
 import ephyra.i18n.MR
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.core.components.material.DISABLED_ALPHA
 import ephyra.presentation.core.components.material.TextButton
 import ephyra.presentation.core.components.material.padding

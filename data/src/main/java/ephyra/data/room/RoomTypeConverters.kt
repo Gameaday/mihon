@@ -17,7 +17,7 @@ class RoomTypeConverters {
     }
 
     @TypeConverter
-    fun fromGenreString(value: String?): List<String>? {
+    fun fromGenreString(value: String?): List<String> {
         return value?.takeIf { it.isNotEmpty() }?.split(", ") ?: emptyList()
     }
 

@@ -1,7 +1,8 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
+    // ADD THIS: It tells Gradle this is an Android Kotlin module
+    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -28,41 +29,53 @@ kotlin {
 }
 
 dependencies {
+    // Internal Layers
     api(projects.core.common)
     api(projects.domain)
     api(projects.core.domain)
     api(projects.core.data)
+    api(projects.core.archive)
+    api(projects.core.download)
     api(projects.sourceLocal)
     api(projects.sourceApi)
     api(projects.i18n)
 
-    // Compose
-    implementation(compose.activity)
-    implementation(compose.foundation)
-    implementation(compose.material3.core)
-    implementation(compose.material.icons)
-    implementation(compose.animation)
-    implementation(compose.animation.graphics)
+    // Compose Core
+    api(compose.activity)
+    api(compose.foundation)
+    api(compose.material3.core)
+    api(compose.material.icons)
+    api(compose.animation)
+    api(compose.animation.graphics)
     debugImplementation(compose.ui.tooling)
-    implementation(compose.ui.tooling.preview)
-    implementation(compose.ui.util)
+    api(compose.ui.tooling.preview)
+    api(compose.ui.util)
 
-    implementation(androidx.paging.runtime)
-    implementation(androidx.paging.compose)
-    implementation(androidx.appcompat)
-    implementation(androidx.lifecycle.runtimektx)
-    implementation(kotlinx.immutables)
-    implementation(androidx.lifecycle.runtime.compose)
-    implementation(libs.image.decoder)
-    implementation(libs.materialKolor)
-    implementation(platform(libs.coil.bom))
-    implementation(libs.bundles.coil)
-    implementation(libs.bundles.voyager)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
-    implementation(libs.unifile)
-    implementation(libs.shizuku.api)
-    implementation(libs.okio)
+    // Essential UI/Lifecycle Libraries
+    api(androidx.paging.runtime)
+    api(androidx.paging.compose)
+    api(androidx.appcompat)
+    api(androidx.lifecycle.runtimektx)
+    api(kotlinx.immutables)
+    api(androidx.lifecycle.runtime.compose)
+    api(libs.image.decoder)
+    api(libs.materialKolor)
+    api(libs.compose.materialmotion)
+    api(libs.reorderable)
+
+    // Image Loading & Files
+    api(platform(libs.coil.bom))
+    api(libs.bundles.coil)
+    api(libs.unifile)
+    api(libs.okio)
+
+    // Navigation & DI
+    api(libs.bundles.voyager)
+    api(libs.koin.android)
+    api(libs.koin.androidx.compose)
+    api(libs.koin.annotations) // Added this so features can use DI annotations
+
+    // Utilities
+    api(libs.shizuku.api)
 }
-
 

@@ -7,7 +7,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.app.ui.manga.MangaScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 
 class UpcomingScreen : Screen() {
 

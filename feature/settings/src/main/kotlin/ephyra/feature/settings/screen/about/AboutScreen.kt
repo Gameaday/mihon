@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.domain.ui.UiPreferences
-import ephyra.presentation.components.AppBar
+import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.more.LogoHeader
 import ephyra.feature.settings.widget.TextPreferenceWidget
-import ephyra.presentation.util.LocalBackPress
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.LocalBackPress
+import ephyra.presentation.core.util.Screen
 import ephyra.app.BuildConfig
 import cafe.adriel.voyager.koin.koinScreenModel
 import ephyra.app.data.updater.RELEASE_URL

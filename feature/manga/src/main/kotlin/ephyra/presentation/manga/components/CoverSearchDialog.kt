@@ -42,11 +42,11 @@ import ephyra.app.R
 import ephyra.feature.manga.CoverResult
 import ephyra.feature.manga.CoverSearchScreenModel
 import ephyra.i18n.MR
-import ephyra.presentation.components.DropdownMenu
+import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import ephyra.presentation.util.rememberResourceBitmapPainter
+import ephyra.presentation.core.util.rememberResourceBitmapPainter
 
 @Composable
 fun CoverSearchDialog(

@@ -2,12 +2,11 @@ package ephyra.feature.download
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
 import ephyra.core.download.DownloadManager
-import ephyra.core.download.model.Download
+import ephyra.domain.download.model.Download
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import ephyra.core.download.model.Download
+import org.koin.core.annotation.Factory
 
 @Factory
 class DownloadQueueScreenModel(

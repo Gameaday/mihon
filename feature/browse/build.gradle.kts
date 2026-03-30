@@ -19,11 +19,10 @@ dependencies {
     api(projects.feature.manga)
 
     implementation(libs.logcat)
-    implementation(libs.bundles.voyager)
+    api(libs.bundles.voyager)
+    api(libs.koin.core)
     implementation(libs.koin.annotations)
     ksp(libs.koin.ksp.compiler)
 
     testImplementation(libs.bundles.test)
 }
-
-

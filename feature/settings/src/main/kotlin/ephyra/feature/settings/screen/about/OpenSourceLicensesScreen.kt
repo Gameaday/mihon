@@ -9,8 +9,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.util.htmlReadyLicenseContent
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.util.Screen
 import ephyra.app.R
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold

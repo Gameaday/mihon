@@ -34,7 +34,7 @@ import ephyra.app.extension.util.ExtensionInstaller
 import ephyra.app.extension.util.ExtensionLoader
 import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
 import ephyra.app.ui.base.delegate.ThemingDelegateImpl
-import ephyra.app.util.CrashLogUtil
+import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.app.track.MatchUnlinkedJob
 import ephyra.app.track.MatchUnlinkedNotifier
 import ephyra.core.common.storage.AndroidStorageFolderProvider

@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import dev.icerock.moko.resources.StringResource
 import ephyra.domain.manga.model.readerOrientation
-import ephyra.presentation.components.AdaptiveSheet
+import ephyra.presentation.core.components.AdaptiveSheet
 import ephyra.presentation.reader.components.ModeSelectionDialog
 import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.domain.reader.model.ReaderOrientation

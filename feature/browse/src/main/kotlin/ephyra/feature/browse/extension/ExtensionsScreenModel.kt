@@ -9,7 +9,7 @@ import dev.icerock.moko.resources.StringResource
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.extension.interactor.GetExtensionsByType
 import ephyra.domain.source.service.SourcePreferences
-import ephyra.presentation.components.SEARCH_DEBOUNCE_MILLIS
+import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
 import ephyra.app.extension.ExtensionManager
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.InstallStep

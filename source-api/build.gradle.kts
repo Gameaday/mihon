@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import ephyra.buildlogic.AndroidConfig
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     id("ephyra.library.multiplatform")

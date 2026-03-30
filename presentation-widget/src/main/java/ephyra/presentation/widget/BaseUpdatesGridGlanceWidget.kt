@@ -29,11 +29,8 @@ import coil3.request.ImageRequest
 import coil3.size.Precision
 import coil3.size.Scale
 import ephyra.core.common.core.security.SecurityPreferences
-import ephyra.core.common.util.system.dpToPx
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.map
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.system.dpToPx
 import ephyra.domain.manga.model.MangaCover
 import ephyra.domain.updates.interactor.GetUpdates
 import ephyra.domain.updates.model.UpdatesWithRelations
@@ -43,6 +40,9 @@ import ephyra.presentation.widget.components.LockedWidget
 import ephyra.presentation.widget.components.UpdatesWidget
 import ephyra.presentation.widget.util.appWidgetBackgroundRadius
 import ephyra.presentation.widget.util.calculateRowAndColumnCount
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.map
 import org.koin.core.context.GlobalContext
 import java.time.Instant
 import java.time.ZonedDateTime

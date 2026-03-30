@@ -1,11 +1,10 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
 }
 
 android {
-    namespace = "tachiyomi.presentation.widget"
+    namespace = "ephyra.presentation.widget"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -26,7 +25,4 @@ dependencies {
 
     implementation(platform(libs.coil.bom))
     implementation(libs.coil.core)
-
 }
-
-

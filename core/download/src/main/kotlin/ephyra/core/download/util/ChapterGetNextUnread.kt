@@ -1,9 +1,9 @@
 package ephyra.core.download.util
 
-import ephyra.domain.download.service.DownloadManager
-import ephyra.domain.chapter.model.Chapter
-import ephyra.domain.manga.model.Manga
 import ephyra.domain.base.BasePreferences
+import ephyra.domain.chapter.model.Chapter
+import ephyra.domain.download.service.DownloadManager
+import ephyra.domain.manga.model.Manga
 
 /**
  * Gets next unread chapter with filters and sorting applied

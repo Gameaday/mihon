@@ -18,6 +18,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -89,6 +90,7 @@ class DownloadCache(
     private var renewalJob: Job? = null
 
     private val _isInitializing = MutableStateFlow(false)
+    @OptIn(FlowPreview::class)
     val isInitializing = _isInitializing
         .debounce(1000L) // Don't notify if it finishes quickly enough
         .stateIn(scope, SharingStarted.WhileSubscribed(), false)

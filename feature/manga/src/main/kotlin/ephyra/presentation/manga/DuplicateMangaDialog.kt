@@ -64,8 +64,8 @@ import ephyra.feature.manga.presentation.components.MangaCover
 import ephyra.feature.settings.LocalPreferenceMinHeight
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.i18n.MR
-import ephyra.presentation.components.AdaptiveSheet
-import ephyra.presentation.components.TabbedDialogPaddings
+import ephyra.presentation.core.components.AdaptiveSheet
+import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.presentation.core.components.Badge
 import ephyra.presentation.core.components.BadgeGroup
 import ephyra.presentation.core.components.material.padding

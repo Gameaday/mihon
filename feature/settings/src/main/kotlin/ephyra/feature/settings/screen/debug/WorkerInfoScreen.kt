@@ -25,10 +25,10 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.domain.ui.UiPreferences
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
-import ephyra.presentation.util.Screen
-import ephyra.presentation.util.ioCoroutineScope
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.ioCoroutineScope
 import ephyra.app.util.lang.toDateTimestampString
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.app.util.system.workManager

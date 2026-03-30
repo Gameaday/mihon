@@ -66,7 +66,7 @@ import ephyra.feature.manga.presentation.components.MangaToolbar
 import ephyra.feature.manga.presentation.components.MissingChapterCountListItem
 import ephyra.feature.manga.presentation.components.SourceHealthBanner
 import ephyra.i18n.MR
-import ephyra.presentation.components.relativeDateText
+import ephyra.presentation.core.components.relativeDateText
 import ephyra.presentation.core.components.TwoPanelBox
 import ephyra.presentation.core.components.VerticalFastScroller
 import ephyra.presentation.core.components.material.PullRefresh
@@ -74,7 +74,7 @@ import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.shouldExpandFAB
 import ephyra.presentation.core.util.system.copyToClipboard
-import ephyra.presentation.util.formatChapterNumber
+import ephyra.presentation.core.util.formatChapterNumber
 import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.getNameForMangaInfo
 import java.time.Instant

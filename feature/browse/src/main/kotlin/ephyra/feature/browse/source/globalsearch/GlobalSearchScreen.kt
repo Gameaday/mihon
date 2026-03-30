@@ -12,7 +12,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.util.ifSourcesLoaded
 import ephyra.feature.browse.presentation.GlobalSearchScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.feature.browse.source.browse.BrowseSourceScreen
 import ephyra.app.ui.manga.MangaScreen
 import org.koin.core.parameter.parametersOf

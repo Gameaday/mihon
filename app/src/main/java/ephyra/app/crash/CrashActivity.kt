@@ -6,7 +6,7 @@ import androidx.core.view.WindowCompat
 import ephyra.app.ui.main.MainActivity
 import ephyra.presentation.core.util.view.setComposeContent
 import ephyra.presentation.core.ui.activity.BaseActivity
-import ephyra.presentation.crash.CrashScreen
+import ephyra.presentation.core.crash.CrashScreen
 
 class CrashActivity : BaseActivity() {
 

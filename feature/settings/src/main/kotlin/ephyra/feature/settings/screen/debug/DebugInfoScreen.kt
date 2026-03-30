@@ -12,7 +12,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.settings.Preference
 import ephyra.feature.settings.PreferenceScaffold
 import ephyra.feature.settings.screen.about.AboutScreen
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.WebViewUtil
 import kotlinx.collections.immutable.mutate

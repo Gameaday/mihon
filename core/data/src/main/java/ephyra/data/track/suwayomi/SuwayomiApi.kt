@@ -33,7 +33,7 @@ class SuwayomiApi(
     private val baseUrl: String by lazy { source.baseUrl.trimEnd('/') }
     private val apiUrl: String by lazy { "$baseUrl/api/graphql" }
 
-    public fun sourcePreferences(): SharedPreferences = configurableSource.sourcePreferences()
+    fun sourcePreferences(): SharedPreferences = configurableSource.sourcePreferences()
 
     suspend fun getTrackSearch(mangaId: Long): TrackSearch = withIOContext {
         val query = $$"""

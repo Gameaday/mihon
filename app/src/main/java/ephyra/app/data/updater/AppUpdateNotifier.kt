@@ -145,7 +145,7 @@ class AppUpdateNotifier(private val context: Context) : DomainAppUpdateNotifier 
     }
 
     /**
-     * Call when apk download throws a error
+     * Call when apk download throws an error
      *
      * @param url web location of apk to download.
      */

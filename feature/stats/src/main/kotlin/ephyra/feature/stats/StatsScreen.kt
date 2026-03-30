@@ -7,13 +7,13 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.i18n.MR
-import ephyra.presentation.components.AppBar
+import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.more.stats.StatsScreenContent
 import ephyra.presentation.more.stats.StatsScreenState
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 
 class StatsScreen : Screen() {
 

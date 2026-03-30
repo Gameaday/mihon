@@ -45,11 +45,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.StringResource
 import ephyra.feature.browse.presentation.components.BaseBrowseItem
 import ephyra.feature.browse.presentation.components.ExtensionIcon
-import ephyra.presentation.components.WarningBanner
+import ephyra.presentation.core.components.WarningBanner
 import ephyra.presentation.manga.components.DotSeparatorNoSpaceText
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
-import ephyra.presentation.util.animateItemFastScroll
-import ephyra.presentation.util.rememberRequestPackageInstallsPermissionState
+import ephyra.presentation.core.util.animateItemFastScroll
+import ephyra.presentation.core.util.rememberRequestPackageInstallsPermissionState
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.model.InstallStep
 import ephyra.app.ui.browse.extension.ExtensionUiModel

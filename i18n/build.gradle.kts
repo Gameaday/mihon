@@ -30,7 +30,6 @@ kotlin {
     }
 }
 
-
 multiplatformResources {
     resourcesPackage.set("ephyra.i18n")
 }
@@ -41,4 +40,3 @@ val localesConfigTask = project.getLocalesConfigTask(generatedAndroidResourceDir
 tasks.matching { it.name == "preBuild" }.configureEach {
     dependsOn(localesConfigTask)
 }
-

@@ -54,7 +54,7 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.secondaryItemAlpha
-import ephyra.presentation.util.LocalUiPreferences
+import ephyra.presentation.core.util.LocalUiPreferences
 
 
 @Composable

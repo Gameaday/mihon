@@ -89,7 +89,7 @@ class MatchUnlinkedManga(
         // Default tracker for manga with unknown content type.
         // Content-type-specific trackers are resolved per-manga below.
         val defaultTracker = findQueryableTracker()
-        val defaultPrefix = defaultTracker?.let { AddTracks.TRACKER_CANONICAL_PREFIXES[it.id] }
+        defaultTracker?.let { AddTracks.TRACKER_CANONICAL_PREFIXES[it.id] }
 
         for ((index, manga) in unlinked.withIndex()) {
             yield() // cooperative cancellation

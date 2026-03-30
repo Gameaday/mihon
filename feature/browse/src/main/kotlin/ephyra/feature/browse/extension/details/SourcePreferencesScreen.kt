@@ -32,8 +32,8 @@ import androidx.preference.getOnBindEditTextListener
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.util.ifSourcesLoaded
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.util.Screen
 import ephyra.app.R
 import ephyra.app.data.preference.SharedPreferencesDataStore
 import eu.kanade.tachiyomi.source.ConfigurableSource

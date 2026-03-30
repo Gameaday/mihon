@@ -48,7 +48,7 @@ import ephyra.feature.manga.track.TrackInfoDialogHomeScreen
 import ephyra.feature.migration.config.MigrationConfigScreen
 import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.presentation.category.components.ChangeCategoryDialog
-import ephyra.presentation.components.NavigatorAdaptiveSheet
+import ephyra.presentation.core.components.NavigatorAdaptiveSheet
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.toShareIntent

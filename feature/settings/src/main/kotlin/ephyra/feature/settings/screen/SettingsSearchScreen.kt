@@ -51,9 +51,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.components.UpIcon
+import ephyra.presentation.core.components.UpIcon
 import ephyra.feature.settings.Preference
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource

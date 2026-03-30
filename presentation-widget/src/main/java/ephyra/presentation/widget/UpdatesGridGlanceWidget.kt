@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.ui.unit.dp
 import androidx.glance.ImageProvider
 import androidx.glance.unit.ColorProvider
+import ephyra.presentation.widget.R
 
 class UpdatesGridGlanceWidget : BaseUpdatesGridGlanceWidget() {
     @SuppressLint("RestrictedApi")

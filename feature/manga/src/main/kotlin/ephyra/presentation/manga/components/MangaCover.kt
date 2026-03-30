@@ -13,7 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import coil3.compose.AsyncImage
 import ephyra.app.R
-import ephyra.presentation.util.rememberResourceBitmapPainter
+import ephyra.presentation.core.util.rememberResourceBitmapPainter
 
 enum class MangaCover(val ratio: Float) {
     Square(1f / 1f),

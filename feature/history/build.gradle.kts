@@ -1,8 +1,8 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
-    id("com.google.devtools.ksp")
+    // Use the native compiler plugin to solve the Metaspace and KSP errors
+    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    // Internal project dependencies
     api(projects.core.common)
     api(projects.domain)
     api(projects.data)
@@ -17,10 +18,16 @@ dependencies {
     api(projects.i18n)
     api(projects.presentationCore)
 
-    implementation(libs.logcat)
-    implementation(libs.bundles.voyager)
-    implementation(libs.koin.annotations)
-    ksp(libs.koin.ksp.compiler)
+    // Jetpack Compose
+    implementation(compose.material3.core)
+    implementation(compose.ui.tooling.preview)
+    debugImplementation(compose.ui.tooling)
 
-    testImplementation(libs.bundles.test)
+    // Third-party libraries
+    implementation(libs.logcat)
+    api(libs.bundles.voyager)
+
+    // Dependency Injection (Koin)
+    api(libs.koin.core)
+    implementation(libs.koin.annotations)
 }

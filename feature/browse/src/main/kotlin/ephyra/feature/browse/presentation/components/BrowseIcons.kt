@@ -28,7 +28,7 @@ import coil3.compose.AsyncImage
 import cafe.adriel.voyager.koin.koinInject
 import ephyra.app.extension.ExtensionManager
 import ephyra.domain.source.model.icon
-import ephyra.presentation.util.rememberResourceBitmapPainter
+import ephyra.presentation.core.util.rememberResourceBitmapPainter
 import ephyra.app.R
 import ephyra.app.extension.model.Extension
 import ephyra.app.extension.util.ExtensionLoader

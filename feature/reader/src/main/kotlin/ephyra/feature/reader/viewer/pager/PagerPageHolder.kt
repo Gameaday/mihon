@@ -7,7 +7,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
-import ephyra.presentation.util.formattedMessage
+import ephyra.presentation.core.util.formattedMessage
 import ephyra.app.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.model.InsertPage

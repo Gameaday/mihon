@@ -4,11 +4,11 @@ import android.content.Context
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.Toast
+import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.WebViewUtil
 import ephyra.core.common.util.system.setDefaultSettings
 import ephyra.core.common.util.system.toast
-import ephyra.core.common.util.lang.launchUI
 import ephyra.i18n.MR
 import okhttp3.Headers
 import okhttp3.Interceptor

@@ -1,5 +1,12 @@
 package ephyra.data.source
 
+import ephyra.data.room.daos.MangaDao
+import ephyra.domain.manga.interactor.NetworkToLocalManga
+import ephyra.domain.source.model.SourceWithCount
+import ephyra.domain.source.model.StubSource
+import ephyra.domain.source.repository.SourcePagingSource
+import ephyra.domain.source.repository.SourceRepository
+import ephyra.domain.source.service.SourceManager
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.model.FilterList
@@ -7,13 +14,6 @@ import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import ephyra.data.room.daos.MangaDao
-import ephyra.domain.source.model.SourceWithCount
-import ephyra.domain.source.model.StubSource
-import ephyra.domain.source.repository.SourcePagingSource
-import ephyra.domain.source.repository.SourceRepository
-import ephyra.domain.source.service.SourceManager
-import ephyra.domain.manga.interactor.NetworkToLocalManga
 import ephyra.domain.source.model.Source as DomainSource
 
 class SourceRepositoryImpl(

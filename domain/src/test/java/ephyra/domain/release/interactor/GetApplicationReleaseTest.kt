@@ -32,7 +32,7 @@ class GetApplicationReleaseTest {
 
     @Test
     fun `When has update but is preview expect new update`() = runTest {
-        every { preference.get() } returns 0
+        coEvery { preference.get() } returns 0
         every { preference.set(any()) }.answers { }
 
         val release = Release(
@@ -61,7 +61,7 @@ class GetApplicationReleaseTest {
 
     @Test
     fun `When has update expect new update`() = runTest {
-        every { preference.get() } returns 0
+        coEvery { preference.get() } returns 0
         every { preference.set(any()) }.answers { }
 
         val release = Release(
@@ -90,7 +90,7 @@ class GetApplicationReleaseTest {
 
     @Test
     fun `When has no update expect no new update`() = runTest {
-        every { preference.get() } returns 0
+        coEvery { preference.get() } returns 0
         every { preference.set(any()) }.answers { }
 
         val release = Release(
@@ -117,7 +117,7 @@ class GetApplicationReleaseTest {
 
     @Test
     fun `When nightly has update with different SHA expect new update`() = runTest {
-        every { preference.get() } returns 0
+        coEvery { preference.get() } returns 0
         every { preference.set(any()) }.answers { }
 
         val release = Release(
@@ -148,7 +148,7 @@ class GetApplicationReleaseTest {
 
     @Test
     fun `When nightly has same SHA expect no new update`() = runTest {
-        every { preference.get() } returns 0
+        coEvery { preference.get() } returns 0
         every { preference.set(any()) }.answers { }
 
         val release = Release(
@@ -177,7 +177,7 @@ class GetApplicationReleaseTest {
 
     @Test
     fun `When now is before three days expect no new update`() = runTest {
-        every { preference.get() } returns Instant.now().toEpochMilli()
+        coEvery { preference.get() } returns Instant.now().toEpochMilli()
         every { preference.set(any()) }.answers { }
 
         val release = Release(

@@ -27,14 +27,14 @@ import ephyra.domain.manga.model.Manga
 import ephyra.feature.upcoming.components.UpcomingItem
 import ephyra.feature.upcoming.components.calendar.Calendar
 import ephyra.i18n.MR
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.relativeDateText
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.relativeDateText
 import ephyra.presentation.core.components.FastScrollLazyColumn
 import ephyra.presentation.core.components.TwoPanelBox
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import ephyra.presentation.util.isTabletUi
+import ephyra.presentation.core.util.isTabletUi
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.launch

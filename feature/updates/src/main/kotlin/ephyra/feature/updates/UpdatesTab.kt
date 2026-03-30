@@ -15,10 +15,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.presentation.updates.UpdateScreen
-import ephyra.presentation.updates.UpdatesDeleteConfirmationDialog
-import ephyra.presentation.updates.UpdatesFilterDialog
-import ephyra.presentation.util.Tab
 import ephyra.app.R
 import ephyra.app.ui.download.DownloadQueueScreen
 import ephyra.app.ui.home.HomeScreen
@@ -26,11 +22,15 @@ import ephyra.app.ui.main.MainActivity
 import ephyra.app.ui.manga.MangaScreen
 import ephyra.app.ui.reader.ReaderActivity
 import ephyra.app.ui.updates.UpdatesScreenModel.Event
-import kotlinx.coroutines.flow.collectLatest
-import ephyra.feature.upcoming.UpcomingScreen
 import ephyra.core.common.i18n.stringResource
+import ephyra.feature.upcoming.UpcomingScreen
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.updates.UpdateScreen
+import ephyra.presentation.updates.UpdatesDeleteConfirmationDialog
+import ephyra.presentation.updates.UpdatesFilterDialog
+import ephyra.presentation.core.util.Tab
+import kotlinx.coroutines.flow.collectLatest
 
 data object UpdatesTab : Tab {
 
