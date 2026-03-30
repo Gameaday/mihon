@@ -78,3 +78,4 @@ dependencies {
     // Utilities
     api(libs.shizuku.api)
 }
+

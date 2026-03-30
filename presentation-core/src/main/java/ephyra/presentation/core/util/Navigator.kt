@@ -27,27 +27,22 @@ import soup.compose.material.motion.animation.rememberSlideDistance
 /**
  * A generic navigator interface to decouple feature modules from the main application
  * navigation logic.
+ * * Your Feature modules (Manga, Reader) will call these methods, and your :app module
+ * will provide the actual implementation.
  */
 interface AppNavigator {
-    /**
-     * Navigates to the manga details screen.
-     */
     fun openMangaScreen(context: Context, mangaId: Long)
-
-    /**
-     * Navigates to a web view for a given URL and source.
-     */
     fun openWebView(context: Context, url: String, sourceId: Long, title: String)
-}
-
-interface AssistContentScreen {
-    fun onProvideAssistUrl(): String?
 }
 
 /**
  * For invoking back press to the parent activity
  */
 val LocalBackPress: ProvidableCompositionLocal<(() -> Unit)?> = staticCompositionLocalOf { null }
+
+interface AssistContentScreen {
+    fun onProvideAssistUrl(): String?
+}
 
 interface Tab : cafe.adriel.voyager.navigator.tab.Tab {
     suspend fun onReselect(navigator: Navigator) {}

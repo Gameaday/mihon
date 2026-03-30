@@ -50,8 +50,8 @@ import ephyra.domain.source.service.SourcePreferences
 import ephyra.feature.migration.list.MigrationListScreen
 import ephyra.i18n.MR
 import ephyra.presentation.browse.components.SourceIcon
-import ephyra.presentation.components.AppBar
-import ephyra.presentation.components.AppBarActions
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.core.components.FastScrollLazyColumn
 import ephyra.presentation.core.components.Pill
 import ephyra.presentation.core.components.material.Scaffold
@@ -59,7 +59,7 @@ import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.shouldExpandFAB
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.update

@@ -17,7 +17,7 @@ import ephyra.feature.migration.list.components.MigrationMangaDialog
 import ephyra.feature.migration.list.components.MigrationProgressDialog
 import ephyra.i18n.MR
 import ephyra.presentation.core.util.system.toast
-import ephyra.presentation.util.Screen
+import ephyra.presentation.core.util.Screen
 import org.koin.core.parameter.parametersOf
 
 class MigrationListScreen(private val mangaIds: Collection<Long>, private val extraSearchQuery: String?) : Screen() {

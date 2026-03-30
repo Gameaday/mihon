@@ -4,6 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     alias(libs.plugins.koin.compiler)
 }
+koinCompiler {
+    compileSafety = false
+}
 
 android {
     namespace = "ephyra.feature.category"
@@ -12,10 +15,10 @@ android {
 dependencies {
     // Internal project dependencies
     api(projects.core.common)
-    api(projects.core.domain) // FIX: Koin needs this to verify UiPreferences
-    api(projects.core.data)   // FIX: Koin needs this to verify repositories
     api(projects.domain)
+    api(projects.core.domain)
     api(projects.data)
+    api(projects.core.data)
     api(projects.sourceApi)
     api(projects.i18n)
     api(projects.presentationCore)
@@ -31,9 +34,8 @@ dependencies {
 
     // Dependency Injection (Koin)
     api(libs.koin.core)
-    implementation(libs.koin.androidx.compose) // FIX: Resolves koinScreenModel
+    implementation(libs.koin.androidx.compose)
     implementation(libs.koin.annotations)
 
-    // Testing
     testImplementation(libs.bundles.test)
 }

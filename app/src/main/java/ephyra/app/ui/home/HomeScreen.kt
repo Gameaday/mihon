@@ -49,8 +49,8 @@ import ephyra.presentation.core.components.material.NavigationRail
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.theme.MotionTokens
-import ephyra.presentation.util.Screen
-import ephyra.presentation.util.isTabletUi
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.isTabletUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -189,7 +189,7 @@ object HomeScreen : Screen() {
     }
 
     @Composable
-    private fun RowScope.NavigationBarItem(tab: ephyra.presentation.util.Tab) {
+    private fun RowScope.NavigationBarItem(tab: ephyra.presentation.core.util.Tab) {
         val tabNavigator = LocalTabNavigator.current
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
@@ -217,7 +217,7 @@ object HomeScreen : Screen() {
     }
 
     @Composable
-    fun NavigationRailItem(tab: ephyra.presentation.util.Tab) {
+    fun NavigationRailItem(tab: ephyra.presentation.core.util.Tab) {
         val tabNavigator = LocalTabNavigator.current
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
@@ -245,7 +245,7 @@ object HomeScreen : Screen() {
     }
 
     @Composable
-    private fun NavigationIconItem(tab: ephyra.presentation.util.Tab) {
+    private fun NavigationIconItem(tab: ephyra.presentation.core.util.Tab) {
         BadgedBox(
             badge = {
                 when {

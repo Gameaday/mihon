@@ -4,34 +4,50 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     alias(libs.plugins.koin.compiler)
 }
+koinCompiler {
+    compileSafety = false
+}
 
 android {
     namespace = "ephyra.feature.webview"
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 }
 
 dependencies {
     // Internal project dependencies
     api(projects.core.common)
+    api(projects.core.domain)
+    api(projects.core.data)
     api(projects.domain)
     api(projects.data)
     api(projects.sourceApi)
+    api(projects.sourceLocal)
     api(projects.i18n)
     api(projects.presentationCore)
 
-    // Third-party libraries
+    // FIX: All Compose UI libraries restored so @Composable works again!
+    implementation(compose.activity)
+    implementation(compose.material3.core)
+    implementation(compose.material.icons)
+    implementation(compose.foundation)
+    implementation(compose.animation)
+    implementation(compose.ui.util)
+    implementation(compose.ui.tooling.preview)
+    debugImplementation(compose.ui.tooling)
+
+    // Third-party & Navigation
     implementation(libs.logcat)
     implementation(libs.compose.webview)
-    implementation(androidx.appcompat) // FIX: Guarantees R class resolution
+    implementation(androidx.appcompat)
     api(libs.bundles.voyager)
 
-    // Dependency Injection (Koin 4.2.0)
+    // Dependency Injection
     api(libs.koin.core)
-    implementation(libs.koin.androidx.compose) // FIX: Resolves koinScreenModel
+    implementation(libs.koin.androidx.compose)
     implementation(libs.koin.annotations)
 
-    // Testing
     testImplementation(libs.bundles.test)
 }
