@@ -7,7 +7,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.presentation.core.util.AssistContentScreen
 import ephyra.presentation.core.util.Screen
-import ephyra.presentation.webview.WebViewScreenContent
 import org.koin.core.parameter.parametersOf
 
 class WebViewScreen(

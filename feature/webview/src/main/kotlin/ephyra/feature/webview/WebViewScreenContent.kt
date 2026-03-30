@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,10 +42,11 @@ import com.kevinnzou.web.WebContent
 import com.kevinnzou.web.WebView
 import com.kevinnzou.web.WebViewNavigator
 import com.kevinnzou.web.WebViewState
-import ephyra.app.BuildConfig
-import ephyra.app.util.system.getHtml
-import ephyra.app.util.system.setDefaultSettings
+// 🟢 FIX: Point to the new core utilities
+import ephyra.core.common.util.system.getHtml
+import ephyra.core.common.util.system.setDefaultSettings
 import ephyra.i18n.MR
+import ephyra.presentation.core.R // 🟢 FIX: Import core resources for the drawable
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.core.components.WarningBanner
@@ -64,6 +66,7 @@ class WebViewWindow(webContent: WebContent, val navigator: WebViewNavigator) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebViewScreenContent(
     onNavigateUp: () -> Unit,
@@ -234,7 +237,8 @@ fun WebViewScreenContent(
                                     ),
                                 ).builder().apply {
                                     if (windowStack.size > 1) {
-                                        MutableList.add(
+                                        // 🟢 FIX: Replaced MutableList.add with the correct builder function
+                                        add(
                                             0,
                                             AppBar.Action(
                                                 title = stringResource(MR.strings.action_webview_close_tab),
@@ -252,8 +256,9 @@ fun WebViewScreenContent(
                         Surface(
                             modifier = Modifier.padding(8.dp),
                         ) {
+                            // 🟢 FIX: Update to 'text' and passed the string directly instead of using textRes
                             WarningBanner(
-                                textRes = MR.strings.information_cloudflare_help,
+                                text = stringResource(MR.strings.information_cloudflare_help),
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
                                     .clickable {
@@ -282,9 +287,6 @@ fun WebViewScreenContent(
             }
         },
     ) { contentPadding ->
-        // We need to key the WebView composable to the window object since simply updating the WebView composable will
-        // not cause it to re-invoke the WebView factory and render the new current window's WebView. This lets us
-        // completely reset the WebView composable when the current window switches.
         key(currentWindow) {
             WebView(
                 state = currentWindow.state,
@@ -295,10 +297,8 @@ fun WebViewScreenContent(
                 onCreated = { webView ->
                     webView.setDefaultSettings()
 
-                    // Debug mode (chrome://inspect/#devices)
-                    if (BuildConfig.DEBUG &&
-                        0 != webView.context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
-                    ) {
+                    // 🟢 FIX: Checking ApplicationInfo directly removes the need for App's BuildConfig
+                    if (0 != webView.context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) {
                         WebView.setWebContentsDebuggingEnabled(true)
                     }
 
@@ -309,13 +309,8 @@ fun WebViewScreenContent(
                 onDispose = { webView ->
                     val window = windowStack.items.find { it.webView == webView }
                     if (window == null) {
-                        // If we couldn't find any window on the stack that owns this WebView, it means that we can
-                        // safely dispose of it because the window containing it has been closed.
                         webView.destroy()
                     } else {
-                        // The composable is being disposed but the WebView object is not.
-                        // When the WebView element is recomposed, we will want the WebView to resume from its state
-                        // before it was unmounted, we won't want it to reset back to its original target.
                         window.state.content = WebContent.NavigatorOnly
                     }
                 },
