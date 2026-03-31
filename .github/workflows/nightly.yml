@@ -34,7 +34,7 @@ jobs:
 
       - name: Sign APK
         if: ${{ env.SIGNING_KEY != '' }}
-        uses: r0adkll/sign-android-release@f30bdd30588842ac76044ecdbd4b6d0e3e813478
+        uses: r0adkll/sign-android-release@a391126403df92c6a0a3988a829dd47f79b89ed7
         with:
           releaseDirectory: app/build/outputs/apk/nightly
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
