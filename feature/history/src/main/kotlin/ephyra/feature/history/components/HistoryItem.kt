@@ -28,7 +28,7 @@ import ephyra.domain.history.model.HistoryWithRelations
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import ephyra.presentation.manga.components.MangaCover
+import ephyra.feature.manga.presentation.components.MangaCover
 import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.presentation.core.util.formatChapterNumber
 

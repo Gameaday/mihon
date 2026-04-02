@@ -187,6 +187,7 @@ import ephyra.app.ui.more.OnboardingScreen
 import ephyra.app.util.system.isNavigationBarNeedsScrim
 import ephyra.app.util.system.updaterEnabled
 import ephyra.presentation.core.util.view.setComposeContent
+import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.core.common.Constants
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.system.logcat
@@ -219,7 +220,7 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority
 import org.koin.android.ext.android.inject
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), AppReadySignal {
 
     private val libraryPreferences: LibraryPreferences by inject()
     private val preferences: BasePreferences by inject()
@@ -236,6 +237,10 @@ class MainActivity : BaseActivity() {
 
     // To be checked by splash screen. If true then splash screen will be removed.
     var ready = false
+
+    override fun signalReady() {
+        ready = true
+    }
 
     private var navigator: Navigator? = null
 

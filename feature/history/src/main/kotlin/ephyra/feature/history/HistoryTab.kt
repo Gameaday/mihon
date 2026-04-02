@@ -16,22 +16,21 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.app.R
-import ephyra.app.ui.category.CategoryScreen
-import ephyra.app.ui.main.MainActivity
-import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.ui.reader.ReaderActivity
 import ephyra.core.common.i18n.stringResource
 import ephyra.domain.chapter.model.Chapter
+import ephyra.feature.category.CategoryScreen
+import ephyra.feature.category.components.ChangeCategoryDialog
+import ephyra.feature.history.components.HistoryDeleteAllDialog
+import ephyra.feature.history.components.HistoryDeleteDialog
+import ephyra.feature.manga.MangaScreen
 import ephyra.feature.migration.dialog.MigrateMangaDialog
+import ephyra.feature.reader.ReaderActivity
 import ephyra.i18n.MR
-import ephyra.presentation.category.components.ChangeCategoryDialog
+import ephyra.presentation.core.R
 import ephyra.presentation.core.i18n.stringResource
-import ephyra.presentation.history.HistoryScreen
-import ephyra.presentation.history.components.HistoryDeleteAllDialog
-import ephyra.presentation.history.components.HistoryDeleteDialog
-import ephyra.presentation.manga.DuplicateMangaDialog
+import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.presentation.core.util.Tab
+import ephyra.presentation.manga.presentation.DuplicateMangaDialog
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -133,7 +132,7 @@ data object HistoryTab : Tab {
 
         LaunchedEffect(state.list) {
             if (state.list != null) {
-                (context as? MainActivity)?.ready = true
+                (context as? AppReadySignal)?.signalReady()
             }
         }
 

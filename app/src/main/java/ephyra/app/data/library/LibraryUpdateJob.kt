@@ -387,5 +387,23 @@ class LibraryUpdateJob(
         fun stop(context: Context) {
             context.workManager.cancelUniqueWork(TAG)
         }
+
+        /**
+         * Enqueues a one-time manual library update, optionally restricted to a single [category].
+         *
+         * @return `true` if the work request was enqueued, `false` if a manual run is already
+         *         in progress.
+         */
+        fun startNow(context: Context, category: ephyra.domain.category.model.Category? = null): Boolean {
+            val wm = context.workManager
+            if (wm.isRunning(WORK_NAME_MANUAL)) return false
+            val inputData = workDataOf(KEY_CATEGORY to (category?.id ?: -1L))
+            val request = OneTimeWorkRequestBuilder<LibraryUpdateJob>()
+                .addTag(WORK_NAME_MANUAL)
+                .setInputData(inputData)
+                .build()
+            wm.enqueueUniqueWork(WORK_NAME_MANUAL, ExistingWorkPolicy.KEEP, request)
+            return true
+        }
     }
 }
