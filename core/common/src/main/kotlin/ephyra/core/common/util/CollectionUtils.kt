@@ -1,7 +1,5 @@
 package ephyra.core.common.util
 
-import androidx.compose.ui.util.fastFilter
-import androidx.compose.ui.util.fastForEach
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -62,7 +60,7 @@ fun <T : R, R : Any> List<T>.insertSeparatorsReversed(
 @OptIn(ExperimentalContracts::class)
 inline fun <T> List<T>.fastFilterNot(predicate: (T) -> Boolean): List<T> {
     contract { callsInPlace(predicate) }
-    return fastFilter { !predicate(it) }
+    return filter { !predicate(it) }
 }
 
 /**
@@ -75,7 +73,7 @@ inline fun <T> List<T>.fastPartition(predicate: (T) -> Boolean): Pair<List<T>, L
     contract { callsInPlace(predicate) }
     val first = ArrayList<T>()
     val second = ArrayList<T>()
-    fastForEach {
+    forEach {
         if (predicate(it)) {
             first.add(it)
         } else {
@@ -94,6 +92,6 @@ inline fun <T> List<T>.fastPartition(predicate: (T) -> Boolean): Pair<List<T>, L
 inline fun <T> List<T>.fastCountNot(predicate: (T) -> Boolean): Int {
     contract { callsInPlace(predicate) }
     var count = size
-    fastForEach { if (predicate(it)) --count }
+    forEach { if (predicate(it)) --count }
     return count
 }

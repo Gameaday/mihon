@@ -1,5 +1,6 @@
 package ephyra.feature.browse.presentation.components
 
+import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -19,21 +20,19 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import coil3.compose.AsyncImage
 import cafe.adriel.voyager.koin.koinInject
-import ephyra.domain.extension.service.ExtensionManager
-import ephyra.domain.source.model.icon
-import ephyra.presentation.core.util.rememberResourceBitmapPainter
-import ephyra.app.R
-import ephyra.domain.extension.model.Extension
-import ephyra.app.extension.util.ExtensionLoader
+import coil3.compose.AsyncImage
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.domain.extension.model.Extension
+import ephyra.domain.extension.service.ExtensionManager
 import ephyra.domain.source.model.Source
+import ephyra.domain.source.model.icon
+import ephyra.presentation.core.R
+import ephyra.presentation.core.util.rememberResourceBitmapPainter
 import ephyra.source.local.isLocal
 
 private val defaultModifier = Modifier
@@ -103,7 +102,8 @@ fun ExtensionIcon(
         }
 
         is Extension.Installed -> {
-            val icon by extension.getIcon(density)
+            val extensionManager = koinInject<ExtensionManager>()
+            val icon by extension.getIcon(extensionManager, density)
             when (icon) {
                 Result.Loading -> Box(modifier = modifier)
                 is Result.Success -> Image(
@@ -130,18 +130,19 @@ fun ExtensionIcon(
 }
 
 @Composable
-private fun Extension.getIcon(density: Int = DisplayMetrics.DENSITY_DEFAULT): State<Result<ImageBitmap>> {
-    val context = LocalContext.current
+private fun Extension.Installed.getIcon(
+    extensionManager: ExtensionManager,
+    density: Int = DisplayMetrics.DENSITY_DEFAULT,
+): State<Result<ImageBitmap>> {
     return produceState<Result<ImageBitmap>>(initialValue = Result.Loading, this) {
         withIOContext {
             value = try {
-                val appInfo = ExtensionLoader.getExtensionPackageInfoFromPkgName(context, pkgName)!!.applicationInfo!!
-                val appResources = context.packageManager.getResourcesForApplication(appInfo)
-                Result.Success(
-                    appResources.getDrawableForDensity(appInfo.icon, density, null)!!
-                        .toBitmap()
-                        .asImageBitmap(),
-                )
+                val drawable = extensionManager.getExtensionIcon(pkgName, density) as? Drawable
+                if (drawable != null) {
+                    Result.Success(drawable.toBitmap().asImageBitmap())
+                } else {
+                    Result.Error
+                }
             } catch (e: Exception) {
                 Result.Error
             }

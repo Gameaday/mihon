@@ -6,7 +6,7 @@ import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.app.extension.api.ExtensionApi
 import ephyra.app.extension.api.ExtensionUpdateNotifier
 import ephyra.domain.extension.model.Extension
-import ephyra.app.extension.model.InstallStep
+import ephyra.domain.extension.model.InstallStep
 import ephyra.app.extension.model.LoadResult
 import ephyra.app.extension.util.ExtensionInstallReceiver
 import ephyra.app.extension.util.ExtensionInstaller
@@ -106,6 +106,17 @@ class ExtensionManager(
         return iconMap.getOrPut(pkgName) {
             extensionLoader.getExtensionPackageInfoFromPkgName(context, pkgName)!!.applicationInfo!!
                 .loadIcon(context.packageManager)
+        }
+    }
+
+    override fun getExtensionIcon(pkgName: String, density: Int): Drawable? {
+        val appInfo = extensionLoader.getExtensionPackageInfoFromPkgName(context, pkgName)
+            ?.applicationInfo ?: return null
+        val appResources = context.packageManager.getResourcesForApplication(appInfo)
+        return try {
+            appResources.getDrawableForDensity(appInfo.icon, density, null)
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -232,7 +243,7 @@ class ExtensionManager(
      *
      * @param extension The extension to be installed.
      */
-    fun installExtension(extension: Extension.Available): Flow<InstallStep> {
+    override fun installExtension(extension: Extension.Available): Flow<InstallStep> {
         return installer.downloadAndInstall(api.getApkUrl(extension), extension)
     }
 
@@ -243,12 +254,12 @@ class ExtensionManager(
      *
      * @param extension The extension to be updated.
      */
-    fun updateExtension(extension: Extension.Installed): Flow<InstallStep> {
+    override fun updateExtension(extension: Extension.Installed): Flow<InstallStep> {
         val availableExt = availableExtensionMapFlow.value[extension.pkgName] ?: return emptyFlow()
         return installExtension(availableExt)
     }
 
-    fun cancelInstallUpdateExtension(extension: Extension) {
+    override fun cancelInstallUpdateExtension(extension: Extension) {
         installer.cancelInstall(extension.pkgName)
     }
 

@@ -12,7 +12,7 @@ import android.content.pm.PackageManager
 import android.os.IBinder
 import androidx.core.content.ContextCompat
 import ephyra.app.BuildConfig
-import ephyra.app.extension.model.InstallStep
+import ephyra.domain.extension.model.InstallStep
 import ephyra.app.shizuku.IShellInterface
 import ephyra.app.shizuku.ShellInterface
 import ephyra.core.common.util.system.logcat

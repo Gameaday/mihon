@@ -28,6 +28,7 @@ import ephyra.app.data.library.LibraryUpdateNotifier
 import ephyra.app.data.library.MetadataUpdateJob
 import ephyra.data.saver.ImageSaver
 import ephyra.app.data.updater.AppUpdateDownloadJob
+import ephyra.app.data.updater.AppUpdateDownloaderImpl
 import ephyra.app.extension.ExtensionManager
 import ephyra.app.extension.api.ExtensionApi
 import ephyra.app.extension.util.ExtensionInstaller
@@ -149,6 +150,7 @@ val koinAppModule = module {
 
     single<SourceManager> { AndroidSourceManager(androidApplication(), get(), get(), get(), get(), get()) }
     single { ExtensionManager(androidApplication(), get(), get(), get(), get(), get()) }
+    single<ephyra.domain.extension.service.ExtensionManager> { get<ExtensionManager>() }
 
     single { DownloadStore(androidApplication(), get(), get(), get(), get()) }
     single { DownloadProvider(androidApplication(), get()) }
@@ -192,6 +194,7 @@ val koinAppModule = module {
 
     single { AppUpdateNotifier(androidApplication()) }
     single<ephyra.domain.release.service.AppUpdateNotifier> { get<AppUpdateNotifier>() }
+    single<ephyra.domain.release.service.AppUpdateDownloader> { AppUpdateDownloaderImpl(androidApplication()) }
 
     single { ImageSaver(androidApplication()) }
 

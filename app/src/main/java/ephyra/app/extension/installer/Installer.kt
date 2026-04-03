@@ -9,7 +9,7 @@ import android.net.Uri
 import androidx.annotation.CallSuper
 import androidx.core.content.ContextCompat
 import ephyra.app.extension.ExtensionManager
-import ephyra.app.extension.model.InstallStep
+import ephyra.domain.extension.model.InstallStep
 import java.util.Collections
 import kotlin.concurrent.atomics.AtomicReference
 

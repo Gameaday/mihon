@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import ephyra.app.extension.ExtensionManager
-import ephyra.app.extension.model.InstallStep
+import ephyra.domain.extension.model.InstallStep
 import ephyra.app.util.system.hasMiuiPackageInstaller
 import ephyra.presentation.core.util.system.toast
 import org.koin.android.ext.android.inject

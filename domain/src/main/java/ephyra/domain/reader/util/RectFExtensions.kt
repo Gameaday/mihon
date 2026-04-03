@@ -1,4 +1,4 @@
-package ephyra.core.common.util.lang
+package ephyra.domain.reader.util
 
 import android.graphics.RectF
 import ephyra.domain.reader.service.ReaderPreferences
