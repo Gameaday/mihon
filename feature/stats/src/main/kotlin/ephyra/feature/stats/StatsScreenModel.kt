@@ -5,9 +5,9 @@ import androidx.compose.ui.util.fastFilter
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.core.common.util.lang.launchIO
-import ephyra.core.download.DownloadManager
-import ephyra.core.util.fastCountNot
-import ephyra.data.track.TrackerManager
+import ephyra.domain.download.service.DownloadManager
+import ephyra.core.common.util.fastCountNot
+import ephyra.domain.track.service.TrackerManager
 import ephyra.domain.history.interactor.GetTotalReadDuration
 import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.library.service.LibraryPreferences
@@ -17,8 +17,8 @@ import ephyra.domain.library.service.LibraryPreferences.Companion.MANGA_NON_READ
 import ephyra.domain.manga.interactor.GetLibraryManga
 import ephyra.domain.track.interactor.GetTracks
 import ephyra.domain.track.model.Track
-import ephyra.presentation.more.stats.StatsScreenState
-import ephyra.presentation.more.stats.data.StatsData
+import ephyra.feature.more.stats.StatsScreenState
+import ephyra.feature.more.stats.data.StatsData
 import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.model.SManga
 import kotlinx.coroutines.flow.update

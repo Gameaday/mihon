@@ -7,23 +7,23 @@ import androidx.compose.ui.util.fastMap
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import org.koin.core.annotation.Factory
-import ephyra.core.preference.PreferenceMutableState
-import ephyra.core.preference.asState
-import ephyra.core.util.fastFilterNot
+import ephyra.presentation.core.util.PreferenceMutableState
+import ephyra.presentation.core.util.asState
+import ephyra.core.common.util.fastFilterNot
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.chapter.interactor.SetReadStatus
 import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
 import ephyra.feature.library.presentation.components.LibraryToolbarTitle
-import ephyra.presentation.manga.DownloadAction
+import ephyra.feature.manga.presentation.DownloadAction
 import ephyra.data.cache.CoverCache
 import ephyra.core.download.DownloadCache
-import ephyra.core.download.DownloadManager
-import ephyra.data.track.TrackerManager
+import ephyra.domain.download.service.DownloadManager
+import ephyra.domain.track.service.TrackerManager
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.util.chapter.getNextUnread
-import ephyra.app.util.removeCovers
+import ephyra.core.download.util.getNextUnread
+import ephyra.presentation.core.util.manga.removeCovers
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -68,8 +68,6 @@ import ephyra.domain.track.interactor.GetTracksPerManga
 import ephyra.domain.track.model.Track
 import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.util.chapter.getNextUnread
-import ephyra.app.util.removeCovers
 import kotlin.random.Random
 
 @Factory

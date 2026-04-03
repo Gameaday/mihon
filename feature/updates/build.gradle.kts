@@ -17,6 +17,10 @@ dependencies {
     api(projects.sourceApi)
     api(projects.i18n)
     api(projects.presentationCore)
+    implementation(projects.feature.manga)
+    implementation(projects.feature.reader)
+    implementation(projects.feature.download)
+    implementation(projects.feature.upcoming)
 
     // Third-party libraries
     implementation(libs.logcat)

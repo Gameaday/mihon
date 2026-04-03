@@ -11,6 +11,11 @@ android {
 
 dependencies {
     implementation(projects.presentationCore)
+    implementation(projects.feature.manga)
+    implementation(projects.feature.reader)
+    implementation(projects.feature.category)
+    implementation(projects.feature.browse)
+    implementation(projects.feature.download)
     // Internal project dependencies
     api(projects.core.common)
     api(projects.domain)

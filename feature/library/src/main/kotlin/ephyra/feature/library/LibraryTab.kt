@@ -35,15 +35,15 @@ import ephyra.feature.library.presentation.components.LibraryToolbar
 import ephyra.presentation.manga.components.LibraryBottomActionMenu
 import ephyra.presentation.more.onboarding.GETTING_STARTED_URL
 import ephyra.presentation.core.util.Tab
-import ephyra.app.R
-import ephyra.app.data.library.LibraryUpdateJob
-import ephyra.app.ui.browse.source.globalsearch.GlobalSearchScreen
-import ephyra.app.ui.category.CategoryScreen
-import ephyra.app.ui.home.HomeScreen
-import ephyra.app.ui.main.MainActivity
-import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.ui.reader.ReaderActivity
-import kotlinx.collections.immutable.persistentListOf
+import ephyra.presentation.core.R
+import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
+import ephyra.feature.category.CategoryScreen
+import ephyra.feature.manga.MangaScreen
+import ephyra.feature.reader.ReaderActivity
+import ephyra.presentation.core.ui.AppReadySignal
+import ephyra.presentation.core.ui.BottomNavController
+import ephyra.domain.library.service.LibraryUpdateScheduler
+import org.koin.compose.koinInject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -88,13 +88,14 @@ data object LibraryTab : Tab {
         val haptic = LocalHapticFeedback.current
 
         val screenModel = koinScreenModel<LibraryScreenModel>()
+        val updateScheduler = koinInject<LibraryUpdateScheduler>()
         val settingsScreenModel = koinScreenModel<LibrarySettingsScreenModel>()
         val state by screenModel.state.collectAsStateWithLifecycle()
 
         val snackbarHostState = remember { SnackbarHostState() }
 
         val onClickRefresh: (Category?) -> Boolean = { category ->
-            val started = LibraryUpdateJob.startNow(context, category)
+            val started = updateScheduler.startNow(context, category)
             scope.launch {
                 val msgRes = when {
                     !started -> MR.strings.update_already_running
@@ -271,12 +272,12 @@ data object LibraryTab : Tab {
         }
 
         LaunchedEffect(state.selectionMode, state.dialog) {
-            HomeScreen.showBottomNav(!state.selectionMode)
+            (navigator as? BottomNavController)?.showBottomNav(!state.selectionMode)
         }
 
         LaunchedEffect(state.isLoading) {
             if (!state.isLoading) {
-                (context as? MainActivity)?.ready = true
+                (context as? AppReadySignal)?.signalReady()
             }
         }
 

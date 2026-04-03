@@ -15,13 +15,13 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.app.R
-import ephyra.app.ui.download.DownloadQueueScreen
-import ephyra.app.ui.home.HomeScreen
-import ephyra.app.ui.main.MainActivity
-import ephyra.app.ui.manga.MangaScreen
-import ephyra.app.ui.reader.ReaderActivity
-import ephyra.app.ui.updates.UpdatesScreenModel.Event
+import ephyra.presentation.core.R
+import ephyra.feature.download.DownloadQueueScreen
+import ephyra.feature.manga.MangaScreen
+import ephyra.feature.reader.ReaderActivity
+import ephyra.feature.updates.UpdatesScreenModel.Event
+import ephyra.presentation.core.ui.AppReadySignal
+import ephyra.presentation.core.ui.BottomNavController
 import ephyra.core.common.i18n.stringResource
 import ephyra.feature.upcoming.UpcomingScreen
 import ephyra.i18n.MR
@@ -119,12 +119,12 @@ data object UpdatesTab : Tab {
         }
 
         LaunchedEffect(state.selectionMode) {
-            HomeScreen.showBottomNav(!state.selectionMode)
+            (navigator as? BottomNavController)?.showBottomNav(!state.selectionMode)
         }
 
         LaunchedEffect(state.isLoading) {
             if (!state.isLoading) {
-                (context as? MainActivity)?.ready = true
+                (context as? AppReadySignal)?.signalReady()
             }
         }
         DisposableEffect(Unit) {

@@ -18,6 +18,7 @@ dependencies {
     api(projects.sourceApi)
     api(projects.i18n)
     api(projects.presentationCore)
+    implementation(projects.feature.more)
 
     // Third-party libraries
     implementation(libs.logcat)

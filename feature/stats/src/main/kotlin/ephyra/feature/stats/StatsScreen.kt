@@ -11,8 +11,8 @@ import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
-import ephyra.presentation.more.stats.StatsScreenContent
-import ephyra.presentation.more.stats.StatsScreenState
+import ephyra.feature.more.stats.StatsScreenContent
+import ephyra.feature.more.stats.StatsScreenState
 import ephyra.presentation.core.util.Screen
 
 class StatsScreen : Screen() {

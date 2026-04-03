@@ -7,18 +7,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.util.fastFilter
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import ephyra.app.data.library.LibraryUpdateJob
-import ephyra.app.util.lang.toLocalDate
+import ephyra.domain.library.service.LibraryUpdateScheduler
+import ephyra.core.common.util.lang.toLocalDate
 import ephyra.core.common.preference.TriState
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadCache
-import ephyra.core.download.DownloadManager
+import ephyra.domain.download.service.DownloadManager
 import ephyra.core.download.model.Download
-import ephyra.core.preference.asState
-import ephyra.core.util.addOrRemove
-import ephyra.core.util.insertSeparators
+import ephyra.presentation.core.util.asState
+import ephyra.core.common.util.addOrRemove
+import ephyra.core.common.util.insertSeparators
 import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.chapter.interactor.SetReadStatus
 import ephyra.domain.chapter.interactor.UpdateChapter
@@ -67,6 +67,7 @@ class UpdatesScreenModel(
     private val libraryPreferences: LibraryPreferences,
     private val updatesPreferences: UpdatesPreferences,
     private val application: Application,
+    private val libraryUpdateScheduler: LibraryUpdateScheduler,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) : StateScreenModel<UpdatesScreenModel.State>(State()) {
 
@@ -186,7 +187,7 @@ class UpdatesScreenModel(
     }
 
     fun updateLibrary(): Boolean {
-        val started = LibraryUpdateJob.startNow(application)
+        val started = libraryUpdateScheduler.startNow(application)
         screenModelScope.launch {
             _events.send(Event.LibraryUpdateTriggered(started))
         }
