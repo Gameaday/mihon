@@ -11,8 +11,8 @@ import ephyra.feature.browse.presentation.components.BaseSourceItem
 import ephyra.presentation.core.components.AppBar
 import ephyra.feature.settings.widget.SwitchPreferenceWidget
 import ephyra.presentation.core.util.animateItemFastScroll
-import ephyra.app.ui.browse.source.SourcesFilterScreenModel
-import ephyra.app.util.system.LocaleHelper
+import ephyra.feature.browse.source.SourcesFilterScreenModel
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.source.model.Source
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.FastScrollLazyColumn

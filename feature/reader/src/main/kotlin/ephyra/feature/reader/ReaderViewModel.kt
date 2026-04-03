@@ -36,8 +36,8 @@ import ephyra.domain.reader.model.ReaderOrientation
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.reader.model.ReadingMode
 import ephyra.feature.reader.viewer.Viewer
-import ephyra.app.util.chapter.filterDownloaded
-import ephyra.app.util.chapter.removeDuplicates
+import ephyra.core.download.util.filterDownloaded
+import ephyra.core.download.util.removeDuplicates
 import ephyra.presentation.core.util.manga.editCover
 import ephyra.core.common.util.lang.byteSize
 import ephyra.core.common.util.storage.DiskUtil

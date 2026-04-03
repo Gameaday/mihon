@@ -45,13 +45,14 @@ import eu.kanade.tachiyomi.network.PREF_DOH_NJALLA
 import eu.kanade.tachiyomi.network.PREF_DOH_QUAD101
 import eu.kanade.tachiyomi.network.PREF_DOH_QUAD9
 import eu.kanade.tachiyomi.network.PREF_DOH_SHECAN
-import ephyra.app.ui.more.OnboardingScreen
-import ephyra.app.util.CrashLogUtil
+import ephyra.feature.more.OnboardingScreen
+import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.core.common.util.system.GLUtil
-import ephyra.app.util.system.isReleaseBuildType
+import ephyra.presentation.core.ui.AppInfo
 import ephyra.app.util.system.isShizukuInstalled
 import ephyra.app.util.system.powerManager
 import ephyra.app.util.system.setDefaultSettings
+import org.koin.compose.koinInject
 import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
@@ -82,6 +83,7 @@ object SettingsAdvancedScreen : SearchableSettings {
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
+        val appInfo: AppInfo = koinInject()
 
         val basePreferences = screenModel.basePreferences
         val networkPreferences = screenModel.networkPreferences
@@ -437,7 +439,7 @@ object SettingsAdvancedScreen : SearchableSettings {
                     entries = extensionInstallerPref.entries
                         .filter {
                             // TODO: allow private option in stable versions once URL handling is more fleshed out
-                            if (isReleaseBuildType) {
+                            if (appInfo.isRelease) {
                                 it != BasePreferences.ExtensionInstaller.PRIVATE
                             } else {
                                 true

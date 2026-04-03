@@ -51,10 +51,10 @@ import ephyra.presentation.core.components.WarningBanner
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.feature.settings.widget.TrailingWidgetBuffer
 import ephyra.app.R
-import ephyra.app.extension.model.Extension
+import ephyra.domain.extension.model.Extension
 import eu.kanade.tachiyomi.source.ConfigurableSource
-import ephyra.app.ui.browse.extension.details.ExtensionDetailsScreenModel
-import ephyra.app.util.system.LocaleHelper
+import ephyra.feature.browse.extension.details.ExtensionDetailsScreenModel
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.presentation.core.util.system.copyToClipboard
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

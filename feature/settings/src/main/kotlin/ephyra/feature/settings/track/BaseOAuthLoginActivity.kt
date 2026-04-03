@@ -4,7 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import ephyra.data.track.TrackerManager
-import ephyra.app.ui.base.activity.BaseActivity
+import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.app.ui.main.MainActivity
 import ephyra.presentation.core.util.view.setComposeContent
 import ephyra.presentation.core.screens.LoadingScreen

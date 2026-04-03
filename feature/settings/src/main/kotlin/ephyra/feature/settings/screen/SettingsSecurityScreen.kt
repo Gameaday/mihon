@@ -11,7 +11,8 @@ import ephyra.domain.security.service.PrivacyPreferences
 import ephyra.domain.security.service.SecurityPreferences
 import ephyra.app.util.system.AuthenticatorUtil.authenticate
 import ephyra.app.util.system.AuthenticatorUtil.isAuthenticationSupported
-import ephyra.app.util.system.telemetryIncluded
+import ephyra.presentation.core.ui.AppInfo
+import org.koin.compose.koinInject
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
 import ephyra.core.common.i18n.stringResource
@@ -32,10 +33,11 @@ object SettingsSecurityScreen : SearchableSettings {
         val screenModel = koinScreenModel<SettingsSecurityScreenModel>()
         val securityPreferences = screenModel.securityPreferences
         val privacyPreferences = screenModel.privacyPreferences
+        val appInfo: AppInfo = koinInject()
 
         return buildList(2) {
             add(getSecurityGroup(securityPreferences))
-            if (!telemetryIncluded) return@buildList
+            if (!appInfo.telemetryIncluded) return@buildList
             add(getFirebaseGroup(privacyPreferences))
         }
     }

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import ephyra.feature.browse.presentation.components.GlobalSearchToolbar
 import eu.kanade.tachiyomi.source.CatalogueSource
-import ephyra.app.ui.browse.source.globalsearch.SearchScreenModel
-import ephyra.app.ui.browse.source.globalsearch.SourceFilter
+import ephyra.feature.browse.source.globalsearch.SearchScreenModel
+import ephyra.feature.browse.source.globalsearch.SourceFilter
 import ephyra.domain.manga.model.Manga
 import ephyra.presentation.core.components.material.Scaffold
 

@@ -31,7 +31,7 @@ import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.ioCoroutineScope
 import ephyra.core.common.util.lang.toDateTimestampString
 import ephyra.presentation.core.util.system.copyToClipboard
-import ephyra.app.util.system.workManager
+import ephyra.core.common.util.system.workManager
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

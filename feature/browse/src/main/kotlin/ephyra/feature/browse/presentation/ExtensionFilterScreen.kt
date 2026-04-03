@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import ephyra.presentation.core.components.AppBar
 import ephyra.feature.settings.widget.SwitchPreferenceWidget
-import ephyra.app.ui.browse.extension.ExtensionFilterState
-import ephyra.app.util.system.LocaleHelper
+import ephyra.feature.browse.extension.ExtensionFilterState
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource

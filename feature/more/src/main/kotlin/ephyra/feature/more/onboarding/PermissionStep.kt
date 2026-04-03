@@ -34,7 +34,8 @@ import androidx.core.net.toUri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import ephyra.app.util.system.telemetryIncluded
+import ephyra.presentation.core.ui.AppInfo
+import org.koin.compose.koinInject
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
@@ -55,6 +56,7 @@ internal class PermissionStep : OnboardingStep {
         val context = LocalContext.current
         val lifecycleOwner = LocalLifecycleOwner.current
         val privacyPreferences = LocalPrivacyPreferences.current
+        val appInfo: AppInfo = koinInject()
 
         val installGranted = rememberRequestPackageInstallsPermissionState()
 
@@ -110,7 +112,7 @@ internal class PermissionStep : OnboardingStep {
                 },
             )
 
-            if (!telemetryIncluded) return@Column
+            if (!appInfo.telemetryIncluded) return@Column
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),

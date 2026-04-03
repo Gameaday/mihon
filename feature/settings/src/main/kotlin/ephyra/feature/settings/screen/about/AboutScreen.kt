@@ -28,14 +28,14 @@ import ephyra.presentation.more.LogoHeader
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.presentation.core.util.LocalBackPress
 import ephyra.presentation.core.util.Screen
-import ephyra.app.BuildConfig
 import cafe.adriel.voyager.koin.koinScreenModel
-import ephyra.app.data.updater.RELEASE_URL
-import ephyra.app.ui.more.NewUpdateScreen
-import ephyra.app.util.CrashLogUtil
+import ephyra.data.updater.RELEASE_URL
+import ephyra.feature.more.NewUpdateScreen
+import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.toast
-import ephyra.app.util.system.updaterEnabled
+import ephyra.presentation.core.ui.AppInfo
+import org.koin.compose.koinInject
 import logcat.LogPriority
 import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.system.logcat
@@ -56,6 +56,7 @@ object AboutScreen : Screen() {
     override fun Content() {
         val screenModel = koinScreenModel<AboutScreenModel>()
         val state by screenModel.state.collectAsState()
+        val appInfo: AppInfo = koinInject()
 
         val context = LocalContext.current
         val uriHandler = LocalUriHandler.current
@@ -110,7 +111,7 @@ object AboutScreen : Screen() {
                     )
                 }
 
-                if (updaterEnabled) {
+                if (appInfo.updaterEnabled) {
                     item {
                         TextPreferenceWidget(
                             title = stringResource(MR.strings.check_for_updates),
@@ -127,7 +128,7 @@ object AboutScreen : Screen() {
                     }
                 }
 
-                if (!BuildConfig.DEBUG) {
+                if (!appInfo.isDebug) {
                     item {
                         TextPreferenceWidget(
                             title = stringResource(MR.strings.whats_new),

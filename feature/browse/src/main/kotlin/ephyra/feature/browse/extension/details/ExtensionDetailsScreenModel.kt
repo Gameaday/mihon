@@ -11,11 +11,11 @@ import ephyra.domain.extension.interactor.GetExtensionSources
 import ephyra.domain.source.interactor.ToggleIncognito
 import ephyra.domain.source.interactor.ToggleSource
 import ephyra.domain.source.service.SourcePreferences
-import ephyra.app.extension.ExtensionManager
-import ephyra.app.extension.model.Extension
+import ephyra.domain.extension.service.ExtensionManager
+import ephyra.domain.extension.model.Extension
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.util.system.LocaleHelper
+import ephyra.core.common.util.system.LocaleHelper
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

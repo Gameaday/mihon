@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import coil3.compose.AsyncImage
 import cafe.adriel.voyager.koin.koinInject
-import ephyra.app.extension.ExtensionManager
+import ephyra.domain.extension.service.ExtensionManager
 import ephyra.domain.source.model.icon
 import ephyra.presentation.core.util.rememberResourceBitmapPainter
 import ephyra.app.R
-import ephyra.app.extension.model.Extension
+import ephyra.domain.extension.model.Extension
 import ephyra.app.extension.util.ExtensionLoader
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.source.model.Source

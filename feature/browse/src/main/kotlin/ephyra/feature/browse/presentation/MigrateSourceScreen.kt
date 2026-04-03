@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import ephyra.domain.source.interactor.SetMigrateSorting
 import ephyra.feature.browse.presentation.components.BaseSourceItem
 import ephyra.feature.browse.presentation.components.SourceIcon
-import ephyra.app.ui.browse.migration.sources.MigrateSourceScreenModel
+import ephyra.feature.browse.migration.sources.MigrateSourceScreenModel
 import ephyra.presentation.core.util.system.copyToClipboard
 import kotlinx.collections.immutable.ImmutableList
 import ephyra.domain.source.model.Source

@@ -21,9 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import ephyra.feature.browse.presentation.components.BaseSourceItem
-import ephyra.app.ui.browse.source.SourcesScreenModel
-import ephyra.app.ui.browse.source.browse.BrowseSourceScreenModel.Listing
-import ephyra.app.util.system.LocaleHelper
+import ephyra.feature.browse.source.SourcesScreenModel
+import ephyra.feature.browse.source.browse.BrowseSourceScreenModel.Listing
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.source.model.Pin
 import ephyra.domain.source.model.Source
 import ephyra.i18n.MR

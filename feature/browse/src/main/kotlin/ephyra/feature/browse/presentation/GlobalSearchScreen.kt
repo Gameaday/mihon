@@ -11,10 +11,10 @@ import ephyra.feature.browse.presentation.components.GlobalSearchLoadingResultIt
 import ephyra.feature.browse.presentation.components.GlobalSearchResultItem
 import ephyra.feature.browse.presentation.components.GlobalSearchToolbar
 import eu.kanade.tachiyomi.source.CatalogueSource
-import ephyra.app.ui.browse.source.globalsearch.SearchItemResult
-import ephyra.app.ui.browse.source.globalsearch.SearchScreenModel
-import ephyra.app.ui.browse.source.globalsearch.SourceFilter
-import ephyra.app.util.system.LocaleHelper
+import ephyra.feature.browse.source.globalsearch.SearchItemResult
+import ephyra.feature.browse.source.globalsearch.SearchScreenModel
+import ephyra.feature.browse.source.globalsearch.SourceFilter
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.manga.model.Manga
 import ephyra.presentation.core.components.material.Scaffold
 

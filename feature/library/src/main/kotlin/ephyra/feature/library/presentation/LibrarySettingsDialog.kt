@@ -20,7 +20,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import ephyra.presentation.core.components.TabbedDialog
 import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.feature.library.LibrarySettingsScreenModel
-import ephyra.app.util.system.isReleaseBuildType
+import ephyra.presentation.core.ui.AppInfo
+import org.koin.compose.koinInject
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.core.common.preference.TriState
 import ephyra.domain.category.model.Category
@@ -80,6 +81,7 @@ fun LibrarySettingsDialog(
 private fun ColumnScope.FilterPage(
     screenModel: LibrarySettingsScreenModel,
 ) {
+    val appInfo: AppInfo = koinInject()
     val filterDownloaded by screenModel.libraryPreferences.filterDownloaded().collectAsStateWithLifecycle()
     val downloadedOnly by screenModel.preferences.downloadedOnly().collectAsStateWithLifecycle()
     val autoUpdateMangaRestrictions by screenModel.libraryPreferences.autoUpdateMangaRestrictions()
@@ -132,7 +134,7 @@ private fun ColumnScope.FilterPage(
         onClick = { screenModel.toggleFilter(LibraryPreferences::filterContentTypeManga) },
     )
     // TODO: re-enable when custom intervals are ready for stable
-    if ((!isReleaseBuildType) && LibraryPreferences.MANGA_OUTSIDE_RELEASE_PERIOD in autoUpdateMangaRestrictions) {
+    if ((!appInfo.isRelease) && LibraryPreferences.MANGA_OUTSIDE_RELEASE_PERIOD in autoUpdateMangaRestrictions) {
         val filterIntervalCustom by screenModel.libraryPreferences.filterIntervalCustom().collectAsStateWithLifecycle()
         TriStateItem(
             label = stringResource(MR.strings.action_filter_interval_custom),

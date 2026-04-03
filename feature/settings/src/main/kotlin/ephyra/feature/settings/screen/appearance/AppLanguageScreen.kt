@@ -26,7 +26,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.util.Screen
 import ephyra.app.R
-import ephyra.app.util.system.LocaleHelper
+import ephyra.core.common.util.system.LocaleHelper
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.xmlpull.v1.XmlPullParser

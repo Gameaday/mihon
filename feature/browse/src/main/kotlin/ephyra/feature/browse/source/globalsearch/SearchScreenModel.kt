@@ -7,7 +7,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.presentation.core.util.ioCoroutineScope
-import ephyra.app.extension.ExtensionManager
+import ephyra.domain.extension.service.ExtensionManager
 import eu.kanade.tachiyomi.source.CatalogueSource
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.mutate

@@ -50,11 +50,11 @@ import ephyra.presentation.manga.components.DotSeparatorNoSpaceText
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
 import ephyra.presentation.core.util.animateItemFastScroll
 import ephyra.presentation.core.util.rememberRequestPackageInstallsPermissionState
-import ephyra.app.extension.model.Extension
-import ephyra.app.extension.model.InstallStep
-import ephyra.app.ui.browse.extension.ExtensionUiModel
-import ephyra.app.ui.browse.extension.ExtensionsScreenModel
-import ephyra.app.util.system.LocaleHelper
+import ephyra.domain.extension.model.Extension
+import ephyra.domain.extension.model.InstallStep
+import ephyra.feature.browse.extension.ExtensionUiModel
+import ephyra.feature.browse.extension.ExtensionsScreenModel
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.presentation.core.util.system.launchRequestPackageInstallsPermission
 import kotlinx.collections.immutable.persistentListOf
 import ephyra.i18n.MR

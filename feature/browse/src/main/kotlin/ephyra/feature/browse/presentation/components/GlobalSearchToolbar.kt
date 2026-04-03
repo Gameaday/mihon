@@ -27,7 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import ephyra.presentation.core.components.SearchToolbar
-import ephyra.app.ui.browse.source.globalsearch.SourceFilter
+import ephyra.feature.browse.source.globalsearch.SourceFilter
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource

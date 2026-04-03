@@ -1,4 +1,4 @@
-package ephyra.app.ui.more
+package ephyra.feature.more
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable

@@ -11,7 +11,7 @@ import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.source.service.SourceManager
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
-import ephyra.app.extension.ExtensionManager
+import ephyra.domain.extension.service.ExtensionManager
 import ephyra.domain.manga.interactor.NetworkToLocalManga
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.source.service.SourceManager

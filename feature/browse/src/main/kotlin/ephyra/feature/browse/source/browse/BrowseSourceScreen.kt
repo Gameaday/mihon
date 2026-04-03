@@ -48,8 +48,8 @@ import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.browse.extension.details.SourcePreferencesScreen
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel.Listing
-import ephyra.app.ui.category.CategoryScreen
-import ephyra.app.ui.manga.MangaScreen
+import ephyra.feature.category.CategoryScreen
+import ephyra.feature.manga.MangaScreen
 import ephyra.app.ui.webview.WebViewScreen
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest

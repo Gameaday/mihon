@@ -35,6 +35,8 @@ import ephyra.app.extension.util.ExtensionLoader
 import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
 import ephyra.app.ui.base.delegate.ThemingDelegateImpl
 import ephyra.presentation.core.util.CrashLogUtil
+import ephyra.presentation.core.ui.AppInfo
+import ephyra.app.BuildConfig as AppBuildConfig
 import ephyra.app.track.MatchUnlinkedJob
 import ephyra.app.track.MatchUnlinkedNotifier
 import ephyra.core.common.storage.AndroidStorageFolderProvider
@@ -120,6 +122,18 @@ val koinAppModule = module {
     single { ExtensionInstaller(androidContext(), get(), get(), get()) }
 
     single { CrashLogUtil(androidContext(), get()) }
+    single<AppInfo> {
+        object : AppInfo {
+            override val isDebug: Boolean get() = AppBuildConfig.DEBUG
+            override val buildType: String get() = AppBuildConfig.BUILD_TYPE
+            override val commitSha: String get() = AppBuildConfig.COMMIT_SHA
+            override val commitCount: String get() = AppBuildConfig.COMMIT_COUNT.toString()
+            override val versionName: String get() = AppBuildConfig.VERSION_NAME
+            override val buildTime: String get() = AppBuildConfig.BUILD_TIME
+            override val telemetryIncluded: Boolean get() = AppBuildConfig.TELEMETRY_INCLUDED
+            override val updaterEnabled: Boolean get() = AppBuildConfig.UPDATER_ENABLED
+        }
+    }
     single { ChapterCache(androidApplication(), get()) }
     single { CoverCache(androidApplication()) }
     single { MangaKeyer(get()) }

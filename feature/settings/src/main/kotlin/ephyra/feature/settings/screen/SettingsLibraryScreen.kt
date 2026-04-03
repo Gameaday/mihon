@@ -18,8 +18,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.presentation.category.visualName
 import ephyra.feature.settings.Preference
 import ephyra.feature.settings.widget.TriStateListDialog
-import ephyra.app.data.library.LibraryUpdateJob
-import ephyra.app.ui.category.CategoryScreen
+import ephyra.domain.library.service.LibraryUpdateScheduler
+import ephyra.feature.category.CategoryScreen
+import org.koin.compose.koinInject
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
@@ -120,6 +121,7 @@ object SettingsLibraryScreen : SearchableSettings {
         libraryPreferences: LibraryPreferences,
     ): Preference.PreferenceGroup {
         val context = LocalContext.current
+        val scheduler: LibraryUpdateScheduler = koinInject()
 
         val autoUpdateIntervalPref = libraryPreferences.autoUpdateInterval()
         val autoUpdateCategoriesPref = libraryPreferences.updateCategories()
@@ -163,7 +165,7 @@ object SettingsLibraryScreen : SearchableSettings {
                     ),
                     title = stringResource(MR.strings.pref_library_update_interval),
                     onValueChanged = {
-                        LibraryUpdateJob.setupTask(context, libraryPreferences, it)
+                        scheduler.setupLibraryUpdateTask()
                         true
                     },
                 ),
@@ -180,7 +182,7 @@ object SettingsLibraryScreen : SearchableSettings {
                     onValueChanged = {
                         // Post to event looper to allow the preference to be updated.
                         ContextCompat.getMainExecutor(context)
-                            .execute { LibraryUpdateJob.setupTask(context, libraryPreferences) }
+                            .execute { scheduler.setupLibraryUpdateTask() }
                         true
                     },
                 ),

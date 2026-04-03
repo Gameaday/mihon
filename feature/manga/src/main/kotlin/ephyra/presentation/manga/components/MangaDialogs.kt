@@ -19,8 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import ephyra.app.util.system.isReleaseBuildType
 import ephyra.domain.manga.interactor.FetchInterval
+import ephyra.presentation.core.ui.AppInfo
+import org.koin.compose.koinInject
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.WheelTextPicker
 import ephyra.presentation.core.components.material.padding
@@ -69,6 +70,7 @@ fun SetIntervalDialog(
     onDismissRequest: () -> Unit,
     onValueChanged: ((Int) -> Unit)? = null,
 ) {
+    val appInfo: AppInfo = koinInject()
     var selectedInterval by rememberSaveable { mutableIntStateOf(if (interval < 0) -interval else 0) }
 
     val nextUpdateDays = remember(nextUpdate) {
@@ -108,7 +110,7 @@ fun SetIntervalDialog(
                 }
                 Spacer(Modifier.height(MaterialTheme.padding.small))
 
-                if (onValueChanged != null && (!isReleaseBuildType)) {
+                if (onValueChanged != null && (!appInfo.isRelease)) {
                     Text(stringResource(MR.strings.manga_interval_custom_amount))
 
                     BoxWithConstraints(

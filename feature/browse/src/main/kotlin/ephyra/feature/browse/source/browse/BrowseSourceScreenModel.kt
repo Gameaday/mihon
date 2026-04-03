@@ -24,7 +24,7 @@ import ephyra.presentation.core.util.ioCoroutineScope
 import ephyra.data.cache.CoverCache
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.model.FilterList
-import ephyra.app.util.removeCovers
+import ephyra.presentation.core.util.manga.removeCovers
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.SharingStarted

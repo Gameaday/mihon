@@ -35,8 +35,8 @@ import ephyra.domain.base.BasePreferences
 import ephyra.data.coil.cropBorders
 import ephyra.data.coil.customDecoder
 import ephyra.feature.reader.viewer.webtoon.WebtoonSubsamplingImageView
-import ephyra.app.util.system.animatorDurationScale
-import ephyra.app.util.view.isVisibleOnScreen
+import ephyra.presentation.core.util.system.animatorDurationScale
+import ephyra.presentation.core.util.view.isVisibleOnScreen
 import okio.BufferedSource
 import ephyra.core.common.util.system.ImageUtil
 import org.koin.android.ext.android.getKoin

@@ -9,7 +9,7 @@ import ephyra.feature.settings.Preference
 import ephyra.domain.reader.model.ReaderOrientation
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.reader.model.ReadingMode
-import ephyra.app.util.system.hasDisplayCutout
+import ephyra.presentation.core.util.system.hasDisplayCutout
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap

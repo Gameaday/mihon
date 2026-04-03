@@ -10,11 +10,11 @@ import ephyra.domain.base.BasePreferences
 import ephyra.domain.extension.interactor.GetExtensionsByType
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
-import ephyra.app.extension.ExtensionManager
-import ephyra.app.extension.model.Extension
-import ephyra.app.extension.model.InstallStep
+import ephyra.domain.extension.service.ExtensionManager
+import ephyra.domain.extension.model.Extension
+import ephyra.domain.extension.model.InstallStep
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.app.util.system.LocaleHelper
+import ephyra.core.common.util.system.LocaleHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

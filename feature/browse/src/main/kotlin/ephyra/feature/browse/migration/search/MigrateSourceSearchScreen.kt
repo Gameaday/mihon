@@ -27,7 +27,7 @@ import ephyra.presentation.core.util.Screen
 import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel
 import ephyra.feature.browse.source.browse.SourceFilterDialog
-import ephyra.app.ui.home.HomeScreen
+import ephyra.presentation.core.ui.BottomNavController
 import ephyra.feature.manga.MangaScreen
 import ephyra.app.ui.webview.WebViewScreen
 import kotlinx.coroutines.launch
@@ -145,7 +145,7 @@ data class MigrateSourceSearchScreen(
                     onComplete = {
                         scope.launch {
                             navigator.popUntilRoot()
-                            HomeScreen.openTab(HomeScreen.Tab.Browse())
+                            (navigator as? BottomNavController)?.showBottomNav(true)
                             navigator.push(MangaScreen(dialog.target.id))
                         }
                     },

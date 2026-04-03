@@ -14,7 +14,7 @@ import ephyra.core.util.ifSourcesLoaded
 import ephyra.feature.browse.presentation.GlobalSearchScreen
 import ephyra.presentation.core.util.Screen
 import ephyra.feature.browse.source.browse.BrowseSourceScreen
-import ephyra.app.ui.manga.MangaScreen
+import ephyra.feature.manga.MangaScreen
 import org.koin.core.parameter.parametersOf
 
 class GlobalSearchScreen(

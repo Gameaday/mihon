@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
-import ephyra.app.util.system.LocaleHelper
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.source.model.Source
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.util.secondaryItemAlpha

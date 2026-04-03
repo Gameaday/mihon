@@ -17,7 +17,7 @@ import ephyra.feature.browse.presentation.ExtensionScreen
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.TabContent
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
-import ephyra.app.extension.model.Extension
+import ephyra.domain.extension.model.Extension
 import ephyra.feature.browse.extension.details.ExtensionDetailsScreen
 import ephyra.app.ui.webview.WebViewScreen
 import ephyra.presentation.core.util.system.isPackageInstalled
