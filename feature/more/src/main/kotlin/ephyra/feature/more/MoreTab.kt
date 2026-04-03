@@ -16,7 +16,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.app.ui.setting.SettingsScreen
+import ephyra.feature.settings.SettingsScreen
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.download.DownloadManager
 import ephyra.core.preference.asState

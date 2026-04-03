@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.app.ui.setting.SettingsScreen
+import ephyra.feature.settings.SettingsScreen
 import ephyra.domain.base.BasePreferences
 import ephyra.feature.settings.screen.SearchableSettings
 import ephyra.feature.settings.screen.SettingsDataScreen

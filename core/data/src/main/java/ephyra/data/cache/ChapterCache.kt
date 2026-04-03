@@ -155,13 +155,17 @@ class ChapterCache(
      * and must not hold long-lived references to it across operations that could trigger eviction
      * (e.g. a manual [clear]).
      *
+     * Returns `null` if the entry has been evicted from the disk cache (e.g. due to LRU
+     * pressure or a concurrent [clear] call). Callers that stored a stream lambda around
+     * this function should treat `null` as a transient cache-miss and re-queue the page
+     * for download rather than surfacing an error to the user.
+     *
      * @param imageUrl url of image.
-     * @return path of image.
+     * @return path of image, or `null` if the entry is no longer cached.
      */
-    fun getImageFile(imageUrl: String): File {
+    fun getImageFile(imageUrl: String): File? {
         val key = DiskUtil.hashKeyForDisk(imageUrl)
         return diskCache.openSnapshot(key)?.use { File(it.data.toString()) }
-            ?: error("Image not in cache: $imageUrl")
     }
 
     /**

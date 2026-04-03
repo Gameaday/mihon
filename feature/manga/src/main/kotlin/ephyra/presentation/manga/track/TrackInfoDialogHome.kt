@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
 import ephyra.data.track.Tracker
 import ephyra.app.ui.manga.track.TrackItem
-import ephyra.app.util.lang.toLocalDate
+import ephyra.core.common.util.lang.toLocalDate
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.core.i18n.stringResource

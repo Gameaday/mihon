@@ -6,9 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import ephyra.feature.settings.Preference
-import ephyra.app.ui.reader.setting.ReaderOrientation
-import ephyra.app.ui.reader.setting.ReaderPreferences
-import ephyra.app.ui.reader.setting.ReadingMode
+import ephyra.domain.reader.model.ReaderOrientation
+import ephyra.domain.reader.service.ReaderPreferences
+import ephyra.domain.reader.model.ReadingMode
 import ephyra.app.util.system.hasDisplayCutout
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf

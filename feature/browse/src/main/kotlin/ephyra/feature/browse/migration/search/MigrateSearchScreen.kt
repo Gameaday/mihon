@@ -10,7 +10,7 @@ import ephyra.feature.browse.presentation.MigrateSearchScreen
 import ephyra.presentation.core.util.Screen
 import org.koin.core.parameter.parametersOf
 import ephyra.feature.browse.source.globalsearch.SearchScreenModel
-import ephyra.app.ui.manga.MangaScreen
+import ephyra.feature.manga.MangaScreen
 import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.feature.migration.list.MigrationListScreen
 

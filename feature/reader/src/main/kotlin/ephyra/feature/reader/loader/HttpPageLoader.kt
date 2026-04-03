@@ -429,7 +429,18 @@ internal class HttpPageLoader(
                     chapterCache.fetchAndCacheImage(imageUrl) { source.getImage(page) }
                 }
 
-                page.stream = { chapterCache.getImageFile(imageUrl).inputStream() }
+                page.stream = {
+                    // getImageFile returns null if the entry was evicted from the disk cache
+                    // (e.g. LRU pressure during a rapid progress-bar seek). In that case, reset
+                    // the page so the loader re-downloads it, and throw IOException so the caller
+                    // (PagerPageHolder / WebtoonPageHolder) can distinguish this from a permanent
+                    // error and avoid showing an error UI.
+                    chapterCache.getImageFile(imageUrl)?.inputStream() ?: run {
+                        page.status = Page.State.Queue
+                        page.stream = null
+                        throw IOException("Image evicted from cache, page queued for re-download: $imageUrl")
+                    }
+                }
 
                 // Run pre-processor check on boundary pages. If the page matches a
                 // blocked hash, it is marked hidden and the viewer is notified to

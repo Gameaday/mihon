@@ -480,9 +480,12 @@ class Downloader(
             // If the image is already downloaded, do nothing. Otherwise download from network
             val file = when {
                 imageFile != null -> imageFile
-                chapterCache.isImageInCache(
-                    page.imageUrl!!,
-                ) -> copyImageFromCache(chapterCache.getImageFile(page.imageUrl!!), tmpDir, filename)
+                // getImageFile returns null if the cache entry was evicted between isImageInCache
+                // and the actual file access (TOCTOU race). Fall through to downloadImage in that case.
+                chapterCache.isImageInCache(page.imageUrl!!) ->
+                    chapterCache.getImageFile(page.imageUrl!!)
+                        ?.let { copyImageFromCache(it, tmpDir, filename) }
+                        ?: downloadImage(page, download.source, tmpDir, filename)
 
                 else -> downloadImage(page, download.source, tmpDir, filename)
             }

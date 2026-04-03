@@ -28,7 +28,7 @@ import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel
 import ephyra.feature.browse.source.browse.SourceFilterDialog
 import ephyra.app.ui.home.HomeScreen
-import ephyra.app.ui.manga.MangaScreen
+import ephyra.feature.manga.MangaScreen
 import ephyra.app.ui.webview.WebViewScreen
 import kotlinx.coroutines.launch
 import ephyra.feature.migration.dialog.MigrateMangaDialog

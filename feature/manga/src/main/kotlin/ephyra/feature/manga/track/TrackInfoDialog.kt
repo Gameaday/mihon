@@ -43,8 +43,8 @@ import ephyra.data.track.EnhancedTracker
 import ephyra.data.track.Tracker
 import ephyra.data.track.TrackerManager
 import ephyra.data.track.model.TrackSearch
-import ephyra.app.util.lang.convertEpochMillisZone
-import ephyra.app.util.lang.toLocalDate
+import ephyra.core.common.util.lang.convertEpochMillisZone
+import ephyra.core.common.util.lang.toLocalDate
 import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchNonCancellable

@@ -29,7 +29,7 @@ import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.ioCoroutineScope
-import ephyra.app.util.lang.toDateTimestampString
+import ephyra.core.common.util.lang.toDateTimestampString
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.app.util.system.workManager
 import kotlinx.collections.immutable.persistentListOf

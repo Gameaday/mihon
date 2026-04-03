@@ -6,7 +6,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.app.BuildConfig
 import ephyra.app.data.updater.AppUpdateChecker
-import ephyra.app.util.lang.toDateTimestampString
+import ephyra.core.common.util.lang.toDateTimestampString
 import ephyra.app.util.system.isNightlyBuildType
 import ephyra.app.util.system.isPreviewBuildType
 import ephyra.core.common.util.lang.launchIO

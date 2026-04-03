@@ -21,6 +21,7 @@ import ephyra.app.ui.webview.WebViewActivity
 import ephyra.core.common.util.system.dpToPx
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -222,6 +223,10 @@ class WebtoonPageHolder(
                 removeErrorLayout()
             }
         } catch (e: Throwable) {
+            if (e is CancellationException) throw e
+            // When the stream lambda detects a cache eviction, it resets page.status to Queue.
+            // Don't show an error — the loader will re-download the page automatically.
+            if (page?.status == Page.State.Queue) return
             logcat(LogPriority.ERROR, e)
             withUIContext {
                 setError(e)
