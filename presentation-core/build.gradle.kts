@@ -77,5 +77,6 @@ dependencies {
 
     // Utilities
     api(libs.shizuku.api)
+    api(androidx.biometricktx)
 }
 

@@ -52,7 +52,7 @@ import ephyra.domain.ui.model.setAppCompatDelegateThemeMode
 import ephyra.i18n.MR
 import ephyra.presentation.core.data.coil.TachiyomiImageDecoder
 import ephyra.presentation.core.ui.delegate.SecureActivityDelegate
-import ephyra.app.ui.base.delegate.SecureActivityDelegateState
+import ephyra.presentation.core.ui.delegate.SecureActivityDelegateState
 import ephyra.presentation.widget.WidgetManager
 import ephyra.telemetry.TelemetryConfig
 import eu.kanade.tachiyomi.network.NetworkHelper
