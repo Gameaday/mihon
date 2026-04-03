@@ -29,7 +29,7 @@ import ephyra.feature.browse.source.browse.BrowseSourceScreenModel
 import ephyra.feature.browse.source.browse.SourceFilterDialog
 import ephyra.presentation.core.ui.BottomNavController
 import ephyra.feature.manga.MangaScreen
-import ephyra.app.ui.webview.WebViewScreen
+import ephyra.feature.webview.WebViewScreen
 import kotlinx.coroutines.launch
 import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.feature.migration.list.MigrationListScreen

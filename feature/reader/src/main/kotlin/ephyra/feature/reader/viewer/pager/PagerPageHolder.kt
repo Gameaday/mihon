@@ -8,14 +8,14 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
 import ephyra.presentation.core.util.formattedMessage
-import ephyra.app.databinding.ReaderErrorBinding
+import ephyra.feature.reader.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.model.InsertPage
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.feature.reader.viewer.ReaderProgressIndicator
-import ephyra.app.ui.webview.WebViewActivity
-import ephyra.app.widget.ViewPagerAdapter
+import ephyra.feature.webview.WebViewActivity
+import ephyra.feature.reader.widget.ViewPagerAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.MainScope

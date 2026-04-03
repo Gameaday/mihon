@@ -1,4 +1,4 @@
-package ephyra.app.data.export
+package ephyra.data.export
 
 import android.content.Context
 import android.net.Uri

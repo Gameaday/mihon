@@ -7,7 +7,7 @@ import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.ThemeMode
 import ephyra.presentation.core.ui.delegate.ThemingDelegate
 import ephyra.domain.reader.service.ReaderPreferences
-import ephyra.app.R
+import ephyra.presentation.core.R
 import ephyra.presentation.core.util.system.isNightMode
 
 /**

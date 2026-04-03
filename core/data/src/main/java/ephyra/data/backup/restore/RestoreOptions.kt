@@ -1,4 +1,4 @@
-package ephyra.app.data.backup.restore
+package ephyra.data.backup.restore
 
 import dev.icerock.moko.resources.StringResource
 import ephyra.i18n.MR

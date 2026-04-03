@@ -29,7 +29,7 @@ import ephyra.presentation.core.components.WarningBanner
 import ephyra.presentation.core.util.Screen
 import ephyra.app.data.backup.BackupFileValidator
 import ephyra.app.data.backup.restore.BackupRestoreJob
-import ephyra.app.data.backup.restore.RestoreOptions
+import ephyra.data.backup.restore.RestoreOptions
 import ephyra.core.common.util.system.DeviceUtil
 import kotlinx.coroutines.flow.update
 import ephyra.i18n.MR

@@ -15,7 +15,7 @@ import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.viewer.ReaderButton
 import ephyra.feature.reader.viewer.ReaderTransitionView
 import ephyra.core.common.util.system.dpToPx
-import ephyra.app.widget.ViewPagerAdapter
+import ephyra.feature.reader.widget.ViewPagerAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest

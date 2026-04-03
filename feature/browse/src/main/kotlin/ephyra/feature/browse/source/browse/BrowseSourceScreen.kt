@@ -50,7 +50,7 @@ import ephyra.feature.browse.extension.details.SourcePreferencesScreen
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel.Listing
 import ephyra.feature.category.CategoryScreen
 import ephyra.feature.manga.MangaScreen
-import ephyra.app.ui.webview.WebViewScreen
+import ephyra.feature.webview.WebViewScreen
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow

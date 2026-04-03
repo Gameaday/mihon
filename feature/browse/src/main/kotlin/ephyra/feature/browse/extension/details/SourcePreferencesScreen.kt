@@ -35,7 +35,7 @@ import ephyra.core.util.ifSourcesLoaded
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.util.Screen
 import ephyra.app.R
-import ephyra.app.data.preference.SharedPreferencesDataStore
+import ephyra.data.preference.SharedPreferencesDataStore
 import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.sourcePreferences
 import ephyra.app.widget.TachiyomiTextInputEditText.Companion.setIncognito

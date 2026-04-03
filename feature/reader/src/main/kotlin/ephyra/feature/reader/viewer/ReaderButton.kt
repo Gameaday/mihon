@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import com.google.android.material.button.MaterialButton
-import ephyra.app.R
+import com.google.android.material.R
 import ephyra.feature.reader.viewer.pager.PagerViewer
 
 /**

@@ -10,7 +10,7 @@ import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewpager.widget.ViewPager
-import ephyra.app.R
+import ephyra.feature.reader.R
 import ephyra.core.download.DownloadManager
 import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.ReaderActivity

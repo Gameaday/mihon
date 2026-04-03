@@ -12,12 +12,12 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import ephyra.presentation.core.util.formattedMessage
-import ephyra.app.databinding.ReaderErrorBinding
+import ephyra.feature.reader.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.feature.reader.viewer.ReaderProgressIndicator
-import ephyra.app.ui.webview.WebViewActivity
+import ephyra.feature.webview.WebViewActivity
 import ephyra.core.common.util.system.dpToPx
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope

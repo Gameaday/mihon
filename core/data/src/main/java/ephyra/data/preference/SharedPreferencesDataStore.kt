@@ -1,4 +1,4 @@
-package ephyra.app.data.preference
+package ephyra.data.preference
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
