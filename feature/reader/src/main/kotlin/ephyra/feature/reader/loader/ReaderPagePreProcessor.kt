@@ -1,6 +1,7 @@
 package ephyra.feature.reader.loader
 
 import ephyra.feature.reader.model.ReaderPage
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
@@ -140,7 +141,7 @@ class ReaderPagePreProcessor(
      * blocklist is empty or contains no valid entries (common fast-path).
      */
     private fun resolveBlockedDHashes(): List<Long>? {
-        val hexSet = downloadPreferences.blockedPageHashes().get()
+        val hexSet = runBlocking { downloadPreferences.blockedPageHashes().get() }
         if (hexSet.isEmpty()) return null
         val hashes = hexSet.mapNotNull { hex ->
             try {

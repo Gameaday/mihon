@@ -39,7 +39,8 @@ import ephyra.presentation.core.util.system.animatorDurationScale
 import ephyra.presentation.core.util.view.isVisibleOnScreen
 import okio.BufferedSource
 import ephyra.core.common.util.system.ImageUtil
-import org.koin.android.ext.android.getKoin
+import kotlinx.coroutines.runBlocking
+import org.koin.core.context.GlobalContext
 
 /**
  * A wrapper view for showing page image.
@@ -57,7 +58,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttrs, defStyleRes) {
 
     private val alwaysDecodeLongStripWithSSIV by lazy {
-        context.getKoin().get<BasePreferences>().alwaysDecodeLongStripWithSSIV().get()
+        runBlocking { GlobalContext.get().get<BasePreferences>().alwaysDecodeLongStripWithSSIV().get() }
     }
 
     private var pageView: View? = null

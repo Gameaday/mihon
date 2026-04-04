@@ -9,6 +9,7 @@ import ephyra.presentation.core.ui.delegate.ThemingDelegate
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.presentation.core.R
 import ephyra.presentation.core.util.system.isNightMode
+import kotlinx.coroutines.runBlocking
 
 /**
  * Creates night mode Context depending on reader theme/background
@@ -17,8 +18,8 @@ fun Context.createReaderThemeContext(
     preferences: UiPreferences,
     readerPreferences: ReaderPreferences,
 ): Context {
-    val themeMode = preferences.themeMode().get()
-    val isDarkBackground = when (readerPreferences.readerTheme().get()) {
+    val themeMode = runBlocking { preferences.themeMode().get() }
+    val isDarkBackground = when (runBlocking { readerPreferences.readerTheme().get() }) {
         1, 2 -> true // Black, Gray
         3 -> when (themeMode) { // Automatic bg uses activity background by default
             ThemeMode.SYSTEM -> applicationContext.isNightMode()
@@ -35,7 +36,7 @@ fun Context.createReaderThemeContext(
 
         val wrappedContext = ContextThemeWrapper(this, R.style.Theme_Tachiyomi)
         wrappedContext.applyOverrideConfiguration(overrideConf)
-        ThemingDelegate.getThemeResIds(preferences.appTheme().get(), preferences.themeDarkAmoled().get())
+        ThemingDelegate.getThemeResIds(runBlocking { preferences.appTheme().get() }, runBlocking { preferences.themeDarkAmoled().get() })
             .forEach { wrappedContext.theme.applyStyle(it, true) }
         return wrappedContext
     }

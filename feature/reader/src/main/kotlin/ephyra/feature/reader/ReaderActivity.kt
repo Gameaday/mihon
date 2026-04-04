@@ -138,7 +138,7 @@ class ReaderActivity : BaseActivity() {
 
     private var loadingIndicator: ReaderProgressIndicator? = null
 
-    private var isScrollingThroughPages = false
+    internal var isScrollingThroughPages = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.applyHighRefreshRate()

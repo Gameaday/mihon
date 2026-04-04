@@ -4,6 +4,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import ephyra.domain.reader.service.ReaderPreferences
+import ephyra.domain.ui.UiPreferences
 import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
@@ -11,6 +13,7 @@ import ephyra.feature.reader.model.ViewerChapters
 import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.feature.reader.viewer.calculateChapterGap
 import ephyra.feature.reader.util.createReaderThemeContext
+import org.koin.android.ext.android.getKoin
 
 /**
  * RecyclerView Adapter used by this [viewer] to where [ViewerChapters] updates are posted.
@@ -30,8 +33,8 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
      * current app theme and reader background color
      */
     private var readerThemedContext = viewer.activity.createReaderThemeContext(
-        viewer.activity.get(),
-        viewer.activity.get(),
+        viewer.activity.getKoin().get<UiPreferences>(),
+        viewer.activity.getKoin().get<ReaderPreferences>(),
     )
 
     /**
@@ -79,8 +82,8 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
 
     fun refresh() {
         readerThemedContext = viewer.activity.createReaderThemeContext(
-            viewer.activity.get(),
-            viewer.activity.get(),
+            viewer.activity.getKoin().get<UiPreferences>(),
+            viewer.activity.getKoin().get<ReaderPreferences>(),
         )
     }
 
