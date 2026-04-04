@@ -1,8 +1,6 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-    // Use the native compiler plugin to resolve the KSP errors
-    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -17,5 +15,4 @@ dependencies {
 
     // Dependency Injection (Koin)
     api(libs.koin.core)
-    implementation(libs.koin.annotations)
 }

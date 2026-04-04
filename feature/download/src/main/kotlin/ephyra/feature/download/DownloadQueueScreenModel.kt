@@ -6,9 +6,6 @@ import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.download.model.Download
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import org.koin.core.annotation.Factory
-
-@Factory
 class DownloadQueueScreenModel(
     private val downloadManager: DownloadManager,
 ) : ScreenModel {
