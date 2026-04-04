@@ -70,11 +70,9 @@ abstract class BaseTracker(
 
     override suspend fun getPassword() = trackPreferences.trackPassword(this).get()
 
-    @Suppress("DEPRECATION")
-    fun getUsernameSync() = trackPreferences.trackUsername(this).getSync()
+    fun getUsernameSync() = kotlinx.coroutines.runBlocking { trackPreferences.trackUsername(this@BaseTracker).get() }
 
-    @Suppress("DEPRECATION")
-    fun getPasswordSync() = trackPreferences.trackPassword(this).getSync()
+    fun getPasswordSync() = kotlinx.coroutines.runBlocking { trackPreferences.trackPassword(this@BaseTracker).get() }
 
     override fun saveCredentials(username: String, password: String) {
         trackPreferences.setCredentials(this, username, password)

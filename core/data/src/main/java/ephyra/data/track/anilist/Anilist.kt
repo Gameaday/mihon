@@ -13,6 +13,7 @@ import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.model.toDomainTrack
@@ -70,8 +71,7 @@ class Anilist(
     override fun getCompletionStatus(): Long = COMPLETED
 
     override fun getScoreList(): List<String> {
-        @Suppress("DEPRECATION")
-        return when (trackPreferences.anilistScoreType().getSync()) {
+        return when (runBlocking { trackPreferences.anilistScoreType().get() }) {
             POINT_10 -> IntRange(1, 10).map { it.toString() }
             POINT_10_DECIMAL -> IntRange(1, 100).map { (it / 10.0).toString() }
             POINT_5 -> listOf("★", "★★", "★★★", "★★★★", "★★★★★")
@@ -82,8 +82,7 @@ class Anilist(
     }
 
     override fun indexToScore(index: Int): Double {
-        @Suppress("DEPRECATION")
-        return when (trackPreferences.anilistScoreType().getSync()) {
+        return when (runBlocking { trackPreferences.anilistScoreType().get() }) {
             POINT_10 -> (index + 1).toDouble()
             POINT_10_DECIMAL -> (index + 1) / 10.0
             POINT_5 -> (index + 1).toDouble()
@@ -96,8 +95,7 @@ class Anilist(
     override fun displayScore(track: Track): String {
         val score = track.score
         if (score <= 0) return ""
-        @Suppress("DEPRECATION")
-        return when (trackPreferences.anilistScoreType().getSync()) {
+        return when (runBlocking { trackPreferences.anilistScoreType().get() }) {
             POINT_10_DECIMAL -> score.toString()
             POINT_10 -> score.toInt().toString()
             POINT_5 -> "★".repeat(score.toInt())
@@ -117,7 +115,7 @@ class Anilist(
     }
 
     override suspend fun bindInternal(track: DbTrack, hasReadChapters: Boolean): DbTrack {
-        val remoteTrack = api.findLibManga(track, getUsernameSync().toInt())
+        val remoteTrack = api.findLibManga(track, getUsername().toInt())
         return if (remoteTrack != null) {
             track.copyPersonalFrom(remoteTrack)
             track.remote_id = remoteTrack.remote_id
@@ -140,7 +138,7 @@ class Anilist(
     }
 
     override suspend fun refreshInternal(track: DbTrack): DbTrack {
-        return api.findLibManga(track, getUsernameSync().toInt()) ?: updateInternal(track)
+        return api.findLibManga(track, getUsername().toInt()) ?: updateInternal(track)
     }
 
     override suspend fun login(username: String, password: String) {
@@ -156,10 +154,9 @@ class Anilist(
         trackPreferences.trackToken(this).set(json.encodeToString(oAuth))
     }
 
-    @Suppress("DEPRECATION")
     fun loadOAuth(): ALOAuth? {
         return try {
-            json.decodeFromString<ALOAuth>(trackPreferences.trackToken(this).getSync())
+            json.decodeFromString<ALOAuth>(runBlocking { trackPreferences.trackToken(this@Anilist).get() })
         } catch (e: Exception) {
             null
         }

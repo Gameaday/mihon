@@ -13,6 +13,7 @@ import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import ephyra.domain.track.model.Track
 
@@ -58,7 +59,7 @@ class Bangumi(
     }
 
     override suspend fun bindInternal(track: DbTrack, hasReadChapters: Boolean): DbTrack {
-        val statusTrack = api.statusLibManga(track, getUsernameSync())
+        val statusTrack = api.statusLibManga(track, getUsername())
         return if (statusTrack != null) {
             track.copyPersonalFrom(statusTrack, copyRemotePrivate = false)
             track.library_id = statusTrack.library_id
