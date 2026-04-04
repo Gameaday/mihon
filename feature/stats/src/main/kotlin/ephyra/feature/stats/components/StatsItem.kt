@@ -1,4 +1,4 @@
-package ephyra.feature.more.stats.components
+package ephyra.feature.stats.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

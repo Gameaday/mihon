@@ -34,15 +34,15 @@ import androidx.core.net.toUri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import ephyra.presentation.core.ui.AppInfo
-import org.koin.compose.koinInject
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.ui.AppInfo
+import ephyra.presentation.core.util.LocalPrivacyPreferences
 import ephyra.presentation.core.util.collectAsState
+import ephyra.presentation.core.util.rememberRequestPackageInstallsPermissionState
 import ephyra.presentation.core.util.secondaryItemAlpha
 import ephyra.presentation.core.util.system.launchRequestPackageInstallsPermission
-import ephyra.presentation.core.util.LocalPrivacyPreferences
-import ephyra.presentation.core.util.rememberRequestPackageInstallsPermissionState
+import org.koin.compose.koinInject
 
 internal class PermissionStep : OnboardingStep {
 

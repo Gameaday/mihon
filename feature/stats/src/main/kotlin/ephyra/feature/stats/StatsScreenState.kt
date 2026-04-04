@@ -1,7 +1,7 @@
-package ephyra.feature.more.stats
+package ephyra.feature.stats
 
 import androidx.compose.runtime.Immutable
-import ephyra.feature.more.stats.data.StatsData
+import ephyra.feature.stats.data.StatsData
 
 sealed interface StatsScreenState {
     @Immutable

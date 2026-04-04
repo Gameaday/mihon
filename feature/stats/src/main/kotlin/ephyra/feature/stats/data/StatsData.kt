@@ -1,4 +1,4 @@
-package ephyra.feature.more.stats.data
+package ephyra.feature.stats.data
 
 sealed interface StatsData {
 

@@ -1,4 +1,4 @@
-package ephyra.feature.more.stats
+package ephyra.feature.stats
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -16,9 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import ephyra.feature.more.stats.components.StatsItem
-import ephyra.feature.more.stats.components.StatsOverviewItem
-import ephyra.feature.more.stats.data.StatsData
+import ephyra.feature.stats.components.StatsItem
+import ephyra.feature.stats.components.StatsOverviewItem
+import ephyra.feature.stats.data.StatsData
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.SectionCard
 import ephyra.presentation.core.components.material.padding

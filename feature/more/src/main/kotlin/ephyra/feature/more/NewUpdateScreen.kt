@@ -5,10 +5,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.koin.compose.koinInject
 import ephyra.domain.release.service.AppUpdateDownloader
-import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.system.openInBrowser
+import org.koin.compose.koinInject
 
 class NewUpdateScreen(
     private val versionName: String,
