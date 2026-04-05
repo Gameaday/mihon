@@ -48,8 +48,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.app.BuildConfig
-import ephyra.data.cache.ChapterCache
-import ephyra.core.download.DownloadCache
 import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.data.updater.AppUpdateChecker
 import ephyra.app.data.updater.RELEASE_URL
@@ -64,12 +62,12 @@ import ephyra.app.ui.more.NewUpdateScreen
 import ephyra.app.ui.more.OnboardingScreen
 import ephyra.app.util.system.isNavigationBarNeedsScrim
 import ephyra.app.util.system.updaterEnabled
-import ephyra.presentation.core.util.view.setComposeContent
-import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.core.common.Constants
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.system.logcat
+import ephyra.core.download.DownloadCache
 import ephyra.core.migration.Migrator
+import ephyra.data.cache.ChapterCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.release.interactor.GetApplicationRelease
@@ -83,10 +81,12 @@ import ephyra.presentation.core.components.IncognitoModeBannerBackgroundColor
 import ephyra.presentation.core.components.IndexingBannerBackgroundColor
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.presentation.core.ui.activity.BaseActivity
-import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.AssistContentScreen
 import ephyra.presentation.core.util.DefaultNavigatorScreenTransition
+import ephyra.presentation.core.util.system.openInBrowser
+import ephyra.presentation.core.util.view.setComposeContent
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -149,128 +149,129 @@ class MainActivity : BaseActivity(), AppReadySignal {
                 ephyra.presentation.util.LocalStoragePreferences provides storagePreferences,
             ) {
                 var didMigration by remember { mutableStateOf<Boolean?>(null) }
-            LaunchedEffect(Unit) {
-                didMigration = Migrator.awaitAndRelease()
-            }
-
-            val context = LocalContext.current
-
-            var incognito by remember { mutableStateOf(getIncognitoState.await(null)) }
-            val downloadOnly by preferences.downloadedOnly().collectAsStateWithLifecycle()
-            val indexing by downloadCache.isInitializing.collectAsStateWithLifecycle()
-
-            val isSystemInDarkTheme = isSystemInDarkTheme()
-            val statusBarBackgroundColor = when {
-                indexing -> IndexingBannerBackgroundColor
-                downloadOnly -> DownloadedOnlyBannerBackgroundColor
-                incognito -> IncognitoModeBannerBackgroundColor
-                else -> MaterialTheme.colorScheme.surface
-            }
-            LaunchedEffect(isSystemInDarkTheme, statusBarBackgroundColor) {
-                // Draw edge-to-edge and set system bars color to transparent
-                val lightStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.BLACK)
-                val darkStyle = SystemBarStyle.dark(Color.TRANSPARENT)
-                enableEdgeToEdge(
-                    statusBarStyle = if (statusBarBackgroundColor.luminance() > 0.5) lightStyle else darkStyle,
-                    navigationBarStyle = if (isSystemInDarkTheme) darkStyle else lightStyle,
-                )
-            }
-
-            Navigator(
-                screen = HomeScreen,
-                disposeBehavior = NavigatorDisposeBehavior(disposeNestedNavigators = false, disposeSteps = true),
-            ) { navigator ->
-                LaunchedEffect(navigator) {
-                    this@MainActivity.navigator = navigator
-
-                    if (isLaunch) {
-                        // Set start screen
-                        handleIntentAction(intent, navigator)
-
-                        // Reset Incognito Mode on relaunch
-                        preferences.incognitoMode().set(false)
-                    }
-                }
-                LaunchedEffect(navigator.lastItem) {
-                    (navigator.lastItem as? BrowseSourceScreen)?.sourceId
-                        .let(getIncognitoState::subscribe)
-                        .collectLatest { incognito = it }
+                LaunchedEffect(Unit) {
+                    didMigration = Migrator.awaitAndRelease()
                 }
 
-                val scaffoldInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)
-                Scaffold(
-                    topBar = {
-                        AppStateBanners(
-                            downloadedOnlyMode = downloadOnly,
-                            incognitoMode = incognito,
-                            indexing = indexing,
-                            modifier = Modifier.windowInsetsPadding(scaffoldInsets),
-                        )
-                    },
-                    contentWindowInsets = scaffoldInsets,
-                ) { contentPadding ->
-                    // Consume insets already used by app state banners
-                    Box {
-                        // Shows current screen
-                        DefaultNavigatorScreenTransition(
-                            navigator = navigator,
-                            modifier = Modifier
-                                .padding(contentPadding)
-                                .consumeWindowInsets(contentPadding),
-                        )
+                val context = LocalContext.current
 
-                        // Draw navigation bar scrim when needed
-                        if (remember { isNavigationBarNeedsScrim() }) {
-                            Spacer(
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .fillMaxWidth()
-                                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
-                                    .alpha(0.8f)
-                                    .background(MaterialTheme.colorScheme.surfaceContainer),
-                            )
+                var incognito by remember { mutableStateOf(getIncognitoState.await(null)) }
+                val downloadOnly by preferences.downloadedOnly().collectAsStateWithLifecycle()
+                val indexing by downloadCache.isInitializing.collectAsStateWithLifecycle()
+
+                val isSystemInDarkTheme = isSystemInDarkTheme()
+                val statusBarBackgroundColor = when {
+                    indexing -> IndexingBannerBackgroundColor
+                    downloadOnly -> DownloadedOnlyBannerBackgroundColor
+                    incognito -> IncognitoModeBannerBackgroundColor
+                    else -> MaterialTheme.colorScheme.surface
+                }
+                LaunchedEffect(isSystemInDarkTheme, statusBarBackgroundColor) {
+                    // Draw edge-to-edge and set system bars color to transparent
+                    val lightStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.BLACK)
+                    val darkStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+                    enableEdgeToEdge(
+                        statusBarStyle = if (statusBarBackgroundColor.luminance() > 0.5) lightStyle else darkStyle,
+                        navigationBarStyle = if (isSystemInDarkTheme) darkStyle else lightStyle,
+                    )
+                }
+
+                Navigator(
+                    screen = HomeScreen,
+                    disposeBehavior = NavigatorDisposeBehavior(disposeNestedNavigators = false, disposeSteps = true),
+                ) { navigator ->
+                    LaunchedEffect(navigator) {
+                        this@MainActivity.navigator = navigator
+
+                        if (isLaunch) {
+                            // Set start screen
+                            handleIntentAction(intent, navigator)
+
+                            // Reset Incognito Mode on relaunch
+                            preferences.incognitoMode().set(false)
                         }
                     }
-                }
+                    LaunchedEffect(navigator.lastItem) {
+                        (navigator.lastItem as? BrowseSourceScreen)?.sourceId
+                            .let(getIncognitoState::subscribe)
+                            .collectLatest { incognito = it }
+                    }
 
-                // Pop source-related screens when incognito mode is turned off
-                LaunchedEffect(Unit) {
-                    preferences.incognitoMode().changes()
-                        .drop(1)
-                        .filter { !it }
-                        .onEach {
-                            val currentScreen = navigator.lastItem
-                            if (currentScreen is BrowseSourceScreen ||
-                                (currentScreen is MangaScreen && currentScreen.fromSource)
-                            ) {
-                                navigator.popUntilRoot()
+                    val scaffoldInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)
+                    Scaffold(
+                        topBar = {
+                            AppStateBanners(
+                                downloadedOnlyMode = downloadOnly,
+                                incognitoMode = incognito,
+                                indexing = indexing,
+                                modifier = Modifier.windowInsetsPadding(scaffoldInsets),
+                            )
+                        },
+                        contentWindowInsets = scaffoldInsets,
+                    ) { contentPadding ->
+                        // Consume insets already used by app state banners
+                        Box {
+                            // Shows current screen
+                            DefaultNavigatorScreenTransition(
+                                navigator = navigator,
+                                modifier = Modifier
+                                    .padding(contentPadding)
+                                    .consumeWindowInsets(contentPadding),
+                            )
+
+                            // Draw navigation bar scrim when needed
+                            if (remember { isNavigationBarNeedsScrim() }) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                                        .alpha(0.8f)
+                                        .background(MaterialTheme.colorScheme.surfaceContainer),
+                                )
                             }
                         }
-                        .launchIn(this)
+                    }
+
+                    // Pop source-related screens when incognito mode is turned off
+                    LaunchedEffect(Unit) {
+                        preferences.incognitoMode().changes()
+                            .drop(1)
+                            .filter { !it }
+                            .onEach {
+                                val currentScreen = navigator.lastItem
+                                if (currentScreen is BrowseSourceScreen ||
+                                    (currentScreen is MangaScreen && currentScreen.fromSource)
+                                ) {
+                                    navigator.popUntilRoot()
+                                }
+                            }
+                            .launchIn(this)
+                    }
+
+                    HandleOnNewIntent(context = context, navigator = navigator)
+
+                    CheckForUpdates()
+                    ShowOnboarding()
                 }
 
-                HandleOnNewIntent(context = context, navigator = navigator)
-
-                CheckForUpdates()
-                ShowOnboarding()
-            }
-
-            var showChangelog by remember { mutableStateOf(didMigration == true && !BuildConfig.DEBUG) }
-            if (showChangelog) {
-                AlertDialog(
-                    onDismissRequest = { showChangelog = false },
-                    title = { Text(text = stringResource(MR.strings.updated_version, BuildConfig.VERSION_NAME)) },
-                    dismissButton = {
-                        TextButton(onClick = { openInBrowser(RELEASE_URL) }) {
-                            Text(text = stringResource(MR.strings.whats_new))
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showChangelog = false }) {
-                            Text(text = stringResource(MR.strings.action_ok))
-                        }
-                    },
-                )
+                var showChangelog by remember { mutableStateOf(didMigration == true && !BuildConfig.DEBUG) }
+                if (showChangelog) {
+                    AlertDialog(
+                        onDismissRequest = { showChangelog = false },
+                        title = { Text(text = stringResource(MR.strings.updated_version, BuildConfig.VERSION_NAME)) },
+                        dismissButton = {
+                            TextButton(onClick = { openInBrowser(RELEASE_URL) }) {
+                                Text(text = stringResource(MR.strings.whats_new))
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showChangelog = false }) {
+                                Text(text = stringResource(MR.strings.action_ok))
+                            }
+                        },
+                    )
+                }
             }
         }
 

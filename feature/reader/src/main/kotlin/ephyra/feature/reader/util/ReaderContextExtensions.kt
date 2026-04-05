@@ -3,11 +3,11 @@ package ephyra.feature.reader.util
 import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.view.ContextThemeWrapper
+import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.ThemeMode
-import ephyra.presentation.core.ui.delegate.ThemingDelegate
-import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.presentation.core.R
+import ephyra.presentation.core.ui.delegate.ThemingDelegate
 import ephyra.presentation.core.util.system.isNightMode
 import kotlinx.coroutines.runBlocking
 
@@ -36,7 +36,12 @@ fun Context.createReaderThemeContext(
 
         val wrappedContext = ContextThemeWrapper(this, R.style.Theme_Tachiyomi)
         wrappedContext.applyOverrideConfiguration(overrideConf)
-        ThemingDelegate.getThemeResIds(runBlocking { preferences.appTheme().get() }, runBlocking { preferences.themeDarkAmoled().get() })
+        ThemingDelegate.getThemeResIds(
+            runBlocking {
+                preferences.appTheme().get()
+            },
+            runBlocking { preferences.themeDarkAmoled().get() },
+        )
             .forEach { wrappedContext.theme.applyStyle(it, true) }
         return wrappedContext
     }

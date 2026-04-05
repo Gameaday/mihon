@@ -7,20 +7,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 import androidx.core.graphics.alpha
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
+import ephyra.core.common.preference.getAndSet
 import ephyra.domain.reader.service.ReaderPreferences.Companion.ColorFilterMode
 import ephyra.feature.reader.setting.ReaderSettingsScreenModel
-import ephyra.core.common.preference.getAndSet
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.CheckboxItem
 import ephyra.presentation.core.components.SettingsChipRow
 import ephyra.presentation.core.components.SliderItem
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun ColumnScope.ColorFilterPage(screenModel: ReaderSettingsScreenModel) {

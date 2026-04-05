@@ -43,9 +43,9 @@ import coil3.imageLoader
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.size.Size
-import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.domain.manga.model.Manga
 import ephyra.feature.manga.presentation.EditCoverAction
+import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions

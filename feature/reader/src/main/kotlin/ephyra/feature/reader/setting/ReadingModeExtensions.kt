@@ -1,6 +1,5 @@
 package ephyra.feature.reader.setting
 
-import ephyra.presentation.core.R
 import ephyra.domain.reader.model.ReadingMode
 import ephyra.feature.reader.ReaderActivity
 import ephyra.feature.reader.viewer.Viewer
@@ -8,6 +7,7 @@ import ephyra.feature.reader.viewer.pager.L2RPagerViewer
 import ephyra.feature.reader.viewer.pager.R2LPagerViewer
 import ephyra.feature.reader.viewer.pager.VerticalPagerViewer
 import ephyra.feature.reader.viewer.webtoon.WebtoonViewer
+import ephyra.presentation.core.R
 import org.koin.android.ext.android.get
 
 val ReadingMode.iconRes: Int

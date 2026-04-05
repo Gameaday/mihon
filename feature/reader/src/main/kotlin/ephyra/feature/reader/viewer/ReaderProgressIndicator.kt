@@ -15,8 +15,8 @@ import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import ephyra.presentation.theme.TachiyomiTheme
 import ephyra.presentation.core.components.CombinedCircularProgressIndicator
+import ephyra.presentation.theme.TachiyomiTheme
 
 /**
  * A wrapper for [CircularProgressIndicator] that always rotates.

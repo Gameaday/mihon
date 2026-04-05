@@ -10,17 +10,20 @@ import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewpager.widget.ViewPager
-import ephyra.feature.reader.R
+import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.system.ImageUtil
+import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadManager
-import eu.kanade.tachiyomi.source.model.Page
+import ephyra.domain.reader.service.ReaderPreferences
+import ephyra.feature.reader.R
 import ephyra.feature.reader.ReaderActivity
 import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.InsertPage
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.model.ViewerChapters
-import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.feature.reader.viewer.Viewer
 import ephyra.feature.reader.viewer.ViewerNavigation.NavigationRegion
+import eu.kanade.tachiyomi.source.model.Page
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -29,9 +32,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import logcat.LogPriority
 import okio.Buffer
-import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.system.ImageUtil
-import ephyra.core.common.util.system.logcat
 import kotlin.math.min
 
 /**

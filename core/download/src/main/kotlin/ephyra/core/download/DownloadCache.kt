@@ -90,6 +90,7 @@ class DownloadCache(
     private var renewalJob: Job? = null
 
     private val _isInitializing = MutableStateFlow(false)
+
     @OptIn(FlowPreview::class)
     val isInitializing = _isInitializing
         .debounce(1000L) // Don't notify if it finishes quickly enough

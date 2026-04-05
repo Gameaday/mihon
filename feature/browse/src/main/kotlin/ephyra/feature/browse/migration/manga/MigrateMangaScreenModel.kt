@@ -3,8 +3,11 @@ package ephyra.feature.browse.migration.manga
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
-import org.koin.core.annotation.InjectedParam
+import ephyra.core.common.util.system.logcat
+import ephyra.core.common.utils.mutate
+import ephyra.domain.manga.interactor.GetFavorites
+import ephyra.domain.manga.model.Manga
+import ephyra.domain.source.service.SourceManager
 import eu.kanade.tachiyomi.source.Source
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -18,11 +21,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority
-import ephyra.core.common.utils.mutate
-import ephyra.core.common.util.system.logcat
-import ephyra.domain.manga.interactor.GetFavorites
-import ephyra.domain.manga.model.Manga
-import ephyra.domain.source.service.SourceManager
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.InjectedParam
 
 @Factory
 class MigrateMangaScreenModel(

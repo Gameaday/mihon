@@ -15,11 +15,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.core.components.AdaptiveSheet
-import eu.kanade.tachiyomi.source.model.Filter
-import eu.kanade.tachiyomi.source.model.FilterList
 import ephyra.core.common.preference.TriState
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.AdaptiveSheet
 import ephyra.presentation.core.components.CheckboxItem
 import ephyra.presentation.core.components.CollapsibleBox
 import ephyra.presentation.core.components.HeadingItem
@@ -29,6 +27,8 @@ import ephyra.presentation.core.components.TextItem
 import ephyra.presentation.core.components.TriStateItem
 import ephyra.presentation.core.components.material.Button
 import ephyra.presentation.core.i18n.stringResource
+import eu.kanade.tachiyomi.source.model.Filter
+import eu.kanade.tachiyomi.source.model.FilterList
 
 @Composable
 fun SourceFilterDialog(

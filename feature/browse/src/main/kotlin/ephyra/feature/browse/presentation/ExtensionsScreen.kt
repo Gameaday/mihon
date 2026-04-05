@@ -43,22 +43,17 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.StringResource
-import ephyra.feature.browse.presentation.components.BaseBrowseItem
-import ephyra.feature.browse.presentation.components.ExtensionIcon
-import ephyra.presentation.core.components.WarningBanner
-import ephyra.presentation.manga.components.DotSeparatorNoSpaceText
-import ephyra.feature.settings.screen.browse.ExtensionReposScreen
-import ephyra.presentation.core.util.animateItemFastScroll
-import ephyra.presentation.core.util.rememberRequestPackageInstallsPermissionState
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.extension.model.Extension
 import ephyra.domain.extension.model.InstallStep
 import ephyra.feature.browse.extension.ExtensionUiModel
 import ephyra.feature.browse.extension.ExtensionsScreenModel
-import ephyra.core.common.util.system.LocaleHelper
-import ephyra.presentation.core.util.system.launchRequestPackageInstallsPermission
-import kotlinx.collections.immutable.persistentListOf
+import ephyra.feature.browse.presentation.components.BaseBrowseItem
+import ephyra.feature.browse.presentation.components.ExtensionIcon
+import ephyra.feature.settings.screen.browse.ExtensionReposScreen
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.FastScrollLazyColumn
+import ephyra.presentation.core.components.WarningBanner
 import ephyra.presentation.core.components.material.PullRefresh
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.components.material.topSmallPaddingValues
@@ -67,8 +62,13 @@ import ephyra.presentation.core.screens.EmptyScreen
 import ephyra.presentation.core.screens.EmptyScreenAction
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.theme.header
+import ephyra.presentation.core.util.animateItemFastScroll
 import ephyra.presentation.core.util.plus
+import ephyra.presentation.core.util.rememberRequestPackageInstallsPermissionState
 import ephyra.presentation.core.util.secondaryItemAlpha
+import ephyra.presentation.core.util.system.launchRequestPackageInstallsPermission
+import ephyra.presentation.manga.components.DotSeparatorNoSpaceText
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ExtensionScreen(

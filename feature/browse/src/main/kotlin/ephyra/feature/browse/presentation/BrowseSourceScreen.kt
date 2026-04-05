@@ -16,25 +16,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import ephyra.feature.browse.presentation.components.BrowseSourceComfortableGrid
-import ephyra.feature.browse.presentation.components.BrowseSourceCompactGrid
-import ephyra.feature.browse.presentation.components.BrowseSourceList
-import ephyra.presentation.core.components.AppBar
-import ephyra.presentation.core.util.formattedMessage
-import eu.kanade.tachiyomi.source.Source
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.StateFlow
 import ephyra.core.common.i18n.stringResource
 import ephyra.domain.library.model.LibraryDisplayMode
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.model.StubSource
+import ephyra.feature.browse.presentation.components.BrowseSourceComfortableGrid
+import ephyra.feature.browse.presentation.components.BrowseSourceCompactGrid
+import ephyra.feature.browse.presentation.components.BrowseSourceList
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.EmptyScreen
 import ephyra.presentation.core.screens.EmptyScreenAction
 import ephyra.presentation.core.screens.LoadingScreen
+import ephyra.presentation.core.util.formattedMessage
 import ephyra.source.local.LocalSource
+import eu.kanade.tachiyomi.source.Source
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun BrowseSourceContent(

@@ -89,12 +89,12 @@ import coil3.size.Precision
 import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.model.markdownAnnotatorConfig
 import com.mikepenz.markdown.utils.getUnescapedTextInNode
-import ephyra.presentation.core.R
 import ephyra.domain.manga.model.CanonicalId
 import ephyra.domain.manga.model.LockedField
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.SourceStatus
 import ephyra.i18n.MR
+import ephyra.presentation.core.R
 import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.core.components.material.DISABLED_ALPHA
 import ephyra.presentation.core.components.material.TextButton

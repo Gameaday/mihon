@@ -2,24 +2,24 @@ package ephyra.feature.reader.loader
 
 import android.app.Application
 import android.content.Context
-import ephyra.data.cache.ChapterCache
-import ephyra.core.download.DownloadManager
-import ephyra.core.download.DownloadProvider
-import eu.kanade.tachiyomi.source.Source
-import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.feature.reader.model.ReaderChapter
-import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.archive.archiveReader
 import ephyra.core.archive.epubReader
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.logcat
+import ephyra.core.download.DownloadManager
+import ephyra.core.download.DownloadProvider
+import ephyra.data.cache.ChapterCache
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.model.StubSource
+import ephyra.feature.reader.model.ReaderChapter
 import ephyra.i18n.MR
 import ephyra.source.local.LocalSource
 import ephyra.source.local.io.Format
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.online.HttpSource
 
 /**
  * Loader used to retrieve the [PageLoader] for a given chapter.

@@ -2,6 +2,7 @@ package ephyra.data.track.anilist
 
 import android.net.Uri
 import androidx.core.net.toUri
+import ephyra.core.common.util.lang.withIOContext
 import ephyra.data.database.models.Track
 import ephyra.data.track.anilist.dto.ALAddMangaResult
 import ephyra.data.track.anilist.dto.ALCurrentUserResult
@@ -10,7 +11,6 @@ import ephyra.data.track.anilist.dto.ALOAuth
 import ephyra.data.track.anilist.dto.ALSearchResult
 import ephyra.data.track.anilist.dto.ALUserListMangaQueryResult
 import ephyra.data.track.model.TrackSearch
-import ephyra.core.common.util.lang.withIOContext
 import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.interceptor.rateLimit
@@ -35,7 +35,6 @@ class AnilistApi(
     interceptor: AnilistInterceptor,
     private val json: Json,
 ) {
-
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)

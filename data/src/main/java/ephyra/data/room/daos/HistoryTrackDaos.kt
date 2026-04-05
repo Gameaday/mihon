@@ -18,13 +18,17 @@ interface HistoryDao {
     @Query("SELECT sum(time_read) FROM history")
     suspend fun getTotalReadDuration(): Long
 
-    @Query("SELECT history.* FROM history JOIN chapters ON history.chapter_id = chapters._id WHERE chapters.manga_id = :mangaId")
+    @Query(
+        "SELECT history.* FROM history JOIN chapters ON history.chapter_id = chapters._id WHERE chapters.manga_id = :mangaId",
+    )
     suspend fun getHistoryByMangaId(mangaId: Long): List<HistoryEntity>
 
     @Query("UPDATE history SET last_read = 0, time_read = 0 WHERE _id = :id")
     suspend fun resetHistory(id: Long)
 
-    @Query("UPDATE history SET last_read = 0, time_read = 0 WHERE _id IN (SELECT history._id FROM history JOIN chapters ON history.chapter_id = chapters._id WHERE chapters.manga_id = :mangaId)")
+    @Query(
+        "UPDATE history SET last_read = 0, time_read = 0 WHERE _id IN (SELECT history._id FROM history JOIN chapters ON history.chapter_id = chapters._id WHERE chapters.manga_id = :mangaId)",
+    )
     suspend fun resetHistoryByMangaId(mangaId: Long)
 
     @Query("DELETE FROM history")

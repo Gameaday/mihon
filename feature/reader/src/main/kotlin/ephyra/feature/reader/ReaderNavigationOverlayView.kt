@@ -11,9 +11,9 @@ import android.view.ViewPropertyAnimator
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import androidx.core.view.isVisible
+import ephyra.core.common.i18n.stringResource
 import ephyra.feature.reader.viewer.ViewerNavigation
 import ephyra.feature.reader.viewer.navigation.DisabledNavigation
-import ephyra.core.common.i18n.stringResource
 import kotlin.math.abs
 
 class ReaderNavigationOverlayView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {

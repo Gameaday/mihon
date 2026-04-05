@@ -1,11 +1,11 @@
 package ephyra.feature.settings.screen
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import ephyra.domain.track.service.TrackerManager
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.interactor.TrackerListImporter
 import ephyra.domain.track.service.TrackPreferences
+import ephyra.domain.track.service.TrackerManager
 
 class SettingsTrackingScreenModel(
     val trackPreferences: TrackPreferences,

@@ -66,12 +66,11 @@ import ephyra.feature.reader.viewer.ReaderProgressIndicator
 import ephyra.i18n.MR
 import ephyra.presentation.core.data.coil.TachiyomiImageDecoder
 import ephyra.presentation.core.ui.activity.BaseActivity
-import ephyra.presentation.core.R as CoreR
 import ephyra.presentation.core.util.AppNavigator
-import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.presentation.core.util.collectAsState
-import ephyra.presentation.core.util.system.isNightMode
+import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.presentation.core.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.isNightMode
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast
@@ -99,6 +98,7 @@ import logcat.LogPriority
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.ByteArrayOutputStream
+import ephyra.presentation.core.R as CoreR
 
 @OptIn(FlowPreview::class)
 class ReaderActivity : BaseActivity() {

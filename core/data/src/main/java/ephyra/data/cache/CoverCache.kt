@@ -3,10 +3,10 @@ package ephyra.data.cache
 import android.content.Context
 import ephyra.core.common.util.storage.DiskUtil
 import ephyra.domain.manga.model.Manga
-import ephyra.domain.manga.service.CoverCache as ICoverCache
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import ephyra.domain.manga.service.CoverCache as ICoverCache
 
 /**
  * Class used to create cover cache.

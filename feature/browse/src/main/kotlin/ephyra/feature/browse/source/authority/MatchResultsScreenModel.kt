@@ -2,13 +2,6 @@ package ephyra.feature.browse.source.authority
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
-import ephyra.domain.track.interactor.MatchUnlinkedManga
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.launch
-import logcat.LogPriority
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.manga.model.CanonicalId
@@ -16,6 +9,12 @@ import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.repository.MangaRepository
 import ephyra.domain.track.interactor.MatchUnlinkedManga
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
+import logcat.LogPriority
+import org.koin.core.annotation.Factory
 
 /**
  * Screen model for the authority match results screen.

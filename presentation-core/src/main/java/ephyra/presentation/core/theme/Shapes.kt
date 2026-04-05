@@ -74,4 +74,3 @@ val MaterialTheme.shapeTokens: ShapeTokens
     @Composable
     @ReadOnlyComposable
     get() = ShapeTokens
-

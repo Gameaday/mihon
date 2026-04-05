@@ -12,9 +12,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import ephyra.domain.reader.service.ReaderPreferences
+import ephyra.presentation.core.util.collectAsState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import ephyra.presentation.core.util.collectAsState
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable

@@ -5,25 +5,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.icerock.moko.resources.StringResource
 import ephyra.domain.manga.model.readerOrientation
-import ephyra.presentation.core.components.AdaptiveSheet
-import ephyra.presentation.reader.components.ModeSelectionDialog
-import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.domain.reader.model.ReaderOrientation
-import ephyra.feature.reader.setting.icon
 import ephyra.feature.reader.setting.ReaderSettingsScreenModel
+import ephyra.feature.reader.setting.icon
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.AdaptiveSheet
 import ephyra.presentation.core.components.SettingsIconGrid
 import ephyra.presentation.core.components.material.IconToggleButton
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.reader.components.ModeSelectionDialog
+import ephyra.presentation.theme.TachiyomiPreviewTheme
 
 private val ReaderOrientationsWithoutDefault = ReaderOrientation.entries - ReaderOrientation.DEFAULT
 

@@ -15,13 +15,13 @@ import androidx.core.text.HtmlCompat
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.google.android.material.textview.MaterialTextView
+import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
-import ephyra.presentation.core.util.Screen
-import kotlinx.collections.immutable.persistentListOf
-import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.util.Screen
+import kotlinx.collections.immutable.persistentListOf
 
 class OpenSourceLibraryLicenseScreen(
     private val name: String,

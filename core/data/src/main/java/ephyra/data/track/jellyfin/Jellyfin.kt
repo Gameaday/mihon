@@ -3,16 +3,16 @@ package ephyra.data.track.jellyfin
 import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
-import ephyra.data.database.models.Track as DbTrack
+import ephyra.core.common.util.system.logcat
 import ephyra.data.track.BaseTracker
 import ephyra.data.track.DeletableTracker
-import ephyra.domain.track.service.EnhancedTracker
 import ephyra.data.track.model.TrackSearch
 import ephyra.data.track.model.toDomainTrackSearch
-import ephyra.core.common.util.system.logcat
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
+import ephyra.domain.track.model.Track
+import ephyra.domain.track.service.EnhancedTracker
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper
@@ -26,7 +26,7 @@ import logcat.LogPriority
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import kotlin.time.Duration.Companion.seconds
-import ephyra.domain.track.model.Track
+import ephyra.data.database.models.Track as DbTrack
 
 /**
  * Jellyfin tracker for syncing read progress with a Jellyfin media server.
@@ -40,7 +40,8 @@ class Jellyfin(
     insertTrack: InsertTrack,
     private val libraryPreferences: LibraryPreferences,
     private val json: Json,
-) : BaseTracker(id, "Jellyfin", context, trackPreferences, networkService, addTracks, insertTrack), EnhancedTracker,
+) : BaseTracker(id, "Jellyfin", context, trackPreferences, networkService, addTracks, insertTrack),
+    EnhancedTracker,
     DeletableTracker {
 
     companion object {
@@ -70,7 +71,6 @@ class Jellyfin(
             .build()
 
     val api by lazy { JellyfinApi(id, client, json) }
-
 
     /**
      * Mutex to prevent concurrent sync operations from corrupting read progress.

@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import ephyra.data.updater.AppUpdateChecker
-import ephyra.core.common.util.lang.toDateTimestampString
 import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.lang.toDateTimestampString
+import ephyra.data.updater.AppUpdateChecker
 import ephyra.domain.release.interactor.GetApplicationRelease
 import ephyra.domain.ui.UiPreferences
 import ephyra.presentation.core.ui.AppInfo

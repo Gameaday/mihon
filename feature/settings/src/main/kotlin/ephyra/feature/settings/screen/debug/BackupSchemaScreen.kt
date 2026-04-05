@@ -14,16 +14,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ephyra.data.backup.models.Backup
+import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.components.material.Scaffold
+import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.Screen
-import ephyra.data.backup.models.Backup
 import ephyra.presentation.core.util.system.copyToClipboard
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.protobuf.schema.ProtoBufSchemaGenerator
-import ephyra.i18n.MR
-import ephyra.presentation.core.components.material.Scaffold
-import ephyra.presentation.core.i18n.stringResource
 
 class BackupSchemaScreen : Screen() {
 

@@ -43,29 +43,29 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.koin.koinScreenModel
 import dev.icerock.moko.resources.StringResource
-import ephyra.domain.track.interactor.AddTracks
-import ephyra.domain.track.interactor.MatchUnlinkedJob
-import ephyra.domain.track.model.AutoTrackState
-import ephyra.feature.settings.Preference
+import ephyra.core.common.i18n.stringResource
+import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.lang.withUIContext
 import ephyra.data.track.EnhancedTracker
 import ephyra.data.track.Tracker
 import ephyra.data.track.anilist.AnilistApi
 import ephyra.data.track.bangumi.BangumiApi
 import ephyra.data.track.myanimelist.MyAnimeListApi
 import ephyra.data.track.shikimori.ShikimoriApi
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.MatchUnlinkedJob
+import ephyra.domain.track.model.AutoTrackState
+import ephyra.feature.settings.Preference
+import ephyra.i18n.MR
+import ephyra.presentation.core.components.material.padding
+import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentMap
-import ephyra.core.common.i18n.stringResource
-import ephyra.core.common.util.lang.launchIO
-import ephyra.core.common.util.lang.withUIContext
-import ephyra.i18n.MR
-import ephyra.presentation.core.components.material.padding
-import ephyra.presentation.core.i18n.stringResource
-import cafe.adriel.voyager.koin.koinScreenModel
 
 object SettingsTrackingScreen : SearchableSettings {
 

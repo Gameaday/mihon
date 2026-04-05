@@ -1,8 +1,8 @@
 package ephyra.data.updater
 
 import android.content.Context
-import ephyra.core.data.BuildConfig
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.data.BuildConfig
 import ephyra.domain.release.interactor.GetApplicationRelease
 import ephyra.domain.release.service.AppUpdateNotifier
 

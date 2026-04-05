@@ -9,7 +9,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -17,30 +16,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ephyra.core.common.Constants
 import ephyra.core.util.ifSourcesLoaded
+import ephyra.domain.manga.model.Manga
 import ephyra.feature.browse.presentation.BrowseSourceContent
-import ephyra.presentation.core.components.SearchToolbar
-import ephyra.presentation.core.util.Screen
-import eu.kanade.tachiyomi.source.online.HttpSource
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel
 import ephyra.feature.browse.source.browse.SourceFilterDialog
-import ephyra.presentation.core.ui.BottomNavController
 import ephyra.feature.manga.MangaScreen
-import ephyra.feature.webview.WebViewScreen
-import kotlinx.coroutines.launch
 import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.feature.migration.list.MigrationListScreen
-import ephyra.presentation.core.util.collectAsLazyPagingItems
-import ephyra.core.common.Constants
-import ephyra.domain.manga.model.Manga
+import ephyra.feature.webview.WebViewScreen
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.SearchToolbar
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
+import ephyra.presentation.core.ui.BottomNavController
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.collectAsLazyPagingItems
 import ephyra.source.local.LocalSource
+import eu.kanade.tachiyomi.source.online.HttpSource
+import kotlinx.coroutines.launch
 
 data class MigrateSourceSearchScreen(
     private val currentManga: Manga,

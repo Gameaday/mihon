@@ -1,13 +1,13 @@
 package ephyra.feature.browse.source.globalsearch
 
+import ephyra.domain.extension.service.ExtensionManager
+import ephyra.domain.manga.interactor.GetManga
+import ephyra.domain.manga.interactor.NetworkToLocalManga
+import ephyra.domain.source.service.SourceManager
+import ephyra.domain.source.service.SourcePreferences
 import eu.kanade.tachiyomi.source.CatalogueSource
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
-import ephyra.domain.source.service.SourcePreferences
-import ephyra.domain.source.service.SourceManager
-import ephyra.domain.extension.service.ExtensionManager
-import ephyra.domain.manga.interactor.NetworkToLocalManga
-import ephyra.domain.manga.interactor.GetManga
 
 @Factory
 class GlobalSearchScreenModel(

@@ -12,19 +12,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.fastMap
 import androidx.core.content.ContextCompat
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.feature.category.presentation.visualName
-import ephyra.feature.settings.Preference
-import ephyra.feature.settings.widget.TriStateListDialog
-import ephyra.domain.library.service.LibraryUpdateScheduler
-import ephyra.feature.category.CategoryScreen
-import org.koin.compose.koinInject
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toImmutableMap
-import kotlinx.coroutines.launch
 import ephyra.domain.category.interactor.ResetCategoryFlags
 import ephyra.domain.category.model.Category
 import ephyra.domain.library.service.LibraryPreferences
@@ -37,10 +28,19 @@ import ephyra.domain.library.service.LibraryPreferences.Companion.MANGA_NON_READ
 import ephyra.domain.library.service.LibraryPreferences.Companion.MANGA_OUTSIDE_RELEASE_PERIOD
 import ephyra.domain.library.service.LibraryPreferences.Companion.MARK_DUPLICATE_CHAPTER_READ_EXISTING
 import ephyra.domain.library.service.LibraryPreferences.Companion.MARK_DUPLICATE_CHAPTER_READ_NEW
+import ephyra.domain.library.service.LibraryUpdateScheduler
+import ephyra.feature.category.CategoryScreen
+import ephyra.feature.category.presentation.visualName
+import ephyra.feature.settings.Preference
+import ephyra.feature.settings.widget.TriStateListDialog
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
-import cafe.adriel.voyager.koin.koinScreenModel
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 object SettingsLibraryScreen : SearchableSettings {
 

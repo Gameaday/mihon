@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,9 +49,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.preference.Preference
 import ephyra.core.common.preference.TriState
@@ -63,6 +62,7 @@ import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.theme.header
 import ephyra.presentation.core.util.collectAsState
 import ephyra.presentation.core.util.secondaryItemAlpha
+import kotlinx.coroutines.launch
 
 object SettingsItemsPaddings {
     val Horizontal = 24.dp

@@ -3,20 +3,20 @@ package ephyra.feature.browse.migration.sources
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalUriHandler
-import cafe.adriel.voyager.koin.koinScreenModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ephyra.feature.browse.migration.manga.MigrateMangaScreen
 import ephyra.feature.browse.presentation.MigrateSourceScreen
+import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.TabContent
-import ephyra.feature.browse.migration.manga.MigrateMangaScreen
-import kotlinx.collections.immutable.persistentListOf
-import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun Screen.migrateSourceTab(): TabContent {

@@ -6,19 +6,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ephyra.core.common.i18n.stringResource
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.feature.settings.Preference
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
-import ephyra.presentation.core.util.system.AuthenticatorUtil.authenticate
-import kotlinx.collections.immutable.persistentListOf
-import ephyra.presentation.core.util.collectAsState
-import ephyra.core.common.i18n.stringResource
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
-import cafe.adriel.voyager.koin.koinScreenModel
+import ephyra.presentation.core.util.collectAsState
+import ephyra.presentation.core.util.system.AuthenticatorUtil.authenticate
+import kotlinx.collections.immutable.persistentListOf
 
 object SettingsBrowseScreen : SearchableSettings {
 

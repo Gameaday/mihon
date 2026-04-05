@@ -135,11 +135,10 @@ private fun determineMangaField(manga: Manga): ComicInfo.Manga? {
                 ReadingMode.WEBTOON,
                 ReadingMode.CONTINUOUS_VERTICAL,
                 ReadingMode.VERTICAL,
-                    -> ComicInfo.Manga("Yes")
+                -> ComicInfo.Manga("Yes")
                 // RIGHT_TO_LEFT and DEFAULT both get manga RTL
                 else -> ComicInfo.Manga("YesAndRightToLeft")
             }
         }
     }
 }
-

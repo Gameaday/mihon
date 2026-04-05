@@ -7,17 +7,24 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
-import ephyra.presentation.core.util.formattedMessage
+import ephyra.core.common.i18n.stringResource
+import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.lang.withUIContext
+import ephyra.core.common.util.system.ImageUtil
+import ephyra.core.common.util.system.logcat
 import ephyra.feature.reader.databinding.ReaderErrorBinding
-import eu.kanade.tachiyomi.source.model.Page
 import ephyra.feature.reader.model.InsertPage
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.feature.reader.viewer.ReaderProgressIndicator
-import ephyra.feature.webview.WebViewActivity
 import ephyra.feature.reader.widget.ViewPagerAdapter
-import kotlinx.coroutines.Job
+import ephyra.feature.webview.WebViewActivity
+import ephyra.i18n.MR
+import ephyra.presentation.core.util.formattedMessage
+import eu.kanade.tachiyomi.source.model.Page
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
@@ -28,13 +35,6 @@ import kotlinx.coroutines.supervisorScope
 import logcat.LogPriority
 import okio.Buffer
 import okio.BufferedSource
-import ephyra.core.common.i18n.stringResource
-import ephyra.core.common.util.lang.launchIO
-import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.lang.withUIContext
-import ephyra.core.common.util.system.ImageUtil
-import ephyra.core.common.util.system.logcat
-import ephyra.i18n.MR
 
 /**
  * Intermediate result from the IO context that carries everything the UI

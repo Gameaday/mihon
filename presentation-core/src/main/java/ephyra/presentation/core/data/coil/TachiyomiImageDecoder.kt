@@ -10,11 +10,10 @@ import coil3.decode.ImageSource
 import coil3.fetch.SourceFetchResult
 import coil3.request.Options
 import coil3.request.bitmapConfig
-import okio.BufferedSource
-import ephyra.core.common.util.system.ImageUtil
 import coil3.size.pxOrElse
+import ephyra.core.common.util.system.ImageUtil
+import okio.BufferedSource
 import tachiyomi.decoder.ImageDecoder
-
 
 /**
  * A [Decoder] that uses the native [ImageDecoder] library to decode JXL images,

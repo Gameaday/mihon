@@ -31,7 +31,6 @@ class DelayedTrackingUpdateJob(
             return Result.failure()
         }
 
-
         withIOContext {
             val items = delayedTrackingStore.getItems()
                 .mapNotNull {

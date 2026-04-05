@@ -2,6 +2,7 @@ package ephyra.data.backup.restore.restorers
 
 import android.content.Context
 import android.util.Log
+import ephyra.core.common.preference.PreferenceStore
 import ephyra.data.backup.models.BackupCategory
 import ephyra.data.backup.models.BackupPreference
 import ephyra.data.backup.models.BackupSourcePreferences
@@ -11,7 +12,6 @@ import ephyra.data.backup.models.IntPreferenceValue
 import ephyra.data.backup.models.LongPreferenceValue
 import ephyra.data.backup.models.StringPreferenceValue
 import ephyra.data.backup.models.StringSetPreferenceValue
-import ephyra.core.common.preference.PreferenceStore
 import ephyra.domain.backup.service.BackupPreferences
 import ephyra.domain.backup.service.BackupScheduler
 import ephyra.domain.category.interactor.GetCategories

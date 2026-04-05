@@ -1,11 +1,9 @@
 package ephyra.data.room.daos
 
-import ephyra.data.room.entities.CategoryEntity
-
-import ephyra.data.room.entities.MangaCategoryEntity
-
 import androidx.paging.PagingSource
 import androidx.room.*
+import ephyra.data.room.entities.CategoryEntity
+import ephyra.data.room.entities.MangaCategoryEntity
 import ephyra.data.room.entities.MangaEntity
 import ephyra.data.room.views.LibraryView
 import kotlinx.coroutines.flow.Flow
@@ -95,7 +93,9 @@ interface MangaDao {
     @Query("SELECT source, count(*) as count FROM mangas WHERE favorite = 1 GROUP BY source")
     fun getSourceIdWithFavoriteCount(): Flow<List<SourceWithCountRecord>>
 
-    @Query("SELECT source, count(*) as count FROM mangas WHERE favorite = 0 AND _id IN (SELECT DISTINCT manga_id FROM chapters WHERE read = 1) GROUP BY source")
+    @Query(
+        "SELECT source, count(*) as count FROM mangas WHERE favorite = 0 AND _id IN (SELECT DISTINCT manga_id FROM chapters WHERE read = 1) GROUP BY source",
+    )
     fun getSourceIdsWithNonLibraryManga(): Flow<List<SourceWithCountRecord>>
 
     @Transaction

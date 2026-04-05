@@ -33,17 +33,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ephyra.presentation.theme.TachiyomiPreviewTheme
 import ephyra.data.database.models.toDomainChapter
-import ephyra.feature.reader.model.ChapterTransition
-import ephyra.feature.reader.model.ReaderChapter
-import kotlinx.collections.immutable.persistentMapOf
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.service.calculateChapterGap
+import ephyra.feature.reader.model.ChapterTransition
+import ephyra.feature.reader.model.ReaderChapter
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.secondaryItemAlpha
+import ephyra.presentation.theme.TachiyomiPreviewTheme
+import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun ChapterTransition(

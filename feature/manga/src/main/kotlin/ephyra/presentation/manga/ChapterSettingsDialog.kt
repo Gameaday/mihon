@@ -32,11 +32,11 @@ import ephyra.domain.base.BasePreferences
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.downloadedFilter
 import ephyra.i18n.MR
-import ephyra.presentation.core.components.TabbedDialog
-import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.presentation.core.components.LabeledCheckbox
 import ephyra.presentation.core.components.RadioItem
 import ephyra.presentation.core.components.SortItem
+import ephyra.presentation.core.components.TabbedDialog
+import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.presentation.core.components.TriStateItem
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.theme.active

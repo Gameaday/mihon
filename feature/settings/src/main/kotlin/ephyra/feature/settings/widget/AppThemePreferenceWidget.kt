@@ -43,19 +43,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import ephyra.domain.ui.UiPreferences
-import ephyra.domain.ui.model.AppTheme
-import ephyra.presentation.manga.components.MangaCover
-import ephyra.presentation.theme.TachiyomiTheme
+import ephyra.core.common.preference.InMemoryPreferenceStore
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.isDynamicColorAvailable
-import ephyra.core.common.preference.InMemoryPreferenceStore
+import ephyra.domain.ui.UiPreferences
+import ephyra.domain.ui.model.AppTheme
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
-import ephyra.presentation.core.util.secondaryItemAlpha
 import ephyra.presentation.core.util.LocalUiPreferences
-
+import ephyra.presentation.core.util.secondaryItemAlpha
+import ephyra.presentation.manga.components.MangaCover
+import ephyra.presentation.theme.TachiyomiTheme
 
 @Composable
 fun AppThemePreferenceWidget(

@@ -1,12 +1,12 @@
 package ephyra.feature.reader.viewer
 
+import ephyra.core.common.preference.Preference
 import ephyra.domain.reader.service.ReaderPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
-import ephyra.core.common.preference.Preference
 
 /**
  * Common configuration for all viewers.

@@ -43,15 +43,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import ephyra.presentation.core.components.material.padding
+import ephyra.presentation.core.util.clearFocusOnSoftKeyboardHide
+import ephyra.presentation.core.util.clickableNoIndication
+import ephyra.presentation.core.util.showSoftKeyboard
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import ephyra.presentation.core.components.material.padding
-import ephyra.presentation.core.util.clearFocusOnSoftKeyboardHide
-import ephyra.presentation.core.util.clickableNoIndication
-import ephyra.presentation.core.util.showSoftKeyboard
 import kotlin.math.absoluteValue
 
 @Composable

@@ -5,23 +5,23 @@ import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
-import cafe.adriel.voyager.koin.koinScreenModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.SourceOptionsDialog
 import ephyra.feature.browse.presentation.SourcesScreen
-import ephyra.presentation.core.components.AppBar
-import ephyra.presentation.core.components.TabContent
 import ephyra.feature.browse.source.browse.BrowseSourceScreen
 import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
+import ephyra.i18n.MR
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.TabContent
+import ephyra.presentation.core.i18n.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import ephyra.i18n.MR
-import ephyra.presentation.core.i18n.stringResource
 
 @Composable
 fun Screen.sourcesTab(): TabContent {

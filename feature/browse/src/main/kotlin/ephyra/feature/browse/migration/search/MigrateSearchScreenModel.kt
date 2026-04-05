@@ -1,20 +1,18 @@
 package ephyra.feature.browse.migration.search
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import ephyra.domain.extension.service.ExtensionManager
+import ephyra.domain.manga.interactor.GetManga
+import ephyra.domain.manga.interactor.NetworkToLocalManga
+import ephyra.domain.source.service.SourceManager
 import ephyra.domain.source.service.SourcePreferences
-import eu.kanade.tachiyomi.source.CatalogueSource
 import ephyra.feature.browse.source.globalsearch.SearchItemResult
 import ephyra.feature.browse.source.globalsearch.SearchScreenModel
+import eu.kanade.tachiyomi.source.CatalogueSource
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ephyra.domain.manga.interactor.GetManga
-import ephyra.domain.source.service.SourceManager
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
-import ephyra.domain.extension.service.ExtensionManager
-import ephyra.domain.manga.interactor.NetworkToLocalManga
-import ephyra.domain.manga.interactor.GetManga
-import ephyra.domain.source.service.SourceManager
 
 @Factory
 class MigrateSearchScreenModel(

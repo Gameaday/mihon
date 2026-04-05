@@ -17,11 +17,11 @@ import ephyra.feature.settings.screen.SettingsDataScreen
 import ephyra.feature.settings.screen.SettingsMainScreen
 import ephyra.feature.settings.screen.SettingsTrackingScreen
 import ephyra.feature.settings.screen.about.AboutScreen
+import ephyra.presentation.core.components.TwoPanelBox
 import ephyra.presentation.core.util.DefaultNavigatorScreenTransition
 import ephyra.presentation.core.util.LocalBackPress
 import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.isTabletUi
-import ephyra.presentation.core.components.TwoPanelBox
 
 class SettingsScreen(
     private val destination: Int? = null,

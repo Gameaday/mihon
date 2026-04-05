@@ -11,11 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
+import ephyra.core.download.DownloadManager
+import ephyra.domain.manga.model.Manga
+import ephyra.feature.reader.model.ChapterTransition
 import ephyra.presentation.reader.ChapterTransition
 import ephyra.presentation.theme.TachiyomiTheme
-import ephyra.core.download.DownloadManager
-import ephyra.feature.reader.model.ChapterTransition
-import ephyra.domain.manga.model.Manga
 import ephyra.source.local.isLocal
 
 class ReaderTransitionView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :

@@ -1,9 +1,9 @@
 package ephyra.data.track.kavita
 
-import ephyra.data.database.models.Track
-import ephyra.data.track.model.TrackSearch
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
+import ephyra.data.database.models.Track
+import ephyra.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.awaitSuccess
@@ -22,7 +22,6 @@ class KavitaApi(
     interceptor: KavitaInterceptor,
     private val json: Json,
 ) {
-
 
     private val authClient = client.newBuilder()
         .dns(Dns.SYSTEM)

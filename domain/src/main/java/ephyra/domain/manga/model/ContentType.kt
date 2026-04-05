@@ -46,16 +46,16 @@ enum class ContentType(val value: Int) {
                 "oneshot", "one_shot", "one-shot", "one shot",
                 "doujinshi", "doujin",
                 "oel", // Original English Language manga
-                    -> MANGA
+                -> MANGA
 
                 // Novel variants
                 "novel", "light novel", "light_novel",
                 "web novel", "web_novel",
-                    -> NOVEL
+                -> NOVEL
 
                 // Book variants
                 "artbook", "art book", "art_book",
-                    -> BOOK
+                -> BOOK
 
                 else -> UNKNOWN
             }

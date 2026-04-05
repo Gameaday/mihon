@@ -1,11 +1,11 @@
 package ephyra.data.track.anilist.dto
 
+import ephyra.core.common.util.lang.htmlDecode
 import ephyra.data.database.models.Track
-import ephyra.domain.track.service.TrackerManager
 import ephyra.data.track.anilist.Anilist
 import ephyra.data.track.anilist.AnilistApi
 import ephyra.data.track.model.TrackSearch
-import ephyra.core.common.util.lang.htmlDecode
+import ephyra.domain.track.service.TrackerManager
 import java.text.SimpleDateFormat
 import java.util.Locale
 

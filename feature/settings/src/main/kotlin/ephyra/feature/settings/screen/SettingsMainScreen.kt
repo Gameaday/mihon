@@ -33,16 +33,16 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.StringResource
-import ephyra.presentation.core.components.AppBar
-import ephyra.presentation.core.components.AppBarActions
 import ephyra.feature.settings.screen.about.AboutScreen
 import ephyra.feature.settings.widget.TextPreferenceWidget
+import ephyra.i18n.MR
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
+import ephyra.presentation.core.components.material.Scaffold
+import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.LocalBackPress
 import ephyra.presentation.core.util.Screen
 import kotlinx.collections.immutable.persistentListOf
-import ephyra.i18n.MR
-import ephyra.presentation.core.components.material.Scaffold
-import ephyra.presentation.core.i18n.stringResource
 import cafe.adriel.voyager.core.screen.Screen as VoyagerScreen
 
 object SettingsMainScreen : Screen() {

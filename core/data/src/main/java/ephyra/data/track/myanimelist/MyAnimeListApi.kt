@@ -2,6 +2,8 @@ package ephyra.data.track.myanimelist
 
 import android.net.Uri
 import androidx.core.net.toUri
+import ephyra.core.common.util.PkceUtil
+import ephyra.core.common.util.lang.withIOContext
 import ephyra.data.database.models.Track
 import ephyra.data.track.model.TrackSearch
 import ephyra.data.track.myanimelist.dto.MALListItem
@@ -10,8 +12,6 @@ import ephyra.data.track.myanimelist.dto.MALManga
 import ephyra.data.track.myanimelist.dto.MALOAuth
 import ephyra.data.track.myanimelist.dto.MALSearchResult
 import ephyra.data.track.myanimelist.dto.MALUser
-import ephyra.core.common.util.PkceUtil
-import ephyra.core.common.util.lang.withIOContext
 import eu.kanade.tachiyomi.network.DELETE
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.POST
@@ -35,7 +35,6 @@ class MyAnimeListApi(
     interceptor: MyAnimeListInterceptor,
     private val json: Json,
 ) {
-
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)

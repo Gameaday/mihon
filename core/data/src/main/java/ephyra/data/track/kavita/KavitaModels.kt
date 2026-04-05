@@ -1,7 +1,7 @@
 package ephyra.data.track.kavita
 
-import ephyra.domain.track.service.TrackerManager
 import ephyra.data.track.model.TrackSearch
+import ephyra.domain.track.service.TrackerManager
 import kotlinx.serialization.Serializable
 
 @Serializable

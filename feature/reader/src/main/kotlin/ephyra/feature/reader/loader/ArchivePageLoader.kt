@@ -1,10 +1,10 @@
 package ephyra.feature.reader.loader
 
-import eu.kanade.tachiyomi.source.model.Page
-import ephyra.feature.reader.model.ReaderPage
-import ephyra.core.common.util.lang.compareToCaseInsensitiveNaturalOrder
 import ephyra.core.archive.ArchiveReader
+import ephyra.core.common.util.lang.compareToCaseInsensitiveNaturalOrder
 import ephyra.core.common.util.system.ImageUtil
+import ephyra.feature.reader.model.ReaderPage
+import eu.kanade.tachiyomi.source.model.Page
 
 /**
  * Loader used to load a chapter from an archive file.

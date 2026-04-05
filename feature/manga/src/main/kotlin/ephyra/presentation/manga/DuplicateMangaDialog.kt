@@ -65,9 +65,9 @@ import ephyra.feature.settings.LocalPreferenceMinHeight
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AdaptiveSheet
-import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.presentation.core.components.Badge
 import ephyra.presentation.core.components.BadgeGroup
+import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource

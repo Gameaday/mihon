@@ -20,8 +20,8 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import kotlinx.collections.immutable.persistentMapOf
 import ephyra.presentation.core.components.material.BadgeTokens
+import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun BadgeGroup(

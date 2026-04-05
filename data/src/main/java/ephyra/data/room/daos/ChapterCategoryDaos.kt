@@ -1,8 +1,7 @@
 package ephyra.data.room.daos
 
-import ephyra.data.room.entities.CategoryEntity
-
 import androidx.room.*
+import ephyra.data.room.entities.CategoryEntity
 import ephyra.data.room.entities.ChapterEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -71,10 +70,14 @@ interface CategoryDao {
     @Query("SELECT * FROM categories")
     suspend fun getCategories(): List<CategoryEntity>
 
-    @Query("SELECT * FROM categories WHERE _id IN (SELECT category_id FROM mangas_categories WHERE manga_id = :mangaId)")
+    @Query(
+        "SELECT * FROM categories WHERE _id IN (SELECT category_id FROM mangas_categories WHERE manga_id = :mangaId)",
+    )
     fun getCategoriesByMangaIdAsFlow(mangaId: Long): Flow<List<CategoryEntity>>
 
-    @Query("SELECT * FROM categories WHERE _id IN (SELECT category_id FROM mangas_categories WHERE manga_id = :mangaId)")
+    @Query(
+        "SELECT * FROM categories WHERE _id IN (SELECT category_id FROM mangas_categories WHERE manga_id = :mangaId)",
+    )
     suspend fun getCategoriesByMangaId(mangaId: Long): List<CategoryEntity>
 
     @Query("UPDATE categories SET flags = :flags")

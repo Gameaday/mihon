@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ephyra.feature.library.LibraryItem
 import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.manga.model.MangaCover
+import ephyra.feature.library.LibraryItem
 
 @Composable
 internal fun LibraryCompactGrid(

@@ -1,6 +1,7 @@
 package ephyra.data.track.kitsu
 
 import androidx.core.net.toUri
+import ephyra.core.common.util.lang.withIOContext
 import ephyra.data.database.models.Track
 import ephyra.data.track.kitsu.dto.KitsuAddMangaResult
 import ephyra.data.track.kitsu.dto.KitsuAlgoliaSearchResult
@@ -9,7 +10,6 @@ import ephyra.data.track.kitsu.dto.KitsuListSearchResult
 import ephyra.data.track.kitsu.dto.KitsuOAuth
 import ephyra.data.track.kitsu.dto.KitsuSearchResult
 import ephyra.data.track.model.TrackSearch
-import ephyra.core.common.util.lang.withIOContext
 import eu.kanade.tachiyomi.network.DELETE
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.POST
@@ -38,7 +38,6 @@ class KitsuApi(
     interceptor: KitsuInterceptor,
     private val json: Json,
 ) {
-
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)

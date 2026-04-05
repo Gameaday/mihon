@@ -2,8 +2,8 @@ package ephyra.data.backup.restore
 
 import android.content.Context
 import android.net.Uri
+import ephyra.core.common.i18n.stringResource
 import ephyra.data.backup.BackupDecoder
-import ephyra.domain.backup.service.BackupNotifier
 import ephyra.data.backup.models.BackupCategory
 import ephyra.data.backup.models.BackupExtensionRepos
 import ephyra.data.backup.models.BackupManga
@@ -13,7 +13,7 @@ import ephyra.data.backup.restore.restorers.CategoriesRestorer
 import ephyra.data.backup.restore.restorers.ExtensionRepoRestorer
 import ephyra.data.backup.restore.restorers.MangaRestorer
 import ephyra.data.backup.restore.restorers.PreferenceRestorer
-import ephyra.core.common.i18n.stringResource
+import ephyra.domain.backup.service.BackupNotifier
 import ephyra.i18n.MR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope

@@ -1,10 +1,10 @@
 package ephyra.data.track.komga
 
+import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.system.logcat
 import ephyra.core.data.BuildConfig
 import ephyra.data.database.models.Track
 import ephyra.data.track.model.TrackSearch
-import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.system.logcat
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.parseAs
@@ -27,7 +27,6 @@ class KomgaApi(
             .add("User-Agent", "Ephyra v${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})")
             .build()
     }
-
 
     suspend fun getTrackSearch(url: String): TrackSearch =
         withIOContext {
@@ -108,4 +107,3 @@ class KomgaApi(
         private const val READLIST_API = "/api/v1/readlists"
     }
 }
-

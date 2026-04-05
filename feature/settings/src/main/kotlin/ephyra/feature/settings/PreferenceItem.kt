@@ -25,10 +25,10 @@ import ephyra.feature.settings.widget.SwitchPreferenceWidget
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.feature.settings.widget.TitleFontSize
 import ephyra.feature.settings.widget.TrackingPreferenceWidget
-import kotlinx.coroutines.launch
 import ephyra.presentation.core.components.BaseSliderItem
 import ephyra.presentation.core.theme.MotionTokens
 import ephyra.presentation.core.util.collectAsState
+import kotlinx.coroutines.launch
 
 val LocalPreferenceHighlighted = compositionLocalOf(structuralEqualityPolicy()) { false }
 val LocalPreferenceMinHeight = compositionLocalOf(structuralEqualityPolicy()) { 56.dp }

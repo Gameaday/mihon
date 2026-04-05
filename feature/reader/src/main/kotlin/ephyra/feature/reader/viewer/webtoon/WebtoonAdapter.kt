@@ -10,9 +10,9 @@ import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.model.ViewerChapters
+import ephyra.feature.reader.util.createReaderThemeContext
 import ephyra.feature.reader.viewer.ReaderPageImageView
 import ephyra.feature.reader.viewer.calculateChapterGap
-import ephyra.feature.reader.util.createReaderThemeContext
 import org.koin.android.ext.android.getKoin
 
 /**

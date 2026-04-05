@@ -7,18 +7,18 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import ephyra.feature.browse.presentation.components.BaseSourceItem
-import ephyra.presentation.core.components.AppBar
-import ephyra.feature.settings.widget.SwitchPreferenceWidget
-import ephyra.presentation.core.util.animateItemFastScroll
-import ephyra.feature.browse.source.SourcesFilterScreenModel
 import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.source.model.Source
+import ephyra.feature.browse.presentation.components.BaseSourceItem
+import ephyra.feature.browse.source.SourcesFilterScreenModel
+import ephyra.feature.settings.widget.SwitchPreferenceWidget
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.FastScrollLazyColumn
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.EmptyScreen
+import ephyra.presentation.core.util.animateItemFastScroll
 
 @Composable
 fun SourcesFilterScreen(

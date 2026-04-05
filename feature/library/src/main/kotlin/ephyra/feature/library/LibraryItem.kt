@@ -1,9 +1,9 @@
 package ephyra.feature.library
 
-import eu.kanade.tachiyomi.source.getNameForMangaInfo
 import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.source.service.SourceManager
 import ephyra.source.local.LocalSource
+import eu.kanade.tachiyomi.source.getNameForMangaInfo
 
 data class LibraryItem(
     val libraryManga: LibraryManga,

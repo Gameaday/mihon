@@ -2,19 +2,19 @@ package ephyra.feature.browse.source.globalsearch
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.util.ifSourcesLoaded
 import ephyra.feature.browse.presentation.GlobalSearchScreen
-import ephyra.presentation.core.util.Screen
 import ephyra.feature.browse.source.browse.BrowseSourceScreen
 import ephyra.feature.manga.MangaScreen
+import ephyra.presentation.core.util.Screen
 import org.koin.core.parameter.parametersOf
 
 class GlobalSearchScreen(

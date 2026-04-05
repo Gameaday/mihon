@@ -5,13 +5,12 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.fastAny
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import ephyra.data.track.EnhancedTracker
-import ephyra.domain.reader.service.ReaderPreferences
-import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.preference.CheckboxState
 import ephyra.core.common.preference.TriState
 import ephyra.core.common.preference.mapAsCheckboxState
+import ephyra.core.common.util.addOrRemove
+import ephyra.core.common.util.insertSeparators
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.util.lang.withIOContext
@@ -20,10 +19,7 @@ import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadCache
 import ephyra.core.download.DownloadManager
 import ephyra.core.download.model.Download
-import ephyra.presentation.core.util.asState
-import ephyra.core.common.util.addOrRemove
-import ephyra.core.common.util.insertSeparators
-import ephyra.presentation.core.util.manga.removeCovers
+import ephyra.data.track.EnhancedTracker
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.model.Category
 import ephyra.domain.chapter.interactor.GetAvailableScanlators
@@ -38,10 +34,14 @@ import ephyra.domain.manga.model.applyFilter
 import ephyra.domain.manga.model.chaptersFiltered
 import ephyra.domain.manga.model.downloadedFilter
 import ephyra.domain.manga.model.toSManga
+import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.source.service.SourceManager
 import ephyra.feature.manga.presentation.DownloadAction
 import ephyra.feature.manga.presentation.components.ChapterDownloadAction
 import ephyra.i18n.MR
+import ephyra.presentation.core.util.asState
+import ephyra.presentation.core.util.manga.removeCovers
+import ephyra.presentation.core.util.system.toast
 import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.Source
 import kotlinx.collections.immutable.ImmutableList
@@ -215,7 +215,19 @@ class MangaScreenModel(
             val download = queue.find { it.chapter.id == chapter.id }
             ChapterList.Item(
                 chapter = chapter,
-                downloadState = download?.status ?: if (downloadManager.isChapterDownloaded(chapter.name, chapter.scanlator, chapter.url, manga.title, manga.source)) Download.State.DOWNLOADED else Download.State.NOT_DOWNLOADED,
+                downloadState = download?.status ?: if (
+                    downloadManager.isChapterDownloaded(
+                        chapter.name,
+                        chapter.scanlator,
+                        chapter.url,
+                        manga.title,
+                        manga.source,
+                    )
+                ) {
+                    Download.State.DOWNLOADED
+                } else {
+                    Download.State.NOT_DOWNLOADED
+                },
                 downloadProgress = download?.progress ?: 0,
                 selected = chapter.id!! in selectedChapterIds,
             )
@@ -254,8 +266,10 @@ class MangaScreenModel(
             val jellyfinServerUrl: String? = null,
             val imagesInDescription: Boolean = false,
             val isFromSource: Boolean = false,
-            val chapterSwipeStartAction: LibraryPreferences.ChapterSwipeAction = LibraryPreferences.ChapterSwipeAction.ToggleRead,
-            val chapterSwipeEndAction: LibraryPreferences.ChapterSwipeAction = LibraryPreferences.ChapterSwipeAction.ToggleBookmark,
+            val chapterSwipeStartAction: LibraryPreferences.ChapterSwipeAction =
+                LibraryPreferences.ChapterSwipeAction.ToggleRead,
+            val chapterSwipeEndAction: LibraryPreferences.ChapterSwipeAction =
+                LibraryPreferences.ChapterSwipeAction.ToggleBookmark,
             val dialog: Dialog? = null,
         ) : State()
     }

@@ -19,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,19 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.browse.components.SourceIcon
-import ephyra.presentation.core.components.AppBar
-import ephyra.presentation.core.components.AppBarActions
-import ephyra.presentation.core.util.Screen
-import ephyra.presentation.core.util.system.toast
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.lang.toLong
@@ -53,16 +45,24 @@ import ephyra.domain.source.interactor.GetSourcesWithNonLibraryManga
 import ephyra.domain.source.model.Source
 import ephyra.domain.source.model.SourceWithCount
 import ephyra.i18n.MR
+import ephyra.presentation.browse.components.SourceIcon
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.core.components.LazyColumnWithAction
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.EmptyScreen
 import ephyra.presentation.core.screens.LoadingScreen
+import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.selectedBackground
+import ephyra.presentation.core.util.system.toast
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 class ClearDatabaseScreen : Screen() {
 

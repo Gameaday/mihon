@@ -3,7 +3,7 @@ package ephyra.feature.browse.extension
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
+import ephyra.core.common.util.system.logcat
 import ephyra.domain.extension.interactor.GetExtensionLanguages
 import ephyra.domain.source.interactor.ToggleLanguage
 import ephyra.domain.source.service.SourcePreferences
@@ -21,8 +21,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority
-import ephyra.core.common.util.system.logcat
-import ephyra.core.common.util.system.logcat
+import org.koin.core.annotation.Factory
 
 @Factory
 class ExtensionFilterScreenModel(

@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import ephyra.presentation.category.visualName
 import ephyra.domain.category.model.Category
+import ephyra.presentation.category.visualName
 import ephyra.presentation.core.components.material.TabText
 
 @Composable

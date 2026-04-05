@@ -80,4 +80,3 @@ dependencies {
     api(libs.shizuku.api)
     api(androidx.biometricktx)
 }
-

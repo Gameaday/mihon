@@ -23,11 +23,9 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.data.cache.CoverCache
-import ephyra.presentation.core.util.system.toast
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import ephyra.presentation.core.util.ifSourcesLoaded
+import ephyra.data.cache.CoverCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga
@@ -50,11 +48,13 @@ import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.presentation.category.components.ChangeCategoryDialog
 import ephyra.presentation.core.components.NavigatorAdaptiveSheet
 import ephyra.presentation.core.screens.LoadingScreen
-import ephyra.presentation.core.util.system.copyToClipboard
-import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.AssistContentScreen
 import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.presentation.core.util.isTabletUi
+import ephyra.presentation.core.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.toShareIntent
+import ephyra.presentation.core.util.system.toast
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.isLocalOrStub
 import eu.kanade.tachiyomi.source.online.HttpSource
@@ -124,7 +124,9 @@ class MangaScreen(
             onChapterClicked = { openChapter(context, it) },
             onDownloadChapter = if (!successState.source.isLocalOrStub()) {
                 { items, action -> screenModel.onEvent(MangaScreenEvent.RunChapterDownloadActions(items, action)) }
-            } else null,
+            } else {
+                null
+            },
             onAddToLibraryClicked = {
                 screenModel.onEvent(MangaScreenEvent.ToggleFavorite())
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -137,7 +139,9 @@ class MangaScreen(
                         screenModel.source,
                     )
                 }
-            } else null,
+            } else {
+                null
+            },
             onWebViewLongClicked = if (isHttpSource) {
                 {
                     copyMangaUrl(
@@ -146,7 +150,9 @@ class MangaScreen(
                         screenModel.source,
                     )
                 }
-            } else null,
+            } else {
+                null
+            },
             onTrackingClicked = {
                 if (!successState.hasLoggedInTrackers) {
                     navigator.push(SettingsScreen(SettingsScreen.Destination.Tracking))
@@ -162,23 +168,35 @@ class MangaScreen(
             onCoverClicked = { screenModel.onEvent(MangaScreenEvent.ShowCoverDialog) },
             onShareClicked = if (isHttpSource) {
                 { shareManga(context, screenModel.manga, screenModel.source) }
-            } else null,
+            } else {
+                null
+            },
             onDownloadActionClicked = if (!successState.source.isLocalOrStub()) {
                 { screenModel.onEvent(MangaScreenEvent.RunDownloadAction(it)) }
-            } else null,
+            } else {
+                null
+            },
             onEditCategoryClicked = if (successState.manga.favorite) {
                 { screenModel.onEvent(MangaScreenEvent.ShowChangeCategoryDialog) }
-            } else null,
+            } else {
+                null
+            },
             onEditFetchIntervalClicked = if (successState.manga.favorite) {
                 { screenModel.onEvent(MangaScreenEvent.ShowSetFetchIntervalDialog) }
-            } else null,
+            } else {
+                null
+            },
             onMigrateClicked = if (successState.manga.favorite) {
                 { navigator.push(MigrationConfigScreen(successState.manga.id)) }
-            } else null,
+            } else {
+                null
+            },
             onEditNotesClicked = { navigator.push(MangaNotesScreen(manga = successState.manga)) },
             onEditMetadataClicked = if (successState.manga.favorite || successState.manga.canonicalId != null) {
                 { screenModel.onEvent(MangaScreenEvent.ShowEditMetadataDialog) }
-            } else null,
+            } else {
+                null
+            },
             onMultiBookmarkClicked = { ch, b -> screenModel.onEvent(MangaScreenEvent.BookmarkChapters(ch, b)) },
             onMultiMarkAsReadClicked = { ch, b -> screenModel.onEvent(MangaScreenEvent.MarkChaptersRead(ch, b)) },
             onMarkPreviousAsReadClicked = { screenModel.onEvent(MangaScreenEvent.MarkPreviousChapterRead(it)) },

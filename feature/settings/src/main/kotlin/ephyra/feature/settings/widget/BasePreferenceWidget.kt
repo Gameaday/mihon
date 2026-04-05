@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ephyra.feature.settings.LocalPreferenceHighlighted
 import ephyra.feature.settings.LocalPreferenceMinHeight
-import kotlinx.coroutines.delay
 import ephyra.presentation.core.theme.MotionTokens
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 @Composable

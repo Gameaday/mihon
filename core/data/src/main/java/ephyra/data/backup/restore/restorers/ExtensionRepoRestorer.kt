@@ -1,7 +1,7 @@
 package ephyra.data.backup.restore.restorers
 
-import ephyra.data.backup.models.BackupExtensionRepos
 import ephyra.data.DatabaseHandler
+import ephyra.data.backup.models.BackupExtensionRepos
 import ephyra.domain.extensionrepo.interactor.GetExtensionRepo
 
 class ExtensionRepoRestorer(

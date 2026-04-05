@@ -5,19 +5,19 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
-import ephyra.feature.settings.Preference
+import cafe.adriel.voyager.koin.koinScreenModel
 import ephyra.domain.reader.model.ReaderOrientation
-import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.reader.model.ReadingMode
-import ephyra.presentation.core.util.system.hasDisplayCutout
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toImmutableMap
+import ephyra.domain.reader.service.ReaderPreferences
+import ephyra.feature.settings.Preference
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import cafe.adriel.voyager.koin.koinScreenModel
+import ephyra.presentation.core.util.system.hasDisplayCutout
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
 import java.text.NumberFormat
 
 object SettingsReaderScreen : SearchableSettings {

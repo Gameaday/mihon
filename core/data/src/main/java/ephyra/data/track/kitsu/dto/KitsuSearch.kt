@@ -1,8 +1,8 @@
 package ephyra.data.track.kitsu.dto
 
-import ephyra.domain.track.service.TrackerManager
 import ephyra.data.track.kitsu.KitsuApi
 import ephyra.data.track.model.TrackSearch
+import ephyra.domain.track.service.TrackerManager
 import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date

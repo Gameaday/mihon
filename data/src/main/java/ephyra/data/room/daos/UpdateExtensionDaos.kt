@@ -1,9 +1,9 @@
 package ephyra.data.room.daos
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 import ephyra.data.room.entities.ExtensionRepoEntity
 import ephyra.data.room.views.UpdatesView
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UpdateDao {

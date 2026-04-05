@@ -2,25 +2,25 @@ package ephyra.data.track
 
 import android.app.Application
 import androidx.annotation.CallSuper
-import ephyra.data.database.models.Track as DbTrack
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
+import ephyra.core.common.util.system.toast
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
+import ephyra.domain.track.model.Track
+import ephyra.domain.track.model.TrackSearch
 import ephyra.domain.track.model.toDbTrack
 import ephyra.domain.track.model.toDomainTrack
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.domain.track.service.Tracker
-import ephyra.core.common.util.system.toast
 import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.network.NetworkHelper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import logcat.LogPriority
 import okhttp3.OkHttpClient
-import ephyra.domain.track.model.Track
-import ephyra.domain.track.model.TrackSearch
+import ephyra.data.database.models.Track as DbTrack
 
 abstract class BaseTracker(
     override val id: Long,

@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package ephyra.data.track
 
 import android.app.Application
@@ -49,7 +51,8 @@ class TrackerManagerImpl(
     val mangaUpdates = MangaUpdates(7L, context, trackPreferences, networkService, addTracks, insertTrack, json)
     val kavita = Kavita(KAVITA, context, trackPreferences, networkService, addTracks, insertTrack, sourceManager, json)
     val suwayomi = Suwayomi(9L, context, trackPreferences, networkService, addTracks, insertTrack, sourceManager, json)
-    val jellyfin = Jellyfin(JELLYFIN, context, trackPreferences, networkService, addTracks, insertTrack, libraryPreferences, json)
+    val jellyfin =
+        Jellyfin(JELLYFIN, context, trackPreferences, networkService, addTracks, insertTrack, libraryPreferences, json)
 
     val trackers =
         listOf(myAnimeList, aniList, kitsu, shikimori, bangumi, komga, mangaUpdates, kavita, suwayomi, jellyfin)

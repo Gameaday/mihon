@@ -1,7 +1,6 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
 }
 
 android {

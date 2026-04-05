@@ -3,15 +3,15 @@ package ephyra.feature.reader.loader
 import android.app.Application
 import android.net.Uri
 import com.hippo.unifile.UniFile
-import ephyra.data.database.models.toDomainChapter
+import ephyra.core.archive.archiveReader
 import ephyra.core.download.DownloadManager
 import ephyra.core.download.DownloadProvider
-import eu.kanade.tachiyomi.source.Source
-import eu.kanade.tachiyomi.source.model.Page
+import ephyra.data.database.models.toDomainChapter
+import ephyra.domain.manga.model.Manga
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
-import ephyra.core.archive.archiveReader
-import ephyra.domain.manga.model.Manga
+import eu.kanade.tachiyomi.source.Source
+import eu.kanade.tachiyomi.source.model.Page
 
 internal class DownloadPageLoader(
     private val chapter: ReaderChapter,

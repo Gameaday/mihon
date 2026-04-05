@@ -31,9 +31,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.core.R
 import ephyra.core.download.model.Download
 import ephyra.i18n.MR
+import ephyra.presentation.core.R
 import ephyra.presentation.core.components.DropdownMenu
 import ephyra.presentation.core.components.material.IconButtonTokens
 import ephyra.presentation.core.i18n.stringResource

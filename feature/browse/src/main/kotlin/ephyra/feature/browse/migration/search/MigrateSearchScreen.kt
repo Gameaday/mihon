@@ -1,18 +1,18 @@
 package ephyra.feature.browse.migration.search
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.MigrateSearchScreen
-import ephyra.presentation.core.util.Screen
-import org.koin.core.parameter.parametersOf
 import ephyra.feature.browse.source.globalsearch.SearchScreenModel
 import ephyra.feature.manga.MangaScreen
 import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.feature.migration.list.MigrationListScreen
+import ephyra.presentation.core.util.Screen
+import org.koin.core.parameter.parametersOf
 
 class MigrateSearchScreen(private val mangaId: Long) : Screen() {
 

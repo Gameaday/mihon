@@ -12,7 +12,6 @@ class MyAnimeListInterceptor(
     private val json: Json,
 ) : Interceptor {
 
-
     private var oauth: MALOAuth? = myanimelist.loadOAuthSync()
     private val tokenExpired get() = myanimelist.getIfAuthExpiredSync()
 

@@ -1,11 +1,11 @@
 package ephyra.feature.reader.loader
 
-import ephyra.feature.reader.model.ReaderPage
-import kotlinx.coroutines.runBlocking
-import logcat.LogPriority
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.download.service.DownloadPreferences
+import ephyra.feature.reader.model.ReaderPage
+import kotlinx.coroutines.runBlocking
+import logcat.LogPriority
 import java.io.InputStream
 import kotlin.math.abs
 
@@ -77,7 +77,8 @@ class ReaderPagePreProcessor(
                     pageRatios[page.index] = ar
                     allRatios.add(ar)
                 }
-            } catch (_: Exception) { /* skip */
+            } catch (_: Exception) {
+                /* skip */
             }
         }
         val dominantAR = if (allRatios.isNotEmpty()) {

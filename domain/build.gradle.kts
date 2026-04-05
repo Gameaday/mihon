@@ -39,4 +39,3 @@ dependencies {
     testImplementation(kotlinx.coroutines.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
-

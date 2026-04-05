@@ -11,12 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
-import ephyra.presentation.core.R
 import ephyra.domain.reader.model.ReaderOrientation
 import ephyra.domain.reader.model.ReadingMode
 import ephyra.feature.reader.setting.icon
 import ephyra.feature.reader.setting.iconRes
 import ephyra.i18n.MR
+import ephyra.presentation.core.R
 import ephyra.presentation.core.i18n.stringResource
 
 @Composable

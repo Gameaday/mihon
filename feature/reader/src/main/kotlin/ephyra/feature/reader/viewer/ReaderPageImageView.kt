@@ -31,15 +31,15 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.EASE_IN_OUT_QUAD
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.EASE_OUT_QUAD
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE
-import ephyra.domain.base.BasePreferences
+import ephyra.core.common.util.system.ImageUtil
 import ephyra.data.coil.cropBorders
 import ephyra.data.coil.customDecoder
+import ephyra.domain.base.BasePreferences
 import ephyra.feature.reader.viewer.webtoon.WebtoonSubsamplingImageView
 import ephyra.presentation.core.util.system.animatorDurationScale
 import ephyra.presentation.core.util.view.isVisibleOnScreen
-import okio.BufferedSource
-import ephyra.core.common.util.system.ImageUtil
 import kotlinx.coroutines.runBlocking
+import okio.BufferedSource
 import org.koin.core.context.GlobalContext
 
 /**

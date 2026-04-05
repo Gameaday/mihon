@@ -4,11 +4,10 @@ import ephyra.core.common.preference.Preference
 import ephyra.core.common.preference.PreferenceStore
 import ephyra.core.common.preference.TriState
 import ephyra.core.common.preference.getEnum
+import ephyra.core.common.util.system.ImageFormat
 import ephyra.domain.library.model.LibraryDisplayMode
 import ephyra.domain.library.model.LibrarySort
 import ephyra.domain.manga.model.Manga
-
-import ephyra.core.common.util.system.ImageFormat
 
 class LibraryPreferences(
     private val preferenceStore: PreferenceStore,

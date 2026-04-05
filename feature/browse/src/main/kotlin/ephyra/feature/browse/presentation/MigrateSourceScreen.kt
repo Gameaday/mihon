@@ -22,12 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import ephyra.domain.source.interactor.SetMigrateSorting
+import ephyra.domain.source.model.Source
+import ephyra.feature.browse.migration.sources.MigrateSourceScreenModel
 import ephyra.feature.browse.presentation.components.BaseSourceItem
 import ephyra.feature.browse.presentation.components.SourceIcon
-import ephyra.feature.browse.migration.sources.MigrateSourceScreenModel
-import ephyra.presentation.core.util.system.copyToClipboard
-import kotlinx.collections.immutable.ImmutableList
-import ephyra.domain.source.model.Source
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.Badge
 import ephyra.presentation.core.components.BadgeGroup
@@ -41,6 +39,8 @@ import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.theme.header
 import ephyra.presentation.core.util.plus
 import ephyra.presentation.core.util.secondaryItemAlpha
+import ephyra.presentation.core.util.system.copyToClipboard
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun MigrateSourceScreen(

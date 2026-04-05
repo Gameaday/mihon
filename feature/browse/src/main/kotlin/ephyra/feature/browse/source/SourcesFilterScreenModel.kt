@@ -3,17 +3,17 @@ package ephyra.feature.browse.source
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
 import ephyra.domain.source.interactor.GetLanguagesWithSources
 import ephyra.domain.source.interactor.ToggleLanguage
 import ephyra.domain.source.interactor.ToggleSource
+import ephyra.domain.source.model.Source
 import ephyra.domain.source.service.SourcePreferences
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ephyra.domain.source.model.Source
+import org.koin.core.annotation.Factory
 import java.util.SortedMap
 
 @Factory

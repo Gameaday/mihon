@@ -13,23 +13,23 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import ephyra.presentation.core.components.TabbedScreen
-import ephyra.presentation.core.util.Tab
-import ephyra.presentation.core.R
 import ephyra.feature.browse.extension.ExtensionsScreenModel
 import ephyra.feature.browse.extension.extensionsTab
 import ephyra.feature.browse.migration.sources.migrateSourceTab
 import ephyra.feature.browse.source.authority.discoverTab
 import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
 import ephyra.feature.browse.source.sourcesTab
+import ephyra.i18n.MR
+import ephyra.presentation.core.R
+import ephyra.presentation.core.components.TabbedScreen
+import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.ui.AppReadySignal
+import ephyra.presentation.core.util.Tab
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
-import ephyra.i18n.MR
-import ephyra.presentation.core.i18n.stringResource
 
 data object BrowseTab : Tab {
 

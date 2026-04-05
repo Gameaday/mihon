@@ -3,8 +3,8 @@ package ephyra.presentation.core.util
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.state.ToggleableState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ephyra.core.common.preference.CheckboxState
 import ephyra.core.common.preference.Preference
 

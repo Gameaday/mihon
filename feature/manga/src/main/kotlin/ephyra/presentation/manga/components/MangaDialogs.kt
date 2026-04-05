@@ -20,14 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import ephyra.domain.manga.interactor.FetchInterval
-import ephyra.presentation.core.ui.AppInfo
-import org.koin.compose.koinInject
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.WheelTextPicker
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.ui.AppInfo
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.compose.koinInject
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.math.absoluteValue

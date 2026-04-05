@@ -1,10 +1,10 @@
 package ephyra.feature.reader.model
 
-import ephyra.domain.chapter.model.toDbChapter
+import ephyra.core.common.util.system.logcat
 import ephyra.data.database.models.Chapter
+import ephyra.domain.chapter.model.toDbChapter
 import ephyra.feature.reader.loader.PageLoader
 import kotlinx.coroutines.flow.MutableStateFlow
-import ephyra.core.common.util.system.logcat
 
 data class ReaderChapter(val chapter: Chapter) {
 

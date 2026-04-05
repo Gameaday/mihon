@@ -1,8 +1,8 @@
 package ephyra.domain.download.interactor
 
 import ephyra.core.common.util.lang.withNonCancellableContext
-import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.chapter.model.Chapter
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 

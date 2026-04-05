@@ -23,16 +23,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.LocaleListCompat
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.core.components.AppBar
-import ephyra.presentation.core.util.Screen
+import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.LocaleHelper
+import ephyra.i18n.MR
+import ephyra.presentation.core.components.AppBar
+import ephyra.presentation.core.components.material.Scaffold
+import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.util.Screen
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.xmlpull.v1.XmlPullParser
-import ephyra.core.common.i18n.stringResource
-import ephyra.i18n.MR
-import ephyra.presentation.core.components.material.Scaffold
-import ephyra.presentation.core.i18n.stringResource
 
 class AppLanguageScreen : Screen() {
 
@@ -95,7 +95,9 @@ class AppLanguageScreen : Screen() {
 
     private fun getLangs(context: Context): ImmutableList<Language> {
         val langs = mutableListOf<Language>()
-        val parser = context.resources.getXml(context.resources.getIdentifier("locales_config", "xml", context.packageName))
+        val parser = context.resources.getXml(
+            context.resources.getIdentifier("locales_config", "xml", context.packageName),
+        )
         var eventType = parser.eventType
         while (eventType != XmlPullParser.END_DOCUMENT) {
             if (eventType == XmlPullParser.START_TAG && parser.name == "locale") {

@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.feature.reader.setting.ReaderSettingsScreenModel
-import ephyra.presentation.core.util.system.hasDisplayCutout
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.CheckboxItem
 import ephyra.presentation.core.components.SettingsChipRow
@@ -17,6 +16,7 @@ import ephyra.presentation.core.components.SliderItem
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
+import ephyra.presentation.core.util.system.hasDisplayCutout
 
 private val themes = listOf(
     MR.strings.black_background to 1,

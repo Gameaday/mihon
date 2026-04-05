@@ -13,7 +13,6 @@ class KitsuInterceptor(
     private val json: Json,
 ) : Interceptor {
 
-
     /**
      * OAuth object used for authenticated requests.
      */
@@ -52,4 +51,3 @@ class KitsuInterceptor(
         kitsu.saveToken(oauth)
     }
 }
-

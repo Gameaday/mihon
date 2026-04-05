@@ -5,18 +5,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import ephyra.core.common.util.system.LocaleHelper
+import ephyra.domain.manga.model.Manga
 import ephyra.feature.browse.presentation.components.GlobalSearchCardRow
 import ephyra.feature.browse.presentation.components.GlobalSearchErrorResultItem
 import ephyra.feature.browse.presentation.components.GlobalSearchLoadingResultItem
 import ephyra.feature.browse.presentation.components.GlobalSearchResultItem
 import ephyra.feature.browse.presentation.components.GlobalSearchToolbar
-import eu.kanade.tachiyomi.source.CatalogueSource
 import ephyra.feature.browse.source.globalsearch.SearchItemResult
 import ephyra.feature.browse.source.globalsearch.SearchScreenModel
 import ephyra.feature.browse.source.globalsearch.SourceFilter
-import ephyra.core.common.util.system.LocaleHelper
-import ephyra.domain.manga.model.Manga
 import ephyra.presentation.core.components.material.Scaffold
+import eu.kanade.tachiyomi.source.CatalogueSource
 
 @Composable
 fun GlobalSearchScreen(

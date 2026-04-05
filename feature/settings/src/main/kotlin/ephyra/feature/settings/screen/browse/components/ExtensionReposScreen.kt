@@ -12,11 +12,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import ephyra.domain.extensionrepo.model.ExtensionRepo
+import ephyra.feature.settings.screen.browse.RepoScreenState
+import ephyra.i18n.MR
 import ephyra.presentation.category.components.CategoryFloatingActionButton
 import ephyra.presentation.core.components.AppBar
-import ephyra.feature.settings.screen.browse.RepoScreenState
-import ephyra.domain.extensionrepo.model.ExtensionRepo
-import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.components.material.topSmallPaddingValues

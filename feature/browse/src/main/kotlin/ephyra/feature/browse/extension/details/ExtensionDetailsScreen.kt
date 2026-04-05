@@ -2,17 +2,17 @@ package ephyra.feature.browse.extension.details
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.presentation.ExtensionDetailsScreen
+import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.Screen
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.core.parameter.parametersOf
-import ephyra.presentation.core.screens.LoadingScreen
 
 data class ExtensionDetailsScreen(
     private val pkgName: String,

@@ -3,10 +3,13 @@ package ephyra.feature.browse.source
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
+import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.system.logcat
 import ephyra.domain.source.interactor.GetEnabledSources
 import ephyra.domain.source.interactor.ToggleSource
 import ephyra.domain.source.interactor.ToggleSourcePin
+import ephyra.domain.source.model.Pin
+import ephyra.domain.source.model.Source
 import ephyra.feature.browse.presentation.SourceUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -17,10 +20,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import logcat.LogPriority
-import ephyra.core.common.util.lang.launchIO
-import ephyra.core.common.util.system.logcat
-import ephyra.domain.source.model.Pin
-import ephyra.domain.source.model.Source
+import org.koin.core.annotation.Factory
 import java.util.TreeMap
 
 @Factory

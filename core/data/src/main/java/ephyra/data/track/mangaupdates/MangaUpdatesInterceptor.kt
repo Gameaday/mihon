@@ -29,4 +29,3 @@ class MangaUpdatesInterceptor(
         this.token = token
     }
 }
-

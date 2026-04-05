@@ -3,19 +3,19 @@ package ephyra.data.track.bangumi
 import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
-import ephyra.data.database.models.Track as DbTrack
 import ephyra.data.track.BaseTracker
 import ephyra.data.track.bangumi.dto.BGMOAuth
 import ephyra.data.track.model.TrackSearch
 import ephyra.data.track.model.toDomainTrackSearch
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
+import ephyra.domain.track.model.Track
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import ephyra.domain.track.model.Track
+import ephyra.data.database.models.Track as DbTrack
 
 class Bangumi(
     id: Long,
@@ -26,7 +26,6 @@ class Bangumi(
     insertTrack: InsertTrack,
     private val json: Json,
 ) : BaseTracker(id, "Bangumi", context, trackPreferences, networkService, addTracks, insertTrack) {
-
 
     private val interceptor by lazy { BangumiInterceptor(this, json) }
 

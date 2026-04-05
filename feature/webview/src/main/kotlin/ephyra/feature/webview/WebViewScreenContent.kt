@@ -42,11 +42,10 @@ import com.kevinnzou.web.WebContent
 import com.kevinnzou.web.WebView
 import com.kevinnzou.web.WebViewNavigator
 import com.kevinnzou.web.WebViewState
-// 🟢 FIX: Point to the new core utilities
 import ephyra.core.common.util.system.getHtml
 import ephyra.core.common.util.system.setDefaultSettings
 import ephyra.i18n.MR
-import ephyra.presentation.core.R // 🟢 FIX: Import core resources for the drawable
+import ephyra.presentation.core.R
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.core.components.WarningBanner

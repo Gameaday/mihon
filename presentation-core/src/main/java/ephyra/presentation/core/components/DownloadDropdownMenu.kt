@@ -7,11 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.material.DropdownMenu
+import ephyra.presentation.core.components.material.NestedMenuItem
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.manga.DownloadAction
-import ephyra.presentation.core.components.material.DropdownMenu
-import ephyra.presentation.core.components.material.NestedMenuItem
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable

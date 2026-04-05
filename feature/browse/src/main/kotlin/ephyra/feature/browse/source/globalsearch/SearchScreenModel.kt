@@ -5,9 +5,16 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.produceState
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import ephyra.core.common.preference.toggle
+import ephyra.core.common.util.lang.launchIO
+import ephyra.domain.extension.service.ExtensionManager
+import ephyra.domain.manga.interactor.GetManga
+import ephyra.domain.manga.interactor.NetworkToLocalManga
+import ephyra.domain.manga.model.Manga
+import ephyra.domain.manga.model.toDomainManga
+import ephyra.domain.source.service.SourceManager
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.presentation.core.util.ioCoroutineScope
-import ephyra.domain.extension.service.ExtensionManager
 import eu.kanade.tachiyomi.source.CatalogueSource
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.mutate
@@ -23,14 +30,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ephyra.domain.manga.model.toDomainManga
-import ephyra.core.common.preference.toggle
-import ephyra.core.common.util.lang.launchIO
-import ephyra.domain.manga.interactor.GetManga
-import ephyra.domain.manga.interactor.NetworkToLocalManga
-import ephyra.domain.manga.model.Manga
-import ephyra.domain.source.service.SourceManager
-import ephyra.domain.source.service.SourceManager
 
 abstract class SearchScreenModel(
     initialState: State = State(),

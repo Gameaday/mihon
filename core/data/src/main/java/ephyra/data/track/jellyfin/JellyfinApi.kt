@@ -1,7 +1,7 @@
 package ephyra.data.track.jellyfin
 
-import ephyra.data.track.model.TrackSearch
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.parseAs
@@ -23,7 +23,6 @@ class JellyfinApi(
     private val client: OkHttpClient,
     private val json: Json,
 ) {
-
 
     // -- Image URL helpers (Jellyfin-style: quality params for caching) --
 

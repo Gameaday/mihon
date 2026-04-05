@@ -12,23 +12,18 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import ephyra.presentation.core.components.TabbedDialog
-import ephyra.presentation.core.components.TabbedDialogPaddings
-import ephyra.feature.library.LibrarySettingsScreenModel
-import ephyra.presentation.core.ui.AppInfo
-import org.koin.compose.koinInject
-import kotlinx.collections.immutable.persistentListOf
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ephyra.core.common.preference.TriState
 import ephyra.domain.category.model.Category
 import ephyra.domain.library.model.LibraryDisplayMode
 import ephyra.domain.library.model.LibrarySort
 import ephyra.domain.library.model.sort
 import ephyra.domain.library.service.LibraryPreferences
+import ephyra.feature.library.LibrarySettingsScreenModel
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.BaseSortItem
 import ephyra.presentation.core.components.CheckboxItem
@@ -36,9 +31,14 @@ import ephyra.presentation.core.components.HeadingItem
 import ephyra.presentation.core.components.SettingsChipRow
 import ephyra.presentation.core.components.SliderItem
 import ephyra.presentation.core.components.SortItem
+import ephyra.presentation.core.components.TabbedDialog
+import ephyra.presentation.core.components.TabbedDialogPaddings
 import ephyra.presentation.core.components.TriStateItem
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.ui.AppInfo
 import ephyra.presentation.core.util.collectAsState
+import kotlinx.collections.immutable.persistentListOf
+import org.koin.compose.koinInject
 
 @Composable
 fun LibrarySettingsDialog(

@@ -100,7 +100,10 @@ class StatsScreenModel(
             }
     }
 
-    private suspend fun getMangaTrackMap(libraryManga: List<LibraryManga>, loggedInTrackers: List<Tracker>): Map<Long, List<Track>> {
+    private suspend fun getMangaTrackMap(
+        libraryManga: List<LibraryManga>,
+        loggedInTrackers: List<Tracker>,
+    ): Map<Long, List<Track>> {
         val loggedInTrackerIds = loggedInTrackers.mapTo(HashSet()) { it.id }
         return libraryManga.associate { manga ->
             val tracks = getTracks.await(manga.id)

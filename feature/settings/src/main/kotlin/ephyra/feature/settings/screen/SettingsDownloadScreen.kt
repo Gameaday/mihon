@@ -37,30 +37,30 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
 import androidx.core.net.toUri
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.hippo.unifile.UniFile
-import ephyra.domain.track.service.TrackPreferences
-import ephyra.feature.category.presentation.visualName
-import ephyra.feature.settings.Preference
-import ephyra.feature.settings.widget.TriStateListDialog
-import ephyra.domain.track.service.TrackerManager
-import ephyra.presentation.core.util.system.toast
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
-import logcat.LogPriority
 import ephyra.core.common.storage.displayablePath
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.model.Category
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.library.service.LibraryPreferences
+import ephyra.domain.track.service.TrackPreferences
+import ephyra.domain.track.service.TrackerManager
+import ephyra.feature.category.presentation.visualName
+import ephyra.feature.settings.Preference
+import ephyra.feature.settings.widget.TriStateListDialog
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.pluralStringResource
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import cafe.adriel.voyager.koin.koinScreenModel
+import ephyra.presentation.core.util.system.toast
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
+import logcat.LogPriority
 
 object SettingsDownloadScreen : SearchableSettings {
 

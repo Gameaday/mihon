@@ -48,7 +48,7 @@ dependencies {
     implementation(libs.koin.annotations)
 
     implementation(libs.directionalviewpager) // FIX: Resolves ViewPager errors
-    implementation(platform(libs.coil.bom))   // FIX: Resolves Coil errors
+    implementation(platform(libs.coil.bom)) // FIX: Resolves Coil errors
     implementation(libs.bundles.coil)
 
     implementation(libs.subsamplingscaleimageview)

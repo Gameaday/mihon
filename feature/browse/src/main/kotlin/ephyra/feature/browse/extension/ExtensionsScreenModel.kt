@@ -4,17 +4,18 @@ import android.app.Application
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
 import dev.icerock.moko.resources.StringResource
+import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.extension.interactor.GetExtensionsByType
-import ephyra.domain.source.service.SourcePreferences
-import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
-import ephyra.domain.extension.service.ExtensionManager
 import ephyra.domain.extension.model.Extension
 import ephyra.domain.extension.model.InstallStep
+import ephyra.domain.extension.service.ExtensionManager
+import ephyra.domain.source.service.SourcePreferences
+import ephyra.i18n.MR
+import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.core.common.util.system.LocaleHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +30,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ephyra.core.common.util.lang.launchIO
-import ephyra.i18n.MR
+import org.koin.core.annotation.Factory
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.seconds
 

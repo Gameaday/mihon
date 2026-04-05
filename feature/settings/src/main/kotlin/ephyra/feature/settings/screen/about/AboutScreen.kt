@@ -20,27 +20,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.domain.ui.UiPreferences
-import ephyra.presentation.core.components.AppBar
-import ephyra.presentation.more.LogoHeader
-import ephyra.feature.settings.widget.TextPreferenceWidget
-import ephyra.presentation.core.util.LocalBackPress
-import ephyra.presentation.core.util.Screen
-import cafe.adriel.voyager.koin.koinScreenModel
-import ephyra.data.updater.RELEASE_URL
-import ephyra.feature.more.NewUpdateScreen
-import ephyra.presentation.core.util.CrashLogUtil
-import ephyra.presentation.core.util.system.copyToClipboard
-import ephyra.presentation.core.util.system.toast
-import ephyra.presentation.core.ui.AppInfo
-import org.koin.compose.koinInject
-import logcat.LogPriority
 import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.system.logcat
+import ephyra.data.updater.RELEASE_URL
 import ephyra.domain.release.interactor.GetApplicationRelease
+import ephyra.domain.ui.UiPreferences
+import ephyra.feature.more.NewUpdateScreen
+import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.LinkIcon
 import ephyra.presentation.core.components.ScrollbarLazyColumn
 import ephyra.presentation.core.components.material.Scaffold
@@ -48,7 +39,16 @@ import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.icons.CustomIcons
 import ephyra.presentation.core.icons.Discord
 import ephyra.presentation.core.icons.Github
+import ephyra.presentation.core.ui.AppInfo
+import ephyra.presentation.core.util.CrashLogUtil
+import ephyra.presentation.core.util.LocalBackPress
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.toast
+import ephyra.presentation.more.LogoHeader
 import kotlinx.coroutines.flow.collectLatest
+import logcat.LogPriority
+import org.koin.compose.koinInject
 
 object AboutScreen : Screen() {
 

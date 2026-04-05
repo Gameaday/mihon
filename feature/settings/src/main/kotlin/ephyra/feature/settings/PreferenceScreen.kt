@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import ephyra.feature.settings.screen.SearchableSettings
 import ephyra.feature.settings.widget.PreferenceGroupHeader
-import kotlinx.coroutines.delay
 import ephyra.presentation.core.components.ScrollbarLazyColumn
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 /**

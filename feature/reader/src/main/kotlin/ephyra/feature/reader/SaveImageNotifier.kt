@@ -10,15 +10,15 @@ import coil3.asDrawable
 import coil3.imageLoader
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import ephyra.data.notification.Notifications
-import ephyra.presentation.core.R
+import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.cancelNotification
-import ephyra.presentation.core.util.system.getBitmapOrNull
 import ephyra.core.common.util.system.notificationBuilder
 import ephyra.core.common.util.system.notify
-import ephyra.core.common.i18n.stringResource
-import ephyra.presentation.core.util.system.toShareIntent
+import ephyra.data.notification.Notifications
 import ephyra.i18n.MR
+import ephyra.presentation.core.R
+import ephyra.presentation.core.util.system.getBitmapOrNull
+import ephyra.presentation.core.util.system.toShareIntent
 
 /**
  * Class used to show BigPictureStyle notifications

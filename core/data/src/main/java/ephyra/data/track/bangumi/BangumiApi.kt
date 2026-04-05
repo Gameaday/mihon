@@ -2,13 +2,13 @@ package ephyra.data.track.bangumi
 
 import android.net.Uri
 import androidx.core.net.toUri
+import ephyra.core.common.util.lang.withIOContext
 import ephyra.data.database.models.Track
 import ephyra.data.track.bangumi.dto.BGMCollectionResponse
 import ephyra.data.track.bangumi.dto.BGMOAuth
 import ephyra.data.track.bangumi.dto.BGMSearchResult
 import ephyra.data.track.bangumi.dto.BGMUser
 import ephyra.data.track.model.TrackSearch
-import ephyra.core.common.util.lang.withIOContext
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.network.POST
@@ -35,7 +35,6 @@ class BangumiApi(
     interceptor: BangumiInterceptor,
     private val json: Json,
 ) {
-
 
     private val authClient = client.newBuilder()
         .addInterceptor(interceptor)

@@ -7,10 +7,10 @@ import ephyra.core.common.util.lang.toRelativeString
 import ephyra.domain.ui.UiPreferences
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun relativeDateText(

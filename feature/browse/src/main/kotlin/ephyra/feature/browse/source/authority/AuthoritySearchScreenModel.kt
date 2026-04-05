@@ -2,13 +2,23 @@ package ephyra.feature.browse.source.authority
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
-import ephyra.domain.manga.interactor.FindContentSource
-import ephyra.domain.track.interactor.AddTracks
-import ephyra.domain.track.interactor.TrackerListImporter
+import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.system.logcat
 import ephyra.data.track.Tracker
 import ephyra.data.track.TrackerManager
 import ephyra.data.track.model.TrackSearch
+import ephyra.domain.chapter.interactor.GenerateAuthorityChapters
+import ephyra.domain.manga.interactor.FindContentSource
+import ephyra.domain.manga.model.ContentType
+import ephyra.domain.manga.model.Manga
+import ephyra.domain.manga.model.MangaUpdate
+import ephyra.domain.manga.model.MangaWithChapterCount
+import ephyra.domain.manga.model.mergedAlternativeTitles
+import ephyra.domain.manga.repository.MangaRepository
+import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.interactor.InsertTrack
+import ephyra.domain.track.interactor.TrackerListImporter
+import ephyra.domain.track.model.Track
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -16,18 +26,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import logcat.LogPriority
-import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.system.logcat
-import ephyra.domain.chapter.interactor.GenerateAuthorityChapters
-import ephyra.domain.manga.model.ContentType
-import ephyra.domain.manga.model.Manga
-import ephyra.domain.manga.model.MangaUpdate
-import ephyra.domain.manga.model.MangaWithChapterCount
-import ephyra.domain.manga.model.mergedAlternativeTitles
-import ephyra.domain.manga.repository.MangaRepository
-import ephyra.domain.track.interactor.InsertTrack
-import ephyra.domain.track.model.Track
-import ephyra.domain.track.model.Track
+import org.koin.core.annotation.Factory
 
 @Factory
 class AuthoritySearchScreenModel(

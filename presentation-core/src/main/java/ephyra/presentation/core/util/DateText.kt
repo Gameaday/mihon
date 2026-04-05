@@ -19,5 +19,9 @@ fun relativeDateText(date: Long): String {
     }
 
     val context = LocalContext.current
-    return DateUtils.getRelativeTimeSpanString(date, Instant.now().toEpochMilli(), DateUtils.MINUTE_IN_MILLIS).toString()
+    return DateUtils.getRelativeTimeSpanString(
+        date,
+        Instant.now().toEpochMilli(),
+        DateUtils.MINUTE_IN_MILLIS,
+    ).toString()
 }

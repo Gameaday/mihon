@@ -82,4 +82,3 @@ val MaterialTheme.motion: MotionTokens
     @Composable
     @ReadOnlyComposable
     get() = MotionTokens
-

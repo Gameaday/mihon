@@ -10,18 +10,18 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import ephyra.core.common.i18n.stringResource
+import ephyra.core.common.util.system.dpToPx
 import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.viewer.ReaderButton
 import ephyra.feature.reader.viewer.ReaderTransitionView
-import ephyra.core.common.util.system.dpToPx
 import ephyra.feature.reader.widget.ViewPagerAdapter
+import ephyra.i18n.MR
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import ephyra.core.common.i18n.stringResource
-import ephyra.i18n.MR
 
 /**
  * View of the ViewPager that contains a chapter transition.

@@ -3,15 +3,15 @@ package ephyra.data.track.kavita
 import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
-import ephyra.data.database.models.Track as DbTrack
 import ephyra.data.track.BaseTracker
-import ephyra.domain.track.service.EnhancedTracker
 import ephyra.data.track.model.TrackSearch
 import ephyra.data.track.model.toDomainTrackSearch
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
+import ephyra.domain.track.model.Track
+import ephyra.domain.track.service.EnhancedTracker
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper
@@ -20,7 +20,7 @@ import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.sourcePreferences
 import kotlinx.serialization.json.Json
 import java.security.MessageDigest
-import ephyra.domain.track.model.Track
+import ephyra.data.database.models.Track as DbTrack
 
 class Kavita(
     id: Long,
@@ -43,7 +43,6 @@ class Kavita(
 
     private val interceptor by lazy { KavitaInterceptor(this) }
     val api by lazy { KavitaApi(client, interceptor, json) }
-
 
     override fun getLogo(): Int = R.drawable.brand_kavita
 

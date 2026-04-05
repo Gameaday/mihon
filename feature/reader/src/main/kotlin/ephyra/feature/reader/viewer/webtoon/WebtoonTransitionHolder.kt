@@ -9,16 +9,16 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import ephyra.core.common.i18n.stringResource
+import ephyra.core.common.util.system.dpToPx
 import ephyra.feature.reader.model.ChapterTransition
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.viewer.ReaderTransitionView
-import ephyra.core.common.util.system.dpToPx
+import ephyra.i18n.MR
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import ephyra.core.common.i18n.stringResource
-import ephyra.i18n.MR
 
 /**
  * Holder of the webtoon viewer that contains a chapter transition.

@@ -11,6 +11,7 @@ import ephyra.core.common.util.system.WebViewUtil
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.source.service.SourceManager
 import ephyra.i18n.MR
+import ephyra.presentation.core.R
 import ephyra.presentation.core.ui.activity.BaseActivity
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toShareIntent
@@ -22,8 +23,6 @@ import eu.kanade.tachiyomi.source.online.HttpSource
 import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.koin.android.ext.android.inject
-import ephyra.presentation.core.R
-
 
 class WebViewActivity : BaseActivity() {
 

@@ -9,16 +9,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.profileinstaller.ProfileVerifier
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ephyra.core.common.util.system.DeviceUtil
+import ephyra.core.common.util.system.WebViewUtil
 import ephyra.feature.settings.Preference
 import ephyra.feature.settings.PreferenceScaffold
 import ephyra.feature.settings.screen.about.AboutScreen
+import ephyra.i18n.MR
 import ephyra.presentation.core.util.Screen
-import ephyra.core.common.util.system.DeviceUtil
-import ephyra.core.common.util.system.WebViewUtil
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.guava.await
-import ephyra.i18n.MR
 
 class DebugInfoScreen : Screen() {
 
@@ -86,7 +86,7 @@ class DebugInfoScreen : Screen() {
                 ProfileVerifier.CompilationStatus.RESULT_CODE_ERROR_CACHE_FILE_EXISTS_BUT_CANNOT_BE_READ,
                 ProfileVerifier.CompilationStatus.RESULT_CODE_ERROR_CANT_WRITE_PROFILE_VERIFICATION_RESULT_CACHE_FILE,
                 ProfileVerifier.CompilationStatus.RESULT_CODE_ERROR_PACKAGE_NAME_DOES_NOT_EXIST,
-                    -> "Error $result"
+                -> "Error $result"
 
                 ProfileVerifier.CompilationStatus.RESULT_CODE_ERROR_UNSUPPORTED_API_VERSION -> "Not supported"
                 ProfileVerifier.CompilationStatus.RESULT_CODE_PROFILE_ENQUEUED_FOR_COMPILATION -> "Pending compilation"

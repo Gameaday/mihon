@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.coroutines.delay
 import ephyra.domain.extensionrepo.model.ExtensionRepo
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 @Composable

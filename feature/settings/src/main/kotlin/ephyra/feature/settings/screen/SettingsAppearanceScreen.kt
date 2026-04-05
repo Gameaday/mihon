@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.domain.ui.UiPreferences
@@ -18,13 +19,12 @@ import ephyra.feature.settings.Preference
 import ephyra.feature.settings.screen.appearance.AppLanguageScreen
 import ephyra.feature.settings.widget.AppThemeModePreferenceWidget
 import ephyra.feature.settings.widget.AppThemePreferenceWidget
-import ephyra.presentation.core.util.system.toast
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableMap
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.collectAsState
-import cafe.adriel.voyager.koin.koinScreenModel
+import ephyra.presentation.core.util.system.toast
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableMap
 import java.time.LocalDate
 
 object SettingsAppearanceScreen : SearchableSettings {

@@ -2,9 +2,9 @@ package ephyra.feature.settings.screen.browse
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -13,12 +13,12 @@ import ephyra.feature.settings.screen.browse.components.ExtensionRepoConflictDia
 import ephyra.feature.settings.screen.browse.components.ExtensionRepoCreateDialog
 import ephyra.feature.settings.screen.browse.components.ExtensionRepoDeleteDialog
 import ephyra.feature.settings.screen.browse.components.ExtensionReposScreen
+import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.system.openInBrowser
 import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.collectLatest
-import ephyra.presentation.core.screens.LoadingScreen
 
 class ExtensionReposScreen(
     private val url: String? = null,

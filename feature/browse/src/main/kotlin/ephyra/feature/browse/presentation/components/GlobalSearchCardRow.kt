@@ -14,14 +14,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.library.components.CommonMangaItemDefaults
-import ephyra.presentation.library.components.MangaComfortableGridItem
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaCover
 import ephyra.domain.manga.model.asMangaCover
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.library.components.CommonMangaItemDefaults
+import ephyra.presentation.library.components.MangaComfortableGridItem
 
 @Composable
 fun GlobalSearchCardRow(

@@ -10,6 +10,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.AppTheme
+import ephyra.presentation.core.theme.AtollaThemeConfig
+import ephyra.presentation.core.theme.BrandedThemeConfig
+import ephyra.presentation.core.theme.EphyraThemeConfig
+import ephyra.presentation.core.theme.LocalBrandedTheme
+import ephyra.presentation.core.theme.NagareThemeConfig
+import ephyra.presentation.core.theme.toShapes
+import ephyra.presentation.core.util.LocalUiPreferences
+import ephyra.presentation.core.util.collectAsState
 import ephyra.presentation.theme.colorscheme.AtollaColorScheme
 import ephyra.presentation.theme.colorscheme.BaseColorScheme
 import ephyra.presentation.theme.colorscheme.CatppuccinColorScheme
@@ -28,14 +36,6 @@ import ephyra.presentation.theme.colorscheme.TealTurqoiseColorScheme
 import ephyra.presentation.theme.colorscheme.TidalWaveColorScheme
 import ephyra.presentation.theme.colorscheme.YinYangColorScheme
 import ephyra.presentation.theme.colorscheme.YotsubaColorScheme
-import ephyra.presentation.core.theme.AtollaThemeConfig
-import ephyra.presentation.core.theme.BrandedThemeConfig
-import ephyra.presentation.core.theme.EphyraThemeConfig
-import ephyra.presentation.core.theme.LocalBrandedTheme
-import ephyra.presentation.core.theme.NagareThemeConfig
-import ephyra.presentation.core.theme.toShapes
-import ephyra.presentation.core.util.LocalUiPreferences
-import ephyra.presentation.core.util.collectAsState
 
 @Composable
 fun TachiyomiTheme(
@@ -196,4 +196,3 @@ private val colorSchemes: Map<AppTheme, BaseColorScheme> = mapOf(
     AppTheme.NAGARE to NagareColorScheme,
     AppTheme.ATOLLA to AtollaColorScheme,
 )
-

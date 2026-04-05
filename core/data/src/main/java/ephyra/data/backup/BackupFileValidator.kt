@@ -3,9 +3,9 @@ package ephyra.data.backup
 import android.content.Context
 import android.net.Uri
 import ephyra.data.backup.models.Backup
+import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.service.TrackerManager
 import eu.kanade.tachiyomi.source.Source
-import ephyra.domain.source.service.SourceManager
 
 class BackupFileValidator(
     private val context: Context,

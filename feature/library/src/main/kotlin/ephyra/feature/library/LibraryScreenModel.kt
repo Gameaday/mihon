@@ -6,24 +6,51 @@ import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastMap
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import org.koin.core.annotation.Factory
-import ephyra.presentation.core.util.PreferenceMutableState
-import ephyra.presentation.core.util.asState
+import ephyra.core.common.preference.CheckboxState
+import ephyra.core.common.preference.TriState
 import ephyra.core.common.util.fastFilterNot
+import ephyra.core.common.util.lang.compareToWithCollator
+import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.lang.launchNonCancellable
+import ephyra.core.common.utils.mutate
+import ephyra.core.download.DownloadCache
+import ephyra.core.download.util.getNextUnread
+import ephyra.data.cache.CoverCache
 import ephyra.domain.base.BasePreferences
+import ephyra.domain.category.interactor.GetCategories
+import ephyra.domain.category.interactor.SetMangaCategories
+import ephyra.domain.category.model.Category
+import ephyra.domain.chapter.interactor.GetBookmarkedChaptersByMangaId
+import ephyra.domain.chapter.interactor.GetChaptersByMangaId
 import ephyra.domain.chapter.interactor.SetReadStatus
+import ephyra.domain.chapter.model.Chapter
+import ephyra.domain.download.service.DownloadManager
+import ephyra.domain.history.interactor.GetNextChapters
+import ephyra.domain.library.model.LibraryDisplayMode
+import ephyra.domain.library.model.LibraryManga
+import ephyra.domain.library.model.LibrarySort
+import ephyra.domain.library.model.sort
+import ephyra.domain.library.service.LibraryPreferences
+import ephyra.domain.manga.interactor.GetLibraryManga
 import ephyra.domain.manga.interactor.UpdateManga
-import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
+import ephyra.domain.manga.model.ContentType
+import ephyra.domain.manga.model.Manga
+import ephyra.domain.manga.model.MangaUpdate
+import ephyra.domain.manga.model.SourceStatus
+import ephyra.domain.manga.model.applyFilter
+import ephyra.domain.source.service.SourceManager
+import ephyra.domain.track.interactor.GetTracksPerManga
+import ephyra.domain.track.model.Track
+import ephyra.domain.track.service.TrackerManager
 import ephyra.feature.library.presentation.components.LibraryToolbarTitle
 import ephyra.feature.manga.presentation.DownloadAction
-import ephyra.data.cache.CoverCache
-import ephyra.core.download.DownloadCache
-import ephyra.domain.download.service.DownloadManager
-import ephyra.domain.track.service.TrackerManager
+import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
+import ephyra.presentation.core.util.PreferenceMutableState
+import ephyra.presentation.core.util.asState
+import ephyra.presentation.core.util.manga.removeCovers
+import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.online.HttpSource
-import ephyra.core.download.util.getNextUnread
-import ephyra.presentation.core.util.manga.removeCovers
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -40,35 +67,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.runBlocking
-import ephyra.core.common.utils.mutate
-import ephyra.core.common.preference.CheckboxState
-import ephyra.core.common.preference.TriState
-import ephyra.core.common.util.lang.compareToWithCollator
-import ephyra.core.common.util.lang.launchIO
-import ephyra.core.common.util.lang.launchNonCancellable
-import ephyra.domain.category.interactor.GetCategories
-import ephyra.domain.category.interactor.SetMangaCategories
-import ephyra.domain.category.model.Category
-import ephyra.domain.chapter.interactor.GetBookmarkedChaptersByMangaId
-import ephyra.domain.chapter.interactor.GetChaptersByMangaId
-import ephyra.domain.chapter.model.Chapter
-import ephyra.domain.history.interactor.GetNextChapters
-import ephyra.domain.library.model.LibraryDisplayMode
-import ephyra.domain.library.model.LibraryManga
-import ephyra.domain.library.model.LibrarySort
-import ephyra.domain.library.model.sort
-import ephyra.domain.library.service.LibraryPreferences
-import ephyra.domain.manga.interactor.GetLibraryManga
-import ephyra.domain.manga.model.ContentType
-import ephyra.domain.manga.model.Manga
-import ephyra.domain.manga.model.MangaUpdate
-import ephyra.domain.manga.model.SourceStatus
-import ephyra.domain.manga.model.applyFilter
-import ephyra.domain.source.service.SourceManager
-import ephyra.domain.track.interactor.GetTracksPerManga
-import ephyra.domain.track.model.Track
-import ephyra.source.local.isLocal
-import eu.kanade.tachiyomi.source.online.HttpSource
+import org.koin.core.annotation.Factory
 import kotlin.random.Random
 
 @Factory
@@ -555,7 +554,8 @@ class LibraryScreenModel(
             DownloadAction.SYNC_TO_JELLYFIN,
             DownloadAction.SYNC_READ_TO_JELLYFIN,
             DownloadAction.SYNC_ALL_TO_JELLYFIN,
-                -> { /* no-op at library level */
+            -> {
+                /* no-op at library level */
             }
         }
         clearSelection()

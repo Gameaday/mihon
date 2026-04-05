@@ -22,11 +22,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import dev.icerock.moko.resources.StringResource
-import kotlinx.collections.immutable.ImmutableList
 import ephyra.presentation.core.components.ActionButton
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.secondaryItemAlpha
+import kotlinx.collections.immutable.ImmutableList
 import kotlin.random.Random
 
 data class EmptyScreenAction(

@@ -10,11 +10,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.util.htmlReadyLicenseContent
-import ephyra.presentation.core.components.AppBar
-import ephyra.presentation.core.util.Screen
 import ephyra.i18n.MR
+import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
+import ephyra.presentation.core.util.Screen
 
 class OpenSourceLicensesScreen : Screen() {
 
@@ -31,7 +31,9 @@ class OpenSourceLicensesScreen : Screen() {
             },
         ) { contentPadding ->
             val context = LocalContext.current
-            val libraries by produceLibraries(context.resources.getIdentifier("aboutlibraries", "raw", context.packageName))
+            val libraries by produceLibraries(
+                context.resources.getIdentifier("aboutlibraries", "raw", context.packageName),
+            )
             LibrariesContainer(
                 libraries = libraries,
                 modifier = Modifier
