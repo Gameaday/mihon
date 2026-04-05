@@ -426,4 +426,6 @@ fun Manga.isLocal(): Boolean = source == LocalSource.ID
 
 fun Source.isLocal(): Boolean = id == LocalSource.ID
 
+fun Source.isLocalOrStub(): Boolean = isLocal() || this is ephyra.domain.source.model.StubSource
+
 fun DomainSource.isLocal(): Boolean = id == LocalSource.ID

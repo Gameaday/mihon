@@ -45,7 +45,7 @@ import ephyra.feature.manga.presentation.components.SetIntervalDialog
 import ephyra.feature.manga.track.TrackInfoDialogHomeScreen
 import ephyra.feature.migration.config.MigrationConfigScreen
 import ephyra.feature.migration.dialog.MigrateMangaDialog
-import ephyra.presentation.category.components.ChangeCategoryDialog
+import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.presentation.core.components.NavigatorAdaptiveSheet
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.AssistContentScreen
@@ -56,7 +56,7 @@ import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast
 import eu.kanade.tachiyomi.source.Source
-import eu.kanade.tachiyomi.source.isLocalOrStub
+import ephyra.source.local.isLocalOrStub
 import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -154,8 +154,8 @@ class MangaScreen(
                 null
             },
             onTrackingClicked = {
-                if (!successState.hasLoggedInTrackers) {
-                    navigator.push(SettingsScreen(SettingsScreen.Destination.Tracking))
+                if (successState.trackingCount == 0) {
+                    screenModel.onEvent(MangaScreenEvent.ShowTrackDialog)
                 } else {
                     screenModel.onEvent(MangaScreenEvent.ShowTrackDialog)
                 }
