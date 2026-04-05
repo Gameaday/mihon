@@ -119,6 +119,8 @@ class ReaderPreferences(
 
     fun invertedColors() = preferenceStore.getBoolean("pref_inverted_colors", false)
 
+    fun trueColor() = preferenceStore.getBoolean("pref_true_color", false)
+
     // endregion
 
     // region Controls

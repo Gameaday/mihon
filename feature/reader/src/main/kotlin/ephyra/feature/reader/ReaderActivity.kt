@@ -1,6 +1,7 @@
 package ephyra.feature.reader
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.assist.AssistContent
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -231,14 +232,16 @@ class ReaderActivity : BaseActivity() {
             if (currentChapter != null) {
                 val showPageNumber: Boolean by readerPreferences.showPageNumber().collectAsState()
                 if (showPageNumber) {
-                    ReaderPageIndicator(
-                        currentPage = state.currentPage,
-                        totalPages = state.totalPages,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .navigationBarsPadding()
-                            .padding(bottom = 16.dp),
-                    )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        ReaderPageIndicator(
+                            currentPage = state.currentPage,
+                            totalPages = state.totalPages,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .navigationBarsPadding()
+                                .padding(bottom = 16.dp),
+                        )
+                    }
                 }
             }
 
@@ -332,6 +335,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.onActivityFinish()
         super.finish()
         overrideTransitionCompat(
+            Activity.OVERRIDE_TRANSITION_CLOSE,
             CoreR.anim.shared_axis_x_pop_enter,
             CoreR.anim.shared_axis_x_pop_exit,
         )
@@ -417,7 +421,7 @@ class ReaderActivity : BaseActivity() {
             enabledPrevious = state.viewerChapters?.prevChapter != null,
             currentPage = state.currentPage,
             totalPages = state.totalPages,
-            onPageIndexChange = { viewModel.state.value.viewer?.moveToPage(it) },
+            onPageIndexChange = { moveToPageIndex(it) },
 
             readingMode = ReadingMode.fromPreference(viewModel.getMangaReadingMode()),
             onClickReadingMode = { viewModel.openReadingModeSelectDialog() },
@@ -464,7 +468,7 @@ class ReaderActivity : BaseActivity() {
 
     private fun shareChapter() {
         val url = viewModel.getChapterUrl() ?: return
-        startActivity(toShareIntent(url))
+        startActivity(url.toUri().toShareIntent(this, "text/plain"))
     }
 
     private fun showToast(stringRes: StringResource) {
@@ -493,14 +497,17 @@ class ReaderActivity : BaseActivity() {
                 }
             }
         } else {
-            loadingIndicator?.dismiss()
+            loadingIndicator?.hide()
             loadingIndicator = null
         }
     }
 
     private fun moveToPageIndex(index: Int) {
         val viewer = viewModel.state.value.viewer ?: return
-        viewer.moveToPage(index)
+        val pages = viewModel.state.value.viewerChapters?.currChapter?.pages
+            ?.filterNot { it.isHidden } ?: return
+        val page = pages.getOrNull(index) ?: return
+        viewer.moveToPage(page)
     }
 
     fun onPageSelected(page: ReaderPage) {
@@ -528,7 +535,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     fun onShareImageResult(uri: Uri, page: ReaderPage) {
-        startActivity(toShareIntent(uri))
+        startActivity(uri.toShareIntent(this))
     }
 
     fun onCopyImageResult(uri: Uri) {
@@ -546,7 +553,7 @@ class ReaderActivity : BaseActivity() {
         when (result) {
             Success -> toast(MR.strings.cover_updated)
             AddToLibraryFirst -> toast(MR.strings.notification_first_add_to_library)
-            is Error -> toast(result.error.message)
+            Error -> toast(MR.strings.error_saving_cover)
         }
     }
 
@@ -663,7 +670,15 @@ class ReaderActivity : BaseActivity() {
         }
 
         fun setDisplayProfile(data: String) {
-            TachiyomiImageDecoder.displayProfile = data
+            TachiyomiImageDecoder.displayProfile = if (data.isNotEmpty()) {
+                try {
+                    contentResolver.openInputStream(data.toUri())?.readBytes()
+                } catch (_: Exception) {
+                    null
+                }
+            } else {
+                null
+            }
             updateViewer()
         }
 

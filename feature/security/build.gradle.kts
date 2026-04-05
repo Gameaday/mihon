@@ -1,8 +1,6 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-
-    alias(libs.plugins.koin.compiler)
 }
 
 android {
