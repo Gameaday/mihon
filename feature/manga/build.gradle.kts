@@ -25,6 +25,7 @@ dependencies {
     implementation(projects.feature.reader)
     implementation(projects.feature.webview)
     implementation(projects.feature.category)
+    implementation(projects.feature.migration)
 
     // 2. MISSING UI LIBRARIES (Markdown, Swipe, etc.)
     implementation(libs.bundles.markdown)

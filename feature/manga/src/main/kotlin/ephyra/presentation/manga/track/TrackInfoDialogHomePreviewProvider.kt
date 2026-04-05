@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import ephyra.domain.track.model.Track
 import ephyra.feature.manga.track.TrackItem
-import ephyra.test.DummyTracker
+import ephyra.presentation.manga.preview.DummyTracker
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 

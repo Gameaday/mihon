@@ -4,8 +4,6 @@ plugins {
     // Keep KSP for Room database processing
     id("com.google.devtools.ksp")
     alias(libs.plugins.sqldelight)
-    // Add the Koin Native Compiler Plugin to offload Metaspace usage
-    alias(libs.plugins.koin.compiler)
 }
 
 android {

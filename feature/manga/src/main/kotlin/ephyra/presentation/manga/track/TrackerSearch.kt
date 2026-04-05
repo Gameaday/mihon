@@ -82,7 +82,7 @@ import ephyra.presentation.core.util.plus
 import ephyra.presentation.core.util.runOnEnterKeyPressed
 import ephyra.presentation.core.util.secondaryItemAlpha
 import ephyra.presentation.core.util.system.openInBrowser
-import ephyra.presentation.manga.components.MangaCover
+import ephyra.feature.manga.presentation.components.MangaCover
 import ephyra.presentation.theme.TachiyomiPreviewTheme
 import kotlinx.coroutines.launch
 

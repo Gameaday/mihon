@@ -51,7 +51,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.util.lang.toLocalDate
-import ephyra.data.track.Tracker
+import ephyra.domain.track.service.Tracker
 import ephyra.feature.manga.track.TrackItem
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.DropdownMenu

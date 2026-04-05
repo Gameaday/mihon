@@ -1,8 +1,6 @@
 plugins {
     id("ephyra.library")
     id("ephyra.library.compose")
-    // ADD THIS: It tells Gradle this is an Android Kotlin module
-    alias(libs.plugins.koin.compiler)
 }
 
 android {
