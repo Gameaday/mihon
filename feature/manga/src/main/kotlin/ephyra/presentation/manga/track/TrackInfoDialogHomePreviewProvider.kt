@@ -72,7 +72,7 @@ internal class TrackInfoDialogHomePreviewProvider :
 
     private val noTrackers = @Composable {
         TrackInfoDialogHome(
-            trackItems = listOf(),
+            trackItems = listOf<TrackItem>(),
             dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM),
             onStatusClick = {},
             onChapterClick = {},

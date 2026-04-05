@@ -40,7 +40,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import ephyra.feature.manga.notes.MangaNotesScreen
+import ephyra.feature.manga.notes.MangaNotesState
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
@@ -55,7 +55,7 @@ private const val MAX_LENGTH_WARN = MAX_LENGTH * 0.9
 
 @Composable
 fun MangaNotesTextArea(
-    state: MangaNotesScreen.State,
+    state: MangaNotesState,
     onUpdate: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {

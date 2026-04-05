@@ -36,7 +36,7 @@ import ephyra.domain.manga.model.downloadedFilter
 import ephyra.domain.manga.model.toSManga
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.source.service.SourceManager
-import ephyra.feature.manga.presentation.DownloadAction
+import ephyra.presentation.core.util.manga.DownloadAction
 import ephyra.feature.manga.presentation.components.ChapterDownloadAction
 import ephyra.i18n.MR
 import ephyra.presentation.core.util.asState

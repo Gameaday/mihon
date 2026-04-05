@@ -3,7 +3,7 @@ package ephyra.feature.manga
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.model.Manga
-import ephyra.feature.manga.presentation.DownloadAction
+import ephyra.presentation.core.util.manga.DownloadAction
 
 sealed interface MangaScreenEvent {
     data class FetchAllFromSource(val manualFetch: Boolean = false) : MangaScreenEvent

@@ -64,7 +64,7 @@ import kotlin.collections.sortedWith
 
 @Composable
 fun TrackInfoDialogHome(
-    trackItems: List<T>,
+    trackItems: List<TrackItem>,
     dateFormat: DateTimeFormatter,
     canonicalId: String? = null,
     onStatusClick: (TrackItem) -> Unit,

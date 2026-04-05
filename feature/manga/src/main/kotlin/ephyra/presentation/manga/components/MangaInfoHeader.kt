@@ -105,8 +105,6 @@ import ephyra.presentation.core.util.clickableNoIndication
 import ephyra.presentation.core.util.secondaryItemAlpha
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.openInBrowser
-import ephyra.presentation.library.components.authorityBrandColor
-import ephyra.presentation.library.components.authorityBrandGradient
 import eu.kanade.tachiyomi.source.model.SManga
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
@@ -282,7 +280,7 @@ fun ExpandableMangaDescription(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.animateContentSize()) {
-        val (expanded, _) = rememberSaveable {
+        val (expanded, onExpanded) = rememberSaveable {
             mutableStateOf(defaultExpandState)
         }
         val desc =
@@ -840,6 +838,7 @@ private fun MangaSummary(
     description: String,
     notes: String,
     expanded: Boolean,
+    imagesInDescription: Boolean,
     onEditNotesClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -972,4 +971,28 @@ private fun RowScope.MangaActionButton(
             )
         }
     }
+}
+
+private val AUTHORITY_BRAND_COLORS = mapOf(
+    "al" to Color(0xFF02A9FF),
+    "mal" to Color(0xFF2E51A2),
+    "mu" to Color(0xFFFF6740),
+    "jf" to Color(0xFF00A4DC),
+)
+
+private val AUTHORITY_GRADIENT_COLORS = mapOf(
+    "jf" to listOf(Color(0xFFAA5CC3), Color(0xFF00A4DC)),
+)
+
+private fun authorityBrandColor(canonicalId: String?): Color? {
+    if (canonicalId == null) return null
+    val prefix = canonicalId.substringBefore(":", "")
+    return AUTHORITY_BRAND_COLORS[prefix]
+}
+
+private fun authorityBrandGradient(canonicalId: String?): Brush? {
+    if (canonicalId == null) return null
+    val prefix = canonicalId.substringBefore(":", "")
+    val colors = AUTHORITY_GRADIENT_COLORS[prefix] ?: return null
+    return Brush.horizontalGradient(colors)
 }
