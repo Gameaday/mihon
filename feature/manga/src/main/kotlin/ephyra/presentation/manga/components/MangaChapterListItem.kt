@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import ephyra.core.download.model.Download
+import ephyra.domain.download.model.Download
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.DISABLED_ALPHA

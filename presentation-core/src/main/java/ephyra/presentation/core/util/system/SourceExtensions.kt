@@ -12,3 +12,6 @@ fun Source.icon(extensionManager: ExtensionManager): ImageBitmap? {
         ?.toBitmap()
         ?.asImageBitmap()
 }
+
+/** Returns a human-readable name suitable for display next to a manga info label. */
+fun Source.getNameForMangaInfo(): String = toString()

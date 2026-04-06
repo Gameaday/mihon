@@ -46,7 +46,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastMap
-import ephyra.core.download.model.Download
+import ephyra.domain.download.model.Download
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.service.missingChaptersCount
 import ephyra.domain.library.service.LibraryPreferences
@@ -76,7 +76,8 @@ import ephyra.presentation.core.util.formatChapterNumber
 import ephyra.presentation.core.util.shouldExpandFAB
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.source.local.isLocal
-import eu.kanade.tachiyomi.source.getNameForMangaInfo
+import eu.kanade.tachiyomi.source.Source
+import ephyra.presentation.core.util.system.getNameForMangaInfo
 import java.time.Instant
 
 @Composable
