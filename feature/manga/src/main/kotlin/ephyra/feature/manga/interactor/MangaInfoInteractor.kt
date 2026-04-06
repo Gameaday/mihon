@@ -61,6 +61,7 @@ class MangaInfoInteractor(
         networkManga: eu.kanade.tachiyomi.source.model.SManga?,
         manualFetch: Boolean,
     ) {
+        networkManga ?: return
         updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch)
     }
 

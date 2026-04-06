@@ -9,6 +9,7 @@ import ephyra.domain.chapter.interactor.SyncChaptersWithSource
 import ephyra.domain.chapter.interactor.UpdateChapter
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.model.ChapterUpdate
+import ephyra.domain.chapter.model.toSChapter
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.interactor.SetMangaChapterFlags
 import ephyra.domain.manga.model.Manga
@@ -94,7 +95,7 @@ class MangaChapterInteractor(
         manualFetch: Boolean,
     ): List<Chapter> {
         return syncChaptersWithSource.await(
-            chapters,
+            chapters.map { it.toSChapter() },
             manga,
             source,
             manualFetch,
