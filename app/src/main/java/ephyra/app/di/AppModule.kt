@@ -72,6 +72,7 @@ import org.koin.dsl.module
 import ephyra.app.BuildConfig as AppBuildConfig
 import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
 import ephyra.presentation.core.ui.GlobalSearchScreenFactory
+import ephyra.presentation.core.ui.MigrationConfigScreenFactory
 import ephyra.presentation.core.ui.delegate.SecureActivityDelegate as CoreSecureActivityDelegate
 import ephyra.presentation.core.ui.delegate.ThemingDelegate as CoreThemingDelegate
 
@@ -203,6 +204,7 @@ val koinAppModule = module {
 
     single { ImageSaver(androidApplication()) }
     single<GlobalSearchScreenFactory> { GlobalSearchScreenFactory { query -> GlobalSearchScreen(query) } }
+    single<MigrationConfigScreenFactory> { MigrationConfigScreenFactory { mangaId -> MigrationConfigScreen(mangaId) } }
 
     single { AndroidStorageFolderProvider(androidApplication()) }
     single { LocalSourceFileSystem(get()) }

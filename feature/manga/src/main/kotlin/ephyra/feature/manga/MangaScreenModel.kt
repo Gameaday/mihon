@@ -18,8 +18,7 @@ import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadCache
 import ephyra.core.download.DownloadManager
-import ephyra.core.download.model.Download
-import ephyra.data.track.EnhancedTracker
+import ephyra.domain.download.model.Download
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.model.Category
 import ephyra.domain.chapter.interactor.GetAvailableScanlators
@@ -91,6 +90,9 @@ class MangaScreenModel(
     val manga: Manga?
         get() = successState?.manga
 
+    val source: Source?
+        get() = successState?.source
+
     private val skipRead by readerPreferences.skipRead().asState(screenModelScope)
     private val skipFiltered by readerPreferences.skipFiltered().asState(screenModelScope)
     private val skipDupe by readerPreferences.skipDupe().asState(screenModelScope)
@@ -124,8 +126,7 @@ class MangaScreenModel(
                 downloadManager.queueState,
                 libraryPreferences.swipeToEndAction().changes(),
                 libraryPreferences.swipeToStartAction().changes(),
-                mangaTrackInteractor.autoUpdateTrackOnMarkRead().changes(),
-            ) { mangaAndChapters, _, queue, swipeStart, swipeEnd, autoTrack ->
+            ) { mangaAndChapters, _, queue, swipeStart, swipeEnd ->
                 val manga = mangaAndChapters.manga
                 val chapters = mangaAndChapters.chapters
 
@@ -186,10 +187,58 @@ class MangaScreenModel(
             MangaScreenEvent.ShowSettingsDialog -> {
                 mutableState.update { state ->
                     val success = state as? State.Success ?: return@update state
-                    success.copy(dialog = Dialog.Settings)
+                    success.copy(dialog = Dialog.SettingsSheet)
                 }
             }
-            // ...
+            MangaScreenEvent.ShowTrackDialog -> {
+                mutableState.update { state ->
+                    val success = state as? State.Success ?: return@update state
+                    success.copy(dialog = Dialog.TrackSheet)
+                }
+            }
+            MangaScreenEvent.ShowCoverDialog -> {
+                mutableState.update { state ->
+                    val success = state as? State.Success ?: return@update state
+                    success.copy(dialog = Dialog.FullCover)
+                }
+            }
+            MangaScreenEvent.ShowEditMetadataDialog -> {
+                mutableState.update { state ->
+                    val success = state as? State.Success ?: return@update state
+                    success.copy(dialog = Dialog.EditMetadata)
+                }
+            }
+            is MangaScreenEvent.ShowDeleteChapterDialog -> {
+                mutableState.update { state ->
+                    val success = state as? State.Success ?: return@update state
+                    success.copy(dialog = Dialog.DeleteChapters(event.chapters))
+                }
+            }
+            is MangaScreenEvent.ShowMigrateDialog -> {
+                mutableState.update { state ->
+                    val success = state as? State.Success ?: return@update state
+                    success.copy(dialog = Dialog.Migrate(current = success.manga, target = event.duplicate))
+                }
+            }
+            MangaScreenEvent.ShowChangeCategoryDialog -> {
+                screenModelScope.launchIO {
+                    val manga = manga ?: return@launchIO
+                    val categories = getCategories.await()
+                    val selection = categories.map { category ->
+                        CheckboxState.State.None(category) as CheckboxState<Category>
+                    }
+                    mutableState.update { state ->
+                        val success = state as? State.Success ?: return@update state
+                        success.copy(dialog = Dialog.ChangeCategory(manga, selection))
+                    }
+                }
+            }
+            MangaScreenEvent.ShowSetFetchIntervalDialog -> {
+                mutableState.update { state ->
+                    val success = state as? State.Success ?: return@update state
+                    success.copy(dialog = Dialog.SetFetchInterval(success.manga))
+                }
+            }
             else -> {}
         }
     }
@@ -259,8 +308,10 @@ class MangaScreenModel(
             val chapterListItems: List<ChapterList> = emptyList(),
             val isAnySelected: Boolean = false,
             val filterActive: Boolean = false,
+            val scanlatorFilterActive: Boolean = false,
             val isRefreshingData: Boolean = false,
             val isJellyfinLinked: Boolean = false,
+            val isUpdateIntervalEnabled: Boolean = false,
             val trackingCount: Int = 0,
             val metadataSourceName: String? = null,
             val jellyfinServerUrl: String? = null,
@@ -275,12 +326,18 @@ class MangaScreenModel(
     }
 
     sealed interface Dialog {
-        data object Settings : Dialog
-        data object Track : Dialog
-        data object Cover : Dialog
+        data object SettingsSheet : Dialog
+        data object TrackSheet : Dialog
+        data object FullCover : Dialog
         data object EditMetadata : Dialog
+        data class ChangeCategory(
+            val manga: Manga,
+            val initialSelection: List<CheckboxState<Category>>,
+        ) : Dialog
+        data class DuplicateManga(val duplicates: List<Manga>) : Dialog
         data class DeleteChapters(val chapters: List<Chapter>) : Dialog
-        data class Migrate(val duplicate: Manga) : Dialog
+        data class Migrate(val current: Manga, val target: Manga) : Dialog
+        data class SetFetchInterval(val manga: Manga) : Dialog
     }
 }
 

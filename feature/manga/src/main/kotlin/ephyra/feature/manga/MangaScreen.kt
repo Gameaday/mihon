@@ -45,8 +45,8 @@ import ephyra.feature.manga.presentation.components.MangaCoverDialog
 import ephyra.feature.manga.presentation.components.ScanlatorFilterDialog
 import ephyra.feature.manga.presentation.components.SetIntervalDialog
 import ephyra.feature.manga.track.TrackInfoDialogHomeScreen
-import ephyra.feature.migration.config.MigrationConfigScreen
 import ephyra.feature.migration.dialog.MigrateMangaDialog
+import ephyra.presentation.core.ui.MigrationConfigScreenFactory
 import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.feature.reader.ReaderActivity
 import ephyra.feature.webview.WebViewScreen
@@ -92,6 +92,7 @@ class MangaScreen(
         val basePreferences = koinInject<BasePreferences>()
         val coverCache = koinInject<CoverCache>()
         val globalSearchScreenFactory = koinInject<ephyra.presentation.core.ui.GlobalSearchScreenFactory>()
+        val migrationConfigScreenFactory = koinInject<MigrationConfigScreenFactory>()
 
         val screenModel = koinScreenModel<MangaScreenModel> {
             parametersOf(lifecycleOwner.lifecycle, mangaId, fromSource)
@@ -193,7 +194,7 @@ class MangaScreen(
                 null
             },
             onMigrateClicked = if (successState.manga.favorite) {
-                { navigator.push(MigrationConfigScreen(successState.manga.id)) }
+                { navigator.push(migrationConfigScreenFactory.create(successState.manga.id)) }
             } else {
                 null
             },
