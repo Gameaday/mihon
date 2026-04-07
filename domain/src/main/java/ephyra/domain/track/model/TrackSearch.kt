@@ -17,5 +17,10 @@ data class TrackSearch(
     val alternative_titles: List<String> = emptyList(),
     val genres: List<String> = emptyList(),
     val total_chapters: Long = 0,
+    val last_chapter_read: Double = 0.0,
+    val status: Long = 0L,
+    val score: Double = 0.0,
+    val started_reading_date: Long = 0L,
+    val finished_reading_date: Long = 0L,
     var private: Boolean = false,
 ) : Serializable

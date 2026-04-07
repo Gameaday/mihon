@@ -338,7 +338,7 @@ class AuthoritySearchScreenModel(
         )
 
         // Bind the tracker only if user is logged in
-        if (tracker.isLoggedIn) {
+        if (runBlocking { tracker.isLoggedIn() }) {
             val track = Track(
                 id = 0L,
                 mangaId = manga.id,

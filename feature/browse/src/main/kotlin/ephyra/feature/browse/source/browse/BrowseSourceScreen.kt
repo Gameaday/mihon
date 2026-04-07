@@ -60,7 +60,7 @@ import ephyra.presentation.core.util.AssistContentScreen
 import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.collectAsLazyPagingItems
 import ephyra.presentation.core.ui.SearchableScreen
-import ephyra.presentation.manga.DuplicateMangaDialog
+import ephyra.feature.manga.presentation.DuplicateMangaDialog
 import ephyra.source.local.LocalSource
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.online.HttpSource

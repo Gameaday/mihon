@@ -92,15 +92,19 @@ fun MangaCompactGridItem(
                             .fillMaxWidth()
                             .align(Alignment.BottomCenter),
                     )
-                    MangaGridItemTitle(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .weight(1f)
-                            .padding(8.dp),
-                        title = title,
-                        style = MaterialTheme.typography.titleSmall.copy(color = Color.White),
-                        minLines = 1,
-                    )
+                    Row(
+                        modifier = Modifier.align(Alignment.BottomStart),
+                        verticalAlignment = Alignment.Bottom,
+                    ) {
+                        MangaGridItemTitle(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp),
+                            title = title,
+                            style = MaterialTheme.typography.titleSmall.copy(color = Color.White),
+                            minLines = 1,
+                        )
+                    }
                 }
             },
         )
