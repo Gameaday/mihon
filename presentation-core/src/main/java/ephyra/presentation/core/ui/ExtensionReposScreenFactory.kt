@@ -12,9 +12,9 @@ import cafe.adriel.voyager.core.screen.Screen
  * Usage:
  * ```kotlin
  * val extensionReposFactory = koinInject<ExtensionReposScreenFactory>()
- * navigator.push(extensionReposFactory.create())
+ * navigator.push(extensionReposFactory.create(null))
  * ```
  */
 fun interface ExtensionReposScreenFactory {
-    fun create(url: String? = null): Screen
+    fun create(url: String?): Screen
 }

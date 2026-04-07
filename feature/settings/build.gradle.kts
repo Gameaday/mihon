@@ -26,4 +26,7 @@ dependencies {
     api(libs.bundles.voyager)
     api(libs.koin.core)
     implementation(libs.koin.android)
+
+    implementation(androidx.profileinstaller)
+    implementation(kotlinx.coroutines.guava)
 }

@@ -48,7 +48,7 @@ fun extensionsTab(
             ),
             AppBar.OverflowAction(
                 title = stringResource(MR.strings.label_extension_repos),
-                onClick = { navigator.push(extensionReposFactory.create()) },
+                onClick = { navigator.push(extensionReposFactory.create(null)) },
             ),
         ),
         content = { contentPadding, _ ->
