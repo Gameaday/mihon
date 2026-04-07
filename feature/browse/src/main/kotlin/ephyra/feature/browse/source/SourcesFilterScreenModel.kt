@@ -51,11 +51,11 @@ class SourcesFilterScreenModel(
     }
 
     fun toggleSource(source: Source) {
-        toggleSource.await(source)
+        screenModelScope.launch { toggleSource.await(source) }
     }
 
     fun toggleLanguage(language: String) {
-        toggleLanguage.await(language)
+        screenModelScope.launch { toggleLanguage.await(language) }
     }
 
     sealed interface State {

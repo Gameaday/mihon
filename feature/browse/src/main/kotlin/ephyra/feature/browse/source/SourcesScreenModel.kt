@@ -79,11 +79,11 @@ class SourcesScreenModel(
     }
 
     fun toggleSource(source: Source) {
-        toggleSource.await(source)
+        screenModelScope.launch { toggleSource.await(source) }
     }
 
     fun togglePin(source: Source) {
-        toggleSourcePin.await(source)
+        screenModelScope.launch { toggleSourcePin.await(source) }
     }
 
     fun showSourceDialog(source: Source) {
