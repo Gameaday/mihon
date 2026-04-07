@@ -681,7 +681,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                 Preference.PreferenceItem.TrackerPreference(
                                     tracker = service,
                                     login = {
-                                        if (service is ephyra.app.data.track.jellyfin.Jellyfin) {
+                                        if (service is ephyra.data.track.jellyfin.Jellyfin) {
                                             dialog = JellyfinLogin(service)
                                         } else {
                                             (service as EnhancedTracker).loginNoop()

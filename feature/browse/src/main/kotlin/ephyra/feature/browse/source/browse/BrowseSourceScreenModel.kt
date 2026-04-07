@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
 import java.time.Instant
@@ -103,7 +104,7 @@ class BrowseSourceScreenModel(
     /**
      * Flow of Pager flow tied to [State.listing]
      */
-    private val hideInLibraryItems = sourcePreferences.hideInLibraryItems().get()
+    private val hideInLibraryItems = runBlocking { sourcePreferences.hideInLibraryItems().get() }
     val mangaPagerFlowFlow = state.map { it.listing }
         .distinctUntilChanged()
         .map { listing ->
@@ -123,11 +124,13 @@ class BrowseSourceScreenModel(
 
     fun getColumnsPreference(orientation: Int): GridCells {
         val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
-        val columns = if (isLandscape) {
-            libraryPreferences.landscapeColumns()
-        } else {
-            libraryPreferences.portraitColumns()
-        }.get()
+        val columns = runBlocking {
+            if (isLandscape) {
+                libraryPreferences.landscapeColumns()
+            } else {
+                libraryPreferences.portraitColumns()
+            }.get()
+        }
         return if (columns == 0) GridCells.Adaptive(128.dp) else GridCells.Fixed(columns)
     }
 

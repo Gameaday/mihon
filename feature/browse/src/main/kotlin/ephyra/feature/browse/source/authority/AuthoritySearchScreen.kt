@@ -140,7 +140,7 @@ fun Screen.discoverTab(): TabContent {
                     onSelectSource = { match ->
                         screenModel.dismissSourcePrompt()
                         navigator.push(
-                            ephyra.app.ui.browse.source.browse.BrowseSourceScreen(
+                            ephyra.feature.browse.source.browse.BrowseSourceScreen(
                                 match.sourceId,
                                 match.manga.title,
                             ),
@@ -172,8 +172,8 @@ fun Screen.discoverTab(): TabContent {
 @Composable
 private fun DiscoverContent(
     state: AuthoritySearchState,
-    trackersForFilter: (ContentType) -> ImmutableList<ephyra.app.data.track.Tracker>,
-    onSelectTracker: (ephyra.app.data.track.Tracker) -> Unit,
+    trackersForFilter: (ContentType) -> ImmutableList<ephyra.domain.track.service.Tracker>,
+    onSelectTracker: (ephyra.domain.track.service.Tracker) -> Unit,
     onSearch: (String) -> Unit,
     onRetrySearch: () -> Unit,
     onAddToLibrary: (TrackSearch) -> Unit,
