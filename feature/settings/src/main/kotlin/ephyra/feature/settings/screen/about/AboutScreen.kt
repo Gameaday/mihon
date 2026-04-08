@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +29,6 @@ import ephyra.core.common.util.system.logcat
 import ephyra.data.updater.RELEASE_URL
 import ephyra.domain.release.interactor.GetApplicationRelease
 import ephyra.domain.ui.UiPreferences
-import ephyra.feature.more.NewUpdateScreen
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
@@ -40,12 +40,14 @@ import ephyra.presentation.core.icons.CustomIcons
 import ephyra.presentation.core.icons.Discord
 import ephyra.presentation.core.icons.Github
 import ephyra.presentation.core.ui.AppInfo
+import ephyra.presentation.core.ui.NewUpdateScreenFactory
 import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.presentation.core.util.LocalBackPress
 import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.collectAsState
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.toast
-import ephyra.presentation.more.LogoHeader
+import ephyra.presentation.core.components.LogoHeader
 import kotlinx.coroutines.flow.collectLatest
 import logcat.LogPriority
 import org.koin.compose.koinInject
@@ -57,6 +59,7 @@ object AboutScreen : Screen() {
         val screenModel = koinScreenModel<AboutScreenModel>()
         val state by screenModel.state.collectAsState()
         val appInfo: AppInfo = koinInject()
+        val newUpdateScreenFactory: NewUpdateScreenFactory = koinInject()
 
         val context = LocalContext.current
         val uriHandler = LocalUriHandler.current
@@ -67,7 +70,7 @@ object AboutScreen : Screen() {
             screenModel.events.collectLatest { event ->
                 when (event) {
                     is AboutEvent.NewUpdate -> {
-                        val updateScreen = NewUpdateScreen(
+                        val updateScreen = newUpdateScreenFactory.create(
                             versionName = event.result.release.version,
                             changelogInfo = event.result.release.info,
                             releaseLink = event.result.release.releaseLink,

@@ -40,10 +40,10 @@ import ephyra.feature.library.presentation.LibrarySettingsDialog
 import ephyra.feature.library.presentation.components.LibraryContent
 import ephyra.feature.library.presentation.components.LibraryToolbar
 import ephyra.feature.manga.MangaScreen
-import ephyra.feature.migration.config.MigrationConfigScreen
 import ephyra.feature.reader.ReaderActivity
 import ephyra.i18n.MR
-import ephyra.presentation.category.components.ChangeCategoryDialog
+import ephyra.feature.category.components.ChangeCategoryDialog
+import ephyra.feature.manga.presentation.components.LibraryBottomActionMenu
 import ephyra.presentation.core.R
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
@@ -52,9 +52,9 @@ import ephyra.presentation.core.screens.EmptyScreenAction
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.presentation.core.ui.BottomNavController
+import ephyra.presentation.core.ui.MigrationConfigScreenFactory
 import ephyra.presentation.core.util.Tab
-import ephyra.feature.manga.presentation.components.LibraryBottomActionMenu
-import ephyra.presentation.more.onboarding.GETTING_STARTED_URL
+import kotlinx.collections.immutable.persistentListOf
 import ephyra.source.local.isLocal
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
@@ -90,6 +90,7 @@ data object LibraryTab : Tab {
         val screenModel = koinScreenModel<LibraryScreenModel>()
         val updateScheduler = koinInject<LibraryUpdateScheduler>()
         val settingsScreenModel = koinScreenModel<LibrarySettingsScreenModel>()
+        val migrationConfigScreenFactory = koinInject<MigrationConfigScreenFactory>()
         val state by screenModel.state.collectAsStateWithLifecycle()
 
         val snackbarHostState = remember { SnackbarHostState() }
@@ -154,7 +155,7 @@ data object LibraryTab : Tab {
                     onMigrateClicked = {
                         val selection = state.selection
                         screenModel.clearSelection()
-                        navigator.push(MigrationConfigScreen(selection))
+                        navigator.push(migrationConfigScreenFactory.create(selection))
                     },
                 )
             },
@@ -174,7 +175,7 @@ data object LibraryTab : Tab {
                             EmptyScreenAction(
                                 stringRes = MR.strings.getting_started_guide,
                                 icon = Icons.AutoMirrored.Outlined.HelpOutline,
-                                onClick = { handler.openUri(GETTING_STARTED_URL) },
+                                onClick = { handler.openUri("https://ephyra.app/docs/guides/getting-started") },
                             ),
                         ),
                     )

@@ -42,6 +42,7 @@ import ephyra.feature.settings.screen.debug.DebugInfoScreen
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.ui.AppInfo
+import ephyra.presentation.core.ui.OnboardingScreenFactory
 import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.presentation.core.util.collectAsState
 import ephyra.presentation.core.util.system.isShizukuInstalled
@@ -83,6 +84,7 @@ object SettingsAdvancedScreen : SearchableSettings {
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
         val appInfo: AppInfo = koinInject()
+        val onboardingScreenFactory: OnboardingScreenFactory = koinInject()
 
         val basePreferences = screenModel.basePreferences
         val networkPreferences = screenModel.networkPreferences
@@ -110,6 +112,10 @@ object SettingsAdvancedScreen : SearchableSettings {
             Preference.PreferenceItem.TextPreference(
                 title = stringResource(MR.strings.pref_debug_info),
                 onClick = { navigator.push(DebugInfoScreen()) },
+            ),
+            Preference.PreferenceItem.TextPreference(
+                title = stringResource(MR.strings.pref_onboarding_guide),
+                onClick = { navigator.push(onboardingScreenFactory.create()) },
             ),
             Preference.PreferenceItem.TextPreference(
                 title = stringResource(MR.strings.pref_manage_notifications),

@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import ephyra.core.preference.PreferenceMutableState
+import ephyra.presentation.core.util.PreferenceMutableState
 import ephyra.domain.category.model.Category
 import ephyra.domain.library.model.LibraryDisplayMode
 import ephyra.domain.library.model.LibraryManga

@@ -43,7 +43,8 @@ import ephyra.domain.track.interactor.GetTracksPerManga
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.service.TrackerManager
 import ephyra.feature.library.presentation.components.LibraryToolbarTitle
-import ephyra.feature.manga.presentation.DownloadAction
+import ephyra.presentation.core.util.manga.DownloadAction
+import ephyra.presentation.core.util.system.getNameForMangaInfo
 import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
 import ephyra.presentation.core.util.PreferenceMutableState
 import ephyra.presentation.core.util.asState
@@ -500,7 +501,7 @@ class LibraryScreenModel(
     }
 
     suspend fun getNextUnreadChapter(manga: Manga): Chapter? {
-        return getChaptersByMangaId.await(manga.id, applyScanlatorFilter = true).getNextUnread(manga, downloadManager)
+        return getChaptersByMangaId.await(manga.id, applyScanlatorFilter = true).getNextUnread(manga, downloadManager, preferences)
     }
 
     /**

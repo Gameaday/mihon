@@ -1,34 +1,7 @@
 package ephyra.feature.more
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import ephyra.presentation.core.R
+import ephyra.presentation.core.components.LogoHeader as PresentationCoreLogoHeader
 
 @Composable
-fun LogoHeader() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_ephyra),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .padding(vertical = 56.dp)
-                .size(64.dp),
-        )
-
-        HorizontalDivider()
-    }
-}
+fun LogoHeader() = PresentationCoreLogoHeader()
