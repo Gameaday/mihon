@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.koinScreenModel
+import ephyra.domain.ui.UiPreferences
+import kotlinx.coroutines.runBlocking
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.common.util.lang.launchUI
@@ -44,7 +46,7 @@ import ephyra.presentation.core.ui.NewUpdateScreenFactory
 import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.presentation.core.util.LocalBackPress
 import ephyra.presentation.core.util.Screen
-import ephyra.presentation.core.util.collectAsState
+import androidx.compose.runtime.collectAsState
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.toast
 import ephyra.presentation.core.components.LogoHeader
@@ -175,6 +177,30 @@ object AboutScreen : Screen() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    fun getVersionName(withBuildDate: Boolean): String {
+        val screenModel = koinScreenModel<AboutScreenModel>()
+        return screenModel.getVersionName(withBuildDate)
+    }
+
+    @Composable
+    fun getFormattedBuildTime(): String {
+        val appInfo: AppInfo = koinInject()
+        val uiPreferences: UiPreferences = koinInject()
+        return runBlocking {
+            try {
+                val fmt = uiPreferences.dateFormat().get()
+                val dt = java.time.LocalDateTime.ofInstant(
+                    java.time.Instant.parse(appInfo.buildTime),
+                    java.time.ZoneId.systemDefault(),
+                )
+                dt.toDateTimestampString(UiPreferences.dateFormat(fmt))
+            } catch (e: Exception) {
+                appInfo.buildTime
             }
         }
     }
