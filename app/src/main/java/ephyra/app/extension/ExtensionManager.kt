@@ -47,17 +47,13 @@ class ExtensionManager(
     private val securityPreferences: SecurityPreferences,
     private val extensionLoader: ExtensionLoader,
     private val api: ExtensionApi,
+    private val installer: ExtensionInstaller,
 ) : IExtensionManager {
 
     val scope = CoroutineScope(SupervisorJob())
 
     private val _isInitialized = MutableStateFlow(false)
     override val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
-
-    /**
-     * The installer which installs, updates and uninstalls the extensions.
-     */
-    private val installer by lazy { ExtensionInstaller(context) }
 
     private val iconMap = mutableMapOf<String, Drawable>()
 

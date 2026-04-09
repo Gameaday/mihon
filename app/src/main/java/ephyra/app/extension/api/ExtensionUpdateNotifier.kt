@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import ephyra.app.R
 import ephyra.app.data.notification.NotificationReceiver
-import ephyra.app.data.notification.Notifications
+import ephyra.data.notification.Notifications
 import ephyra.core.common.core.security.SecurityPreferences
 import ephyra.core.common.i18n.pluralStringResource
 import ephyra.core.common.util.system.cancelNotification
@@ -27,7 +27,7 @@ class ExtensionUpdateNotifier(
                     names.size,
                 ),
             )
-            if (!securityPreferences.hideNotificationContent().get()) {
+            if (!securityPreferences.hideNotificationContent().getSync()) {
                 val extNames = names.joinToString(", ")
                 setContentText(extNames)
                 setStyle(NotificationCompat.BigTextStyle().bigText(extNames))

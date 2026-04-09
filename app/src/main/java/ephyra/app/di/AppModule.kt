@@ -161,7 +161,7 @@ val koinAppModule = module {
     single { ExtensionApi(get(), get(), get(), get(), get(), get(), get()) }
 
     single<SourceManager> { AndroidSourceManager(androidApplication(), get(), get(), get(), get(), get()) }
-    single { ExtensionManager(androidApplication(), get(), get(), get(), get(), get()) }
+    single { ExtensionManager(androidApplication(), get(), get(), get(), get(), get(), get()) }
     single<ephyra.domain.extension.service.ExtensionManager> { get<ExtensionManager>() }
 
     single { DownloadStore(androidApplication(), get(), get(), get(), get()) }

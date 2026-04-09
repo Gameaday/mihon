@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import ephyra.app.R
-import ephyra.app.data.notification.Notifications
+import ephyra.data.notification.Notifications
 import ephyra.app.extension.installer.Installer
 import ephyra.app.extension.installer.PackageInstallerInstaller
 import ephyra.app.extension.installer.ShizukuInstaller

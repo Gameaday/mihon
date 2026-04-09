@@ -42,6 +42,7 @@ import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ephyra.presentation.core.util.collectAsState
 import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -153,7 +154,7 @@ class MainActivity : BaseActivity(), AppReadySignal {
                 val context = LocalContext.current
 
                 var incognito by remember { mutableStateOf(getIncognitoState.await(null)) }
-                val downloadOnly by preferences.downloadedOnly().collectAsStateWithLifecycle()
+                val downloadOnly by preferences.downloadedOnly().collectAsState()
                 val indexing by downloadCache.isInitializing.collectAsStateWithLifecycle()
 
                 val isSystemInDarkTheme = isSystemInDarkTheme()

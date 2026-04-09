@@ -12,10 +12,12 @@ import ephyra.app.extension.ExtensionManager
 import ephyra.domain.extension.model.InstallStep
 import java.util.Collections
 import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /**
  * Base implementation class for extension installer. To be used inside a foreground [Service].
  */
+@OptIn(ExperimentalAtomicApi::class)
 abstract class Installer(
     private val service: Service,
     private val extensionManager: ExtensionManager,
