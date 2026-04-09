@@ -129,7 +129,7 @@ class LibraryUpdateNotifier(
                 NotificationCompat.BigTextStyle().bigText(context.stringResource(MR.strings.notification_size_warning)),
             )
             setSmallIcon(R.drawable.ic_warning_white_24dp)
-            setTimeoutAfter(Downloader.WARNING_NOTIF_TIMEOUT_MS)
+            setTimeoutAfter(WARNING_NOTIF_TIMEOUT_MS)
             setContentIntent(NotificationHandler.openUrl(context, HELP_WARNING_URL))
         }
     }
@@ -525,5 +525,6 @@ class LibraryUpdateNotifier(
         private const val NOTIF_TITLE_MAX_LEN = 45
         private const val NOTIF_ICON_SIZE = 192
         private const val MANGA_PER_SOURCE_QUEUE_WARNING_THRESHOLD = 60
+        private const val WARNING_NOTIF_TIMEOUT_MS = 30_000L
     }
 }

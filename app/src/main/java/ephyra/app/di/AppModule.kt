@@ -230,7 +230,7 @@ val koinAppModule = module {
     worker { AppUpdateDownloadJob(get(), get(), get()) }
     worker { BackupCreateJob(get(), get(), get()) }
     worker { BackupRestoreJob(get(), get(), get()) }
-    worker { DownloadJob(get(), get(), get()) }
+    worker { DownloadJob(get(), get(), get(), get()) }
     worker { DelayedTrackingUpdateJob(get(), get(), get(), get(), get()) }
     worker { MatchUnlinkedJob(get(), get(), get()) }
     worker { MetadataUpdateJob(get(), get(), get(), get(), get(), get(), get()) }

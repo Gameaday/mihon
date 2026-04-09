@@ -61,5 +61,9 @@ class BackupRestoreJob(
         fun isRunning(context: Context): Boolean {
             return context.workManager.isRunning(TAG)
         }
+
+        fun stop(context: Context) {
+            context.workManager.cancelUniqueWork(TAG)
+        }
     }
 }

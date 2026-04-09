@@ -309,7 +309,7 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
         )
     }
 
-    private class ScreenModel(
+    internal class ScreenModel(
         val sourcePreferences: SourcePreferences,
         private val sourceManager: SourceManager,
     ) : StateScreenModel<ScreenModel.State>(State()) {
