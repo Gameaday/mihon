@@ -60,7 +60,7 @@ import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
 import ephyra.feature.manga.MangaScreen
 import ephyra.feature.more.NewUpdateScreen
 import ephyra.feature.more.OnboardingScreen
-import ephyra.app.util.system.isNavigationBarNeedsScrim
+import ephyra.presentation.core.util.system.isNavigationBarNeedsScrim
 import ephyra.app.util.system.updaterEnabled
 import ephyra.core.common.Constants
 import ephyra.core.common.util.lang.launchIO
@@ -103,12 +103,12 @@ class MainActivity : BaseActivity(), AppReadySignal {
     private val libraryPreferences: LibraryPreferences by inject()
     private val preferences: BasePreferences by inject()
 
-    private val downloadCache: ephyra.app.data.download.DownloadCache by inject()
-    private val chapterCache: ephyra.app.data.cache.ChapterCache by inject()
+    private val downloadCache: DownloadCache by inject()
+    private val chapterCache: ChapterCache by inject()
 
     private val getIncognitoState: GetIncognitoState by inject()
     private val uiPreferences: ephyra.domain.ui.UiPreferences by inject()
-    private val privacyPreferences: ephyra.app.core.security.PrivacyPreferences by inject()
+    private val privacyPreferences: ephyra.core.common.core.security.PrivacyPreferences by inject()
     private val storagePreferences: ephyra.domain.storage.service.StoragePreferences by inject()
     private val extensionApi: ExtensionApi by inject()
     private val appUpdateChecker: AppUpdateChecker by inject()
@@ -142,11 +142,8 @@ class MainActivity : BaseActivity(), AppReadySignal {
 
         setComposeContent {
             androidx.compose.runtime.CompositionLocalProvider(
-                ephyra.presentation.util.LocalUiPreferences provides uiPreferences,
-                ephyra.presentation.util.LocalBasePreferences provides preferences,
-                ephyra.presentation.util.LocalPrivacyPreferences provides privacyPreferences,
-                ephyra.presentation.util.LocalLibraryPreferences provides libraryPreferences,
-                ephyra.presentation.util.LocalStoragePreferences provides storagePreferences,
+                ephyra.presentation.core.util.LocalUiPreferences provides uiPreferences,
+                ephyra.presentation.core.util.LocalPrivacyPreferences provides privacyPreferences,
             ) {
                 var didMigration by remember { mutableStateOf<Boolean?>(null) }
                 LaunchedEffect(Unit) {
@@ -220,7 +217,7 @@ class MainActivity : BaseActivity(), AppReadySignal {
                             )
 
                             // Draw navigation bar scrim when needed
-                            if (remember { isNavigationBarNeedsScrim() }) {
+                            if (remember { context.isNavigationBarNeedsScrim() }) {
                                 Spacer(
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
