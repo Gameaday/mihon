@@ -163,13 +163,14 @@ class LibraryUpdateNotifier(
      * @param updates a list of manga with new updates.
      */
     override suspend fun showUpdateNotifications(updates: List<Pair<Manga, Array<Chapter>>>) {
+        val hideContent = securityPreferences.hideNotificationContent().get()
         // Parent group notification
         context.notify(
             Notifications.ID_NEW_CHAPTERS,
             Notifications.CHANNEL_NEW_CHAPTERS,
         ) {
             setContentTitle(context.stringResource(MR.strings.notification_new_chapters))
-            if (updates.size == 1 && !securityPreferences.hideNotificationContent().get()) {
+            if (updates.size == 1 && !hideContent) {
                 setContentText(updates.first().first.title.chop(NOTIF_TITLE_MAX_LEN))
             } else {
                 setContentText(
@@ -180,7 +181,7 @@ class LibraryUpdateNotifier(
                     ),
                 )
 
-                if (!securityPreferences.hideNotificationContent().get()) {
+                if (!hideContent) {
                     setStyle(
                         NotificationCompat.BigTextStyle().bigText(
                             updates.joinToString("\n") {
@@ -204,7 +205,7 @@ class LibraryUpdateNotifier(
         }
 
         // Per-manga notification
-        if (!securityPreferences.hideNotificationContent().get()) {
+        if (!hideContent) {
             updates.forEach { (manga, chapters) ->
                 context.notify(
                     manga.id.hashCode(),

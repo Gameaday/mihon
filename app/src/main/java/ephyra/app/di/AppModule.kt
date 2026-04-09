@@ -74,6 +74,7 @@ import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
 import ephyra.feature.more.NewUpdateScreen
 import ephyra.feature.more.OnboardingScreen
 import ephyra.feature.settings.screen.browse.ExtensionReposScreen
+import ephyra.feature.migration.config.MigrationConfigScreen
 import ephyra.presentation.core.ui.ExtensionReposScreenFactory
 import ephyra.presentation.core.ui.GlobalSearchScreenFactory
 import ephyra.presentation.core.ui.MatchUnlinkedJobRunner

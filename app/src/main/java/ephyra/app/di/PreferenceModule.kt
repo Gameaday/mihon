@@ -16,7 +16,7 @@ import ephyra.domain.storage.service.StoragePreferences
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.updates.service.UpdatesPreferences
-import ephyra.feature.reader.setting.ReaderPreferences
+import ephyra.domain.reader.service.ReaderPreferences
 import eu.kanade.tachiyomi.network.NetworkPreferences
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module

@@ -2,6 +2,7 @@ package ephyra.app.data.notification
 
 import android.content.Context
 import ephyra.core.common.notification.NotificationManager
+import ephyra.data.notification.Notifications
 
 /**
  * Concrete implementation of the NotificationManager, bridging core logic with the

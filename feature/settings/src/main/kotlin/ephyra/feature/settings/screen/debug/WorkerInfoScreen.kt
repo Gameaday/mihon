@@ -117,7 +117,7 @@ class WorkerInfoScreen : Screen() {
         )
     }
 
-    private class Model(
+    class Model(
         context: Context,
         private val uiPreferences: UiPreferences,
     ) : ScreenModel {
