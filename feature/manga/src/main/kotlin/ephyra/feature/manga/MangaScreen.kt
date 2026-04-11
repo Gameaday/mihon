@@ -20,7 +20,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.koin.koinScreenModel
-import org.koin.compose.koinInject
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -33,6 +32,7 @@ import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.hasCustomCover
 import ephyra.domain.manga.model.toSManga
 import ephyra.feature.category.CategoryScreen
+import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.feature.manga.notes.MangaNotesScreen
 import ephyra.feature.manga.presentation.ChapterSettingsDialog
 import ephyra.feature.manga.presentation.DuplicateMangaDialog
@@ -46,12 +46,11 @@ import ephyra.feature.manga.presentation.components.ScanlatorFilterDialog
 import ephyra.feature.manga.presentation.components.SetIntervalDialog
 import ephyra.feature.manga.track.TrackInfoDialogHomeScreen
 import ephyra.feature.migration.dialog.MigrateMangaDialog
-import ephyra.presentation.core.ui.MigrationConfigScreenFactory
-import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.feature.reader.ReaderActivity
 import ephyra.feature.webview.WebViewScreen
 import ephyra.presentation.core.components.NavigatorAdaptiveSheet
 import ephyra.presentation.core.screens.LoadingScreen
+import ephyra.presentation.core.ui.MigrationConfigScreenFactory
 import ephyra.presentation.core.ui.SearchableScreen
 import ephyra.presentation.core.util.AssistContentScreen
 import ephyra.presentation.core.util.Screen
@@ -60,12 +59,13 @@ import ephyra.presentation.core.util.isTabletUi
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast
-import eu.kanade.tachiyomi.source.Source
 import ephyra.source.local.isLocalOrStub
+import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import logcat.LogPriority
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 class MangaScreen(
@@ -172,7 +172,9 @@ class MangaScreen(
             onFilterButtonClicked = { screenModel.onEvent(MangaScreenEvent.ShowSettingsDialog) },
             onRefresh = { screenModel.onEvent(MangaScreenEvent.FetchAllFromSource(manualFetch = true)) },
             onContinueReading = { continueReading(context, screenModel.getNextUnreadChapter()) },
-            onSearch = { query, global -> scope.launch { performSearch(navigator, query, global, globalSearchScreenFactory) } },
+            onSearch = { query, global ->
+                scope.launch { performSearch(navigator, query, global, globalSearchScreenFactory) }
+            },
             onCoverClicked = { screenModel.onEvent(MangaScreenEvent.ShowCoverDialog) },
             onShareClicked = if (isHttpSource) {
                 { shareManga(context, screenModel.manga, screenModel.source) }

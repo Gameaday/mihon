@@ -13,7 +13,6 @@ import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
 import androidx.core.content.PermissionChecker
 import androidx.core.content.getSystemService
 import ephyra.app.R
-
 import ephyra.presentation.core.R as PresentationCoreR
 
 val Context.notificationManager: NotificationManager

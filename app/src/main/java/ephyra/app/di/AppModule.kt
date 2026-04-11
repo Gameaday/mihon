@@ -5,6 +5,7 @@ import androidx.room.*
 import ephyra.app.data.backup.BackupNotifier
 import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.restore.BackupRestoreJob
+import ephyra.app.data.download.DownloadNotifier
 import ephyra.app.data.library.LibraryUpdateJob
 import ephyra.app.data.library.LibraryUpdateNotifier
 import ephyra.app.data.library.MetadataUpdateJob
@@ -23,7 +24,6 @@ import ephyra.app.ui.base.delegate.ThemingDelegateImpl
 import ephyra.core.common.storage.AndroidStorageFolderProvider
 import ephyra.core.download.DownloadCache
 import ephyra.core.download.DownloadJob
-import ephyra.app.data.download.DownloadNotifier
 import ephyra.core.download.DownloadPendingDeleter
 import ephyra.core.download.DownloadProvider
 import ephyra.core.download.DownloadStore
@@ -53,7 +53,18 @@ import ephyra.domain.storage.service.StorageManager
 import ephyra.domain.track.service.DelayedTrackingUpdateJob
 import ephyra.domain.track.service.TrackerManager
 import ephyra.domain.track.store.DelayedTrackingStore
+import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
+import ephyra.feature.migration.config.MigrationConfigScreen
+import ephyra.feature.more.NewUpdateScreen
+import ephyra.feature.more.OnboardingScreen
+import ephyra.feature.settings.screen.browse.ExtensionReposScreen
 import ephyra.presentation.core.ui.AppInfo
+import ephyra.presentation.core.ui.ExtensionReposScreenFactory
+import ephyra.presentation.core.ui.GlobalSearchScreenFactory
+import ephyra.presentation.core.ui.MatchUnlinkedJobRunner
+import ephyra.presentation.core.ui.MigrationConfigScreenFactory
+import ephyra.presentation.core.ui.NewUpdateScreenFactory
+import ephyra.presentation.core.ui.OnboardingScreenFactory
 import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.source.local.image.LocalCoverManager
 import ephyra.source.local.io.LocalSourceFileSystem
@@ -70,17 +81,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.module
 import ephyra.app.BuildConfig as AppBuildConfig
-import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
-import ephyra.feature.more.NewUpdateScreen
-import ephyra.feature.more.OnboardingScreen
-import ephyra.feature.settings.screen.browse.ExtensionReposScreen
-import ephyra.feature.migration.config.MigrationConfigScreen
-import ephyra.presentation.core.ui.ExtensionReposScreenFactory
-import ephyra.presentation.core.ui.GlobalSearchScreenFactory
-import ephyra.presentation.core.ui.MatchUnlinkedJobRunner
-import ephyra.presentation.core.ui.MigrationConfigScreenFactory
-import ephyra.presentation.core.ui.NewUpdateScreenFactory
-import ephyra.presentation.core.ui.OnboardingScreenFactory
 import ephyra.presentation.core.ui.delegate.SecureActivityDelegate as CoreSecureActivityDelegate
 import ephyra.presentation.core.ui.delegate.ThemingDelegate as CoreThemingDelegate
 
@@ -168,9 +168,15 @@ val koinAppModule = module {
     single { DownloadProvider(androidApplication(), get(), get()) }
     single { DownloadCache(androidApplication(), get(), get(), get()) }
     single<ephyra.domain.download.service.DownloadManager> {
-        ephyra.core.download.DownloadManager(androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+        ephyra.core.download.DownloadManager(
+            androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
+        )
     }
-    single { Downloader(androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single {
+        Downloader(
+            androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
+        )
+    }
     single { DownloadPendingDeleter(androidApplication(), get()) }
     single { DownloadNotifier(androidApplication(), get()) }
 
@@ -212,7 +218,9 @@ val koinAppModule = module {
 
     single { ImageSaver(androidApplication()) }
     single<GlobalSearchScreenFactory> { GlobalSearchScreenFactory { query -> GlobalSearchScreen(query) } }
-    single<MigrationConfigScreenFactory> { MigrationConfigScreenFactory { mangaIds -> MigrationConfigScreen(mangaIds) } }
+    single<MigrationConfigScreenFactory> {
+        MigrationConfigScreenFactory { mangaIds -> MigrationConfigScreen(mangaIds) }
+    }
     single<ExtensionReposScreenFactory> { ExtensionReposScreenFactory { url -> ExtensionReposScreen(url) } }
     single<NewUpdateScreenFactory> { NewUpdateScreenFactory { v, c, r, d -> NewUpdateScreen(v, c, r, d) } }
     single<OnboardingScreenFactory> { OnboardingScreenFactory { OnboardingScreen() } }

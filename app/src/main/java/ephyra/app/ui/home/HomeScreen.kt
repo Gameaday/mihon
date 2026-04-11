@@ -34,13 +34,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import ephyra.feature.manga.MangaScreen
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.feature.browse.BrowseTab
 import ephyra.feature.download.DownloadQueueScreen
 import ephyra.feature.history.HistoryTab
 import ephyra.feature.library.LibraryTab
+import ephyra.feature.manga.MangaScreen
 import ephyra.feature.more.MoreTab
 import ephyra.feature.updates.UpdatesTab
 import ephyra.i18n.MR

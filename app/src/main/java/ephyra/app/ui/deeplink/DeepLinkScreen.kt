@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
-import org.koin.core.parameter.parametersOf
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
@@ -19,6 +18,7 @@ import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.Screen
+import org.koin.core.parameter.parametersOf
 
 class DeepLinkScreen(
     val query: String = "",

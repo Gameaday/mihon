@@ -945,7 +945,9 @@ object SettingsTrackingScreen : SearchableSettings {
                         scope.launchIO {
                             processing = true
                             try {
-                                tracker.loginWithCredentials(serverUrl.text, username.text, password.text)
+                                tracker.loginWithCredentials(
+                                    serverUrl.text, username.text, password.text,
+                                )
                                 withUIContext { onDismissRequest() }
                             } catch (e: Exception) {
                                 inputError = true

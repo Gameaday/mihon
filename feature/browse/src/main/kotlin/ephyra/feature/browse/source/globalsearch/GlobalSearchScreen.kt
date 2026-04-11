@@ -10,12 +10,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.feature.browse.presentation.GlobalSearchScreen
 import ephyra.feature.browse.source.browse.BrowseSourceScreen
 import ephyra.feature.manga.MangaScreen
-import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.screens.LoadingScreen
+import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.ifSourcesLoaded
 import org.koin.core.parameter.parametersOf
 
 class GlobalSearchScreen(

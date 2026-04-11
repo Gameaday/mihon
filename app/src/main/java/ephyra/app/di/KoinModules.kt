@@ -111,7 +111,9 @@ val koinAppModule_UI = module {
     }
 
     factory { DownloadQueueScreenModel(get()) }
-    factory { (mangaId: Long) -> MangaCoverScreenModel(mangaId, get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory { (mangaId: Long) ->
+        MangaCoverScreenModel(mangaId, get(), get(), get(), get(), get(), get(), get(), get(), get())
+    }
     factory { (title: String, sourceId: Long) -> CoverSearchScreenModel(title, sourceId, get()) }
     factory { MigrationConfigScreen.ScreenModel(get(), get()) }
     factory { UpcomingScreenModel(get()) }

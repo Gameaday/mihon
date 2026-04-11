@@ -21,7 +21,10 @@ import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.system.toast
 import org.koin.core.parameter.parametersOf
 
-class MigrationListScreen(private val mangaIds: Collection<Long>, private val extraSearchQuery: String?) : Screen(), MigrationListPresenter {
+class MigrationListScreen(
+    private val mangaIds: Collection<Long>,
+    private val extraSearchQuery: String?,
+) : Screen(), MigrationListPresenter {
 
     private var matchOverride: Pair<Long, Long>? = null
 

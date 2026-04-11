@@ -23,12 +23,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import ephyra.presentation.core.util.manga.DownloadAction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -47,9 +46,9 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastMap
-import ephyra.domain.download.model.Download
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.service.missingChaptersCount
+import ephyra.domain.download.model.Download
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.SourceStatus
@@ -74,11 +73,12 @@ import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.components.relativeDateText
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.formatChapterNumber
+import ephyra.presentation.core.util.manga.DownloadAction
 import ephyra.presentation.core.util.shouldExpandFAB
 import ephyra.presentation.core.util.system.copyToClipboard
+import ephyra.presentation.core.util.system.getNameForMangaInfo
 import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.Source
-import ephyra.presentation.core.util.system.getNameForMangaInfo
 import java.time.Instant
 
 @Composable

@@ -17,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.core.util.manga.DownloadAction
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
@@ -25,6 +24,7 @@ import ephyra.presentation.core.components.AppBarTitle
 import ephyra.presentation.core.components.DownloadDropdownMenu
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.theme.active
+import ephyra.presentation.core.util.manga.DownloadAction
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable

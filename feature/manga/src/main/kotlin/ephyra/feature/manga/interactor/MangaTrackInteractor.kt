@@ -1,8 +1,6 @@
 package ephyra.feature.manga.interactor
 
 import android.content.Context
-import ephyra.domain.track.service.Tracker
-import ephyra.domain.track.service.TrackerManager
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.GetTracks
@@ -13,6 +11,8 @@ import ephyra.domain.track.interactor.TrackChapter
 import ephyra.domain.track.model.AutoTrackState
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.service.TrackPreferences
+import ephyra.domain.track.service.Tracker
+import ephyra.domain.track.service.TrackerManager
 import eu.kanade.tachiyomi.source.Source
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Factory
@@ -54,7 +54,9 @@ class MangaTrackInteractor(
         trackChapter.await(context, mangaId, maxChapterNumber)
     }
 
-    suspend fun isAutoTrackStateAlways(): Boolean = trackPreferences.autoUpdateTrackOnMarkRead().get() == AutoTrackState.ALWAYS
-    suspend fun isAutoTrackStateNever(): Boolean = trackPreferences.autoUpdateTrackOnMarkRead().get() == AutoTrackState.NEVER
+    suspend fun isAutoTrackStateAlways(): Boolean =
+        trackPreferences.autoUpdateTrackOnMarkRead().get() == AutoTrackState.ALWAYS
+    suspend fun isAutoTrackStateNever(): Boolean =
+        trackPreferences.autoUpdateTrackOnMarkRead().get() == AutoTrackState.NEVER
     fun autoUpdateTrackOnMarkRead() = trackPreferences.autoUpdateTrackOnMarkRead()
 }

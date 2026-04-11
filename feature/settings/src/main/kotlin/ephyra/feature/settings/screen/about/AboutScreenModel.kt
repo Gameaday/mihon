@@ -5,7 +5,6 @@ import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.core.common.util.lang.launchIO
-import kotlinx.coroutines.runBlocking
 import ephyra.core.common.util.lang.toDateTimestampString
 import ephyra.data.updater.AppUpdateChecker
 import ephyra.domain.release.interactor.GetApplicationRelease
@@ -14,6 +13,7 @@ import ephyra.presentation.core.ui.AppInfo
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

@@ -6,13 +6,13 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import ephyra.app.R
+import ephyra.app.data.notification.NotificationReceiver
 import ephyra.app.ui.main.MainActivity
 import ephyra.core.common.Constants
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.system.cancelNotification
 import ephyra.core.common.util.system.notificationBuilder
 import ephyra.core.common.util.system.notify
-import ephyra.app.data.notification.NotificationReceiver
 import ephyra.data.notification.Notifications
 import ephyra.domain.track.interactor.MatchUnlinkedManga
 import ephyra.i18n.MR

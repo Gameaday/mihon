@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,20 +23,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.koinScreenModel
-import ephyra.domain.extension.service.ExtensionManager
-import ephyra.domain.ui.UiPreferences
-import kotlinx.coroutines.runBlocking
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.lang.toDateTimestampString
 import ephyra.core.common.util.system.logcat
 import ephyra.data.updater.RELEASE_URL
+import ephyra.domain.extension.service.ExtensionManager
 import ephyra.domain.release.interactor.GetApplicationRelease
+import ephyra.domain.ui.UiPreferences
 import ephyra.feature.settings.widget.TextPreferenceWidget
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.LinkIcon
+import ephyra.presentation.core.components.LogoHeader
 import ephyra.presentation.core.components.ScrollbarLazyColumn
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.i18n.stringResource
@@ -47,11 +48,10 @@ import ephyra.presentation.core.ui.NewUpdateScreenFactory
 import ephyra.presentation.core.util.CrashLogUtil
 import ephyra.presentation.core.util.LocalBackPress
 import ephyra.presentation.core.util.Screen
-import androidx.compose.runtime.collectAsState
 import ephyra.presentation.core.util.system.copyToClipboard
 import ephyra.presentation.core.util.system.toast
-import ephyra.presentation.core.components.LogoHeader
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import org.koin.compose.koinInject
 

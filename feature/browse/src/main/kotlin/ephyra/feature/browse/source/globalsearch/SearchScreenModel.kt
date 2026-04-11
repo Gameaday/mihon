@@ -29,8 +29,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 abstract class SearchScreenModel(
     initialState: State = State(),
@@ -48,8 +48,12 @@ abstract class SearchScreenModel(
 
     // Parse Set<String> source IDs to Set<Long> once at construction time to avoid creating a
     // new String per source on every getEnabledSources()/sortComparator call.
-    private val disabledSourceIds = runBlocking { sourcePreferences.disabledSources().get() }.mapTo(HashSet()) { it.toLong() }
-    protected val pinnedSourceIds = runBlocking { sourcePreferences.pinnedSources().get() }.mapTo(HashSet()) { it.toLong() }
+    private val disabledSourceIds = runBlocking {
+        sourcePreferences.disabledSources().get()
+    }.mapTo(HashSet()) { it.toLong() }
+    protected val pinnedSourceIds = runBlocking {
+        sourcePreferences.pinnedSources().get()
+    }.mapTo(HashSet()) { it.toLong() }
 
     private var lastQuery: String? = null
     private var lastSourceFilter: SourceFilter? = null

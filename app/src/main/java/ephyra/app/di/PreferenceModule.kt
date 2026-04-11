@@ -11,12 +11,12 @@ import ephyra.domain.base.BasePreferences
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.reader.model.*
+import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.domain.storage.service.StoragePreferences
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.updates.service.UpdatesPreferences
-import ephyra.domain.reader.service.ReaderPreferences
 import eu.kanade.tachiyomi.network.NetworkPreferences
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module

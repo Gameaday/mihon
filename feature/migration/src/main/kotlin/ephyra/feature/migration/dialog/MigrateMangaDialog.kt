@@ -24,7 +24,6 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withUIContext
-import kotlinx.coroutines.runBlocking
 import ephyra.data.cache.CoverCache
 import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.manga.model.Manga
@@ -38,6 +37,7 @@ import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import kotlin.collections.toMutableSet
 
 private fun MigrationFlag.getLabel(): StringResource {

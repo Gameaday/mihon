@@ -18,13 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import ephyra.presentation.core.util.PreferenceMutableState
 import ephyra.domain.category.model.Category
 import ephyra.domain.library.model.LibraryDisplayMode
 import ephyra.domain.library.model.LibraryManga
 import ephyra.feature.library.LibraryItem
 import ephyra.i18n.MR
 import ephyra.presentation.core.screens.EmptyScreen
+import ephyra.presentation.core.util.PreferenceMutableState
 import ephyra.presentation.core.util.plus
 
 @Composable

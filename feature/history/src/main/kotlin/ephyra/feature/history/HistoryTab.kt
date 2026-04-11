@@ -23,6 +23,7 @@ import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.feature.history.components.HistoryDeleteAllDialog
 import ephyra.feature.history.components.HistoryDeleteDialog
 import ephyra.feature.manga.MangaScreen
+import ephyra.feature.manga.presentation.DuplicateMangaDialog
 import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.feature.reader.ReaderActivity
 import ephyra.i18n.MR
@@ -30,7 +31,6 @@ import ephyra.presentation.core.R
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.presentation.core.util.Tab
-import ephyra.feature.manga.presentation.DuplicateMangaDialog
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow

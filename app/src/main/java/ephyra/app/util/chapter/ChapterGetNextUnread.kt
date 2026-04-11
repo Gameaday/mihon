@@ -10,7 +10,11 @@ import ephyra.feature.manga.ChapterList
 /**
  * Gets next unread chapter with filters and sorting applied
  */
-fun List<Chapter>.getNextUnread(manga: Manga, downloadManager: DownloadManager, basePreferences: BasePreferences): Chapter? {
+fun List<Chapter>.getNextUnread(
+    manga: Manga,
+    downloadManager: DownloadManager,
+    basePreferences: BasePreferences,
+): Chapter? {
     return applyFilters(manga, downloadManager, basePreferences).let { chapters ->
         if (manga.sortDescending()) {
             chapters.findLast { !it.read }

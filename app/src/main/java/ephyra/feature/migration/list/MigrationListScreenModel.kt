@@ -11,6 +11,7 @@ import ephyra.domain.chapter.interactor.SyncChaptersWithSource
 import ephyra.domain.manga.interactor.GetFavoritesByCanonicalId
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.interactor.NetworkToLocalManga
+import ephyra.domain.manga.interactor.SmartSourceSearchEngine
 import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.toSManga
@@ -19,7 +20,6 @@ import ephyra.domain.source.service.SourceManager
 import ephyra.domain.source.service.SourcePreferences
 import ephyra.feature.migration.list.models.MigratingManga
 import ephyra.feature.migration.list.models.MigratingManga.SearchResult
-import ephyra.domain.manga.interactor.SmartSourceSearchEngine
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.getNameForMangaInfo
 import kotlinx.collections.immutable.ImmutableList
@@ -31,13 +31,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import logcat.LogPriority

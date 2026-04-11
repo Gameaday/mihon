@@ -64,12 +64,11 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
-import cafe.adriel.voyager.core.screen.Screen as VoyagerScreen
-import ephyra.domain.track.model.TrackSearch
 import ephyra.domain.manga.interactor.FindContentSource
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.MangaWithChapterCount
 import ephyra.domain.track.interactor.AddTracks
+import ephyra.domain.track.model.TrackSearch
 import ephyra.feature.browse.source.globalsearch.GlobalSearchScreen
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AdaptiveSheet
@@ -82,6 +81,7 @@ import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.theme.MotionTokens
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import cafe.adriel.voyager.core.screen.Screen as VoyagerScreen
 
 /**
  * Creates the Search sub-tab inside the top-level Discover tab.

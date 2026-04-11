@@ -6,7 +6,6 @@ import ephyra.core.common.preference.Preference
 import ephyra.core.common.preference.TriState
 import ephyra.core.common.preference.getAndSet
 import ephyra.core.common.util.lang.launchIO
-import ephyra.domain.track.service.TrackerManager
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.category.interactor.SetDisplayMode
 import ephyra.domain.category.interactor.SetSortModeForCategory
@@ -14,6 +13,7 @@ import ephyra.domain.category.model.Category
 import ephyra.domain.library.model.LibraryDisplayMode
 import ephyra.domain.library.model.LibrarySort
 import ephyra.domain.library.service.LibraryPreferences
+import ephyra.domain.track.service.TrackerManager
 import ephyra.source.local.isLocal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

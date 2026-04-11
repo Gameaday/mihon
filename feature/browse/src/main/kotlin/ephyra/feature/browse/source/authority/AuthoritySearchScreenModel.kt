@@ -4,9 +4,6 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import ephyra.domain.track.service.Tracker
-import ephyra.domain.track.service.TrackerManager
-import ephyra.domain.track.model.TrackSearch
 import ephyra.domain.chapter.interactor.GenerateAuthorityChapters
 import ephyra.domain.manga.interactor.FindContentSource
 import ephyra.domain.manga.model.ContentType
@@ -19,6 +16,9 @@ import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.interactor.TrackerListImporter
 import ephyra.domain.track.model.Track
+import ephyra.domain.track.model.TrackSearch
+import ephyra.domain.track.service.Tracker
+import ephyra.domain.track.service.TrackerManager
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

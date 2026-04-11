@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ephyra.app.R
 import ephyra.domain.manga.model.Manga
+import ephyra.feature.manga.presentation.components.MangaCover
 import ephyra.feature.migration.list.models.MigratingManga
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
@@ -71,7 +72,6 @@ import ephyra.presentation.core.util.animateItemFastScroll
 import ephyra.presentation.core.util.formatChapterNumber
 import ephyra.presentation.core.util.plus
 import ephyra.presentation.core.util.rememberResourceBitmapPainter
-import ephyra.feature.manga.presentation.components.MangaCover
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

@@ -8,15 +8,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.ui.draw.alpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -24,6 +24,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.domain.manga.model.Manga
 import ephyra.feature.manga.MangaScreen
+import ephyra.feature.manga.presentation.components.BaseMangaListItem
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.FastScrollLazyColumn
@@ -36,7 +37,6 @@ import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.selectedBackground
 import ephyra.presentation.core.util.shouldExpandFAB
 import ephyra.presentation.core.util.system.toast
-import ephyra.feature.manga.presentation.components.BaseMangaListItem
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf

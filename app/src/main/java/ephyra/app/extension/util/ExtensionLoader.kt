@@ -5,13 +5,13 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.core.content.pm.PackageInfoCompat
-import ephyra.domain.extension.model.Extension
 import ephyra.app.extension.model.LoadResult
 import ephyra.app.util.system.ChildFirstPathClassLoader
 import ephyra.core.common.util.lang.Hash
 import ephyra.core.common.util.storage.copyAndSetReadOnlyTo
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.extension.interactor.TrustExtension
+import ephyra.domain.extension.model.Extension
 import ephyra.domain.source.service.SourcePreferences
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.Source

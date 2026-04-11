@@ -17,8 +17,8 @@ junit = "6.0.3"
 materialKolor = "5.0.0-alpha07"
 
 # Koin 4.2.0 Ecosystem (Native Plugin path)
-koin = "4.2.0"
-koin_annotations = "4.2.0"
+koin = "4.2.1"
+koin_annotations = "4.2.1"
 koin_compiler_plugin = "0.4.1"
 
 # Compiler Tools

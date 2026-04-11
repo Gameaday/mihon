@@ -5,10 +5,10 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import ephyra.app.extension.installer.Installer
-import ephyra.domain.extension.model.Extension
 import ephyra.core.common.util.storage.getUriCompat
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.base.BasePreferences
+import ephyra.domain.extension.model.Extension
 import ephyra.domain.extension.model.InstallStep
 import ephyra.presentation.core.util.system.isPackageInstalled
 import eu.kanade.tachiyomi.network.NetworkHelper

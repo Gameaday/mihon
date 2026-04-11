@@ -30,13 +30,13 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.forEach
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.data.preference.SharedPreferencesDataStore
 import ephyra.domain.source.service.SourceManager
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.Screen
+import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.presentation.core.widget.TachiyomiTextInputEditText.Companion.setIncognito
 import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.sourcePreferences

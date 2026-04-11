@@ -209,7 +209,11 @@ private class RestoreBackupScreenModel(
 
         if (results.missingSources.isNotEmpty() || results.missingTrackers.isNotEmpty()) {
             setError(
-                error = MissingRestoreComponents(uri, results.missingSources.toList(), results.missingTrackers.toList()),
+                error = MissingRestoreComponents(
+                    uri,
+                    results.missingSources.toList(),
+                    results.missingTrackers.toList(),
+                ),
                 canRestore = true,
             )
             return

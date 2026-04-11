@@ -50,6 +50,7 @@ import ephyra.feature.browse.extension.ExtensionUiModel
 import ephyra.feature.browse.extension.ExtensionsScreenModel
 import ephyra.feature.browse.presentation.components.BaseBrowseItem
 import ephyra.feature.browse.presentation.components.ExtensionIcon
+import ephyra.feature.manga.presentation.components.DotSeparatorNoSpaceText
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.FastScrollLazyColumn
 import ephyra.presentation.core.components.WarningBanner
@@ -57,19 +58,18 @@ import ephyra.presentation.core.components.material.PullRefresh
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.components.material.topSmallPaddingValues
 import ephyra.presentation.core.i18n.stringResource
-import ephyra.presentation.core.ui.ExtensionReposScreenFactory
-import org.koin.compose.koinInject
 import ephyra.presentation.core.screens.EmptyScreen
 import ephyra.presentation.core.screens.EmptyScreenAction
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.theme.header
+import ephyra.presentation.core.ui.ExtensionReposScreenFactory
 import ephyra.presentation.core.util.animateItemFastScroll
 import ephyra.presentation.core.util.plus
 import ephyra.presentation.core.util.rememberRequestPackageInstallsPermissionState
 import ephyra.presentation.core.util.secondaryItemAlpha
 import ephyra.presentation.core.util.system.launchRequestPackageInstallsPermission
-import ephyra.feature.manga.presentation.components.DotSeparatorNoSpaceText
 import kotlinx.collections.immutable.persistentListOf
+import org.koin.compose.koinInject
 
 @Composable
 fun ExtensionScreen(

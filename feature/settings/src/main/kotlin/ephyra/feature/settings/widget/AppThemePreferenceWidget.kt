@@ -48,12 +48,12 @@ import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.isDynamicColorAvailable
 import ephyra.domain.ui.UiPreferences
 import ephyra.domain.ui.model.AppTheme
+import ephyra.feature.manga.presentation.components.MangaCover
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.util.LocalUiPreferences
 import ephyra.presentation.core.util.secondaryItemAlpha
-import ephyra.feature.manga.presentation.components.MangaCover
 import ephyra.presentation.theme.TachiyomiTheme
 
 @Composable

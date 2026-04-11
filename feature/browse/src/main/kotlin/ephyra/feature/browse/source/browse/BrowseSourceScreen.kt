@@ -35,10 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.koin.core.parameter.parametersOf
 import ephyra.core.common.Constants
 import ephyra.core.common.util.lang.launchIO
-import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.domain.source.model.StubSource
 import ephyra.feature.browse.extension.details.SourcePreferencesScreen
 import ephyra.feature.browse.presentation.BrowseSourceContent
@@ -47,26 +45,28 @@ import ephyra.feature.browse.presentation.components.BrowseSourceToolbar
 import ephyra.feature.browse.presentation.components.RemoveMangaDialog
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel.Listing
 import ephyra.feature.category.CategoryScreen
+import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.feature.manga.MangaScreen
+import ephyra.feature.manga.presentation.DuplicateMangaDialog
 import ephyra.feature.migration.dialog.MigrateMangaDialog
 import ephyra.feature.webview.WebViewScreen
 import ephyra.i18n.MR
-import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.components.material.padding
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.LoadingScreen
+import ephyra.presentation.core.ui.SearchableScreen
 import ephyra.presentation.core.util.AssistContentScreen
 import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.collectAsLazyPagingItems
-import ephyra.presentation.core.ui.SearchableScreen
-import ephyra.feature.manga.presentation.DuplicateMangaDialog
+import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.source.local.LocalSource
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
+import org.koin.core.parameter.parametersOf
 
 data class BrowseSourceScreen(
     val sourceId: Long,

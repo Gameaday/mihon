@@ -34,7 +34,6 @@ import androidx.compose.ui.util.fastForEach
 import ephyra.core.common.preference.Preference
 import ephyra.core.common.preference.getAndSet
 import ephyra.core.common.preference.toggle
-import kotlinx.coroutines.launch
 import ephyra.core.util.fastFilterNot
 import ephyra.domain.migration.models.MigrationFlag
 import ephyra.domain.source.service.SourcePreferences
@@ -47,6 +46,7 @@ import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.theme.active
 import ephyra.presentation.core.theme.header
 import ephyra.presentation.core.util.collectAsState
+import kotlinx.coroutines.launch
 
 @Composable
 fun MigrationConfigScreenSheet(

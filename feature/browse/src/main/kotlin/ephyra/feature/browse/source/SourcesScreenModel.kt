@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.core.common.util.lang.launchIO
-import kotlinx.coroutines.launch
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.source.interactor.GetEnabledSources
 import ephyra.domain.source.interactor.ToggleSource
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import logcat.LogPriority
 import org.koin.core.annotation.Factory
 import java.util.TreeMap

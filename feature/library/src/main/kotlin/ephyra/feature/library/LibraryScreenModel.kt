@@ -43,12 +43,12 @@ import ephyra.domain.track.interactor.GetTracksPerManga
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.service.TrackerManager
 import ephyra.feature.library.presentation.components.LibraryToolbarTitle
-import ephyra.presentation.core.util.manga.DownloadAction
-import ephyra.presentation.core.util.system.getNameForMangaInfo
 import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
 import ephyra.presentation.core.util.PreferenceMutableState
 import ephyra.presentation.core.util.asState
+import ephyra.presentation.core.util.manga.DownloadAction
 import ephyra.presentation.core.util.manga.removeCovers
+import ephyra.presentation.core.util.system.getNameForMangaInfo
 import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.online.HttpSource
@@ -501,7 +501,10 @@ class LibraryScreenModel(
     }
 
     suspend fun getNextUnreadChapter(manga: Manga): Chapter? {
-        return getChaptersByMangaId.await(manga.id, applyScanlatorFilter = true).getNextUnread(manga, downloadManager, preferences)
+        return getChaptersByMangaId.await(
+            manga.id,
+            applyScanlatorFilter = true,
+        ).getNextUnread(manga, downloadManager, preferences)
     }
 
     /**

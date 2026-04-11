@@ -24,16 +24,16 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import org.koin.compose.koinInject
 import coil3.compose.AsyncImage
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.extension.model.Extension
 import ephyra.domain.extension.service.ExtensionManager
 import ephyra.domain.source.model.Source
-import ephyra.presentation.core.util.system.icon
 import ephyra.presentation.core.R
 import ephyra.presentation.core.util.rememberResourceBitmapPainter
+import ephyra.presentation.core.util.system.icon
 import ephyra.source.local.isLocal
+import org.koin.compose.koinInject
 
 private val defaultModifier = Modifier
     .height(40.dp)

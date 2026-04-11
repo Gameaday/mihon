@@ -25,7 +25,6 @@ import coil3.request.crossfade
 import coil3.util.DebugLogger
 import ephyra.app.crash.CrashActivity
 import ephyra.app.crash.GlobalExceptionHandler
-import ephyra.data.notification.Notifications
 import ephyra.app.di.koinAppModule
 import ephyra.app.di.koinAppModule_UI
 import ephyra.app.di.koinPreferenceModule
@@ -46,6 +45,7 @@ import ephyra.data.coil.BufferedSourceFetcher
 import ephyra.data.coil.MangaCoverFetcher
 import ephyra.data.coil.MangaCoverKeyer
 import ephyra.data.coil.MangaKeyer
+import ephyra.data.notification.Notifications
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.koinDomainModule
 import ephyra.domain.ui.UiPreferences

@@ -15,12 +15,12 @@ import androidx.compose.material.icons.outlined.Deselect
 import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -41,15 +41,15 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.feature.browse.migration.search.MigrateSearchScreen
-import ephyra.core.common.util.system.LocaleHelper
 import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.system.LocaleHelper
 import ephyra.domain.source.model.Source
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.source.service.SourcePreferences
+import ephyra.feature.browse.migration.search.MigrateSearchScreen
+import ephyra.feature.browse.presentation.components.SourceIcon
 import ephyra.feature.migration.list.MigrationListScreen
 import ephyra.i18n.MR
-import ephyra.feature.browse.presentation.components.SourceIcon
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
 import ephyra.presentation.core.components.FastScrollLazyColumn
@@ -383,7 +383,9 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
 
         fun toggleSelection(config: SelectionConfig) {
             val pinnedSources = runBlocking { sourcePreferences.pinnedSources().get() }.mapNotNull { it.toLongOrNull() }
-            val disabledSources = runBlocking { sourcePreferences.disabledSources().get() }.mapNotNull { it.toLongOrNull() }
+            val disabledSources = runBlocking {
+                sourcePreferences.disabledSources().get()
+            }.mapNotNull { it.toLongOrNull() }
             val isSelected: (Long) -> Boolean = {
                 when (config) {
                     SelectionConfig.All -> true

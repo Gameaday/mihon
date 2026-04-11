@@ -7,9 +7,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import cafe.adriel.voyager.koin.koinScreenModel
-import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.core.security.PrivacyPreferences
 import ephyra.core.common.core.security.SecurityPreferences
+import ephyra.core.common.i18n.stringResource
 import ephyra.feature.settings.Preference
 import ephyra.i18n.MR
 import ephyra.presentation.core.i18n.pluralStringResource
