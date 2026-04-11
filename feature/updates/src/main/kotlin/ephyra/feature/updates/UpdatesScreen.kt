@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import ephyra.domain.download.model.Download
+import ephyra.feature.manga.presentation.components.ChapterDownloadAction
+import ephyra.feature.manga.presentation.components.MangaBottomActionMenu
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.AppBarActions
@@ -34,8 +36,6 @@ import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.screens.EmptyScreen
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.theme.active
-import ephyra.feature.manga.presentation.components.ChapterDownloadAction
-import ephyra.feature.manga.presentation.components.MangaBottomActionMenu
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

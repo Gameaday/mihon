@@ -48,15 +48,15 @@ import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withUIContext
+import ephyra.data.track.anilist.AnilistApi
+import ephyra.data.track.bangumi.BangumiApi
+import ephyra.data.track.myanimelist.MyAnimeListApi
+import ephyra.data.track.shikimori.ShikimoriApi
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.model.AutoTrackState
 import ephyra.domain.track.service.EnhancedTracker
 import ephyra.domain.track.service.Tracker
 import ephyra.domain.track.service.TrackerManager
-import ephyra.data.track.anilist.AnilistApi
-import ephyra.data.track.bangumi.BangumiApi
-import ephyra.data.track.myanimelist.MyAnimeListApi
-import ephyra.data.track.shikimori.ShikimoriApi
 import ephyra.feature.settings.Preference
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.material.padding
@@ -254,13 +254,16 @@ object SettingsTrackingScreen : SearchableSettings {
                         ),
                         Preference.PreferenceItem.TrackerPreference(
                             tracker = trackerManager.get(TrackerManager.KITSU)!!,
-                            login = { dialog = LoginDialog(trackerManager.get(TrackerManager.KITSU)!!, MR.strings.email) },
+                            login = {
+                                dialog = LoginDialog(trackerManager.get(TrackerManager.KITSU)!!, MR.strings.email)
+                            },
                             logout = { dialog = LogoutDialog(trackerManager.get(TrackerManager.KITSU)!!) },
                         ),
                         Preference.PreferenceItem.TrackerPreference(
                             tracker = trackerManager.get(TrackerManager.MANGAUPDATES)!!,
                             login = {
-                                dialog = LoginDialog(trackerManager.get(TrackerManager.MANGAUPDATES)!!, MR.strings.username)
+                                dialog =
+                                    LoginDialog(trackerManager.get(TrackerManager.MANGAUPDATES)!!, MR.strings.username)
                             },
                             logout = { dialog = LogoutDialog(trackerManager.get(TrackerManager.MANGAUPDATES)!!) },
                         ),
@@ -300,10 +303,22 @@ object SettingsTrackingScreen : SearchableSettings {
 
                 // Build label map for all canonical trackers
                 val trackerLabels: Map<Long, String> = buildMap {
-                    put(trackerManager.get(TrackerManager.MANGAUPDATES)!!.id, trackerManager.get(TrackerManager.MANGAUPDATES)!!.name)
-                    put(trackerManager.get(TrackerManager.ANILIST)!!.id, trackerManager.get(TrackerManager.ANILIST)!!.name)
-                    put(trackerManager.get(TrackerManager.MYANIMELIST)!!.id, trackerManager.get(TrackerManager.MYANIMELIST)!!.name)
-                    put((trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).id, (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).name)
+                    put(
+                        trackerManager.get(TrackerManager.MANGAUPDATES)!!.id,
+                        trackerManager.get(TrackerManager.MANGAUPDATES)!!.name,
+                    )
+                    put(
+                        trackerManager.get(TrackerManager.ANILIST)!!.id,
+                        trackerManager.get(TrackerManager.ANILIST)!!.name,
+                    )
+                    put(
+                        trackerManager.get(TrackerManager.MYANIMELIST)!!.id,
+                        trackerManager.get(TrackerManager.MYANIMELIST)!!.name,
+                    )
+                    put(
+                        (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).id,
+                        (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).name,
+                    )
                 }
 
                 fun isAvailable(trackerId: Long): Boolean {
@@ -521,11 +536,22 @@ object SettingsTrackingScreen : SearchableSettings {
                         ),
                     )
                     // Show connection info & settings when Jellyfin is logged in
-                    if (runBlocking { (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).isLoggedIn() }) {
+                    if (runBlocking {
+                            (
+                                trackerManager.get(
+                                    TrackerManager.JELLYFIN,
+                                ) as ephyra.data.track.jellyfin.Jellyfin
+                                ).isLoggedIn()
+                        }
+                    ) {
                         var showUpdateServerUrlDialog by remember { mutableStateOf(false) }
                         if (showUpdateServerUrlDialog) {
                             JellyfinUpdateServerUrlDialog(
-                                jellyfin = (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin),
+                                jellyfin = (
+                                    trackerManager.get(
+                                        TrackerManager.JELLYFIN,
+                                    ) as ephyra.data.track.jellyfin.Jellyfin
+                                    ),
                                 onDismissRequest = { showUpdateServerUrlDialog = false },
                             )
                         }
@@ -561,10 +587,18 @@ object SettingsTrackingScreen : SearchableSettings {
                         if (currentLibraryId.isNotBlank()) {
                             androidx.compose.runtime.LaunchedEffect(currentLibraryId) {
                                 try {
-                                    val serverUrl = (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).getServerUrl()
+                                    val serverUrl = (
+                                        trackerManager.get(
+                                            TrackerManager.JELLYFIN,
+                                        ) as ephyra.data.track.jellyfin.Jellyfin
+                                        ).getServerUrl()
                                     val userId = trackPreferences.jellyfinUserId().get()
                                     if (userId.isNotBlank()) {
-                                        val libs = (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).api.getLibraries(serverUrl, userId)
+                                        val libs = (
+                                            trackerManager.get(
+                                                TrackerManager.JELLYFIN,
+                                            ) as ephyra.data.track.jellyfin.Jellyfin
+                                            ).api.getLibraries(serverUrl, userId)
                                         jellyfinLibraryName = libs.firstOrNull {
                                             it.id == currentLibraryId
                                         }?.name
@@ -585,10 +619,18 @@ object SettingsTrackingScreen : SearchableSettings {
                                     scope.launchIO {
                                         try {
                                             val serverUrl =
-                                                (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).getServerUrl()
+                                                (
+                                                    trackerManager.get(
+                                                        TrackerManager.JELLYFIN,
+                                                    ) as ephyra.data.track.jellyfin.Jellyfin
+                                                    ).getServerUrl()
                                             val userId = trackPreferences.jellyfinUserId().get()
                                             if (userId.isNotBlank()) {
-                                                val libs = (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).api.getLibraries(
+                                                val libs = (
+                                                    trackerManager.get(
+                                                        TrackerManager.JELLYFIN,
+                                                    ) as ephyra.data.track.jellyfin.Jellyfin
+                                                    ).api.getLibraries(
                                                     serverUrl,
                                                     userId,
                                                 )
@@ -635,8 +677,16 @@ object SettingsTrackingScreen : SearchableSettings {
                                 onClick = {
                                     scope.launchIO {
                                         try {
-                                            val info = (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).api.getSystemInfo(
-                                                (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).getServerUrl(),
+                                            val info = (
+                                                trackerManager.get(
+                                                    TrackerManager.JELLYFIN,
+                                                ) as ephyra.data.track.jellyfin.Jellyfin
+                                                ).api.getSystemInfo(
+                                                (
+                                                    trackerManager.get(
+                                                        TrackerManager.JELLYFIN,
+                                                    ) as ephyra.data.track.jellyfin.Jellyfin
+                                                    ).getServerUrl(),
                                             )
                                             // Refresh stored server name on successful test
                                             trackPreferences.jellyfinServerName().set(info.serverName)
@@ -922,12 +972,20 @@ object SettingsTrackingScreen : SearchableSettings {
                         trailingIcon = {
                             IconButton(onClick = { hidePassword = !hidePassword }) {
                                 Icon(
-                                    imageVector = if (hidePassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    imageVector = if (hidePassword) {
+                                        Icons.Filled.Visibility
+                                    } else {
+                                        Icons.Filled.VisibilityOff
+                                    },
                                     contentDescription = null,
                                 )
                             }
                         },
-                        visualTransformation = if (hidePassword) PasswordVisualTransformation() else VisualTransformation.None,
+                        visualTransformation = if (hidePassword) {
+                            PasswordVisualTransformation()
+                        } else {
+                            VisualTransformation.None
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done,
@@ -946,7 +1004,9 @@ object SettingsTrackingScreen : SearchableSettings {
                             processing = true
                             try {
                                 tracker.loginWithCredentials(
-                                    serverUrl.text, username.text, password.text,
+                                    serverUrl.text,
+                                    username.text,
+                                    password.text,
                                 )
                                 withUIContext { onDismissRequest() }
                             } catch (e: Exception) {

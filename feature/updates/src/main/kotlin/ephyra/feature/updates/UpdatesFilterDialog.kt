@@ -87,7 +87,9 @@ private fun ColumnScope.FilterSheet(
 
     val filterExcludedScanlators by screenModel.updatesPreferences.filterExcludedScanlators().collectAsState()
 
-    fun toggleScanlatorFilter() = runBlocking { screenModel.updatesPreferences.filterExcludedScanlators().getAndSet { !it } }
+    fun toggleScanlatorFilter() = runBlocking {
+        screenModel.updatesPreferences.filterExcludedScanlators().getAndSet { !it }
+    }
 
     Row(
         modifier = Modifier

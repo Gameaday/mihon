@@ -15,11 +15,11 @@ import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.util.lang.toLocalDate
 import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadCache
-import ephyra.domain.download.model.Download
 import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.chapter.interactor.SetReadStatus
 import ephyra.domain.chapter.interactor.UpdateChapter
 import ephyra.domain.chapter.model.ChapterUpdate
+import ephyra.domain.download.model.Download
 import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.library.service.LibraryUpdateScheduler
@@ -29,8 +29,8 @@ import ephyra.domain.source.service.SourceManager
 import ephyra.domain.updates.interactor.GetUpdates
 import ephyra.domain.updates.model.UpdatesWithRelations
 import ephyra.domain.updates.service.UpdatesPreferences
-import ephyra.presentation.core.util.asState
 import ephyra.feature.manga.presentation.components.ChapterDownloadAction
+import ephyra.presentation.core.util.asState
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf
