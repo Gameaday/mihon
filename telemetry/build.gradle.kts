@@ -10,9 +10,9 @@ android {
     sourceSets {
         getByName("main") {
             if (Config.includeTelemetry) {
-                java.srcDir("src/firebase/kotlin")
+                kotlin.srcDirs("src/firebase/kotlin")
             } else {
-                java.srcDir("src/noop/kotlin")
+                kotlin.srcDirs("src/noop/kotlin")
             }
         }
     }
