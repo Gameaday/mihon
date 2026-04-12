@@ -18,7 +18,7 @@ object TrackMapper {
         remoteUrl: String,
         startDate: Long,
         finishDate: Long,
-        private: Boolean,
+        isPrivate: Boolean,
     ): Track = Track(
         id = id,
         mangaId = mangaId,
@@ -33,7 +33,7 @@ object TrackMapper {
         remoteUrl = remoteUrl,
         startDate = startDate,
         finishDate = finishDate,
-        private = private,
+        isPrivate = isPrivate,
     )
 
     fun mapTrack(entity: TrackEntity): Track = mapTrack(
@@ -50,6 +50,6 @@ object TrackMapper {
         remoteUrl = entity.remoteUrl,
         startDate = entity.startDate,
         finishDate = entity.finishDate,
-        private = entity.private,
+        isPrivate = entity.isPrivate,
     )
 }

@@ -25,9 +25,9 @@ internal class TrackInfoDialogHomePreviewProvider :
         remoteUrl = "https://example.com",
         startDate = 0L,
         finishDate = 0L,
-        private = false,
+        isPrivate = false,
     )
-    private val privateTrack = aTrack.copy(private = true)
+    private val privateTrack = aTrack.copy(isPrivate = true)
     private val trackItemWithoutTrack = TrackItem(
         track = null,
         tracker = DummyTracker(

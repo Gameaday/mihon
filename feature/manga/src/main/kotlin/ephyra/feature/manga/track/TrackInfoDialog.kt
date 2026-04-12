@@ -265,7 +265,7 @@ data class TrackInfoDialogHomeScreen(
                         remoteUrl = matchResult.tracking_url,
                         startDate = 0L,
                         finishDate = 0L,
-                        private = matchResult.private,
+                        isPrivate = matchResult.isPrivate,
                     )
                     item.tracker.register(track, mangaId)
                 } catch (_: Exception) {
@@ -297,7 +297,7 @@ data class TrackInfoDialogHomeScreen(
 
         fun togglePrivate(item: TrackItem) {
             screenModelScope.launchNonCancellable {
-                item.tracker.setRemotePrivate(item.track!!, !item.track.private)
+                item.tracker.setRemotePrivate(item.track!!, !item.track.isPrivate)
             }
         }
 
@@ -732,9 +732,9 @@ data class TrackerSearchScreen(
             queryResult = state.queryResult,
             selected = state.selected,
             onSelectedChange = screenModel::updateSelection,
-            onConfirmSelection = f@{ private: Boolean ->
+            onConfirmSelection = f@{ isPrivate: Boolean ->
                 val selected = state.selected ?: return@f
-                selected.private = private
+                selected.isPrivate = isPrivate
                 screenModel.registerTracking(selected)
                 navigator.pop()
             },
@@ -797,7 +797,7 @@ data class TrackerSearchScreen(
                     remoteUrl = item.tracking_url,
                     startDate = 0L,
                     finishDate = 0L,
-                    private = item.private,
+                    isPrivate = item.isPrivate,
                 )
                 tracker.register(track, mangaId)
             }

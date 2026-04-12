@@ -254,7 +254,7 @@ class AuthoritySearchScreenModel(
                             remoteUrl = result.tracking_url,
                             startDate = result.started_reading_date,
                             finishDate = result.finished_reading_date,
-                            private = result.private,
+                            isPrivate = result.isPrivate,
                         )
                         insertTrack.await(track)
                     }
@@ -353,7 +353,7 @@ class AuthoritySearchScreenModel(
                 remoteUrl = result.tracking_url,
                 startDate = 0L,
                 finishDate = 0L,
-                private = result.private,
+                isPrivate = result.isPrivate,
             )
             insertTrack.await(track)
         }

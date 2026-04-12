@@ -132,8 +132,8 @@ abstract class BaseTracker(
         updateRemote(track.copy(finishDate = epochMillis))
     }
 
-    override suspend fun setRemotePrivate(track: Track, private: Boolean) {
-        updateRemote(track.copy(private = private))
+    override suspend fun setRemotePrivate(track: Track, isPrivate: Boolean) {
+        updateRemote(track.copy(isPrivate = isPrivate))
     }
 
     private suspend fun updateRemote(track: Track): Unit = withIOContext {

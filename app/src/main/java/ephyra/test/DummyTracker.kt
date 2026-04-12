@@ -116,6 +116,6 @@ data class DummyTracker(
 
     override suspend fun setRemotePrivate(
         track: Track,
-        private: Boolean,
+        isPrivate: Boolean,
     ) = Unit
 }

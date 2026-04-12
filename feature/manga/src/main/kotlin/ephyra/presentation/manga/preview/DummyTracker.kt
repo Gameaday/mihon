@@ -80,5 +80,5 @@ internal data class DummyTracker(
 
     override suspend fun setRemoteFinishDate(track: Track, epochMillis: Long) = Unit
 
-    override suspend fun setRemotePrivate(track: Track, private: Boolean) = Unit
+    override suspend fun setRemotePrivate(track: Track, isPrivate: Boolean) = Unit
 }

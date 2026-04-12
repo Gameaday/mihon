@@ -16,5 +16,5 @@ data class Track(
     val remoteUrl: String,
     val startDate: Long,
     val finishDate: Long,
-    val private: Boolean,
+    val isPrivate: Boolean,
 ) : Serializable

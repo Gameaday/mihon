@@ -93,7 +93,7 @@ fun TrackerSearch(
     queryResult: Result<List<TrackSearch>>?,
     selected: TrackSearch?,
     onSelectedChange: (TrackSearch) -> Unit,
-    onConfirmSelection: (private: Boolean) -> Unit,
+    onConfirmSelection: (isPrivate: Boolean) -> Unit,
     onDismissRequest: () -> Unit,
     supportsPrivateTracking: Boolean,
 ) {

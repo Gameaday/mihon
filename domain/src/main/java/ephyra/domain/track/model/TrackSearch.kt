@@ -22,5 +22,5 @@ data class TrackSearch(
     val score: Double = 0.0,
     val started_reading_date: Long = 0L,
     val finished_reading_date: Long = 0L,
-    var private: Boolean = false,
+    var isPrivate: Boolean = false,
 ) : Serializable

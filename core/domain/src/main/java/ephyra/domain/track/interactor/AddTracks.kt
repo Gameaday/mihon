@@ -113,7 +113,7 @@ class AddTracks(
                                 remoteUrl = searchResult.tracking_url,
                                 startDate = 0,
                                 finishDate = 0,
-                                private = false,
+                                isPrivate = false,
                             )
                             val boundTrack = (service as Tracker).bind(track)
                             insertTrack.await(boundTrack)

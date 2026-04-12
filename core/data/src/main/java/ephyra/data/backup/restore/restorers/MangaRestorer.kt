@@ -417,7 +417,7 @@ class MangaRestorer(
                         track.remoteUrl,
                         track.startDate,
                         track.finishDate,
-                        track.private,
+                        track.isPrivate,
                         track.id,
                     )
                 }

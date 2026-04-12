@@ -32,7 +32,7 @@ interface Track : Serializable {
 
     var tracking_url: String
 
-    var private: Boolean
+    var isPrivate: Boolean
 
     fun copyPersonalFrom(other: Track, copyRemotePrivate: Boolean = true) {
         last_chapter_read = other.last_chapter_read
@@ -40,7 +40,7 @@ interface Track : Serializable {
         status = other.status
         started_reading_date = other.started_reading_date
         finished_reading_date = other.finished_reading_date
-        if (copyRemotePrivate) private = other.private
+        if (copyRemotePrivate) isPrivate = other.isPrivate
     }
 
     companion object {

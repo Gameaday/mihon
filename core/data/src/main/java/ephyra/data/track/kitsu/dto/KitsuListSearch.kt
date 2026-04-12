@@ -5,6 +5,7 @@ import ephyra.data.track.kitsu.KitsuApi
 import ephyra.data.track.kitsu.KitsuDateHelper
 import ephyra.data.track.model.TrackSearch
 import ephyra.domain.track.service.TrackerManager
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -43,7 +44,7 @@ data class KitsuListSearchResult(
             }
             score = userDataAttrs.ratingTwenty?.let { it / 2.0 } ?: 0.0
             last_chapter_read = userDataAttrs.progress.toDouble()
-            private = userDataAttrs.private
+            isPrivate = userDataAttrs.isPrivate
         }
     }
 }
@@ -61,7 +62,8 @@ data class KitsuListSearchItemDataAttributes(
     val finishedAt: String?,
     val ratingTwenty: Int?,
     val progress: Int,
-    val private: Boolean,
+    @SerialName("private")
+    val isPrivate: Boolean,
 )
 
 @Serializable

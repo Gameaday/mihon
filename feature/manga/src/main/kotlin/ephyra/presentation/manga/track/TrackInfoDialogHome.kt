@@ -140,7 +140,7 @@ fun TrackInfoDialogHome(
                     onOpenInBrowser = { onOpenInBrowser(item) } as () -> Unit,
                     onRemoved = { onRemoved(item) } as () -> Unit,
                     onCopyLink = { onCopyLink(item) } as () -> Unit,
-                    private = item.track.private,
+                    isPrivate = item.track.isPrivate,
                     onTogglePrivate = { onTogglePrivate(item) }
                         .takeIf { supportsPrivate },
                 )
@@ -186,7 +186,7 @@ private fun TrackInfoItem(
     onOpenInBrowser: () -> Unit,
     onRemoved: () -> Unit,
     onCopyLink: () -> Unit,
-    private: Boolean,
+    isPrivate: Boolean,
     onTogglePrivate: (() -> Unit)?,
 ) {
     val context = LocalContext.current
@@ -217,7 +217,7 @@ private fun TrackInfoItem(
                                 modifier = Modifier.size(14.dp),
                             )
                         }
-                    } else if (private) {
+                    } else if (isPrivate) {
                         Badge(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -274,7 +274,7 @@ private fun TrackInfoItem(
                 onOpenInBrowser = onOpenInBrowser,
                 onRemoved = onRemoved,
                 onCopyLink = onCopyLink,
-                private = private,
+                isPrivate = isPrivate,
                 onTogglePrivate = onTogglePrivate,
             )
         }
@@ -398,7 +398,7 @@ private fun TrackInfoItemMenu(
     onOpenInBrowser: () -> Unit,
     onRemoved: () -> Unit,
     onCopyLink: () -> Unit,
-    private: Boolean,
+    isPrivate: Boolean,
     onTogglePrivate: (() -> Unit)?,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -432,7 +432,7 @@ private fun TrackInfoItemMenu(
                     text = {
                         Text(
                             stringResource(
-                                if (private) {
+                                if (isPrivate) {
                                     MR.strings.action_toggle_private_off
                                 } else {
                                     MR.strings.action_toggle_private_on

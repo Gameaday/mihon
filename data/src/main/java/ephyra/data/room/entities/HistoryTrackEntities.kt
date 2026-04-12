@@ -53,7 +53,7 @@ data class TrackEntity(
     @ColumnInfo(name = "remote_url") val remoteUrl: String,
     @ColumnInfo(name = "start_date") val startDate: Long,
     @ColumnInfo(name = "finish_date") val finishDate: Long,
-    @ColumnInfo(name = "private") val private: Boolean,
+    @ColumnInfo(name = "private") val isPrivate: Boolean,
 )
 
 @Entity(tableName = "extension_repos")

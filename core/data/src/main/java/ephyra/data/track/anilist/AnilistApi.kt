@@ -59,7 +59,7 @@ class AnilistApi(
                     put("mangaId", track.remote_id)
                     put("progress", track.last_chapter_read.toInt())
                     put("status", track.toApiStatus())
-                    put("private", track.private)
+                    put("private", track.isPrivate)
                 }
             }
             with(json) {
@@ -106,7 +106,7 @@ class AnilistApi(
                     put("score", track.score.toInt())
                     put("startedAt", createDate(track.started_reading_date))
                     put("completedAt", createDate(track.finished_reading_date))
-                    put("private", track.private)
+                    put("private", track.isPrivate)
                 }
             }
             authClient.newCall(POST(API_URL, body = payload.toString().toRequestBody(jsonMime)))

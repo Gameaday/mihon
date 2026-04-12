@@ -30,7 +30,7 @@ class TrackSearch : Track {
 
     override var finished_reading_date: Long = 0
 
-    override var private: Boolean = false
+    override var isPrivate: Boolean = false
 
     override lateinit var tracking_url: String
 

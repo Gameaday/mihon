@@ -13,7 +13,8 @@ data class BGMCollectionResponse(
     val epStatus: Int? = 0,
     @SerialName("vol_status")
     val volStatus: Int? = 0,
-    val private: Boolean = false,
+    @SerialName("private")
+    val isPrivate: Boolean = false,
     val subject: BGMSlimSubject? = null,
 ) {
     fun getStatus(): Long = when (type) {
