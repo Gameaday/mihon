@@ -190,7 +190,7 @@ class ReaderActivity : BaseActivity() {
             .onEach { event ->
                 when (event) {
                     is ReaderViewModel.Event.ReloadViewerChapters -> updateViewer()
-                    is ReaderViewModel.Event.PageChanged -> { /* TODO */ }
+                    is ReaderViewModel.Event.PageChanged -> displayRefreshHost.flash()
                     is ReaderViewModel.Event.SetOrientation -> setOrientation(event.orientation)
                     is ReaderViewModel.Event.SetCoverResult -> onSetAsCoverResult(event.result)
                     is ReaderViewModel.Event.BlockPageResult -> onBlockPageResult(event.result)
@@ -515,7 +515,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     fun onPageLongTap(page: ReaderPage) {
-        // TODO
+        viewModel.openPageDialog(page)
     }
 
     fun requestPreloadChapter(chapter: ReaderChapter) {
@@ -558,7 +558,10 @@ class ReaderActivity : BaseActivity() {
     }
 
     fun onBlockPageResult(result: ReaderViewModel.BlockPageResult) {
-        // TODO
+        when (result) {
+            is ReaderViewModel.BlockPageResult.Success -> toast(MR.strings.page_blocked)
+            is ReaderViewModel.BlockPageResult.Error -> toast(MR.strings.page_block_error)
+        }
     }
 
     fun setOrientation(orientation: Int) {

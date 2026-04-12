@@ -49,7 +49,11 @@ class InMemoryPreferenceStore(
     }
 
     override fun getStringSet(key: String, defaultValue: Set<String>): Preference<Set<String>> {
-        TODO("Not yet implemented")
+        val default = InMemoryPreference(key, null, defaultValue)
+
+        @Suppress("UNCHECKED_CAST")
+        val data: Set<String>? = runBlocking { preferences[key]?.get() } as? Set<String>
+        return if (data == null) default else InMemoryPreference(key, data, defaultValue)
     }
 
     @Suppress("UNCHECKED_CAST")
