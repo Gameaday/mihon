@@ -11,6 +11,7 @@ import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.download.model.Download
 import ephyra.domain.download.service.DownloadPreferences
+import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.source.service.SourceManager
@@ -43,6 +44,7 @@ class DownloadManager(
     private val getChapter: GetChapter,
     private val sourceManager: SourceManager,
     private val downloadPreferences: DownloadPreferences,
+    private val libraryPreferences: LibraryPreferences,
     private val downloader: Downloader,
     private val pendingDeleter: DownloadPendingDeleter,
 ) : IDownloadManager {
@@ -383,7 +385,7 @@ class DownloadManager(
             .mapNotNull { mangaDir.findFile(it) }
             .firstOrNull() ?: return
 
-        val disallowNonAscii = downloadPreferences.downloadOnlyOverWifi().get() // Placeholder
+        val disallowNonAscii = libraryPreferences.disallowNonAsciiFilenames().get()
         var newName = provider.getChapterDirName(
             newChapter.name,
             newChapter.scanlator,
