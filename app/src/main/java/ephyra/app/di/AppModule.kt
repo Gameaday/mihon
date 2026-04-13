@@ -38,6 +38,7 @@ import ephyra.data.backup.create.creators.PreferenceBackupCreator
 import ephyra.data.backup.create.creators.SourcesBackupCreator
 import ephyra.data.backup.restore.BackupRestorer
 import ephyra.data.backup.restore.restorers.CategoriesRestorer
+import ephyra.data.backup.restore.restorers.ExtensionRepoRestorer
 import ephyra.data.backup.restore.restorers.MangaRestorer
 import ephyra.data.backup.restore.restorers.PreferenceRestorer
 import ephyra.data.cache.ChapterCache
@@ -194,6 +195,7 @@ val koinAppModule = module {
     single { BackupCreator(androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 
     single { CategoriesRestorer(get(), get(), get()) }
+    single { ExtensionRepoRestorer(get(), get()) }
     single { BackupRestorer(androidApplication(), get(), get(), get(), get(), get()) }
     single { AppUpdateChecker(get(), get()) }
 

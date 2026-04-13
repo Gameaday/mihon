@@ -135,7 +135,7 @@ class PreferenceRestorer(
         }
 
         if (ids.isNotEmpty()) {
-            // preferenceStore.getStringSet(key) += ids
+            preferenceStore.getStringSet(key).set(ids.toSet())
         }
         return true
     }

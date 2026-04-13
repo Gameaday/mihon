@@ -36,7 +36,7 @@ class BackupRestoreJob(
             backupRestorer.restore(uri, options) { progress, total, title ->
                 notifier.showRestoreProgress(progress, total, title)
             }
-            notifier.showRestoreComplete(0, 0, uri.path)
+            // showRestoreComplete is called by BackupRestorer.restore() itself
             Result.success()
         } catch (e: Exception) {
             logcat(LogPriority.ERROR, e)

@@ -2,10 +2,8 @@ package ephyra.data.backup
 
 import android.content.Context
 import android.net.Uri
-import ephyra.data.backup.models.Backup
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.service.TrackerManager
-import eu.kanade.tachiyomi.source.Source
 
 class BackupFileValidator(
     private val context: Context,
@@ -27,8 +25,10 @@ class BackupFileValidator(
             .values.toSet()
 
         val trackers = backup.backupManga.flatMap { it.tracking }.map { it.syncId }.toSet()
-        val missingTrackers = trackers.filter { trackerManager.get(it.toLong()) == null }
-            .mapNotNull { trackerManager.get(it.toLong())?.name }.toSet()
+        val missingTrackers = trackers
+            .filter { trackerManager.get(it.toLong()) == null }
+            .map { it.toString() }
+            .toSet()
 
         return ValidationResult(
             missingSources = missingSources,
