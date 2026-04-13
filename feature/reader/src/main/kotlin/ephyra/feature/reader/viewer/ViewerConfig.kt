@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 
 /**
  * Common configuration for all viewers.
@@ -75,7 +74,7 @@ abstract class ViewerConfig(
         readerPreferences.alwaysShowChapterTransition()
             .register({ alwaysShowChapterTransition = it })
 
-        forceNavigationOverlay = runBlocking { readerPreferences.showNavigationOverlayNewUser().get() }
+        forceNavigationOverlay = readerPreferences.showNavigationOverlayNewUser().getSync()
         if (forceNavigationOverlay) {
             readerPreferences.showNavigationOverlayNewUser().set(false)
         }

@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 
 /**
  * Configuration used by pager viewers.
@@ -24,7 +23,7 @@ class PagerConfig(
     readerPreferences: ReaderPreferences,
 ) : ViewerConfig(readerPreferences, scope) {
 
-    var theme = runBlocking { readerPreferences.readerTheme().get() }
+    var theme = readerPreferences.readerTheme().getSync()
         private set
 
     var automaticBackground = false

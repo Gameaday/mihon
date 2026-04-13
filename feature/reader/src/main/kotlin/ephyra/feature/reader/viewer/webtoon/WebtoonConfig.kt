@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 
 /**
  * Configuration used by webtoon viewers.
@@ -41,7 +40,7 @@ class WebtoonConfig(
 
     var doubleTapZoomChangedListener: ((Boolean) -> Unit)? = null
 
-    val theme = runBlocking { readerPreferences.readerTheme().get() }
+    val theme = readerPreferences.readerTheme().getSync()
 
     init {
         readerPreferences.cropBordersWebtoon()

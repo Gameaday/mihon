@@ -13,6 +13,7 @@ import ephyra.core.common.util.system.logcat
 import ephyra.core.common.util.system.setForegroundSafely
 import ephyra.core.common.util.system.workManager
 import ephyra.data.backup.restore.BackupRestorer
+import ephyra.data.backup.restore.RestoreOptions
 import logcat.LogPriority
 
 class BackupRestoreJob(
@@ -28,9 +29,11 @@ class BackupRestoreJob(
 
         val uriString = inputData.getString(LOCATION_EXTRA) ?: return Result.failure()
         val uri = Uri.parse(uriString)
+        val optionsArray = inputData.getBooleanArray(OPTIONS_KEY)
+        val options = optionsArray?.let { RestoreOptions.fromBooleanArray(it) }
 
         return try {
-            backupRestorer.restore(uri) { progress, total, title ->
+            backupRestorer.restore(uri, options) { progress, total, title ->
                 notifier.showRestoreProgress(progress, total, title)
             }
             notifier.showRestoreComplete(0, 0, uri.path)
@@ -45,15 +48,16 @@ class BackupRestoreJob(
     companion object {
         private const val TAG = "BackupRestore"
         const val LOCATION_EXTRA = "location"
+        private const val OPTIONS_KEY = "restore_options"
 
         fun start(context: Context, uri: Uri, optionsArray: BooleanArray? = null) {
             val data = Data.Builder()
                 .putString(LOCATION_EXTRA, uri.toString())
-                .build()
+            optionsArray?.let { data.putBooleanArray(OPTIONS_KEY, it) }
 
             val request = OneTimeWorkRequestBuilder<BackupRestoreJob>()
                 .addTag(TAG)
-                .setInputData(data)
+                .setInputData(data.build())
                 .build()
             context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.KEEP, request)
         }

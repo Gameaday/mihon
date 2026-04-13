@@ -18,6 +18,7 @@ import ephyra.core.common.util.system.logcat
 import ephyra.core.common.util.system.setForegroundSafely
 import ephyra.core.common.util.system.workManager
 import ephyra.data.backup.create.BackupCreator
+import ephyra.data.backup.create.BackupOptions
 import ephyra.data.notification.Notifications
 import logcat.LogPriority
 import java.util.concurrent.TimeUnit
@@ -35,10 +36,12 @@ class BackupCreateJob(
 
         val uriString = inputData.getString(URI_KEY)
         val uri = uriString?.let { Uri.parse(it) }
+        val optionsArray = inputData.getBooleanArray(OPTIONS_KEY)
+        val options = optionsArray?.let { BackupOptions.fromBooleanArray(it) }
 
         return try {
             notifier.showBackupProgress()
-            val resultUri = backupCreator.createBackup(uri)
+            val resultUri = backupCreator.createBackup(uri, options)
             notifier.showBackupComplete(resultUri)
             Result.success()
         } catch (e: Exception) {
@@ -51,6 +54,7 @@ class BackupCreateJob(
     companion object {
         private const val TAG = "BackupCreate"
         private const val URI_KEY = "backup_uri"
+        private const val OPTIONS_KEY = "backup_options"
 
         fun setupTask(context: Context, interval: Int) {
             val constraints = Constraints.Builder()
@@ -76,6 +80,7 @@ class BackupCreateJob(
         fun startNow(context: Context, uri: Uri? = null, optionsArray: BooleanArray? = null) {
             val data = Data.Builder()
             uri?.let { data.putString(URI_KEY, it.toString()) }
+            optionsArray?.let { data.putBooleanArray(OPTIONS_KEY, it) }
 
             val request = OneTimeWorkRequestBuilder<BackupCreateJob>()
                 .addTag(TAG)

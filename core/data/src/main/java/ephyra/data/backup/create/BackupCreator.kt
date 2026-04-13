@@ -51,8 +51,8 @@ class BackupCreator(
     private val storageManager: StorageManager,
 ) {
 
-    suspend fun createBackup(uri: Uri? = null): Uri {
-        val options = BackupOptions() // Default options
+    suspend fun createBackup(uri: Uri? = null, options: BackupOptions? = null): Uri {
+        val effectiveOptions = options ?: BackupOptions()
         val filename = getFilename()
         val parentDir = if (uri != null) {
             UniFile.fromUri(context, uri)
@@ -63,7 +63,7 @@ class BackupCreator(
         val file = parentDir.createFile(filename)
             ?: throw Exception("Failed to create backup file")
 
-        val backupMangas = mangaBackupCreator(getFavorites.await(), options)
+        val backupMangas = mangaBackupCreator(getFavorites.await(), effectiveOptions)
         val backup = Backup(
             backupManga = backupMangas,
             backupCategories = categoriesBackupCreator(),

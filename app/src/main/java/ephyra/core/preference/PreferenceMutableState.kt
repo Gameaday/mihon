@@ -6,14 +6,13 @@ import ephyra.core.common.preference.Preference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 
 class PreferenceMutableState<T>(
     private val preference: Preference<T>,
     scope: CoroutineScope,
 ) : MutableState<T> {
 
-    private val state = mutableStateOf(runBlocking { preference.get() })
+    private val state = mutableStateOf(preference.getSync())
 
     init {
         preference.changes()

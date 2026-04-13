@@ -41,7 +41,7 @@ class BackupRestorer(
 
     private var sourceMapping: Map<Long, String> = emptyMap()
 
-    suspend fun restore(uri: Uri, onProgress: (Int, Int, String) -> Unit) {
+    suspend fun restore(uri: Uri, options: RestoreOptions? = null, onProgress: (Int, Int, String) -> Unit) {
         val startTime = System.currentTimeMillis()
 
         // restoreFromFile(uri, onProgress) // Simplified for now
