@@ -142,7 +142,7 @@ data class MigrateSourceSearchScreen(
                     onComplete = {
                         scope.launch {
                             navigator.popUntilRoot()
-                            (navigator as? BottomNavController)?.showBottomNav(true)
+                            (navigator.lastItem as? BottomNavController)?.showBottomNav(true)
                             navigator.push(MangaScreen(dialog.target.id))
                         }
                     },

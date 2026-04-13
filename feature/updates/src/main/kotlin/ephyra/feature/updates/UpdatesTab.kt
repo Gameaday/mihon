@@ -116,7 +116,7 @@ data object UpdatesTab : Tab {
         }
 
         LaunchedEffect(state.selectionMode) {
-            (navigator as? BottomNavController)?.showBottomNav(!state.selectionMode)
+            (navigator.lastItem as? BottomNavController)?.showBottomNav(!state.selectionMode)
         }
 
         LaunchedEffect(state.isLoading) {

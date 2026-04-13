@@ -273,7 +273,7 @@ data object LibraryTab : Tab {
         }
 
         LaunchedEffect(state.selectionMode, state.dialog) {
-            (navigator as? BottomNavController)?.showBottomNav(!state.selectionMode)
+            (navigator.lastItem as? BottomNavController)?.showBottomNav(!state.selectionMode)
         }
 
         LaunchedEffect(state.isLoading) {
