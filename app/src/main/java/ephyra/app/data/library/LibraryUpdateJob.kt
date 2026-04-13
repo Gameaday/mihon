@@ -61,6 +61,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import ephyra.domain.manga.model.SourceStatus
 
 class LibraryUpdateJob(
     private val context: Context,
@@ -378,6 +379,35 @@ class LibraryUpdateJob(
         private const val WORK_NAME_MANUAL = "LibraryUpdate-manual"
 
         private const val KEY_CATEGORY = "category"
+
+        /** Sentinel value written to [ephyra.domain.manga.model.Manga.deadSince] to signal "cleared". */
+        const val DEAD_SINCE_CLEARED = 0L
+
+        /** Manga that have been DEAD for this long are eligible for automatic migration suggestions. */
+        const val DEAD_MIGRATION_THRESHOLD_MS = 3L * 24 * 60 * 60 * 1000
+
+        /**
+         * Chapter-drop threshold expressed as a fraction: NUMERATOR / DENOMINATOR.
+         * A fetch that returns fewer than 70% of the previous chapter count is [SourceStatus.DEGRADED].
+         */
+        const val CHAPTER_DROP_THRESHOLD_NUMERATOR = 7
+        const val CHAPTER_DROP_THRESHOLD_DENOMINATOR = 10
+
+        /**
+         * Determines the [SourceStatus] of a manga based on the number of chapters fetched vs.
+         * the number previously known.
+         *
+         * @param fetchedCount chapters returned by the source in the latest refresh.
+         * @param previousCount chapters known before the refresh.
+         */
+        fun detectSourceHealth(fetchedCount: Int, previousCount: Int): SourceStatus {
+            return when {
+                fetchedCount == 0 && previousCount > 0 -> SourceStatus.DEAD
+                fetchedCount * CHAPTER_DROP_THRESHOLD_DENOMINATOR <
+                    previousCount * CHAPTER_DROP_THRESHOLD_NUMERATOR -> SourceStatus.DEGRADED
+                else -> SourceStatus.HEALTHY
+            }
+        }
 
         fun setupTask(context: Context, preferences: LibraryPreferences) {
             // Placeholder

@@ -1,5 +1,8 @@
 package ephyra.feature.migration.list.search
 
+import ephyra.domain.manga.interactor.BaseSmartSearchEngine
+import ephyra.domain.manga.interactor.SearchAction
+import ephyra.domain.manga.interactor.SearchEntry
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest

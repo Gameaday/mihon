@@ -194,7 +194,7 @@ class FindContentSource(
      * Multiple language variants of the same provider (e.g. MangaDex EN/JP/ES) return the same
      * manga URL; keeping only the highest-confidence hit avoids showing identical entries.
      */
-    internal fun deduplicateByUrl(results: List<SourceMatch>): List<SourceMatch> {
+    fun deduplicateByUrl(results: List<SourceMatch>): List<SourceMatch> {
         return results
             .groupBy { it.manga.url }
             .mapNotNull { (_, matches) -> matches.maxByOrNull { it.confidence } }
@@ -205,7 +205,7 @@ class FindContentSource(
      * First picks the best match per provider (grouped by [CatalogueSource.name]),
      * then fills remaining slots with next-best results from any provider.
      */
-    internal fun diversifyByProvider(results: List<SourceMatch>, limit: Int): List<SourceMatch> {
+    fun diversifyByProvider(results: List<SourceMatch>, limit: Int): List<SourceMatch> {
         if (results.size <= limit) return results
 
         val sorted = results.sortedByDescending { it.confidence }
@@ -266,7 +266,7 @@ class FindContentSource(
      * Final ranking: sources with chapters first, then by confidence, then chapter count.
      * Sources with 0 chapters (dead/degraded) are pushed to the bottom.
      */
-    internal fun rankResults(results: List<SourceMatch>, maxResults: Int): List<SourceMatch> {
+    fun rankResults(results: List<SourceMatch>, maxResults: Int): List<SourceMatch> {
         return results
             .sortedWith(
                 compareByDescending<SourceMatch> { it.chapterCount > 0 }

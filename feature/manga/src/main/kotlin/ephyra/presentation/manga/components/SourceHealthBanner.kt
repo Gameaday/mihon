@@ -128,7 +128,7 @@ fun SourceHealthBanner(
 /**
  * Formats a dead_since timestamp into a human-readable duration string.
  */
-internal fun formatDeadDuration(deadSince: Long): String? {
+fun formatDeadDuration(deadSince: Long): String? {
     if (deadSince <= 0) return null
     val elapsed = System.currentTimeMillis() - deadSince
     if (elapsed < 0) return null

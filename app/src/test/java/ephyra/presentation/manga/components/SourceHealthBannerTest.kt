@@ -1,5 +1,6 @@
 package ephyra.presentation.manga.components
 
+import ephyra.feature.manga.presentation.components.formatDeadDuration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

@@ -1,9 +1,9 @@
 package ephyra.domain.track.interactor
 
-import ephyra.data.cache.CoverCache
-import ephyra.data.track.Tracker
-import ephyra.data.track.TrackerManager
-import ephyra.data.track.model.TrackSearch
+import ephyra.domain.manga.service.CoverCache
+import ephyra.domain.track.model.TrackSearch
+import ephyra.domain.track.service.Tracker
+import ephyra.domain.track.service.TrackerManager
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.repository.MangaRepository
@@ -68,19 +68,17 @@ class RefreshCanonicalMetadataTest {
         alternativeTitles: List<String> = emptyList(),
         publishingStatus: String = "",
         genres: List<String> = emptyList(),
-    ): TrackSearch {
-        val ts = TrackSearch()
-        ts.title = title
-        ts.remote_id = remoteId
-        ts.summary = summary
-        ts.authors = authors
-        ts.artists = artists
-        ts.cover_url = coverUrl
-        ts.alternative_titles = alternativeTitles
-        ts.publishing_status = publishingStatus
-        ts.genres = genres
-        return ts
-    }
+    ) = TrackSearch(
+        remote_id = remoteId,
+        title = title,
+        summary = summary,
+        authors = authors,
+        artists = artists,
+        cover_url = coverUrl,
+        alternative_titles = alternativeTitles,
+        publishing_status = publishingStatus,
+        genres = genres,
+    )
 
     @BeforeEach
     fun setup() {
@@ -92,12 +90,12 @@ class RefreshCanonicalMetadataTest {
 
         // Default: no content source priority fields (all fields prefer authority)
         val contentSourcePriorityPref = mockk<ephyra.core.common.preference.Preference<Long>>(relaxed = true)
-        every { contentSourcePriorityPref.get() } returns 0L
+        coEvery { contentSourcePriorityPref.get() } returns 0L
         every { trackPreferences.contentSourcePriorityFields() } returns contentSourcePriorityPref
 
         // MangaUpdates tracker (ID 7)
         every { muTracker.id } returns 7L
-        every { muTracker.isLoggedIn } returns false
+        coEvery { muTracker.isLoggedIn() } returns false
         every { trackerManager.get(7L) } returns muTracker
 
         refreshCanonicalMetadata =
@@ -433,15 +431,15 @@ class RefreshCanonicalMetadataTest {
             val tm = mockk<TrackerManager>(relaxed = true)
             val tracker = mockk<Tracker>(relaxed = true)
             every { tracker.id } returns 7L
-            every { tracker.isLoggedIn } returns false
+            coEvery { tracker.isLoggedIn() } returns false
             every { tm.get(7L) } returns tracker
 
             val tp = mockk<TrackPreferences>(relaxed = true)
             val csPref = mockk<ephyra.core.common.preference.Preference<Long>>(relaxed = true)
-            every { csPref.get() } returns 0L
+            coEvery { csPref.get() } returns 0L
             every { tp.contentSourcePriorityFields() } returns csPref
 
-            val cc = mockk<ephyra.app.data.cache.CoverCache>(relaxed = true)
+            val cc = mockk<CoverCache>(relaxed = true)
             val refresh = RefreshCanonicalMetadata(repo, tm, tp, cc)
 
             val manga = testManga(

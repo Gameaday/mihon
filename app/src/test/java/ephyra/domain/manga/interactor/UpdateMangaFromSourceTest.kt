@@ -101,17 +101,17 @@ class UpdateMangaFromSourceTest {
 
         // Default: allow title updates for favorites
         val updateTitlesPref = mockk<Preference<Boolean>>(relaxed = true)
-        every { updateTitlesPref.get() } returns true
+        coEvery { updateTitlesPref.get() } returns true
         every { libraryPreferences.updateMangaTitles() } returns updateTitlesPref
 
         // Default: no content source priority fields
         val csPriorityPref = mockk<Preference<Long>>(relaxed = true)
-        every { csPriorityPref.get() } returns 0L
+        coEvery { csPriorityPref.get() } returns 0L
         every { trackPreferences.contentSourcePriorityFields() } returns csPriorityPref
 
         coEvery { mangaRepository.update(any()) } returns true
 
-        updateManga = UpdateManga(mangaRepository, fetchInterval)
+        updateManga = UpdateManga(mangaRepository, fetchInterval, coverCache, libraryPreferences, downloadManager, trackPreferences)
     }
 
     @Test
@@ -142,10 +142,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         result shouldBe true
@@ -179,10 +175,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = true,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         result shouldBe true
@@ -216,10 +208,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         val updateSlot = slot<MangaUpdate>()
@@ -253,10 +241,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = true,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         // Cover cache should not be touched when URL is unchanged
@@ -279,10 +263,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         val updateSlot = slot<MangaUpdate>()
@@ -310,10 +290,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         val updateSlot = slot<MangaUpdate>()
@@ -340,10 +316,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         val updateSlot = slot<MangaUpdate>()
@@ -368,10 +340,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         val updateSlot = slot<MangaUpdate>()
@@ -395,10 +363,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         val updateSlot = slot<MangaUpdate>()
@@ -423,10 +387,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         result shouldBe true
@@ -447,10 +407,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         coVerify { downloadManager.renameManga(manga, "New Title") }
@@ -470,10 +426,6 @@ class UpdateMangaFromSourceTest {
             manga,
             remote,
             manualFetch = false,
-            coverCache = coverCache,
-            libraryPreferences = libraryPreferences,
-            downloadManager = downloadManager,
-            trackPreferences = trackPreferences,
         )
 
         coVerify(exactly = 0) { downloadManager.renameManga(any(), any()) }

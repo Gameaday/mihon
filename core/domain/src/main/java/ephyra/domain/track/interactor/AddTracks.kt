@@ -143,7 +143,7 @@ class AddTracks(
      * Only authoritative trackers (AniList, MAL, MangaUpdates) produce canonical IDs.
      * Once set, canonical_id is not overwritten by subsequent tracker bindings.
      */
-    internal suspend fun setCanonicalIdIfAbsent(mangaId: Long, trackerId: Long, remoteId: Long) {
+    suspend fun setCanonicalIdIfAbsent(mangaId: Long, trackerId: Long, remoteId: Long) {
         if (remoteId <= 0) return
 
         val prefix = TRACKER_CANONICAL_PREFIXES[trackerId] ?: return
@@ -165,7 +165,7 @@ class AddTracks(
      * Deduplicates and filters blanks. New titles are additive — existing titles are never removed.
      * Also adds the tracker's title as an alternative if it differs from the manga's primary title.
      */
-    internal suspend fun mergeAlternativeTitles(mangaId: Long, newTitles: List<String>) {
+    suspend fun mergeAlternativeTitles(mangaId: Long, newTitles: List<String>) {
         try {
             val manga = mangaRepository.getMangaById(mangaId)
             val merged = manga.mergedAlternativeTitles(newTitles) ?: return
