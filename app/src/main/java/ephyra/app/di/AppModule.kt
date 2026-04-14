@@ -1,7 +1,10 @@
 package ephyra.app.di
 
 import android.app.DownloadManager
+import android.database.sqlite.SQLiteException
 import androidx.room.*
+import ephyra.core.common.util.system.logcat
+import logcat.LogPriority
 import ephyra.app.data.backup.BackupNotifier
 import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.restore.BackupRestoreJob
@@ -96,11 +99,11 @@ val koinAppModule = module {
                 override fun onOpen(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                     super.onOpen(db)
                     try {
-                        db.query("PRAGMA foreign_keys = ON").close()
-                        db.query("PRAGMA journal_mode = WAL").close()
-                        db.query("PRAGMA synchronous = NORMAL").close()
-                    } catch (_: Exception) {
-                        // PRAGMA configuration is best-effort; failures are non-fatal.
+                        db.execSQL("PRAGMA foreign_keys = ON")
+                        db.execSQL("PRAGMA journal_mode = WAL")
+                        db.execSQL("PRAGMA synchronous = NORMAL")
+                    } catch (e: SQLiteException) {
+                        logcat(LogPriority.WARN, e) { "Failed to set database PRAGMA options; continuing without them" }
                     }
                 }
             })

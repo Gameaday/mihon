@@ -61,6 +61,7 @@ import eu.kanade.tachiyomi.network.NetworkPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
@@ -169,16 +170,22 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
     private fun initializeMigrator() {
         val preferenceStore = get<PreferenceStore>()
         val preference = preferenceStore.getInt(Preference.appStateKey("last_version_code"), 0)
-        logcat { "Migration from ${preference.getSync()} to ${BuildConfig.VERSION_CODE}" }
-        Migrator.initialize(
-            old = preference.getSync(),
-            new = BuildConfig.VERSION_CODE,
-            migrations = migrations,
-            onMigrationComplete = {
-                logcat { "Updating last version to ${BuildConfig.VERSION_CODE}" }
-                preference.set(BuildConfig.VERSION_CODE)
-            },
-        )
+        // Launch on IO so we await the first DataStore emission instead of reading a
+        // potentially empty in-memory snapshot, which could misidentify an upgrade as a
+        // fresh install and run only isAlways migrations instead of the versioned ones.
+        ProcessLifecycleOwner.get().lifecycleScope.launch(Dispatchers.IO) {
+            val old = preference.get()
+            logcat { "Migration from $old to ${BuildConfig.VERSION_CODE}" }
+            Migrator.initialize(
+                old = old,
+                new = BuildConfig.VERSION_CODE,
+                migrations = migrations,
+                onMigrationComplete = {
+                    logcat { "Updating last version to ${BuildConfig.VERSION_CODE}" }
+                    preference.set(BuildConfig.VERSION_CODE)
+                },
+            )
+        }
     }
 
     override fun newImageLoader(context: Context): ImageLoader {

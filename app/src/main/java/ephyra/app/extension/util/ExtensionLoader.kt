@@ -41,10 +41,6 @@ internal class ExtensionLoader(
     private val trustExtension: TrustExtension,
 ) {
 
-    private val loadNsfwSource by lazy {
-        preferences.showNsfwSource().getSync()
-    }
-
     companion object {
         private const val EXTENSION_FEATURE = "tachiyomi.extension"
         private const val METADATA_SOURCE_CLASS = "tachiyomi.extension.class"
@@ -114,6 +110,7 @@ internal class ExtensionLoader(
      */
     suspend fun loadExtensions(context: Context): List<LoadResult> {
         val pkgManager = context.packageManager
+        val loadNsfwSource = preferences.showNsfwSource().get()
 
         val installedPkgs =
             pkgManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(packageFlags.toLong()))
@@ -161,7 +158,7 @@ internal class ExtensionLoader(
             extPkgs.map { extInfo ->
                 async {
                     try {
-                        loadExtension(context, extInfo)
+                        loadExtension(context, extInfo, loadNsfwSource)
                     } catch (e: Throwable) {
                         logcat(LogPriority.ERROR, e) { "Unexpected error loading extension ${extInfo.packageInfo.packageName}" }
                         LoadResult.Error
@@ -181,7 +178,8 @@ internal class ExtensionLoader(
             logcat(LogPriority.ERROR) { "Extension package is not found ($pkgName)" }
             return LoadResult.Error
         }
-        return loadExtension(context, extensionPackage)
+        val loadNsfwSource = preferences.showNsfwSource().get()
+        return loadExtension(context, extensionPackage, loadNsfwSource)
     }
 
     fun getExtensionPackageInfoFromPkgName(context: Context, pkgName: String): PackageInfo? {
@@ -230,7 +228,7 @@ internal class ExtensionLoader(
      * @param context The application context.
      * @param extensionInfo The extension to load.
      */
-    private suspend fun loadExtension(context: Context, extensionInfo: ExtensionInfo): LoadResult {
+    private suspend fun loadExtension(context: Context, extensionInfo: ExtensionInfo, loadNsfwSource: Boolean): LoadResult {
         val pkgManager = context.packageManager
         val pkgInfo = extensionInfo.packageInfo
         val appInfo = pkgInfo.applicationInfo ?: run {
