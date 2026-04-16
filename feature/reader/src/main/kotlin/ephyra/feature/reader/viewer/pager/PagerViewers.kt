@@ -1,6 +1,6 @@
 package ephyra.feature.reader.viewer.pager
 
-import ephyra.core.download.DownloadManager
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.feature.reader.ReaderActivity
 
