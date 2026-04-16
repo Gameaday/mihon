@@ -311,6 +311,10 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     testImplementation(kotlinx.coroutines.test)
+
+    // Koin test utilities – static module graph verification and isolated Koin contexts
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit5)
 }
 
 val generateLocalesConfig = tasks.register<LocalesConfigTask>("generateLocalesConfig") {

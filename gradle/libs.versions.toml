@@ -54,6 +54,8 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin_annotations" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit5 = { module = "io.insert-koin:koin-test-junit5", version.ref = "koin" }
 
 # Coil
 coil-bom = { module = "io.coil-kt.coil3:coil-bom", version = "3.4.0" }
