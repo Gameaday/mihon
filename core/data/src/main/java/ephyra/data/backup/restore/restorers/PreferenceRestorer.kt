@@ -45,7 +45,8 @@ class PreferenceRestorer(
         backupScheduler.setupBackupTask(backupPreferences.backupInterval().get())
     }
 
-    suspend fun restoreSource(preferences: List<BackupSourcePreferences>) {
+    suspend fun restoreSource(preferences: List<BackupSourcePreferences>): List<String> {
+        val failures = mutableListOf<String>()
         withContext(Dispatchers.IO) {
             preferences.forEach { sourceBackupPrefs ->
                 try {
@@ -66,16 +67,22 @@ class PreferenceRestorer(
                                 editor.putStringSet(key, value.value)
                         }
                     }
-                    editor.apply()
+                    if (!editor.commit()) {
+                        throw IllegalStateException(
+                            "Failed to commit source preferences for <${sourceBackupPrefs.sourceKey}>",
+                        )
+                    }
                 } catch (e: Exception) {
                     Log.e(
                         "PreferenceRestorer",
                         "Failed to restore source preferences <${sourceBackupPrefs.sourceKey}>",
                         e,
                     )
+                    failures.add("Source ${sourceBackupPrefs.sourceKey}: ${e.message}")
                 }
             }
         }
+        return failures
     }
 
     private suspend fun restorePreferences(
