@@ -13,7 +13,7 @@ import androidx.viewpager.widget.ViewPager
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
-import ephyra.core.download.DownloadManager
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.feature.reader.R
 import ephyra.feature.reader.ReaderActivity

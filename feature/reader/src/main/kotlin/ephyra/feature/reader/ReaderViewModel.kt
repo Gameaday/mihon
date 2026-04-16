@@ -18,7 +18,6 @@ import ephyra.core.common.util.storage.cacheImageDir
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
-import ephyra.core.download.DownloadManager
 import ephyra.core.download.DownloadProvider
 import ephyra.core.download.util.filterDownloaded
 import ephyra.core.download.util.removeDuplicates
@@ -35,6 +34,7 @@ import ephyra.domain.chapter.model.ChapterUpdate
 import ephyra.domain.chapter.model.toDbChapter
 import ephyra.domain.chapter.service.getChapterSort
 import ephyra.domain.download.model.Download
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.history.interactor.GetNextChapters
 import ephyra.domain.history.interactor.UpsertHistory

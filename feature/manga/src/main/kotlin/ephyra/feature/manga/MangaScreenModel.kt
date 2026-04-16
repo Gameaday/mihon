@@ -17,13 +17,13 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadCache
-import ephyra.core.download.DownloadManager
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.model.Category
 import ephyra.domain.chapter.interactor.GetAvailableScanlators
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.service.getChapterSort
 import ephyra.domain.download.model.Download
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.interactor.GetDuplicateLibraryManga
 import ephyra.domain.manga.interactor.GetExcludedScanlators

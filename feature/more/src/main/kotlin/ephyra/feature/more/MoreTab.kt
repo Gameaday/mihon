@@ -18,8 +18,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import ephyra.core.common.util.lang.launchIO
-import ephyra.core.download.DownloadManager
 import ephyra.domain.base.BasePreferences
+import ephyra.domain.download.service.DownloadManager
 import ephyra.feature.category.CategoryScreen
 import ephyra.feature.download.DownloadQueueScreen
 import ephyra.feature.settings.SettingsScreen

@@ -1,7 +1,6 @@
 package ephyra.feature.manga.interactor
 
 import ephyra.core.common.preference.TriState
-import ephyra.core.download.DownloadManager
 import ephyra.domain.chapter.interactor.FilterChaptersForDownload
 import ephyra.domain.chapter.interactor.SetMangaDefaultChapterFlags
 import ephyra.domain.chapter.interactor.SetReadStatus
@@ -10,6 +9,7 @@ import ephyra.domain.chapter.interactor.UpdateChapter
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.model.ChapterUpdate
 import ephyra.domain.chapter.model.toSChapter
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.interactor.SetMangaChapterFlags
 import ephyra.domain.manga.model.Manga

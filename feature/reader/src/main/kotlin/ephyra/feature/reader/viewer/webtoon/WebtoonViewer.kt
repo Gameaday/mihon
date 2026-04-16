@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.WebtoonLayoutManager
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.logcat
-import ephyra.core.download.DownloadManager
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.feature.reader.ReaderActivity
 import ephyra.feature.reader.model.ChapterTransition
