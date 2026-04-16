@@ -9,5 +9,16 @@ class StoragePreferences(
     private val preferenceStore: PreferenceStore,
 ) {
 
-    fun baseStorageDirectory() = preferenceStore.getString(Preference.appStateKey("storage_dir"), folderProvider.path())
+    /**
+     * The preferred base storage directory URI.
+     *
+     * The default value is an empty string (unset sentinel).  On first install
+     * a migration ([ephyra.core.migration.migrations.SetupDefaultStorageMigration])
+     * writes the platform's default folder path so that the value is never empty
+     * after initialization, and so that [Preference.isSet] reliably returns true.
+     */
+    fun baseStorageDirectory() = preferenceStore.getString(Preference.appStateKey("storage_dir"), "")
+
+    /** The platform-default storage directory path used when no explicit choice has been made. */
+    fun defaultStoragePath(): String = folderProvider.path()
 }

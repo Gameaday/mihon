@@ -50,6 +50,7 @@ class StorageManager(
     }
 
     private fun getBaseDir(uri: String): UniFile? {
+        if (uri.isEmpty()) return null
         return UniFile.fromUri(context, uri.toUri())
             .takeIf { it?.exists() == true }
     }
