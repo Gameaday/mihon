@@ -47,8 +47,7 @@ class AuthoritySearchScreenModel(
      * This allows discovery to work without login for trackers like MangaUpdates.
      * Initialized asynchronously on IO to avoid blocking the main thread on DataStore reads.
      */
-    private val _allTrackers = MutableStateFlow<ImmutableList<Tracker>>(persistentListOf())
-    private val allTrackers get() = _allTrackers.value
+    private val allTrackers = MutableStateFlow<ImmutableList<Tracker>>(persistentListOf())
 
     init {
         screenModelScope.launch {
@@ -60,7 +59,7 @@ class AuthoritySearchScreenModel(
                     }
                     .toImmutableList()
             }
-            _allTrackers.value = trackers
+            allTrackers.value = trackers
             if (trackers.isNotEmpty()) {
                 mutableState.update { state ->
                     state.copy(selectedTracker = state.selectedTracker ?: trackers.first())
@@ -76,12 +75,13 @@ class AuthoritySearchScreenModel(
      * for that type — saving API calls by not querying irrelevant services.
      */
     fun trackersForFilter(contentType: ContentType): ImmutableList<Tracker> {
-        if (contentType == ContentType.UNKNOWN) return allTrackers
+        if (contentType == ContentType.UNKNOWN) return allTrackers.value
         val validIds = AddTracks.trackersForContentType(contentType)
-        return allTrackers.filter { it.id in validIds }.toImmutableList()
+        return allTrackers.value.filter { it.id in validIds }.toImmutableList()
     }
 
-    fun selectTracker(tracker: Tracker) {        mutableState.value = mutableState.value.copy(
+    fun selectTracker(tracker: Tracker) {
+        mutableState.value = mutableState.value.copy(
             selectedTracker = tracker,
             results = persistentListOf(),
             query = "",

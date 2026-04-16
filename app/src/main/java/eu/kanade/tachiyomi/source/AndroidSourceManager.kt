@@ -3,7 +3,7 @@ package eu.kanade.tachiyomi.source
 import android.content.Context
 import ephyra.app.extension.ExtensionManager
 import ephyra.core.common.i18n.stringResource
-import ephyra.core.download.DownloadManager
+import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.source.model.StubSource
 import ephyra.domain.source.repository.StubSourceRepository
 import ephyra.domain.source.service.SourceManager

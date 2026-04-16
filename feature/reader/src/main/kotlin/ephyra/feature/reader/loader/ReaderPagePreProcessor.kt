@@ -4,7 +4,6 @@ import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.feature.reader.model.ReaderPage
-
 import logcat.LogPriority
 import java.io.InputStream
 import kotlin.math.abs

@@ -19,6 +19,8 @@ import ephyra.domain.category.model.Category
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.library.service.LibraryUpdateScheduler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class PreferenceRestorer(
     private val context: Context,
@@ -43,11 +45,44 @@ class PreferenceRestorer(
         backupScheduler.setupBackupTask(backupPreferences.backupInterval().get())
     }
 
-    suspend fun restoreSource(preferences: List<BackupSourcePreferences>) {
-        preferences.forEach {
-            // val sourcePrefs = DataStorePreferenceStore(SharedPreferencesDataStore(sourcePreferences(it.sourceKey)))
-            // restorePreferences(it.prefs, sourcePrefs)
+    suspend fun restoreSource(preferences: List<BackupSourcePreferences>): List<String> {
+        val failures = mutableListOf<String>()
+        withContext(Dispatchers.IO) {
+            preferences.forEach { sourceBackupPrefs ->
+                try {
+                    val sharedPrefs =
+                        context.getSharedPreferences(
+                            sourceBackupPrefs.sourceKey,
+                            Context.MODE_PRIVATE,
+                        )
+                    val editor = sharedPrefs.edit()
+                    sourceBackupPrefs.prefs.forEach { (key, value) ->
+                        when (value) {
+                            is IntPreferenceValue -> editor.putInt(key, value.value)
+                            is LongPreferenceValue -> editor.putLong(key, value.value)
+                            is FloatPreferenceValue -> editor.putFloat(key, value.value)
+                            is StringPreferenceValue -> editor.putString(key, value.value)
+                            is BooleanPreferenceValue -> editor.putBoolean(key, value.value)
+                            is StringSetPreferenceValue ->
+                                editor.putStringSet(key, value.value)
+                        }
+                    }
+                    if (!editor.commit()) {
+                        throw IllegalStateException(
+                            "Failed to commit source preferences for <${sourceBackupPrefs.sourceKey}>",
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e(
+                        "PreferenceRestorer",
+                        "Failed to restore source preferences <${sourceBackupPrefs.sourceKey}>",
+                        e,
+                    )
+                    failures.add("Source ${sourceBackupPrefs.sourceKey}: ${e.message}")
+                }
+            }
         }
+        return failures
     }
 
     private suspend fun restorePreferences(

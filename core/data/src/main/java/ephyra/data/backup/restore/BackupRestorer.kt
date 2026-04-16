@@ -8,9 +8,11 @@ import ephyra.data.backup.restore.restorers.ExtensionRepoRestorer
 import ephyra.data.backup.restore.restorers.MangaRestorer
 import ephyra.data.backup.restore.restorers.PreferenceRestorer
 import ephyra.domain.backup.service.BackupNotifier
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.protobuf.ProtoBuf
 import java.util.Date
@@ -39,10 +41,8 @@ class BackupRestorer(
         val backup = try {
             BackupDecoder(context, ProtoBuf).decode(uri)
         } catch (e: Exception) {
-            val time = System.currentTimeMillis() - startTime
             errors.add(Pair(Date(), e.message ?: "Failed to decode backup"))
-            notifier.showRestoreComplete(time, errors.size, uri.path)
-            return
+            throw e
         }
 
         val effectiveOptions = options ?: RestoreOptions()
@@ -79,7 +79,9 @@ class BackupRestorer(
         // Restore per-source preferences
         if (effectiveOptions.sourceSettings) {
             try {
-                preferenceRestorer.restoreSource(backup.backupSourcePreferences)
+                preferenceRestorer.restoreSource(backup.backupSourcePreferences).forEach { msg ->
+                    errors.add(Pair(Date(), msg))
+                }
             } catch (e: Exception) {
                 errors.add(Pair(Date(), "Source preferences: ${e.message}"))
             }
@@ -90,10 +92,10 @@ class BackupRestorer(
             val sortedMangas = mangaRestorer.sortByNew(backup.backupManga)
             restoreAmount = sortedMangas.size
 
-            coroutineScope {
-                sortedMangas.forEach { backupManga ->
-                    launch {
-                        ensureActive()
+            @OptIn(ExperimentalCoroutinesApi::class)
+            sortedMangas.asFlow()
+                .flatMapMerge(concurrency = 5) { backupManga ->
+                    flow {
                         try {
                             mangaRestorer.restore(backupManga, backup.backupCategories)
                         } catch (e: Exception) {
@@ -101,9 +103,10 @@ class BackupRestorer(
                         }
                         val progress = restoreProgress.incrementAndGet()
                         onProgress(progress, restoreAmount, backupManga.title)
+                        emit(Unit)
                     }
                 }
-            }
+                .collect()
         }
 
         val time = System.currentTimeMillis() - startTime

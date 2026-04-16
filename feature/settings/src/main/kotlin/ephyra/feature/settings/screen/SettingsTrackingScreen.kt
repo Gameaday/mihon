@@ -329,12 +329,17 @@ object SettingsTrackingScreen : SearchableSettings {
                     .collectAsState(initial = false)
                 val isMalLoggedInForAuthority by trackerManager.get(TrackerManager.MYANIMELIST)!!.isLoggedInFlow
                     .collectAsState(initial = false)
-                val isJellyfinLoggedIn by (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin)
+                val isJellyfinLoggedIn by (
+                    trackerManager.get(
+                        TrackerManager.JELLYFIN,
+                    ) as ephyra.data.track.jellyfin.Jellyfin
+                    )
                     .isLoggedInFlow.collectAsState(initial = false)
                 val trackerLoginState = mapOf(
                     trackerManager.get(TrackerManager.ANILIST)!!.id to isAnilistLoggedIn,
                     trackerManager.get(TrackerManager.MYANIMELIST)!!.id to isMalLoggedInForAuthority,
-                    (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).id to isJellyfinLoggedIn,
+                    (trackerManager.get(TrackerManager.JELLYFIN) as ephyra.data.track.jellyfin.Jellyfin).id to
+                        isJellyfinLoggedIn,
                 )
 
                 fun isAvailable(trackerId: Long): Boolean {

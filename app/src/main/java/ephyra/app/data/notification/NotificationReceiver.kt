@@ -282,6 +282,10 @@ class NotificationReceiver : BroadcastReceiver() {
         private const val EXTRA_CHAPTER_ID = "$ID.$NAME.EXTRA_CHAPTER_ID"
         private const val EXTRA_CHAPTER_URL = "$ID.$NAME.EXTRA_CHAPTER_URL"
 
+        // Unique request code for the backup share action so it does not collide
+        // with request code 0 used by the notification content intent.
+        private const val REQUEST_CODE_SHARE_BACKUP = 1
+
         /**
          * Returns a [PendingIntent] that resumes the download of a chapter
          *
@@ -629,7 +633,7 @@ class NotificationReceiver : BroadcastReceiver() {
             }
             return PendingIntent.getActivity(
                 context,
-                0,
+                REQUEST_CODE_SHARE_BACKUP,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )

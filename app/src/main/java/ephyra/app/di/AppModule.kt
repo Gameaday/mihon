@@ -3,8 +3,6 @@ package ephyra.app.di
 import android.app.DownloadManager
 import android.database.sqlite.SQLiteException
 import androidx.room.*
-import ephyra.core.common.util.system.logcat
-import logcat.LogPriority
 import ephyra.app.data.backup.BackupNotifier
 import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.restore.BackupRestoreJob
@@ -25,6 +23,7 @@ import ephyra.app.track.MatchUnlinkedNotifier
 import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
 import ephyra.app.ui.base.delegate.ThemingDelegateImpl
 import ephyra.core.common.storage.AndroidStorageFolderProvider
+import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadCache
 import ephyra.core.download.DownloadJob
 import ephyra.core.download.DownloadPendingDeleter
@@ -78,6 +77,7 @@ import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.source.AndroidSourceManager
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.protobuf.ProtoBuf
+import logcat.LogPriority
 import nl.adaptivity.xmlutil.XmlDeclMode
 import nl.adaptivity.xmlutil.core.XmlVersion
 import nl.adaptivity.xmlutil.serialization.XML

@@ -15,6 +15,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.work.Configuration
+import androidx.work.WorkerFactory
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
@@ -71,13 +73,25 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 
-class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factory {
+class App : Application(), Configuration.Provider, DefaultLifecycleObserver, SingletonImageLoader.Factory {
 
     private val basePreferences: BasePreferences by inject()
     private val privacyPreferences: PrivacyPreferences by inject()
     private val networkPreferences: NetworkPreferences by inject()
 
     private val disableIncognitoReceiver = DisableIncognitoReceiver()
+
+    /**
+     * Provides the WorkManager [Configuration] on demand (lazy initialization).
+     * Called by WorkManager the first time [WorkManager.getInstance] is invoked.
+     * Koin must be started (via [startKoin]) before this is called; since Koin
+     * is started in [onCreate] and WorkManager.getInstance() is only called after
+     * that, the [WorkerFactory] bean is always available here.
+     */
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(get<WorkerFactory>())
+            .build()
 
     @SuppressLint("LaunchActivityFromNotification")
     override fun onCreate() {
