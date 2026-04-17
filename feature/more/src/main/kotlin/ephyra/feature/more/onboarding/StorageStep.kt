@@ -84,7 +84,7 @@ internal class StorageStep : OnboardingStep {
 
         LaunchedEffect(Unit) {
             storagePref.changes()
-                .collectLatest { _isComplete = storagePref.isSet() }
+                .collectLatest { dirUri -> _isComplete = dirUri.isNotEmpty() }
         }
     }
 }
