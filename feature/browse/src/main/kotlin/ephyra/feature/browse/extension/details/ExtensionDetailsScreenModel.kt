@@ -98,7 +98,17 @@ class ExtensionDetailsScreenModel(
         }
     }
 
-    fun clearCookies() {
+    fun onEvent(event: ExtensionDetailsScreenEvent) {
+        when (event) {
+            ExtensionDetailsScreenEvent.ClearCookies -> clearCookies()
+            ExtensionDetailsScreenEvent.UninstallExtension -> uninstallExtension()
+            is ExtensionDetailsScreenEvent.ToggleSource -> toggleSource(event.sourceId)
+            is ExtensionDetailsScreenEvent.ToggleSources -> toggleSources(event.enable)
+            is ExtensionDetailsScreenEvent.ToggleIncognito -> toggleIncognito(event.enable)
+        }
+    }
+
+    private fun clearCookies() {
         val extension = state.value.extension ?: return
 
         val urls = extension.sources
@@ -118,25 +128,25 @@ class ExtensionDetailsScreenModel(
         logcat { "Cleared $cleared cookies for: ${urls.joinToString()}" }
     }
 
-    fun uninstallExtension() {
+    private fun uninstallExtension() {
         val extension = state.value.extension ?: return
         extensionManager.uninstallExtension(extension)
     }
 
-    fun toggleSource(sourceId: Long) {
+    private fun toggleSource(sourceId: Long) {
         screenModelScope.launch {
             toggleSource.await(sourceId)
         }
     }
 
-    fun toggleSources(enable: Boolean) {
+    private fun toggleSources(enable: Boolean) {
         val sourceIds = state.value.extension?.sources?.map { it.id } ?: return
         screenModelScope.launch {
             toggleSource.await(sourceIds, enable)
         }
     }
 
-    fun toggleIncognito(enable: Boolean) {
+    private fun toggleIncognito(enable: Boolean) {
         val packageName = state.value.extension?.pkgName ?: return
         screenModelScope.launch {
             toggleIncognito.await(packageName, enable)

@@ -50,8 +50,8 @@ fun Screen.sourcesTab(): TabContent {
                 onClickItem = { source, listing ->
                     navigator.push(BrowseSourceScreen(source.id, listing.query))
                 },
-                onClickPin = screenModel::togglePin,
-                onLongClickItem = screenModel::showSourceDialog,
+                onClickPin = { screenModel.onEvent(SourcesScreenEvent.TogglePin(it)) },
+                onLongClickItem = { screenModel.onEvent(SourcesScreenEvent.ShowSourceDialog(it)) },
             )
 
             state.dialog?.let { dialog ->
@@ -59,14 +59,14 @@ fun Screen.sourcesTab(): TabContent {
                 SourceOptionsDialog(
                     source = source,
                     onClickPin = {
-                        screenModel.togglePin(source)
-                        screenModel.closeDialog()
+                        screenModel.onEvent(SourcesScreenEvent.TogglePin(source))
+                        screenModel.onEvent(SourcesScreenEvent.CloseDialog)
                     },
                     onClickDisable = {
-                        screenModel.toggleSource(source)
-                        screenModel.closeDialog()
+                        screenModel.onEvent(SourcesScreenEvent.ToggleSource(source))
+                        screenModel.onEvent(SourcesScreenEvent.CloseDialog)
                     },
-                    onDismiss = screenModel::closeDialog,
+                    onDismiss = { screenModel.onEvent(SourcesScreenEvent.CloseDialog) },
                 )
             }
 

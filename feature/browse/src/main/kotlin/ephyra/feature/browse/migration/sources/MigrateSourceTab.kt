@@ -43,8 +43,8 @@ fun Screen.migrateSourceTab(): TabContent {
                 onClickItem = { source ->
                     navigator.push(MigrateMangaScreen(source.id))
                 },
-                onToggleSortingDirection = screenModel::toggleSortingDirection,
-                onToggleSortingMode = screenModel::toggleSortingMode,
+                onToggleSortingDirection = { screenModel.onEvent(MigrateSourceScreenEvent.ToggleSortingDirection) },
+                onToggleSortingMode = { screenModel.onEvent(MigrateSourceScreenEvent.ToggleSortingMode) },
             )
         },
     )

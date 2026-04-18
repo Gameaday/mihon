@@ -23,6 +23,7 @@ import ephyra.domain.library.model.LibraryDisplayMode
 import ephyra.domain.library.model.LibrarySort
 import ephyra.domain.library.model.sort
 import ephyra.domain.library.service.LibraryPreferences
+import ephyra.feature.library.LibrarySettingsScreenEvent
 import ephyra.feature.library.LibrarySettingsScreenModel
 import ephyra.i18n.MR
 import ephyra.presentation.core.components.BaseSortItem
@@ -95,43 +96,43 @@ private fun ColumnScope.FilterPage(
             filterDownloaded
         },
         enabled = !downloadedOnly,
-        onClick = { screenModel.toggleFilter(LibraryPreferences::filterDownloaded) },
+        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterDownloaded)) },
     )
     val filterUnread by screenModel.libraryPreferences.filterUnread().collectAsState()
     TriStateItem(
         label = stringResource(MR.strings.action_filter_unread),
         state = filterUnread,
-        onClick = { screenModel.toggleFilter(LibraryPreferences::filterUnread) },
+        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterUnread)) },
     )
     val filterStarted by screenModel.libraryPreferences.filterStarted().collectAsState()
     TriStateItem(
         label = stringResource(MR.strings.label_started),
         state = filterStarted,
-        onClick = { screenModel.toggleFilter(LibraryPreferences::filterStarted) },
+        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterStarted)) },
     )
     val filterBookmarked by screenModel.libraryPreferences.filterBookmarked().collectAsState()
     TriStateItem(
         label = stringResource(MR.strings.action_filter_bookmarked),
         state = filterBookmarked,
-        onClick = { screenModel.toggleFilter(LibraryPreferences::filterBookmarked) },
+        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterBookmarked)) },
     )
     val filterCompleted by screenModel.libraryPreferences.filterCompleted().collectAsState()
     TriStateItem(
         label = stringResource(MR.strings.completed),
         state = filterCompleted,
-        onClick = { screenModel.toggleFilter(LibraryPreferences::filterCompleted) },
+        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterCompleted)) },
     )
     val filterSourceHealthDead by screenModel.libraryPreferences.filterSourceHealthDead().collectAsState()
     TriStateItem(
         label = stringResource(MR.strings.action_filter_source_health_dead),
         state = filterSourceHealthDead,
-        onClick = { screenModel.toggleFilter(LibraryPreferences::filterSourceHealthDead) },
+        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterSourceHealthDead)) },
     )
     val filterContentTypeManga by screenModel.libraryPreferences.filterContentTypeManga().collectAsState()
     TriStateItem(
         label = stringResource(MR.strings.action_filter_content_type_manga),
         state = filterContentTypeManga,
-        onClick = { screenModel.toggleFilter(LibraryPreferences::filterContentTypeManga) },
+        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterContentTypeManga)) },
     )
     // TODO: re-enable when custom intervals are ready for stable
     if ((!appInfo.isRelease) && LibraryPreferences.MANGA_OUTSIDE_RELEASE_PERIOD in autoUpdateMangaRestrictions) {
@@ -139,7 +140,7 @@ private fun ColumnScope.FilterPage(
         TriStateItem(
             label = stringResource(MR.strings.action_filter_interval_custom),
             state = filterIntervalCustom,
-            onClick = { screenModel.toggleFilter(LibraryPreferences::filterIntervalCustom) },
+            onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterIntervalCustom)) },
         )
     }
 
@@ -156,7 +157,7 @@ private fun ColumnScope.FilterPage(
             TriStateItem(
                 label = stringResource(MR.strings.action_filter_tracked),
                 state = filterTracker,
-                onClick = { screenModel.toggleTracker(service.id.toInt()) },
+                onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleTracker(service.id.toInt())) },
             )
         }
 
@@ -168,7 +169,7 @@ private fun ColumnScope.FilterPage(
                 TriStateItem(
                     label = service.name,
                     state = filterTracker,
-                    onClick = { screenModel.toggleTracker(service.id.toInt()) },
+                    onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleTracker(service.id.toInt())) },
                 )
             }
         }
@@ -211,7 +212,7 @@ private fun ColumnScope.SortPage(
                 icon = Icons.Default.Refresh
                     .takeIf { sortingMode == LibrarySort.Type.Random },
                 onClick = {
-                    screenModel.setSort(category, mode, LibrarySort.Direction.Ascending)
+                    screenModel.onEvent(LibrarySettingsScreenEvent.SetSort(category, mode, LibrarySort.Direction.Ascending))
                 },
             )
             return@map
@@ -234,7 +235,7 @@ private fun ColumnScope.SortPage(
                         LibrarySort.Direction.Ascending
                     }
                 }
-                screenModel.setSort(category, mode, direction)
+                screenModel.onEvent(LibrarySettingsScreenEvent.SetSort(category, mode, direction))
             },
         )
     }
@@ -256,7 +257,7 @@ private fun ColumnScope.DisplayPage(
         displayModes.map { (titleRes, mode) ->
             FilterChip(
                 selected = displayMode == mode,
-                onClick = { screenModel.setDisplayMode(mode) },
+                onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.SetDisplayMode(mode)) },
                 label = { Text(stringResource(titleRes)) },
             )
         }

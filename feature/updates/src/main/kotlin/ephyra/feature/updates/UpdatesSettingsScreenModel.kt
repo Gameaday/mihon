@@ -14,7 +14,13 @@ class UpdatesSettingsScreenModel(
     val updatesPreferences: UpdatesPreferences,
 ) : ScreenModel {
 
-    fun toggleFilter(preference: (UpdatesPreferences) -> Preference<TriState>) {
+    fun onEvent(event: UpdatesSettingsScreenEvent) {
+        when (event) {
+            is UpdatesSettingsScreenEvent.ToggleFilter -> toggleFilter(event.preference)
+        }
+    }
+
+    private fun toggleFilter(preference: (UpdatesPreferences) -> Preference<TriState>) {
         screenModelScope.launchIO {
             preference(updatesPreferences).getAndSet {
                 it.next()

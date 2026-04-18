@@ -75,7 +75,13 @@ class UpcomingScreenModel(
             .toImmutableMap()
     }
 
-    fun setSelectedYearMonth(yearMonth: YearMonth) {
+    fun onEvent(event: UpcomingScreenEvent) {
+        when (event) {
+            is UpcomingScreenEvent.SetSelectedYearMonth -> setSelectedYearMonth(event.yearMonth)
+        }
+    }
+
+    private fun setSelectedYearMonth(yearMonth: YearMonth) {
         mutableState.update { it.copy(selectedYearMonth = yearMonth) }
     }
 

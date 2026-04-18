@@ -20,7 +20,7 @@ class UpcomingScreen : Screen() {
 
         UpcomingScreenContent(
             state = state,
-            setSelectedYearMonth = screenModel::setSelectedYearMonth,
+            setSelectedYearMonth = { screenModel.onEvent(UpcomingScreenEvent.SetSelectedYearMonth(it)) },
             onClickUpcoming = { navigator.push(MangaScreen(it.id)) },
         )
     }

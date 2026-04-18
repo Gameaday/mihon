@@ -62,7 +62,17 @@ class MangaCoverScreenModel(
         }
     }
 
-    fun saveCover(context: Context) {
+    fun onEvent(event: MangaCoverScreenEvent) {
+        when (event) {
+            is MangaCoverScreenEvent.SaveCover -> saveCover(event.context)
+            is MangaCoverScreenEvent.ShareCover -> shareCover(event.context)
+            is MangaCoverScreenEvent.EditCover -> editCover(event.context, event.data)
+            is MangaCoverScreenEvent.DeleteCustomCover -> deleteCustomCover(event.context)
+            is MangaCoverScreenEvent.SetCoverFromUrl -> setCoverFromUrl(event.context, event.coverUrl, event.sourceId)
+        }
+    }
+
+    private fun saveCover(context: Context) {
         screenModelScope.launch {
             try {
                 saveCoverInternal(context, temp = false)
@@ -80,7 +90,7 @@ class MangaCoverScreenModel(
         }
     }
 
-    fun shareCover(context: Context) {
+    private fun shareCover(context: Context) {
         screenModelScope.launch {
             try {
                 val uri = saveCoverInternal(context, temp = true) ?: return@launch
@@ -143,7 +153,7 @@ class MangaCoverScreenModel(
      * @param context Context.
      * @param data uri of the cover resource.
      */
-    fun editCover(context: Context, data: Uri) {
+    private fun editCover(context: Context, data: Uri) {
         val manga = state.value ?: return
         screenModelScope.launchIO {
             context.contentResolver.openInputStream(data)?.use {
@@ -157,7 +167,7 @@ class MangaCoverScreenModel(
         }
     }
 
-    fun deleteCustomCover(context: Context) {
+    private fun deleteCustomCover(context: Context) {
         val mangaId = state.value?.id ?: return
         screenModelScope.launchIO {
             try {
@@ -183,7 +193,7 @@ class MangaCoverScreenModel(
      * @param coverUrl URL of the cover image to download.
      * @param sourceId ID of the source that owns this cover URL.
      */
-    fun setCoverFromUrl(context: Context, coverUrl: String, sourceId: Long) {
+    private fun setCoverFromUrl(context: Context, coverUrl: String, sourceId: Long) {
         val manga = state.value ?: return
         screenModelScope.launchIO {
             try {

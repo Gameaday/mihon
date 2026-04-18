@@ -33,7 +33,7 @@ class ExtensionReposScreen(
         val state by screenModel.state.collectAsStateWithLifecycle()
 
         LaunchedEffect(url) {
-            url?.let { screenModel.showDialog(RepoDialog.Confirm(it)) }
+            url?.let { screenModel.onEvent(ExtensionReposScreenEvent.ShowDialog(RepoDialog.Confirm(it))) }
         }
 
         if (state is RepoScreenState.Loading) {
@@ -45,10 +45,10 @@ class ExtensionReposScreen(
 
         ExtensionReposScreen(
             state = successState,
-            onClickCreate = { screenModel.showDialog(RepoDialog.Create) },
+            onClickCreate = { screenModel.onEvent(ExtensionReposScreenEvent.ShowDialog(RepoDialog.Create)) },
             onOpenWebsite = { context.openInBrowser(it.website) },
-            onClickDelete = { screenModel.showDialog(RepoDialog.Delete(it)) },
-            onClickRefresh = { screenModel.refreshRepos() },
+            onClickDelete = { screenModel.onEvent(ExtensionReposScreenEvent.ShowDialog(RepoDialog.Delete(it))) },
+            onClickRefresh = { screenModel.onEvent(ExtensionReposScreenEvent.RefreshRepos) },
             navigateUp = navigator::pop,
         )
 
@@ -56,24 +56,24 @@ class ExtensionReposScreen(
             null -> {}
             is RepoDialog.Create -> {
                 ExtensionRepoCreateDialog(
-                    onDismissRequest = screenModel::dismissDialog,
-                    onCreate = { screenModel.createRepo(it) },
+                    onDismissRequest = { screenModel.onEvent(ExtensionReposScreenEvent.DismissDialog) },
+                    onCreate = { screenModel.onEvent(ExtensionReposScreenEvent.CreateRepo(it)) },
                     repoUrls = successState.repos.map { it.baseUrl }.toImmutableSet(),
                 )
             }
 
             is RepoDialog.Delete -> {
                 ExtensionRepoDeleteDialog(
-                    onDismissRequest = screenModel::dismissDialog,
-                    onDelete = { screenModel.deleteRepo(dialog.repo) },
+                    onDismissRequest = { screenModel.onEvent(ExtensionReposScreenEvent.DismissDialog) },
+                    onDelete = { screenModel.onEvent(ExtensionReposScreenEvent.DeleteRepo(dialog.repo)) },
                     repo = dialog.repo,
                 )
             }
 
             is RepoDialog.Conflict -> {
                 ExtensionRepoConflictDialog(
-                    onDismissRequest = screenModel::dismissDialog,
-                    onMigrate = { screenModel.replaceRepo(dialog.newRepo) },
+                    onDismissRequest = { screenModel.onEvent(ExtensionReposScreenEvent.DismissDialog) },
+                    onMigrate = { screenModel.onEvent(ExtensionReposScreenEvent.ReplaceRepo(dialog.newRepo)) },
                     oldRepo = dialog.oldRepo,
                     newRepo = dialog.newRepo,
                 )
@@ -81,8 +81,8 @@ class ExtensionReposScreen(
 
             is RepoDialog.Confirm -> {
                 ExtensionRepoConfirmDialog(
-                    onDismissRequest = screenModel::dismissDialog,
-                    onCreate = { screenModel.createRepo(dialog.url) },
+                    onDismissRequest = { screenModel.onEvent(ExtensionReposScreenEvent.DismissDialog) },
+                    onCreate = { screenModel.onEvent(ExtensionReposScreenEvent.CreateRepo(dialog.url)) },
                     repo = dialog.url,
                 )
             }

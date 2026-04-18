@@ -190,7 +190,7 @@ object DownloadQueueScreen : Screen() {
                                     ),
                                     AppBar.OverflowAction(
                                         title = stringResource(MR.strings.action_cancel_all),
-                                        onClick = { screenModel.clearQueue() },
+                                        onClick = { screenModel.onEvent(DownloadQueueScreenEvent.ClearQueue) },
                                     ),
                                 ),
                             )
@@ -212,9 +212,9 @@ object DownloadQueueScreen : Screen() {
                     },
                     onClick = {
                         if (isRunning) {
-                            screenModel.pauseDownloads()
+                            screenModel.onEvent(DownloadQueueScreenEvent.PauseDownloads)
                         } else {
-                            screenModel.startDownloads()
+                            screenModel.onEvent(DownloadQueueScreenEvent.StartDownloads)
                         }
                     },
                     expanded = fabExpanded,
@@ -263,7 +263,7 @@ object DownloadQueueScreen : Screen() {
                 val toIdx = downloads.indexOf(toItem.download)
                 if (fromIdx != -1 && toIdx != -1) {
                     downloads.add(toIdx, downloads.removeAt(fromIdx))
-                    screenModel.reorder(downloads)
+                    screenModel.onEvent(DownloadQueueScreenEvent.Reorder(downloads))
                 }
             }
 
@@ -304,7 +304,7 @@ object DownloadQueueScreen : Screen() {
                                         val idx = downloads.indexOf(displayItem.download)
                                         if (idx > 0) {
                                             downloads.add(0, downloads.removeAt(idx))
-                                            screenModel.reorder(downloads)
+                                            screenModel.onEvent(DownloadQueueScreenEvent.Reorder(downloads))
                                         }
                                     },
                                     onMoveToBottom = {
@@ -312,23 +312,23 @@ object DownloadQueueScreen : Screen() {
                                         val idx = downloads.indexOf(displayItem.download)
                                         if (idx < downloads.lastIndex) {
                                             downloads.add(downloads.removeAt(idx))
-                                            screenModel.reorder(downloads)
+                                            screenModel.onEvent(DownloadQueueScreenEvent.Reorder(downloads))
                                         }
                                     },
                                     onMoveSeriesTop = {
                                         val mangaId = displayItem.download.manga.id
                                         val (series, others) = downloadList.partition { it.manga.id == mangaId }
-                                        screenModel.reorder(series + others)
+                                        screenModel.onEvent(DownloadQueueScreenEvent.Reorder(series + others))
                                     },
                                     onMoveSeriesBottom = {
                                         val mangaId = displayItem.download.manga.id
                                         val (series, others) = downloadList.partition { it.manga.id == mangaId }
-                                        screenModel.reorder(others + series)
+                                        screenModel.onEvent(DownloadQueueScreenEvent.Reorder(others + series))
                                     },
-                                    onCancel = { screenModel.cancel(listOf(displayItem.download)) },
+                                    onCancel = { screenModel.onEvent(DownloadQueueScreenEvent.Cancel(listOf(displayItem.download))) },
                                     onCancelSeries = {
                                         val mangaId = displayItem.download.manga.id
-                                        screenModel.cancel(downloadList.filter { it.manga.id == mangaId })
+                                        screenModel.onEvent(DownloadQueueScreenEvent.Cancel(downloadList.filter { it.manga.id == mangaId }))
                                     },
                                     dragHandle = {
                                         IconButton(

@@ -31,9 +31,9 @@ class WebViewScreen(
             url = url,
             headers = screenModel.headers,
             onUrlChange = { assistUrl = it },
-            onShare = { screenModel.shareWebpage(context, it) },
-            onOpenInBrowser = { screenModel.openInBrowser(context, it) },
-            onClearCookies = screenModel::clearCookies,
+            onShare = { screenModel.onEvent(WebViewScreenEvent.ShareWebpage(context, it)) },
+            onOpenInBrowser = { screenModel.onEvent(WebViewScreenEvent.OpenInBrowser(context, it)) },
+            onClearCookies = { screenModel.onEvent(WebViewScreenEvent.ClearCookies(it)) },
         )
     }
 }

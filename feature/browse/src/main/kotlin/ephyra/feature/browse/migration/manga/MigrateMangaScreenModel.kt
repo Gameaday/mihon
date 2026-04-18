@@ -59,7 +59,14 @@ class MigrateMangaScreenModel(
         }
     }
 
-    fun toggleSelection(item: Manga) {
+    fun onEvent(event: MigrateMangaScreenEvent) {
+        when (event) {
+            is MigrateMangaScreenEvent.ToggleSelection -> toggleSelection(event.item)
+            MigrateMangaScreenEvent.ClearSelection -> clearSelection()
+        }
+    }
+
+    private fun toggleSelection(item: Manga) {
         mutableState.update { state ->
             val selection = state.selection.mutate { list ->
                 if (!list.remove(item.id)) list.add(item.id)
@@ -68,7 +75,7 @@ class MigrateMangaScreenModel(
         }
     }
 
-    fun clearSelection() {
+    private fun clearSelection() {
         mutableState.update { it.copy(selection = emptySet()) }
     }
 

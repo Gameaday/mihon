@@ -45,12 +45,23 @@ class ExtensionReposScreenModel(
         }
     }
 
+    fun onEvent(event: ExtensionReposScreenEvent) {
+        when (event) {
+            is ExtensionReposScreenEvent.CreateRepo -> createRepo(event.baseUrl)
+            is ExtensionReposScreenEvent.ReplaceRepo -> replaceRepo(event.newRepo)
+            ExtensionReposScreenEvent.RefreshRepos -> refreshRepos()
+            is ExtensionReposScreenEvent.DeleteRepo -> deleteRepo(event.baseUrl)
+            is ExtensionReposScreenEvent.ShowDialog -> showDialog(event.dialog)
+            ExtensionReposScreenEvent.DismissDialog -> dismissDialog()
+        }
+    }
+
     /**
      * Creates and adds a new repo to the database.
      *
      * @param baseUrl The baseUrl of the repo to create.
      */
-    fun createRepo(baseUrl: String) {
+    private fun createRepo(baseUrl: String) {
         screenModelScope.launchIO {
             when (val result = createExtensionRepo.await(baseUrl)) {
                 CreateExtensionRepo.Result.Success -> extensionManager.findAvailableExtensions()
@@ -70,7 +81,7 @@ class ExtensionReposScreenModel(
      *
      * @param newRepo The repo to insert
      */
-    fun replaceRepo(newRepo: ExtensionRepo) {
+    private fun replaceRepo(newRepo: ExtensionRepo) {
         screenModelScope.launchIO {
             replaceExtensionRepo.await(newRepo)
         }
@@ -79,7 +90,7 @@ class ExtensionReposScreenModel(
     /**
      * Refreshes information for each repository.
      */
-    fun refreshRepos() {
+    private fun refreshRepos() {
         val status = state.value
 
         if (status is RepoScreenState.Success) {
@@ -92,14 +103,14 @@ class ExtensionReposScreenModel(
     /**
      * Deletes the given repo from the database
      */
-    fun deleteRepo(baseUrl: String) {
+    private fun deleteRepo(baseUrl: String) {
         screenModelScope.launchIO {
             deleteExtensionRepo.await(baseUrl)
             extensionManager.findAvailableExtensions()
         }
     }
 
-    fun showDialog(dialog: RepoDialog) {
+    private fun showDialog(dialog: RepoDialog) {
         mutableState.update {
             when (it) {
                 RepoScreenState.Loading -> it
@@ -108,7 +119,7 @@ class ExtensionReposScreenModel(
         }
     }
 
-    fun dismissDialog() {
+    private fun dismissDialog() {
         mutableState.update {
             when (it) {
                 RepoScreenState.Loading -> it

@@ -310,7 +310,7 @@ class MangaScreen(
                 if (manga != null) {
                     val getContent = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
                         if (it == null) return@rememberLauncherForActivityResult
-                        sm.editCover(context, it)
+                        sm.onEvent(MangaCoverScreenEvent.EditCover(context, it))
                     }
                     var showCoverSearch by remember { mutableStateOf(false) }
                     if (showCoverSearch) {
@@ -318,18 +318,18 @@ class MangaScreen(
                             parametersOf(manga!!.title, successState.source.id)
                         }
                         val coverSearchState by coverSearchSm.state.collectAsStateWithLifecycle()
-                        LaunchedEffect(Unit) { coverSearchSm.search() }
+                        LaunchedEffect(Unit) { coverSearchSm.onEvent(CoverSearchScreenEvent.Search) }
                         CoverSearchDialog(
                             state = coverSearchState,
                             onCoverSelected = { cover ->
-                                sm.setCoverFromUrl(context, cover.thumbnailUrl, cover.sourceId)
+                                sm.onEvent(MangaCoverScreenEvent.SetCoverFromUrl(context, cover.thumbnailUrl, cover.sourceId))
                                 showCoverSearch = false
                             },
                             onSetAsMetadataSource = { cover ->
                                 screenModel.onEvent(MangaScreenEvent.SetMetadataSource(cover.sourceId, cover.mangaUrl))
                                 showCoverSearch = false
                             },
-                            onRefresh = { coverSearchSm.refresh() },
+                            onRefresh = { coverSearchSm.onEvent(CoverSearchScreenEvent.Refresh) },
                             onDismissRequest = { showCoverSearch = false },
                         )
                     } else {
@@ -337,12 +337,12 @@ class MangaScreen(
                             manga = manga!!,
                             snackbarHostState = sm.snackbarHostState,
                             isCustomCover = remember(manga) { manga!!.hasCustomCover(coverCache) },
-                            onShareClick = { sm.shareCover(context) },
-                            onSaveClick = { sm.saveCover(context) },
+                            onShareClick = { sm.onEvent(MangaCoverScreenEvent.ShareCover(context)) },
+                            onSaveClick = { sm.onEvent(MangaCoverScreenEvent.SaveCover(context)) },
                             onEditClick = {
                                 when (it) {
                                     EditCoverAction.EDIT -> getContent.launch("image/*")
-                                    EditCoverAction.DELETE -> sm.deleteCustomCover(context)
+                                    EditCoverAction.DELETE -> sm.onEvent(MangaCoverScreenEvent.DeleteCustomCover(context))
                                     EditCoverAction.SEARCH -> {
                                         showCoverSearch = true
                                     }

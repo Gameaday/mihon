@@ -58,7 +58,14 @@ class MigrateSourceScreenModel(
             .launchIn(screenModelScope)
     }
 
-    fun toggleSortingMode() {
+    fun onEvent(event: MigrateSourceScreenEvent) {
+        when (event) {
+            MigrateSourceScreenEvent.ToggleSortingMode -> toggleSortingMode()
+            MigrateSourceScreenEvent.ToggleSortingDirection -> toggleSortingDirection()
+        }
+    }
+
+    private fun toggleSortingMode() {
         with(state.value) {
             val newMode = when (sortingMode) {
                 SetMigrateSorting.Mode.ALPHABETICAL -> SetMigrateSorting.Mode.TOTAL
@@ -69,7 +76,7 @@ class MigrateSourceScreenModel(
         }
     }
 
-    fun toggleSortingDirection() {
+    private fun toggleSortingDirection() {
         with(state.value) {
             val newDirection = when (sortingDirection) {
                 SetMigrateSorting.Direction.ASCENDING -> SetMigrateSorting.Direction.DESCENDING

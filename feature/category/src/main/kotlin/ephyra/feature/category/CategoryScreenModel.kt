@@ -47,7 +47,18 @@ class CategoryScreenModel(
         }
     }
 
-    fun createCategory(name: String) {
+    fun onEvent(event: CategoryScreenEvent) {
+        when (event) {
+            is CategoryScreenEvent.CreateCategory -> createCategory(event.name)
+            is CategoryScreenEvent.DeleteCategory -> deleteCategory(event.categoryId)
+            is CategoryScreenEvent.ChangeOrder -> changeOrder(event.category, event.newIndex)
+            is CategoryScreenEvent.RenameCategory -> renameCategory(event.category, event.name)
+            is CategoryScreenEvent.ShowDialog -> showDialog(event.dialog)
+            CategoryScreenEvent.DismissDialog -> dismissDialog()
+        }
+    }
+
+    private fun createCategory(name: String) {
         screenModelScope.launch {
             when (createCategoryWithName.await(name)) {
                 is CreateCategoryWithName.Result.InternalError -> _events.send(CategoryEvent.InternalError)
@@ -56,7 +67,7 @@ class CategoryScreenModel(
         }
     }
 
-    fun deleteCategory(categoryId: Long) {
+    private fun deleteCategory(categoryId: Long) {
         screenModelScope.launch {
             when (deleteCategory.await(categoryId = categoryId)) {
                 is DeleteCategory.Result.InternalError -> _events.send(CategoryEvent.InternalError)
@@ -65,7 +76,7 @@ class CategoryScreenModel(
         }
     }
 
-    fun changeOrder(category: Category, newIndex: Int) {
+    private fun changeOrder(category: Category, newIndex: Int) {
         screenModelScope.launch {
             when (reorderCategory.await(category, newIndex)) {
                 is ReorderCategory.Result.InternalError -> _events.send(CategoryEvent.InternalError)
@@ -74,7 +85,7 @@ class CategoryScreenModel(
         }
     }
 
-    fun renameCategory(category: Category, name: String) {
+    private fun renameCategory(category: Category, name: String) {
         screenModelScope.launch {
             when (renameCategory.await(category, name)) {
                 is RenameCategory.Result.InternalError -> _events.send(CategoryEvent.InternalError)
@@ -83,7 +94,7 @@ class CategoryScreenModel(
         }
     }
 
-    fun showDialog(dialog: CategoryDialog) {
+    private fun showDialog(dialog: CategoryDialog) {
         mutableState.update {
             when (it) {
                 CategoryScreenState.Loading -> it
@@ -92,7 +103,7 @@ class CategoryScreenModel(
         }
     }
 
-    fun dismissDialog() {
+    private fun dismissDialog() {
         mutableState.update {
             when (it) {
                 CategoryScreenState.Loading -> it

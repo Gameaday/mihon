@@ -50,11 +50,18 @@ class SourcesFilterScreenModel(
         }
     }
 
-    fun toggleSource(source: Source) {
+    fun onEvent(event: SourcesFilterScreenEvent) {
+        when (event) {
+            is SourcesFilterScreenEvent.ToggleSource -> toggleSource(event.source)
+            is SourcesFilterScreenEvent.ToggleLanguage -> toggleLanguage(event.language)
+        }
+    }
+
+    private fun toggleSource(source: Source) {
         screenModelScope.launch { toggleSource.await(source) }
     }
 
-    fun toggleLanguage(language: String) {
+    private fun toggleLanguage(language: String) {
         screenModelScope.launch { toggleLanguage.await(language) }
     }
 

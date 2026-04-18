@@ -34,7 +34,15 @@ class WebViewScreenModel(
         }
     }
 
-    fun shareWebpage(context: Context, url: String) {
+    fun onEvent(event: WebViewScreenEvent) {
+        when (event) {
+            is WebViewScreenEvent.ShareWebpage -> shareWebpage(event.context, event.url)
+            is WebViewScreenEvent.OpenInBrowser -> openInBrowser(event.context, event.url)
+            is WebViewScreenEvent.ClearCookies -> clearCookies(event.url)
+        }
+    }
+
+    private fun shareWebpage(context: Context, url: String) {
         try {
             context.startActivity(url.toUri().toShareIntent(context, type = "text/plain"))
         } catch (e: Exception) {
@@ -43,11 +51,11 @@ class WebViewScreenModel(
         }
     }
 
-    fun openInBrowser(context: Context, url: String) {
+    private fun openInBrowser(context: Context, url: String) {
         context.openInBrowser(url, forceDefaultBrowser = true)
     }
 
-    fun clearCookies(url: String) {
+    private fun clearCookies(url: String) {
         url.toHttpUrlOrNull()?.let {
             val cleared = network.cookieJar.remove(it)
             logcat { "Cleared $cleared cookies for: $url" }

@@ -36,7 +36,16 @@ class LibrarySettingsScreenModel(
             initialValue = emptyList(),
         )
 
-    fun toggleFilter(preference: (LibraryPreferences) -> Preference<TriState>) {
+    fun onEvent(event: LibrarySettingsScreenEvent) {
+        when (event) {
+            is LibrarySettingsScreenEvent.ToggleFilter -> toggleFilter(event.preference)
+            is LibrarySettingsScreenEvent.ToggleTracker -> toggleTracker(event.id)
+            is LibrarySettingsScreenEvent.SetDisplayMode -> setDisplayMode(event.mode)
+            is LibrarySettingsScreenEvent.SetSort -> setSort(event.category, event.mode, event.direction)
+        }
+    }
+
+    private fun toggleFilter(preference: (LibraryPreferences) -> Preference<TriState>) {
         screenModelScope.launchIO {
             preference(libraryPreferences).getAndSet {
                 it.next()
@@ -44,15 +53,15 @@ class LibrarySettingsScreenModel(
         }
     }
 
-    fun toggleTracker(id: Int) {
+    private fun toggleTracker(id: Int) {
         toggleFilter { libraryPreferences.filterTracking(id) }
     }
 
-    fun setDisplayMode(mode: LibraryDisplayMode) {
+    private fun setDisplayMode(mode: LibraryDisplayMode) {
         setDisplayMode.await(mode)
     }
 
-    fun setSort(category: Category?, mode: LibrarySort.Type, direction: LibrarySort.Direction) {
+    private fun setSort(category: Category?, mode: LibrarySort.Type, direction: LibrarySort.Direction) {
         screenModelScope.launchIO {
             setSortModeForCategory.await(category, mode, direction)
         }

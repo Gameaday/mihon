@@ -35,12 +35,12 @@ data class ExtensionDetailsScreen(
             navigateUp = navigator::pop,
             state = state,
             onClickSourcePreferences = { navigator.push(SourcePreferencesScreen(it)) },
-            onClickEnableAll = { screenModel.toggleSources(true) },
-            onClickDisableAll = { screenModel.toggleSources(false) },
-            onClickClearCookies = screenModel::clearCookies,
-            onClickUninstall = screenModel::uninstallExtension,
-            onClickSource = screenModel::toggleSource,
-            onClickIncognito = screenModel::toggleIncognito,
+            onClickEnableAll = { screenModel.onEvent(ExtensionDetailsScreenEvent.ToggleSources(true)) },
+            onClickDisableAll = { screenModel.onEvent(ExtensionDetailsScreenEvent.ToggleSources(false)) },
+            onClickClearCookies = { screenModel.onEvent(ExtensionDetailsScreenEvent.ClearCookies) },
+            onClickUninstall = { screenModel.onEvent(ExtensionDetailsScreenEvent.UninstallExtension) },
+            onClickSource = { screenModel.onEvent(ExtensionDetailsScreenEvent.ToggleSource(it)) },
+            onClickIncognito = { screenModel.onEvent(ExtensionDetailsScreenEvent.ToggleIncognito(it)) },
         )
 
         LaunchedEffect(Unit) {

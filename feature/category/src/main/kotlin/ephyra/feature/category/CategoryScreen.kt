@@ -38,10 +38,10 @@ class CategoryScreen : Screen() {
 
         CategoryScreen(
             state = successState,
-            onClickCreate = { screenModel.showDialog(CategoryDialog.Create) },
-            onClickRename = { screenModel.showDialog(CategoryDialog.Rename(it)) },
-            onClickDelete = { screenModel.showDialog(CategoryDialog.Delete(it)) },
-            onChangeOrder = screenModel::changeOrder,
+            onClickCreate = { screenModel.onEvent(CategoryScreenEvent.ShowDialog(CategoryDialog.Create)) },
+            onClickRename = { screenModel.onEvent(CategoryScreenEvent.ShowDialog(CategoryDialog.Rename(it))) },
+            onClickDelete = { screenModel.onEvent(CategoryScreenEvent.ShowDialog(CategoryDialog.Delete(it))) },
+            onChangeOrder = { category, newIndex -> screenModel.onEvent(CategoryScreenEvent.ChangeOrder(category, newIndex)) },
             navigateUp = navigator::pop,
         )
 
@@ -49,16 +49,16 @@ class CategoryScreen : Screen() {
             null -> {}
             CategoryDialog.Create -> {
                 CategoryCreateDialog(
-                    onDismissRequest = screenModel::dismissDialog,
-                    onCreate = screenModel::createCategory,
+                    onDismissRequest = { screenModel.onEvent(CategoryScreenEvent.DismissDialog) },
+                    onCreate = { screenModel.onEvent(CategoryScreenEvent.CreateCategory(it)) },
                     categories = successState.categories.fastMap { it.name }.toImmutableList(),
                 )
             }
 
             is CategoryDialog.Rename -> {
                 CategoryRenameDialog(
-                    onDismissRequest = screenModel::dismissDialog,
-                    onRename = { screenModel.renameCategory(dialog.category, it) },
+                    onDismissRequest = { screenModel.onEvent(CategoryScreenEvent.DismissDialog) },
+                    onRename = { screenModel.onEvent(CategoryScreenEvent.RenameCategory(dialog.category, it)) },
                     categories = successState.categories.fastMap { it.name }.toImmutableList(),
                     category = dialog.category.name,
                 )
@@ -66,8 +66,8 @@ class CategoryScreen : Screen() {
 
             is CategoryDialog.Delete -> {
                 CategoryDeleteDialog(
-                    onDismissRequest = screenModel::dismissDialog,
-                    onDelete = { screenModel.deleteCategory(dialog.category.id) },
+                    onDismissRequest = { screenModel.onEvent(CategoryScreenEvent.DismissDialog) },
+                    onDelete = { screenModel.onEvent(CategoryScreenEvent.DeleteCategory(dialog.category.id)) },
                     category = dialog.category.name,
                 )
             }

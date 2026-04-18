@@ -79,19 +79,28 @@ class SourcesScreenModel(
         }
     }
 
-    fun toggleSource(source: Source) {
+    fun onEvent(event: SourcesScreenEvent) {
+        when (event) {
+            is SourcesScreenEvent.ToggleSource -> toggleSource(event.source)
+            is SourcesScreenEvent.TogglePin -> togglePin(event.source)
+            is SourcesScreenEvent.ShowSourceDialog -> showSourceDialog(event.source)
+            SourcesScreenEvent.CloseDialog -> closeDialog()
+        }
+    }
+
+    private fun toggleSource(source: Source) {
         screenModelScope.launch { toggleSource.await(source) }
     }
 
-    fun togglePin(source: Source) {
+    private fun togglePin(source: Source) {
         screenModelScope.launch { toggleSourcePin.await(source) }
     }
 
-    fun showSourceDialog(source: Source) {
+    private fun showSourceDialog(source: Source) {
         mutableState.update { it.copy(dialog = Dialog(source)) }
     }
 
-    fun closeDialog() {
+    private fun closeDialog() {
         mutableState.update { it.copy(dialog = null) }
     }
 

@@ -34,12 +34,19 @@ class CoverSearchScreenModel(
     private val coroutineDispatcher = Dispatchers.IO.limitedParallelism(3)
     private var searchJob: Job? = null
 
+    fun onEvent(event: CoverSearchScreenEvent) {
+        when (event) {
+            CoverSearchScreenEvent.Search -> search()
+            CoverSearchScreenEvent.Refresh -> refresh()
+        }
+    }
+
     /**
      * Search across all enabled catalogue sources for covers matching the manga title.
      * Returns cached results if available to avoid redundant API calls.
      * Only fetches the first page and extracts thumbnail URLs to minimize network calls.
      */
-    fun search() {
+    private fun search() {
         val query = mangaTitle
         if (query.isBlank()) return
 
@@ -62,7 +69,7 @@ class CoverSearchScreenModel(
     /**
      * Force a fresh search, bypassing the in-memory cache.
      */
-    fun refresh() {
+    private fun refresh() {
         val query = mangaTitle
         if (query.isBlank()) return
         coverResultsCache.remove(query)

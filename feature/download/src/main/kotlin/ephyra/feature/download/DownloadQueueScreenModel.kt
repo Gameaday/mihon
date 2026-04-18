@@ -16,23 +16,33 @@ class DownloadQueueScreenModel(
     val isDownloaderRunning = downloadManager.isDownloaderRunning
         .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    fun startDownloads() {
+    fun onEvent(event: DownloadQueueScreenEvent) {
+        when (event) {
+            DownloadQueueScreenEvent.StartDownloads -> startDownloads()
+            DownloadQueueScreenEvent.PauseDownloads -> pauseDownloads()
+            DownloadQueueScreenEvent.ClearQueue -> clearQueue()
+            is DownloadQueueScreenEvent.Reorder -> reorder(event.downloads)
+            is DownloadQueueScreenEvent.Cancel -> cancel(event.downloads)
+        }
+    }
+
+    private fun startDownloads() {
         downloadManager.startDownloads()
     }
 
-    fun pauseDownloads() {
+    private fun pauseDownloads() {
         downloadManager.pauseDownloads()
     }
 
-    fun clearQueue() {
+    private fun clearQueue() {
         downloadManager.clearQueue()
     }
 
-    fun reorder(downloads: List<Download>) {
+    private fun reorder(downloads: List<Download>) {
         downloadManager.reorderQueue(downloads)
     }
 
-    fun cancel(downloads: List<Download>) {
+    private fun cancel(downloads: List<Download>) {
         downloadManager.cancelQueuedDownloads(downloads)
     }
 

@@ -60,7 +60,7 @@ data class MigrateMangaScreen(
         }
 
         BackHandler(enabled = state.selectionMode) {
-            screenModel.clearSelection()
+            screenModel.onEvent(MigrateMangaScreenEvent.ClearSelection)
         }
 
         val lazyListState = rememberLazyListState()
@@ -71,7 +71,7 @@ data class MigrateMangaScreen(
                     title = state.source!!.name,
                     navigateUp = {
                         if (state.selectionMode) {
-                            screenModel.clearSelection()
+                            screenModel.onEvent(MigrateMangaScreenEvent.ClearSelection)
                         } else {
                             navigator.pop()
                         }
@@ -87,7 +87,7 @@ data class MigrateMangaScreen(
                     },
                     onClick = {
                         val selection = state.selection
-                        screenModel.clearSelection()
+                        screenModel.onEvent(MigrateMangaScreenEvent.ClearSelection)
                         navigator.push(migrationConfigScreenFactory.create(selection))
                     },
                     expanded = lazyListState.shouldExpandFAB(),
@@ -107,7 +107,7 @@ data class MigrateMangaScreen(
                 lazyListState = lazyListState,
                 contentPadding = contentPadding,
                 state = state,
-                onClickItem = screenModel::toggleSelection,
+                onClickItem = { screenModel.onEvent(MigrateMangaScreenEvent.ToggleSelection(it)) },
                 onClickCover = { navigator.push(MangaScreen(it.id)) },
             )
         }

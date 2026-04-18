@@ -41,8 +41,8 @@ class SourcesFilterScreen : Screen() {
         SourcesFilterScreen(
             navigateUp = navigator::pop,
             state = successState,
-            onClickLanguage = screenModel::toggleLanguage,
-            onClickSource = screenModel::toggleSource,
+            onClickLanguage = { screenModel.onEvent(SourcesFilterScreenEvent.ToggleLanguage(it)) },
+            onClickSource = { screenModel.onEvent(SourcesFilterScreenEvent.ToggleSource(it)) },
         )
     }
 }
