@@ -1,8 +1,7 @@
 package ephyra.domain.extension.interactor
 
-import android.content.pm.PackageInfo
-import androidx.core.content.pm.PackageInfoCompat
 import ephyra.core.common.preference.getAndSet
+import ephyra.domain.extension.model.ExtensionPackageInfo
 import ephyra.domain.extensionrepo.repository.ExtensionRepoRepository
 import ephyra.domain.source.service.SourcePreferences
 
@@ -11,9 +10,9 @@ class TrustExtension(
     private val preferences: SourcePreferences,
 ) {
 
-    suspend fun isTrusted(pkgInfo: PackageInfo, fingerprints: List<String>): Boolean {
+    suspend fun isTrusted(pkgInfo: ExtensionPackageInfo, fingerprints: List<String>): Boolean {
         val trustedFingerprints = extensionRepoRepository.getAll().mapTo(HashSet()) { it.signingKeyFingerprint }
-        val key = "${pkgInfo.packageName}:${PackageInfoCompat.getLongVersionCode(pkgInfo)}:${fingerprints.last()}"
+        val key = "${pkgInfo.packageName}:${pkgInfo.versionCode}:${fingerprints.last()}"
         return trustedFingerprints.any { fingerprints.contains(it) } || key in preferences.trustedExtensions().get()
     }
 

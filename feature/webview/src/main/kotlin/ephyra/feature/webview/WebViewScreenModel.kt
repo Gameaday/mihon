@@ -38,6 +38,7 @@ class WebViewScreenModel(
         try {
             context.startActivity(url.toUri().toShareIntent(context, type = "text/plain"))
         } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to share webpage: $url" }
             context.toast(e.message)
         }
     }

@@ -12,6 +12,7 @@ import ephyra.core.common.util.storage.copyAndSetReadOnlyTo
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.extension.interactor.TrustExtension
 import ephyra.domain.extension.model.Extension
+import ephyra.domain.extension.model.ExtensionPackageInfo
 import ephyra.domain.source.service.SourcePreferences
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.Source
@@ -266,7 +267,11 @@ internal class ExtensionLoader(
         if (signatures.isNullOrEmpty()) {
             logcat(LogPriority.WARN) { "Package $pkgName isn't signed" }
             return LoadResult.Error
-        } else if (!trustExtension.isTrusted(pkgInfo, signatures)) {
+        } else if (!trustExtension.isTrusted(
+                ExtensionPackageInfo(pkgInfo.packageName, PackageInfoCompat.getLongVersionCode(pkgInfo)),
+                signatures,
+            )
+        ) {
             val extension = Extension.Untrusted(
                 extName,
                 pkgName,

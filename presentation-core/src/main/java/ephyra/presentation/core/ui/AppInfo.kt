@@ -25,10 +25,26 @@ interface AppInfo {
     /** ISO-8601 build timestamp. */
     val buildTime: String
 
+    /**
+     * GitHub repository slug (e.g. "Gameaday/Ephyra" or "Gameaday/Ephyra-preview").
+     * Used to construct release and changelog URLs without depending on `:data` layer constants.
+     */
+    val githubRepo: String
+
     val isPreview: Boolean get() = buildType == "preview"
     val isNightly: Boolean get() = buildType == "nightly"
     val isRelease: Boolean get() = buildType == "release"
     val isFoss: Boolean get() = buildType == "foss"
     val telemetryIncluded: Boolean
     val updaterEnabled: Boolean
+
+    /**
+     * URL of the current release tag on GitHub (e.g. the "What's New" link).
+     * Computed from [githubRepo], [versionName], [commitCount], and [isPreview].
+     */
+    val releaseUrl: String
+        get() {
+            val tag = if (isPreview) "r$commitCount" else "v$versionName"
+            return "https://github.com/$githubRepo/releases/tag/$tag"
+        }
 }

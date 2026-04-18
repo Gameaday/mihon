@@ -4,7 +4,7 @@ import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
 import ephyra.data.track.BaseTracker
-import ephyra.data.track.DeletableTracker
+import ephyra.domain.track.service.DeletableTracker
 import ephyra.data.track.mangaupdates.dto.MUListItem
 import ephyra.data.track.mangaupdates.dto.MURating
 import ephyra.data.track.mangaupdates.dto.copyTo

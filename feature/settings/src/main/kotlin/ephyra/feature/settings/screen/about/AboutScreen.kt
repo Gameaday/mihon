@@ -28,7 +28,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.lang.toDateTimestampString
 import ephyra.core.common.util.system.logcat
-import ephyra.data.updater.RELEASE_URL
 import ephyra.domain.extension.service.ExtensionManager
 import ephyra.domain.release.interactor.GetApplicationRelease
 import ephyra.domain.ui.UiPreferences
@@ -129,7 +128,7 @@ object AboutScreen : Screen() {
                                     )
                                 }
                             },
-                            onPreferenceClick = { screenModel.checkVersion(context) },
+                            onPreferenceClick = { screenModel.checkVersion() },
                         )
                     }
                 }
@@ -138,7 +137,7 @@ object AboutScreen : Screen() {
                     item {
                         TextPreferenceWidget(
                             title = stringResource(MR.strings.whats_new),
-                            onPreferenceClick = { uriHandler.openUri(RELEASE_URL) },
+                            onPreferenceClick = { uriHandler.openUri(appInfo.releaseUrl) },
                         )
                     }
                 }

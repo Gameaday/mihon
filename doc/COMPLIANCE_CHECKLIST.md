@@ -39,7 +39,7 @@ platform implementation.
 | ⏳ | `core/domain/.../track/interactor/TrackChapter.kt` | `android.content.Context` (passed to `DelayedTrackingUpdateJob.setupTask`) | Remove context from interactor; have the job scheduler interface (in domain) accept the parameters |
 | ⏳ | `core/domain/.../base/ExtensionInstallerPreference.kt` | `android.content.Context` (MIUI / Shizuku checks) | Extract `InstallerCapabilityProvider` interface in domain; implement in `:app` |
 | ⏳ | `core/domain/.../base/BasePreferences.kt` | `android.content.Context` property stored on class | Remove context from `BasePreferences`; `ExtensionInstallerPreference` receives its capabilities via interface |
-| ⏳ | `core/domain/.../extension/interactor/TrustExtension.kt` | `android.content.pm.PackageInfo` in `isTrusted()` | Introduce `data class ExtensionPackageInfo(val packageName: String, val versionCode: Long)` in domain; convert at call sites in `:app` |
+| ✅ | `core/domain/.../extension/interactor/TrustExtension.kt` | `android.content.pm.PackageInfo` in `isTrusted()` | Introduced `data class ExtensionPackageInfo(packageName, versionCode)` in `domain/extension/model`; `TrustExtension.isTrusted()` now accepts it; `ExtensionLoader.kt` converts from `PackageInfo` at the `:app` boundary |
 | ⏳ | `domain/storage/service/StorageManager.kt` | `android.content.Context` + `UniFile` (Android) | Move to `:data`; expose `StorageDirectoryProvider` interface in domain |
 | ⏳ | `domain/reader/util/RectFExtensions.kt` | `android.graphics.RectF` | Introduce `data class Rect(val left: Float, val top: Float, val right: Float, val bottom: Float)` in domain; keep `RectF` in `:presentation-core` |
 
@@ -47,7 +47,7 @@ platform implementation.
 
 ## Principle 2 — Module Boundaries Are Interface Boundaries
 
-Feature modules must import only domain interfaces.  These 23 files bypass the
+Feature modules must import only domain interfaces.  These files bypass the
 boundary and import concrete `:data` implementations directly.
 
 | Status | File | Offending Import(s) | Required Fix |
@@ -57,7 +57,7 @@ boundary and import concrete `:data` implementations directly.
 | ⏳ | `feature/library/.../LibraryScreenModel.kt` | `ephyra.data.cache.CoverCache` | Inject domain interface |
 | ⏳ | `feature/manga/.../MangaCoverScreenModel.kt` | `CoverCache`, `ImageSaver`, `Image`, `Location` (all `:data`) | Formalise `ImageSaver` interface in domain; inject domain types |
 | ⏳ | `feature/manga/.../MangaScreen.kt` | `ephyra.data.cache.CoverCache` | Inject domain interface |
-| ⏳ | `feature/manga/.../track/TrackInfoDialog.kt` | `ephyra.data.track.DeletableTracker` | Move `DeletableTracker` marker interface to domain |
+| ✅ | `feature/manga/.../track/TrackInfoDialog.kt` | `ephyra.data.track.DeletableTracker` | Moved `DeletableTracker` marker interface to `ephyra.domain.track.service`; old `:data` file deleted |
 | ⏳ | `feature/migration/.../MigrateMangaDialog.kt` | `ephyra.data.cache.CoverCache` | Inject domain interface |
 | ⏳ | `feature/reader/.../ReaderViewModel.kt` | `ChapterCache`, `CoverCache`, `toDomainChapter`, `ImageSaver`, `Image`, `Location` | Formalise interfaces in domain; use mapper in `:data` only |
 | ⏳ | `feature/reader/.../SaveImageNotifier.kt` | `ephyra.data.notification.Notifications` | Extract notification-channel constants to `:core:common` or `:presentation-core` |
@@ -69,8 +69,8 @@ boundary and import concrete `:data` implementations directly.
 | ⏳ | `feature/settings/.../SettingsDataScreen.kt` | `ChapterCache`, `LibraryExporter`, `ExportOptions` | Extract `LibraryExporter` interface to domain |
 | ⏳ | `feature/settings/.../SettingsDataScreenModel.kt` | `ephyra.data.cache.ChapterCache` | Extract `ChapterCache` interface to domain |
 | ⏳ | `feature/settings/.../SettingsTrackingScreen.kt` | `AnilistApi`, `BangumiApi`, `MyAnimeListApi`, `ShikimoriApi` | Expose required capabilities via `Tracker` interface; no feature module needs concrete API |
-| ⏳ | `feature/settings/.../about/AboutScreen.kt` | `ephyra.data.updater.RELEASE_URL` | Move constant to domain `release` package |
-| ⏳ | `feature/settings/.../about/AboutScreenModel.kt` | `ephyra.data.updater.AppUpdateChecker` | Extract `AppUpdateChecker` interface to domain |
+| ✅ | `feature/settings/.../about/AboutScreen.kt` | `ephyra.data.updater.RELEASE_URL` | Added `releaseUrl` computed property to `AppInfo` interface (presentation-core); `AboutScreen` now uses `appInfo.releaseUrl` |
+| ✅ | `feature/settings/.../about/AboutScreenModel.kt` | `ephyra.data.updater.AppUpdateChecker` | Replaced with `GetApplicationRelease` interactor; `AppInfo.githubRepo` added to provide repo slug; `checkVersion()` no longer needs `Context` parameter |
 | ⏳ | `feature/settings/.../data/CreateBackupScreen.kt` | `BackupCreator`, `BackupOptions` (`:data`) | Extract `BackupOptions` value type to domain |
 | ⏳ | `feature/settings/.../data/RestoreBackupScreen.kt` | `BackupFileValidator`, `RestoreOptions` (`:data`) | Extract `RestoreOptions` and a validator interface to domain |
 | ⏳ | `feature/settings/.../debug/BackupSchemaScreen.kt` | `ephyra.data.backup.models.Backup` | Move `Backup` model to domain `backup` package |
@@ -126,6 +126,8 @@ or preference stores directly.
 | ✅ | `core/data/.../track/jellyfin/JellyfinApi.kt:505` | `catch (_: Exception)` in `checkServerReachable()` — returns false silently | `logcat(DEBUG)` added |
 | ✅ | `core/data/.../track/kitsu/Kitsu.kt:162` | `catch (_: Exception)` in `restoreToken()` — returns null silently | `logcat(DEBUG)` added |
 | ✅ | `data/.../manga/MangaMapper.kt:337` | `catch (_: Exception)` on JSON parse fall-through in `parseAlternativeTitles()` — no log | `logcat(DEBUG)` added |
+| ✅ | `feature/reader/.../viewer/pager/Pager.kt:75,87,89,91` | 4 defensive touch-event catches — crash-suppression with no diagnostic log | `logcat(DEBUG)` added to all four; comment preserved explaining the Android platform bug |
+| ✅ | `feature/webview/.../WebViewScreenModel.kt:40` | `shareWebpage` catch shows toast but emits nothing to logcat | `logcat(WARN, e)` added alongside existing toast |
 | ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:79` | `catch (_: Exception) { /* skip */ }` on dimension read — no log | `logcat(DEBUG)` added |
 | ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:149` | `catch (_: Exception)` in `resolveBlockedDHashes()` — no log | `logcat(DEBUG)` added |
 | ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:176` | `catch (_: Exception)` in `checkAndFilter()` — no log | `logcat(DEBUG)` added |

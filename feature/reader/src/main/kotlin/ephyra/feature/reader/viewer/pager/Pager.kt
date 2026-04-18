@@ -5,7 +5,9 @@ import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.viewpager.widget.DirectionalViewPager
+import ephyra.core.common.util.system.logcat
 import ephyra.feature.reader.viewer.GestureDetectorWithLongTap
+import logcat.LogPriority
 
 /**
  * Pager implementation that listens for tap and long tap and allows temporarily disabling touch
@@ -73,6 +75,7 @@ open class Pager(
         return try {
             super.onInterceptTouchEvent(ev)
         } catch (e: IllegalArgumentException) {
+            logcat(LogPriority.DEBUG, e) { "Suppressed IllegalArgumentException in onInterceptTouchEvent" }
             false
         }
     }
@@ -85,10 +88,13 @@ open class Pager(
         return try {
             super.onTouchEvent(ev)
         } catch (e: NullPointerException) {
+            logcat(LogPriority.DEBUG, e) { "Suppressed NullPointerException in onTouchEvent" }
             false
         } catch (e: IndexOutOfBoundsException) {
+            logcat(LogPriority.DEBUG, e) { "Suppressed IndexOutOfBoundsException in onTouchEvent" }
             false
         } catch (e: IllegalArgumentException) {
+            logcat(LogPriority.DEBUG, e) { "Suppressed IllegalArgumentException in onTouchEvent" }
             false
         }
     }

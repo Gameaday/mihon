@@ -45,7 +45,7 @@ import ephyra.core.common.util.lang.toLocalDate
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
-import ephyra.data.track.DeletableTracker
+import ephyra.domain.track.service.DeletableTracker
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.interactor.DeleteTrack

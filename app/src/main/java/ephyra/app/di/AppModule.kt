@@ -152,6 +152,8 @@ val koinAppModule = module {
             override val buildTime: String get() = AppBuildConfig.BUILD_TIME
             override val telemetryIncluded: Boolean get() = AppBuildConfig.TELEMETRY_INCLUDED
             override val updaterEnabled: Boolean get() = AppBuildConfig.UPDATER_ENABLED
+            override val githubRepo: String
+                get() = if (isPreview) "Gameaday/Ephyra-preview" else "Gameaday/Ephyra"
         }
     }
     single { ChapterCache(androidApplication(), get()) }

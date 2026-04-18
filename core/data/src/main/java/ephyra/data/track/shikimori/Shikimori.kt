@@ -4,7 +4,7 @@ import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
 import ephyra.data.track.BaseTracker
-import ephyra.data.track.DeletableTracker
+import ephyra.domain.track.service.DeletableTracker
 import ephyra.data.track.model.TrackSearch
 import ephyra.data.track.model.toDomainTrackSearch
 import ephyra.data.track.shikimori.dto.SMOAuth

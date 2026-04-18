@@ -65,7 +65,6 @@ import ephyra.core.download.DownloadCache
 import ephyra.core.migration.Migrator
 import ephyra.data.cache.ChapterCache
 import ephyra.data.updater.AppUpdateChecker
-import ephyra.data.updater.RELEASE_URL
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.release.interactor.GetApplicationRelease
@@ -84,6 +83,7 @@ import ephyra.presentation.core.components.DownloadedOnlyBannerBackgroundColor
 import ephyra.presentation.core.components.IncognitoModeBannerBackgroundColor
 import ephyra.presentation.core.components.IndexingBannerBackgroundColor
 import ephyra.presentation.core.components.material.Scaffold
+import ephyra.presentation.core.ui.AppInfo
 import ephyra.presentation.core.i18n.stringResource
 import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.presentation.core.ui.activity.BaseActivity
@@ -120,6 +120,7 @@ class MainActivity : BaseActivity(), AppReadySignal {
     private val storagePreferences: ephyra.domain.storage.service.StoragePreferences by inject()
     private val extensionApi: ExtensionApi by inject()
     private val appUpdateChecker: AppUpdateChecker by inject()
+    private val appInfo: AppInfo by inject()
 
     // To be checked by splash screen. If true then splash screen will be removed.
     var ready = false
@@ -303,7 +304,7 @@ class MainActivity : BaseActivity(), AppReadySignal {
                         onDismissRequest = { showChangelog = false },
                         title = { Text(text = stringResource(MR.strings.updated_version, BuildConfig.VERSION_NAME)) },
                         dismissButton = {
-                            TextButton(onClick = { openInBrowser(RELEASE_URL) }) {
+                            TextButton(onClick = { openInBrowser(appInfo.releaseUrl) }) {
                                 Text(text = stringResource(MR.strings.whats_new))
                             }
                         },
