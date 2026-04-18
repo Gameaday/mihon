@@ -69,6 +69,8 @@ import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentMap
+import ephyra.core.common.util.system.logcat
+import logcat.LogPriority
 
 object SettingsTrackingScreen : SearchableSettings {
 
@@ -616,7 +618,8 @@ object SettingsTrackingScreen : SearchableSettings {
                                             it.id == currentLibraryId
                                         }?.name
                                     }
-                                } catch (_: Exception) {
+                                } catch (e: Exception) {
+                                    logcat(LogPriority.WARN, e) { "Failed to load Jellyfin library name for id=$currentLibraryId" }
                                 }
                             }
                         }

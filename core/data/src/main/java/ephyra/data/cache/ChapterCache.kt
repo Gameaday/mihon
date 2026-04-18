@@ -122,7 +122,8 @@ class ChapterCache(
             } catch (e: Exception) {
                 try {
                     editor.abort()
-                } catch (_: Exception) {
+                } catch (abortEx: Exception) {
+                    logcat(LogPriority.DEBUG, abortEx) { "Failed to abort disk-cache editor after page-list write failure" }
                 }
                 throw e
             }
@@ -188,7 +189,8 @@ class ChapterCache(
             } catch (e: Exception) {
                 try {
                     editor.abort()
-                } catch (_: Exception) {
+                } catch (abortEx: Exception) {
+                    logcat(LogPriority.DEBUG, abortEx) { "Failed to abort disk-cache editor after image write failure" }
                 }
                 throw e
             }
@@ -226,7 +228,8 @@ class ChapterCache(
         } catch (e: Exception) {
             try {
                 editor.abort()
-            } catch (_: Exception) {
+            } catch (abortEx: Exception) {
+                logcat(LogPriority.DEBUG, abortEx) { "Failed to abort disk-cache editor after fetch-and-cache failure" }
             }
             throw e
         }

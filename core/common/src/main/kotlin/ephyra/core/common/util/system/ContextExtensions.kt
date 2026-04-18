@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.PowerManager
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
+import logcat.LogPriority
 import rikka.sui.Sui
 import java.io.File
 
@@ -46,7 +47,7 @@ fun Context.openInBrowser(uri: Uri, forceDefaultBrowser: Boolean = false) {
         }
         startActivity(intent)
     } catch (e: Exception) {
-        // toast(e.message) // toast is not available here without circular dep?
+        logcat(LogPriority.ERROR, e) { "Failed to open URI in browser: $uri" }
     }
 }
 

@@ -96,7 +96,7 @@ data object LibraryTab : Tab {
         val snackbarHostState = remember { SnackbarHostState() }
 
         val onClickRefresh: (Category?) -> Boolean = { category ->
-            val started = updateScheduler.startNow(context, category)
+            val started = updateScheduler.startNow(category)
             scope.launch {
                 val msgRes = when {
                     !started -> MR.strings.update_already_running

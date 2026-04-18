@@ -24,7 +24,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -41,14 +40,6 @@ class AuthoritySearchScreenModel(
 
     private var searchJob: Job? = null
 
-    /**
-     * All trackers available for authority search (regardless of content type).
-     * Includes logged-in authoritative trackers AND trackers with public search APIs.
-     * This allows discovery to work without login for trackers like MangaUpdates.
-     * Initialized asynchronously on IO to avoid blocking the main thread on DataStore reads.
-     */
-    private val allTrackers = MutableStateFlow<ImmutableList<Tracker>>(persistentListOf())
-
     init {
         screenModelScope.launch {
             val trackers = withIOContext {
@@ -59,11 +50,11 @@ class AuthoritySearchScreenModel(
                     }
                     .toImmutableList()
             }
-            allTrackers.value = trackers
-            if (trackers.isNotEmpty()) {
-                mutableState.update { state ->
-                    state.copy(selectedTracker = state.selectedTracker ?: trackers.first())
-                }
+            mutableState.update { state ->
+                state.copy(
+                    availableTrackers = trackers,
+                    selectedTracker = state.selectedTracker ?: trackers.firstOrNull(),
+                )
             }
         }
     }
@@ -75,9 +66,10 @@ class AuthoritySearchScreenModel(
      * for that type — saving API calls by not querying irrelevant services.
      */
     fun trackersForFilter(contentType: ContentType): ImmutableList<Tracker> {
-        if (contentType == ContentType.UNKNOWN) return allTrackers.value
+        val available = mutableState.value.availableTrackers
+        if (contentType == ContentType.UNKNOWN) return available
         val validIds = AddTracks.trackersForContentType(contentType)
-        return allTrackers.value.filter { it.id in validIds }.toImmutableList()
+        return available.filter { it.id in validIds }.toImmutableList()
     }
 
     fun selectTracker(tracker: Tracker) {
@@ -460,6 +452,8 @@ class AuthoritySearchScreenModel(
 
 data class AuthoritySearchState(
     val selectedTracker: Tracker? = null,
+    /** All trackers available for authority search, populated asynchronously on IO. */
+    val availableTrackers: ImmutableList<Tracker> = persistentListOf(),
     val query: String = "",
     val isSearching: Boolean = false,
     val results: ImmutableList<TrackSearch> = persistentListOf(),

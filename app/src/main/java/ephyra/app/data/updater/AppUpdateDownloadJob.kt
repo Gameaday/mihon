@@ -110,7 +110,7 @@ class AppUpdateDownloadJob(
                 throw Exception("Unsuccessful response")
             }
             notifier.cancel()
-            notifier.promptInstall(apkFile.getUriCompat(context))
+            notifier.promptInstall(apkFile.getUriCompat(context).toString())
         } catch (e: Exception) {
             val shouldCancel = e is CancellationException ||
                 (e is StreamResetException && e.errorCode == ErrorCode.CANCEL)

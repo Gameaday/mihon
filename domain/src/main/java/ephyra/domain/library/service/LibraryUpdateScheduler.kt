@@ -1,6 +1,5 @@
 package ephyra.domain.library.service
 
-import android.content.Context
 import ephyra.domain.category.model.Category
 
 interface LibraryUpdateScheduler {
@@ -9,10 +8,13 @@ interface LibraryUpdateScheduler {
     /**
      * Immediately enqueues a one-off library update.
      *
-     * @param context Android context used to enqueue the WorkManager task.
+     * The Android `Context` required to enqueue the WorkManager task is captured by the
+     * implementation at construction time; it must not be part of the domain interface
+     * (which must remain free of `android.*` imports and be JVM-testable).
+     *
      * @param category When non-null, restrict the update to this category only.
      * @return `true` if the work was successfully enqueued, `false` if a run is already in
      *         progress.
      */
-    fun startNow(context: Context, category: Category? = null): Boolean
+    fun startNow(category: Category? = null): Boolean
 }

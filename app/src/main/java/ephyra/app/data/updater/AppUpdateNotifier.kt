@@ -116,9 +116,10 @@ class AppUpdateNotifier(private val context: Context) : DomainAppUpdateNotifier 
     /**
      * Call when apk download is finished.
      *
-     * @param uri path location of apk.
+     * @param uriString path location of apk, as a URI string.
      */
-    override fun promptInstall(uri: Uri) {
+    override fun promptInstall(uriString: String) {
+        val uri = uriString.toUri()
         val installIntent = NotificationHandler.installApkPendingActivity(context, uri)
         with(notificationBuilder) {
             setContentText(context.stringResource(MR.strings.update_check_notification_download_complete))

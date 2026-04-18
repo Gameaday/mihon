@@ -76,8 +76,8 @@ class ReaderPagePreProcessor(
                     pageRatios[page.index] = ar
                     allRatios.add(ar)
                 }
-            } catch (_: Exception) {
-                /* skip */
+            } catch (e: Exception) {
+                logcat(LogPriority.DEBUG, e) { "Failed to read dimensions for page ${page.index}; skipping" }
             }
         }
         val dominantAR = if (allRatios.isNotEmpty()) {

@@ -682,8 +682,8 @@ class Downloader(
                     fileAspectRatios[idx] = ar
                     validRatios.add(ar)
                 }
-            } catch (_: Exception) {
-                /* skip */
+            } catch (e: Exception) {
+                logcat(LogPriority.DEBUG, e) { "Failed to read dimensions for ${file.name}; skipping" }
             }
         }
         val dominantAR = if (validRatios.isNotEmpty()) {

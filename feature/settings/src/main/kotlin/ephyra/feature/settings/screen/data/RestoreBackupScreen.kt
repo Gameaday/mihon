@@ -191,7 +191,7 @@ private class RestoreBackupScreenModel(
 
     fun startRestore() {
         restoreScheduler.startRestoreNow(
-            uri = uri.toUri(),
+            uriString = uri,
             optionsArray = state.value.options.asBooleanArray(),
         )
     }

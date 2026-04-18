@@ -7,7 +7,7 @@ import ephyra.core.common.util.system.logcat
 import ephyra.domain.manga.model.CanonicalId
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
-import ephyra.domain.manga.repository.MangaRepository
+import ephyra.domain.manga.interactor.GetFavorites
 import ephyra.domain.track.interactor.MatchUnlinkedManga
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -23,7 +23,7 @@ import org.koin.core.annotation.Factory
  */
 @Factory
 class MatchResultsScreenModel(
-    private val mangaRepository: MangaRepository,
+    private val getFavorites: GetFavorites,
     private val matchUnlinkedManga: MatchUnlinkedManga,
 ) : StateScreenModel<MatchResultsState>(MatchResultsState()) {
 
@@ -35,7 +35,7 @@ class MatchResultsScreenModel(
         screenModelScope.launch {
             mutableState.value = mutableState.value.copy(isLoading = true)
             try {
-                val favorites = withIOContext { mangaRepository.getFavorites() }
+                val favorites = withIOContext { getFavorites.await() }
                 val unlinked = favorites
                     .filter { it.canonicalId == null }
                     .sortedBy { it.title }

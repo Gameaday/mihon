@@ -267,7 +267,8 @@ class MangaCoverFetcher(
         } catch (e: Exception) {
             try {
                 editor.abort()
-            } catch (ignored: Exception) {
+            } catch (abortEx: Exception) {
+                logcat(LogPriority.DEBUG, abortEx) { "Failed to abort disk-cache editor after write failure" }
             }
             throw e
         }

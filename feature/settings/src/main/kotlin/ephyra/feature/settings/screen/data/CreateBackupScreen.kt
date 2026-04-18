@@ -137,7 +137,7 @@ private class CreateBackupScreenModel : StateScreenModel<CreateBackupScreenModel
     }
 
     fun createBackup(uri: Uri) {
-        backupScheduler.startBackupNow(uri, state.value.options.asBooleanArray())
+        backupScheduler.startBackupNow(uri.toString(), state.value.options.asBooleanArray())
     }
 
     @Immutable

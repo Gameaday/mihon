@@ -1,7 +1,7 @@
 package ephyra.app.data.scheduler
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import ephyra.app.data.backup.create.BackupCreateJob
 import ephyra.app.data.backup.restore.BackupRestoreJob
 import ephyra.app.data.library.LibraryUpdateJob
@@ -23,8 +23,8 @@ class WorkSchedulerImpl(private val context: Context) :
         BackupCreateJob.setupTask(context, interval)
     }
 
-    override fun startBackupNow(uri: Uri?, optionsArray: BooleanArray?) {
-        BackupCreateJob.startNow(context, uri, optionsArray)
+    override fun startBackupNow(uriString: String?, optionsArray: BooleanArray?) {
+        BackupCreateJob.startNow(context, uriString?.toUri(), optionsArray)
     }
 
     override fun isBackupRunning(): Boolean {
@@ -32,8 +32,8 @@ class WorkSchedulerImpl(private val context: Context) :
     }
 
     // ── RestoreScheduler ───────────────────────────────────────────────────
-    override fun startRestoreNow(uri: Uri, optionsArray: BooleanArray?) {
-        BackupRestoreJob.start(context, uri, optionsArray)
+    override fun startRestoreNow(uriString: String, optionsArray: BooleanArray?) {
+        BackupRestoreJob.start(context, uriString.toUri(), optionsArray)
     }
 
     override fun isRestoreRunning(): Boolean {
@@ -45,7 +45,7 @@ class WorkSchedulerImpl(private val context: Context) :
         // no-op: periodic library updates are managed elsewhere
     }
 
-    override fun startNow(context: Context, category: Category?): Boolean {
+    override fun startNow(category: Category?): Boolean {
         return LibraryUpdateJob.startNow(context, category)
     }
 

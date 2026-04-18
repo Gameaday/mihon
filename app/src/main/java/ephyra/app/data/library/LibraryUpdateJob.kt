@@ -336,7 +336,9 @@ class LibraryUpdateJob(
             try {
                 val networkManga = source.getMangaDetails(sManga)
                 updateManga.awaitUpdateFromSource(manga, networkManga, manualFetch = false)
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Metadata update failed for '${manga.title}'" }
+            }
         }
 
         val chapters = source.getChapterList(sManga)

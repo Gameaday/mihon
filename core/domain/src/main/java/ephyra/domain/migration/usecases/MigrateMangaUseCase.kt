@@ -20,7 +20,9 @@ import ephyra.domain.track.interactor.GetTracks
 import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.service.EnhancedTracker
 import ephyra.domain.track.service.TrackerManager
+import ephyra.core.common.util.system.logcat
 import kotlinx.coroutines.CancellationException
+import logcat.LogPriority
 import java.time.Instant
 
 class MigrateMangaUseCase(
@@ -50,8 +52,8 @@ class MigrateMangaUseCase(
 
             try {
                 syncChaptersWithSource.await(chapters, target, targetSource)
-            } catch (_: Exception) {
-                // Worst case, chapters won't be synced
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Chapter sync failed during migration to '${target.title}'; chapters may be incomplete" }
             }
 
             // Update chapters read, bookmark and dateFetch

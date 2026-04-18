@@ -157,7 +157,8 @@ class MigrationListScreenModel(
                     updateManga.awaitUpdateFromSource(result.manga, newManga, true)
                 } catch (e: CancellationException) {
                     throw e
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    logcat(LogPriority.WARN, e) { "Failed to fetch thumbnail details for '${result.manga.title}' during migration search" }
                 }
             }
 
@@ -290,7 +291,8 @@ class MigrationListScreenModel(
                 updateManga.awaitUpdateFromSource(result, newManga, true)
             } catch (e: CancellationException) {
                 throw e
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Failed to update manga details for '${result.title}' during migration" }
             }
             migratingManga.searchResult.value = result.toSuccessSearchResult()
             updateMigrationProgress()

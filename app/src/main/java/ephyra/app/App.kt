@@ -329,7 +329,8 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
             }
 
             if (isChromiumCall) return WebViewUtil.spoofedPackageName(applicationContext)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to inspect stack trace for Chromium spoofing" }
         }
 
         return super.getPackageName()

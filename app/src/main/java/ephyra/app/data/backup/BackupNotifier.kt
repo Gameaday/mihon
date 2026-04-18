@@ -29,7 +29,7 @@ class BackupNotifier(private val context: Context) : DomainBackupNotifier {
         }
     }
 
-    override fun showBackupComplete(uri: android.net.Uri) {
+    override fun showBackupComplete(uriString: String) {
         context.cancelNotification(Notifications.ID_BACKUP_PROGRESS)
 
         context.notify(
@@ -37,7 +37,7 @@ class BackupNotifier(private val context: Context) : DomainBackupNotifier {
             Notifications.CHANNEL_BACKUP_RESTORE_COMPLETE,
         ) {
             setContentTitle(context.stringResource(MR.strings.backup_created))
-            setContentText(uri.path)
+            setContentText(android.net.Uri.parse(uriString).path)
             setSmallIcon(ephyra.app.core.common.R.drawable.ic_ephyra)
             setLargeIcon(notificationBitmap)
             setAutoCancel(true)

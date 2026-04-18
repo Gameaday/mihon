@@ -18,7 +18,6 @@ import ephyra.presentation.core.components.SEARCH_DEBOUNCE_MILLIS
 import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -43,8 +42,6 @@ class ExtensionsScreenModel(
     private val getExtensions: GetExtensionsByType,
 ) : StateScreenModel<ExtensionsScreenModel.State>(State()) {
 
-    private val currentDownloads = MutableStateFlow<Map<String, InstallStep>>(hashMapOf())
-
     init {
         val extensionMapper: (Map<String, InstallStep>) -> ((Extension) -> ExtensionUiModel.Item) = { map ->
             {
@@ -58,7 +55,7 @@ class ExtensionsScreenModel(
                     .distinctUntilChanged()
                     .debounce(SEARCH_DEBOUNCE_MILLIS)
                     .map { searchQueryPredicate(it ?: "") },
-                currentDownloads,
+                state.map { it.currentDownloads }.distinctUntilChanged(),
                 getExtensions.subscribe(),
             ) { predicate, downloads, (_updates, _installed, _available, _untrusted) ->
                 val mapper = extensionMapper(downloads)
@@ -174,11 +171,11 @@ class ExtensionsScreenModel(
     }
 
     private fun addDownloadState(extension: Extension, installStep: InstallStep) {
-        currentDownloads.update { it + Pair(extension.pkgName, installStep) }
+        mutableState.update { it.copy(currentDownloads = it.currentDownloads + (extension.pkgName to installStep)) }
     }
 
     private fun removeDownloadState(extension: Extension) {
-        currentDownloads.update { it - extension.pkgName }
+        mutableState.update { it.copy(currentDownloads = it.currentDownloads - extension.pkgName) }
     }
 
     private suspend fun Flow<InstallStep>.collectToInstallUpdate(extension: Extension) =
@@ -218,6 +215,8 @@ class ExtensionsScreenModel(
         val updates: Int = 0,
         val installer: BasePreferences.ExtensionInstaller? = null,
         val searchQuery: String? = null,
+        /** Per-extension install-step progress, keyed by package name. */
+        val currentDownloads: Map<String, InstallStep> = emptyMap(),
     ) {
         val isEmpty = items.isEmpty()
     }

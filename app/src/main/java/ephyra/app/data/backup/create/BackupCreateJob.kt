@@ -42,7 +42,7 @@ class BackupCreateJob(
         return try {
             notifier.showBackupProgress()
             val resultUri = backupCreator.createBackup(uri, options)
-            notifier.showBackupComplete(resultUri)
+            notifier.showBackupComplete(resultUri.toString())
             Result.success()
         } catch (e: Exception) {
             logcat(LogPriority.ERROR, e)

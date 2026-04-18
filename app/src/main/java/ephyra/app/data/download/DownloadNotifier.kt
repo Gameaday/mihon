@@ -1,6 +1,5 @@
 package ephyra.app.data.download
 
-import android.app.PendingIntent
 import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
@@ -169,7 +168,7 @@ class DownloadNotifier(
      * @param mangaId the id of the entry being warned about
      * Only works on Android 8+.
      */
-    override fun onWarning(reason: String, timeout: Long?, contentIntent: PendingIntent?, mangaId: Long?) {
+    override fun onWarning(reason: String, timeout: Long?, mangaId: Long?) {
         with(errorNotificationBuilder) {
             setContentTitle(context.stringResource(MR.strings.download_notifier_downloader_title))
             setStyle(NotificationCompat.BigTextStyle().bigText(reason))
@@ -186,7 +185,6 @@ class DownloadNotifier(
             }
             setProgress(0, 0, false)
             timeout?.let { setTimeoutAfter(it) }
-            contentIntent?.let { setContentIntent(it) }
 
             show(Notifications.ID_DOWNLOAD_CHAPTER_ERROR)
         }

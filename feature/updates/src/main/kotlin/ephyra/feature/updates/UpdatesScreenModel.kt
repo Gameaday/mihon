@@ -1,6 +1,5 @@
 package ephyra.feature.updates
 
-import android.app.Application
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -65,7 +64,6 @@ class UpdatesScreenModel(
     private val getChapter: GetChapter,
     private val libraryPreferences: LibraryPreferences,
     private val updatesPreferences: UpdatesPreferences,
-    private val application: Application,
     private val libraryUpdateScheduler: LibraryUpdateScheduler,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) : StateScreenModel<UpdatesScreenModel.State>(State()) {
@@ -186,7 +184,7 @@ class UpdatesScreenModel(
     }
 
     fun updateLibrary(): Boolean {
-        val started = libraryUpdateScheduler.startNow(application)
+        val started = libraryUpdateScheduler.startNow()
         screenModelScope.launch {
             _events.send(Event.LibraryUpdateTriggered(started))
         }
