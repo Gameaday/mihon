@@ -1,6 +1,8 @@
 package ephyra.data.track.anilist.dto
 
+import ephyra.core.common.util.system.logcat
 import kotlinx.serialization.Serializable
+import logcat.LogPriority
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -17,7 +19,8 @@ data class ALFuzzyDate(
                 .atStartOfDay(ZoneId.systemDefault())
                 .toInstant()
                 .toEpochMilli()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) { "Failed to parse AniList fuzzy date ($year-$month-$day); returning 0" }
             0L
         }
     }

@@ -32,6 +32,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.data.preference.SharedPreferencesDataStore
 import ephyra.domain.source.service.SourceManager
+import ephyra.core.common.util.system.logcat
+import logcat.LogPriority
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.material.Scaffold
 import ephyra.presentation.core.screens.LoadingScreen
@@ -155,7 +157,8 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
                         method.isAccessible = true
                         @Suppress("UNCHECKED_CAST")
                         method.invoke(pref) as? EditTextPreference.OnBindEditTextListener
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        logcat(LogPriority.DEBUG, e) { "Reflection access to OnBindEditTextListener unavailable; IME incognito applied without chaining" }
                         null
                     }
                     pref.setOnBindEditTextListener {

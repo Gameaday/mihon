@@ -1183,11 +1183,13 @@ class ReaderViewModel @JvmOverloads constructor(
                 try {
                     val blocked = ImageUtil.hexToDHash(hexStr)
                     ImageUtil.dHashDistance(hash, blocked) <= threshold
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    logcat(LogPriority.DEBUG, e) { "Skipping malformed blocked-page hash entry during check: '$hexStr'" }
                     false
                 }
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) { "Failed to check blocked-page hash for current page; treating as unblocked" }
             null
         }
     }

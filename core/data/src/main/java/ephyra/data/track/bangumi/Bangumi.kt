@@ -3,6 +3,7 @@ package ephyra.data.track.bangumi
 import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
+import ephyra.core.common.util.system.logcat
 import ephyra.data.track.BaseTracker
 import ephyra.data.track.bangumi.dto.BGMOAuth
 import ephyra.data.track.model.TrackSearch
@@ -14,6 +15,7 @@ import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper
 import kotlinx.serialization.json.Json
+import logcat.LogPriority
 import ephyra.data.database.models.Track as DbTrack
 
 class Bangumi(
@@ -119,7 +121,8 @@ class Bangumi(
             // If no username is set, the API returns the user ID as a strings
             val username = api.getUsername()
             saveCredentials(username, oauth.accessToken)
-        } catch (_: Throwable) {
+        } catch (e: Throwable) {
+            logcat(LogPriority.WARN, e) { "Bangumi login failed; logging out" }
             logout()
         }
     }
@@ -131,7 +134,8 @@ class Bangumi(
     fun restoreToken(): BGMOAuth? {
         return try {
             json.decodeFromString<BGMOAuth>(trackPreferences.trackToken(this@Bangumi).getSync())
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) { "Failed to restore Bangumi OAuth token from preferences; user may need to log in again" }
             null
         }
     }

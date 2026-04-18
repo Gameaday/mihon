@@ -1,5 +1,6 @@
 package ephyra.domain.manga.interactor
 
+import ephyra.core.common.util.system.logcat
 import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.model.LockedField
@@ -13,6 +14,7 @@ import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.model.SManga
 import java.time.Instant
 import java.time.ZonedDateTime
+import logcat.LogPriority
 
 class UpdateManga(
     private val mangaRepository: MangaRepository,
@@ -38,7 +40,8 @@ class UpdateManga(
     ): Boolean {
         val remoteTitle = try {
             remoteManga.title
-        } catch (_: UninitializedPropertyAccessException) {
+        } catch (e: UninitializedPropertyAccessException) {
+            logcat(LogPriority.DEBUG, e) { "Source returned SManga with uninitialized title; using empty string" }
             ""
         }
 

@@ -7,9 +7,11 @@ import android.widget.Toast
 import ephyra.core.common.util.lang.launchUI
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.WebViewUtil
+import ephyra.core.common.util.system.logcat
 import ephyra.core.common.util.system.setDefaultSettings
 import ephyra.core.common.util.system.toast
 import ephyra.i18n.MR
+import logcat.LogPriority
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -40,8 +42,9 @@ abstract class WebViewInterceptor(
             // Use applicationContext: WebSettings must not hold a reference to an Activity context
             // as this interceptor is held for the lifetime of the singleton NetworkHelper.
             WebSettings.getDefaultUserAgent(context.applicationContext)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
             // Avoid some crashes like when Chrome/WebView is being updated.
+            logcat(LogPriority.WARN, e) { "Failed to read default WebView user-agent (WebView may be updating)" }
         }
     }
 

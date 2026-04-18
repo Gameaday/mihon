@@ -81,6 +81,26 @@ jobs:
             exit 1
           fi
 
+      - name: Architecture fitness – data-boundary ratchet (feature modules must not import ephyra.data.*)
+        run: |
+          # Feature modules must not import concrete :data implementations directly.
+          # They should reference only domain interfaces and types.
+          #
+          # There are currently 41 known violations that are tracked in doc/COMPLIANCE_CHECKLIST.md
+          # under Principle 2.  This ratchet ensures the count never grows beyond the baseline —
+          # new violations are caught immediately while existing ones can be cleaned up
+          # incrementally.  Reduce BASELINE as violations are resolved.
+          BASELINE=41
+          VIOLATION_COUNT=$(grep -rn --include="*.kt" "^\s*import ephyra\.data\." \
+            feature/*/src 2>/dev/null | wc -l || echo 0)
+          echo "ephyra.data.* imports in feature modules: ${VIOLATION_COUNT} (baseline: ${BASELINE})"
+          if [ "${VIOLATION_COUNT}" -gt "${BASELINE}" ]; then
+            echo "::error::ephyra.data.* import count (${VIOLATION_COUNT}) exceeds baseline (${BASELINE})."
+            echo "::error::Fix the new violations before merging, then lower BASELINE in build.yml."
+            grep -rn --include="*.kt" "^\s*import ephyra\.data\." feature/*/src 2>/dev/null || true
+            exit 1
+          fi
+
       - name: Build app
         run: |
           FLAGS="-Penable-updater"

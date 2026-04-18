@@ -674,7 +674,8 @@ class ReaderActivity : BaseActivity() {
             TachiyomiImageDecoder.displayProfile = if (data.isNotEmpty()) {
                 try {
                     contentResolver.openInputStream(data.toUri())?.readBytes()
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    logcat(LogPriority.WARN, e) { "Failed to read display ICC profile from URI; disabling colour management" }
                     null
                 }
             } else {

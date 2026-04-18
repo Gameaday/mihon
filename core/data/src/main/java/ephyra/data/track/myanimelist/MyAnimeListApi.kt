@@ -18,7 +18,9 @@ import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.interceptor.rateLimit
 import eu.kanade.tachiyomi.network.parseAs
+import ephyra.core.common.util.system.logcat
 import kotlinx.serialization.json.Json
+import logcat.LogPriority
 import okhttp3.FormBody
 import okhttp3.Headers
 import okhttp3.OkHttpClient
@@ -292,7 +294,8 @@ class MyAnimeListApi(
         return try {
             val outputDf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             outputDf.format(epochTime)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) { "Failed to format epoch $epochTime to ISO date; returning null" }
             null
         }
     }

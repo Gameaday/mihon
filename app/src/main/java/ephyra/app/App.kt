@@ -93,9 +93,15 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
      * that, the [WorkerFactory] bean is always available here.
      */
     override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setWorkerFactory(get<WorkerFactory>())
-            .build()
+        get() {
+            val config = Configuration.Builder()
+                .setWorkerFactory(get<WorkerFactory>())
+                .build()
+            // Mark WorkManager as configured; recorded the first time WorkManager requests
+            // the Configuration (lazy initialisation by WorkManager itself).
+            StartupTracker.complete(StartupTracker.Phase.WORKMANAGER_CONFIGURED)
+            return config
+        }
 
     @SuppressLint("LaunchActivityFromNotification")
     override fun onCreate() {

@@ -227,7 +227,8 @@ class MigrationListScreenModel(
             SourceSearchResult(localManga, getChapterInfo(localManga.id), matchConfidence)
         } catch (e: CancellationException) {
             throw e
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Source search failed for '${manga.title}' on source ${source.id}; skipping" }
             null
         }
     }
@@ -273,7 +274,10 @@ class MigrationListScreenModel(
                     val source = sourceManager.get(manga.source)!!
                     val chapters = source.getChapterList(manga.toSManga())
                     syncChaptersWithSource.await(chapters, manga, source)
-                } catch (_: Exception) {
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logcat(LogPriority.WARN, e) { "Chapter sync failed for '${manga.title}' during migration; target will be missing chapters" }
                     return@async null
                 }
                 manga

@@ -110,11 +110,51 @@ or preference stores directly.
 | ✅ | `app/.../migration/.../MigrationListScreenModel.kt:160` | `catch (_: Exception) {}` on thumbnail detail fetch — no log | `logcat(WARN)` added |
 | ✅ | `app/.../migration/.../MigrationListScreenModel.kt:293` | `catch (_: Exception) {}` on batch migration detail — no log | `logcat(WARN)` added |
 
-### Pending — Requires architectural change
+## Principle 4 — Explicit Failure, Never Silent Failure
 
-| Status | File | Violation | Required Fix |
-|--------|------|-----------|--------------|
-| ⏳ | `core/data/.../track/kavita/KavitaInterceptor.kt:13` | `runBlocking { kavita.loadOAuth() }` inside OkHttp interceptor | Pre-load OAuth eagerly during `Kavita` tracker construction; guard with a `Mutex` to prevent duplicate loads on concurrent requests |
+### Completed in this session
+
+| Status | File | Violation | Fix Applied |
+|--------|------|-----------|-------------|
+| ✅ | `app/.../App.kt:332` | `catch (_: Exception) {}` in `getPackageName()` — no log | `logcat(WARN)` added |
+| ✅ | `app/.../LibraryUpdateJob.kt:339` | `catch (_: Exception) {}` on metadata fetch — no log | `logcat(WARN)` with manga title added |
+| ✅ | `core/data/.../MangaCoverFetcher.kt:270` | `catch (ignored: Exception) {}` on `editor.abort()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../ChapterCache.kt:125` | `catch (_: Exception) {}` on `editor.abort()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../ChapterCache.kt:191` | `catch (_: Exception) {}` on `editor.abort()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../ChapterCache.kt:229` | `catch (_: Exception) {}` on `editor.abort()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../ChapterCache.kt:145` | `catch (_: IOException) {}` in `isImageInCache()` — no log | `logcat(DEBUG)` added |
+| ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:79` | `catch (_: Exception) { /* skip */ }` on dimension read — no log | `logcat(DEBUG)` added |
+| ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:149` | `catch (_: Exception)` in `resolveBlockedDHashes()` — no log | `logcat(DEBUG)` added |
+| ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:176` | `catch (_: Exception)` in `checkAndFilter()` — no log | `logcat(DEBUG)` added |
+| ✅ | `feature/reader/.../ReaderActivity.kt:677` | `catch (_: Exception)` in `setDisplayProfile()` — no log | `logcat(WARN)` added |
+| ✅ | `feature/reader/.../ReaderViewModel.kt:1186` | inner `catch (_: Exception)` in `findMatchingBlockedHash()` — no log | `logcat(DEBUG)` added |
+| ✅ | `feature/reader/.../ReaderViewModel.kt:1190` | outer `catch (_: Exception)` in `findMatchingBlockedHash()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/download/.../Downloader.kt:685` | `catch (_: Exception) { /* skip */ }` on dimension read — no log | `logcat(DEBUG)` added |
+| ✅ | `core/domain/.../MigrateMangaUseCase.kt:53` | `catch (_: Exception) { // Worst case... }` on chapter sync — no log | `logcat(WARN)` added |
+| ✅ | `core/common/.../ContextExtensions.kt:48` | `catch (e: Exception) { // toast(e.message) }` on `startActivity` — no log | `logcat(ERROR)` added |
+| ✅ | `feature/settings/.../SettingsTrackingScreen.kt:619` | `catch (_: Exception) {}` on Jellyfin library fetch — no log | `logcat(WARN)` added |
+| ✅ | `app/.../migration/.../MigrationListScreenModel.kt:160` | `catch (_: Exception) {}` on thumbnail detail fetch — no log | `logcat(WARN)` added |
+| ✅ | `app/.../migration/.../MigrationListScreenModel.kt:230` | `catch (_: Exception)` on source search failure — no log | `logcat(WARN)` added |
+| ✅ | `app/.../migration/.../MigrationListScreenModel.kt:276` | `catch (_: Exception)` on chapter sync in `useMangaForMigration()` — no log | `logcat(WARN)` + `CancellationException` rethrow added |
+| ✅ | `feature/browse/.../SourcePreferencesScreen.kt:158` | `catch (_: Exception)` on reflection for `OnBindEditTextListener` — no log | `logcat(DEBUG)` added |
+| ✅ | `feature/manga/.../TrackInfoDialog.kt:270` | `catch (_: Exception)` on `tracker.register()` — toasts user but no diagnostic log | `logcat(ERROR)` added |
+| ✅ | `feature/manga/.../CoverSearchScreenModel.kt:155` | `catch (_: Exception)` on cover source search — no log | `logcat(WARN)` added |
+| ✅ | `core/common/.../DataStorePreferenceStore.kt:174` | `catch (_: Exception)` on preference deserialization in `getSync()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/common/.../DataStorePreferenceStore.kt:197` | `catch (_: Exception)` on preference deserialization in `changes()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/common/.../DiskUtil.kt:58` | `catch (_: Exception)` on `StatFs` for total space — no log | `logcat(WARN)` added |
+| ✅ | `core/common/.../DiskUtil.kt:82` | `catch (_: Exception)` on `StatFs` for available space — no log | `logcat(WARN)` added |
+| ✅ | `eu.kanade.../WebViewInterceptor.kt:43` | `catch (_: Exception)` on `WebSettings.getDefaultUserAgent` crash — no log | `logcat(WARN)` added |
+| ✅ | `core/data/.../ALFuzzyDate.kt:20` | `catch (_: Exception)` on `LocalDate.of()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../MyAnimeListApi.kt:295` | `catch (_: Exception)` on `SimpleDateFormat.format()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../Bangumi.kt:122` | `catch (_: Throwable)` on login — calls `logout()` silently | `logcat(WARN)` added |
+| ✅ | `core/data/.../Bangumi.kt:134` | `catch (_: Exception)` on `restoreToken` JSON parse — no log | `logcat(DEBUG)` added |
+| ✅ | `core/domain/.../UpdateManga.kt:41` | `catch (_: UninitializedPropertyAccessException)` on source title read — no log | `logcat(DEBUG)` added |
+
+### Fixed (architectural)
+
+| Status | File | Violation | Fix Applied |
+|--------|------|-----------|-------------|
+| ✅ | `core/data/.../track/kavita/KavitaInterceptor.kt:13` | `runBlocking { kavita.loadOAuth() }` inside OkHttp interceptor — concurrent requests all block and each triggers a duplicate load | `Mutex` double-checked-locking added: only the first waiter calls `loadOAuth()`; subsequent callers skip after acquiring the lock and seeing `authentications != null` |
 
 ---
 
@@ -140,7 +180,7 @@ Dependencies that must become interfaces before unit-testing is possible:
 | ✅ | Koin startup wrapped in try/catch | Failures were invisible | `recordError(KOIN_INITIALIZED)` before re-throw |
 | ✅ | `initializeMigrator()` crash-safe | Migrator throw left splash on forever | try/catch records error + completes phase + fallback init |
 | ✅ | Theme/log-level `.getSync()` guarded | DataStore race on first launch | try/catch with safe defaults |
-| ⏳ | Add `WORKMANAGER_CONFIGURED` phase | No startup visibility for WorkManager init | Add enum entry + `complete()` call after `workManagerConfiguration` resolves |
+| ✅ | `WORKMANAGER_CONFIGURED` phase added | No startup visibility for WorkManager init | Phase added to enum; `complete()` called inside `workManagerConfiguration` getter — fires the first time WorkManager requests its `Configuration` |
 | ⏳ | Time-bound all phases | Only `MIGRATOR_COMPLETE` (30 s) and overlay (10 s) have timeouts | Add explicit per-phase timeout thresholds to `StartupDiagnosticOverlay` |
 
 ---
@@ -174,7 +214,7 @@ Dependencies that must become interfaces before unit-testing is possible:
 |--------|-------|-------------|
 | ✅ | No `android.*` import in `:core:domain` or `:domain` source | `build.yml` — "Architecture fitness – no android.* imports" step |
 | ✅ | No `Injekt.get()` outside legacy shim | `build.yml` — "Architecture fitness – no Injekt.get()" step |
-| ⏳ | No direct import of `:data` concrete types in `:feature:*` | Add a third fitness step that greps for `ephyra.data.*` imports in `feature/` and fails the build |
+| ✅ | `ephyra.data.*` import count in `feature/` must not exceed baseline of 41 | `build.yml` — "Architecture fitness – data-boundary ratchet" step; reduces to a build error if new violations are added |
 
 ---
 

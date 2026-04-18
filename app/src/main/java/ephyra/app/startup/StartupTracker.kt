@@ -23,6 +23,7 @@ object StartupTracker {
         APP_CREATED("Application created"),
         KOIN_INITIALIZED("Koin DI ready"),
         MIGRATOR_STARTED("Migrator launched"),
+        WORKMANAGER_CONFIGURED("WorkManager configured"),
         ACTIVITY_CREATED("Main activity created"),
         COMPOSE_STARTED("Compose content initialized"),
         MIGRATOR_COMPLETE("Migrations complete"),

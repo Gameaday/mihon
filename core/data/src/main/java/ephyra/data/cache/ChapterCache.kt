@@ -142,7 +142,8 @@ class ChapterCache(
     fun isImageInCache(imageUrl: String): Boolean {
         return try {
             diskCache.openSnapshot(DiskUtil.hashKeyForDisk(imageUrl))?.use { true } ?: false
-        } catch (_: IOException) {
+        } catch (e: IOException) {
+            logcat(LogPriority.DEBUG, e) { "Failed to check chapter cache for URL '$imageUrl'; treating as not cached" }
             false
         }
     }

@@ -267,7 +267,8 @@ data class TrackInfoDialogHomeScreen(
                         isPrivate = matchResult.isPrivate,
                     )
                     item.tracker.register(track, mangaId)
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    logcat(LogPriority.ERROR, e) { "Failed to register track for tracker '${item.tracker.name}'; manga id=$mangaId" }
                     withUIContext { application.toast(MR.strings.error_no_match) }
                 }
             }

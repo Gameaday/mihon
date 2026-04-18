@@ -8,6 +8,8 @@ import android.os.StatFs
 import androidx.core.content.ContextCompat
 import com.hippo.unifile.UniFile
 import ephyra.core.common.util.lang.Hash
+import ephyra.core.common.util.system.logcat
+import logcat.LogPriority
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
@@ -55,7 +57,8 @@ object DiskUtil {
         return try {
             val stat = StatFs(file.absolutePath)
             stat.blockCountLong * stat.blockSizeLong
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to read total storage space for '${file.absolutePath}'; returning -1" }
             -1L
         }
     }
@@ -79,7 +82,8 @@ object DiskUtil {
         return try {
             val stat = StatFs(path)
             stat.availableBlocksLong * stat.blockSizeLong
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to read available storage space for '$path'; returning -1" }
             -1L
         }
     }

@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import ephyra.core.common.util.system.logcat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import logcat.LogPriority
 
 /**
  * Modern [PreferenceStore] implementation backed by Jetpack DataStore.
@@ -171,7 +173,8 @@ class DataStorePreferenceStore(
             val raw = snapshot[prefsKey] ?: return defaultValue
             return try {
                 fromRaw(raw)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logcat(LogPriority.DEBUG, e) { "Failed to deserialize preference '$key'; returning default" }
                 defaultValue
             }
         }
@@ -194,7 +197,8 @@ class DataStorePreferenceStore(
             val raw = prefs[prefsKey] ?: return@map defaultValue
             try {
                 fromRaw(raw)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logcat(LogPriority.DEBUG, e) { "Failed to deserialize preference '$key' from Flow; returning default" }
                 defaultValue
             }
         }.distinctUntilChanged()

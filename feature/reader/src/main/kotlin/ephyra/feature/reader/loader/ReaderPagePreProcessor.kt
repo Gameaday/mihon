@@ -146,7 +146,8 @@ class ReaderPagePreProcessor(
         val hashes = hexSet.mapNotNull { hex ->
             try {
                 ImageUtil.hexToDHash(hex)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logcat(LogPriority.DEBUG, e) { "Skipping malformed blocked-page hash entry: '$hex'" }
                 null
             }
         }
@@ -173,7 +174,8 @@ class ReaderPagePreProcessor(
         val threshold = DownloadPreferences.BLOCKED_PAGE_DHASH_THRESHOLD
         val hash = try {
             streamFn().use { ImageUtil.computeDHash(it) }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) { "Failed to compute dHash for blocked-page filter; skipping check" }
             return false
         } ?: return false
 

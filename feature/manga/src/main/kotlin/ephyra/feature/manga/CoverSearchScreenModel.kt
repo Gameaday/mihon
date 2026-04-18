@@ -3,6 +3,7 @@ package ephyra.feature.manga
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import ephyra.core.common.util.system.logcat
 import ephyra.domain.source.service.SourceManager
 import ephyra.feature.manga.CoverSearchScreenModel.Companion.MAX_CACHE_ENTRIES
 import eu.kanade.tachiyomi.source.online.HttpSource
@@ -13,6 +14,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import logcat.LogPriority
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
 
@@ -152,7 +154,8 @@ class CoverSearchScreenModel(
                                 state.copy(progress = state.progress + 1)
                             }
                         }
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        logcat(LogPriority.WARN, e) { "Cover search failed for source '${source.name}'; skipping" }
                         if (isActive) {
                             mutableState.update { state ->
                                 state.copy(progress = state.progress + 1)
