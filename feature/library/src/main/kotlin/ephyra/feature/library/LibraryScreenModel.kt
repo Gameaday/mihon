@@ -541,10 +541,32 @@ class LibraryScreenModel(
         return Pair(common, uniqueCategories)
     }
 
+    // ── UDF entry-point ──────────────────────────────────────────────────────
+    fun onEvent(event: LibraryScreenEvent) {
+        when (event) {
+            is LibraryScreenEvent.Search -> search(event.query)
+            is LibraryScreenEvent.UpdateActiveCategoryIndex -> updateActiveCategoryIndex(event.index)
+            is LibraryScreenEvent.ToggleSelection -> toggleSelection(event.category, event.manga)
+            is LibraryScreenEvent.ToggleRangeSelection -> toggleRangeSelection(event.category, event.manga)
+            is LibraryScreenEvent.SelectAll -> selectAll()
+            is LibraryScreenEvent.InvertSelection -> invertSelection()
+            is LibraryScreenEvent.ClearSelection -> clearSelection()
+            is LibraryScreenEvent.PerformDownloadAction -> performDownloadAction(event.action)
+            is LibraryScreenEvent.MarkReadSelection -> markReadSelection(event.read)
+            is LibraryScreenEvent.RemoveMangas -> removeMangas(event.mangas, event.deleteFromLibrary, event.deleteChapters)
+            is LibraryScreenEvent.SetMangaCategories -> setMangaCategories(event.mangaList, event.addCategories, event.removeCategories)
+            is LibraryScreenEvent.ShowSettingsDialog -> showSettingsDialog()
+            is LibraryScreenEvent.EnableHealthFilter -> enableHealthFilter()
+            is LibraryScreenEvent.OpenChangeCategoryDialog -> openChangeCategoryDialog()
+            is LibraryScreenEvent.OpenDeleteMangaDialog -> openDeleteMangaDialog()
+            is LibraryScreenEvent.CloseDialog -> closeDialog()
+        }
+    }
+
     /**
      * Queues the amount specified of unread chapters from the list of selected manga
      */
-    fun performDownloadAction(action: DownloadAction) {
+    private fun performDownloadAction(action: DownloadAction) {
         when (action) {
             DownloadAction.NEXT_1_CHAPTER -> downloadNextChapters(1)
             DownloadAction.NEXT_5_CHAPTERS -> downloadNextChapters(5)
@@ -615,7 +637,7 @@ class LibraryScreenModel(
     /**
      * Marks mangas' chapters read status.
      */
-    fun markReadSelection(read: Boolean) {
+    private fun markReadSelection(read: Boolean) {
         val selection = state.value.selectedManga
         screenModelScope.launchNonCancellable {
             selection.forEach { manga ->
@@ -635,7 +657,7 @@ class LibraryScreenModel(
      * @param deleteFromLibrary whether to delete manga from library.
      * @param deleteChapters whether to delete downloaded chapters.
      */
-    fun removeMangas(mangas: List<Manga>, deleteFromLibrary: Boolean, deleteChapters: Boolean) {
+    private fun removeMangas(mangas: List<Manga>, deleteFromLibrary: Boolean, deleteChapters: Boolean) {
         screenModelScope.launchNonCancellable {
             if (deleteFromLibrary) {
                 val toDelete = mangas.map {
@@ -666,7 +688,7 @@ class LibraryScreenModel(
      * @param addCategories the categories to add for all mangas.
      * @param removeCategories the categories to remove in all mangas.
      */
-    fun setMangaCategories(mangaList: List<Manga>, addCategories: List<Long>, removeCategories: List<Long>) {
+    private fun setMangaCategories(mangaList: List<Manga>, addCategories: List<Long>, removeCategories: List<Long>) {
         screenModelScope.launchNonCancellable {
             val removeCategorySet = removeCategories.toHashSet()
             mangaList.forEach { manga ->
@@ -694,22 +716,22 @@ class LibraryScreenModel(
         return state.getItemsForCategoryId(state.activeCategory?.id).randomOrNull()
     }
 
-    fun showSettingsDialog() {
+    private fun showSettingsDialog() {
         mutableState.update { it.copy(dialog = Dialog.SettingsSheet) }
     }
 
-    fun enableHealthFilter() {
+    private fun enableHealthFilter() {
         libraryPreferences.filterSourceHealthDead().set(TriState.ENABLED_IS)
     }
 
     private var lastSelectionCategory: Long? = null
 
-    fun clearSelection() {
+    private fun clearSelection() {
         lastSelectionCategory = null
         mutableState.update { it.copy(selection = setOf()) }
     }
 
-    fun toggleSelection(category: Category, manga: LibraryManga) {
+    private fun toggleSelection(category: Category, manga: LibraryManga) {
         mutableState.update { state ->
             val newSelection = state.selection.mutate { set ->
                 if (!set.remove(manga.id)) set.add(manga.id)
@@ -723,7 +745,7 @@ class LibraryScreenModel(
      * Selects all mangas between and including the given manga and the last pressed manga from the
      * same category as the given manga
      */
-    fun toggleRangeSelection(category: Category, manga: LibraryManga) {
+    private fun toggleRangeSelection(category: Category, manga: LibraryManga) {
         mutableState.update { state ->
             val newSelection = state.selection.mutate { list ->
                 val lastSelected = list.lastOrNull()
@@ -749,7 +771,7 @@ class LibraryScreenModel(
         }
     }
 
-    fun selectAll() {
+    private fun selectAll() {
         lastSelectionCategory = null
         mutableState.update { state ->
             val newSelection = state.selection.mutate { list ->
@@ -759,7 +781,7 @@ class LibraryScreenModel(
         }
     }
 
-    fun invertSelection() {
+    private fun invertSelection() {
         lastSelectionCategory = null
         mutableState.update { state ->
             val newSelection = state.selection.mutate { list ->
@@ -772,11 +794,11 @@ class LibraryScreenModel(
         }
     }
 
-    fun search(query: String?) {
+    private fun search(query: String?) {
         mutableState.update { it.copy(searchQuery = query) }
     }
 
-    fun updateActiveCategoryIndex(index: Int) {
+    private fun updateActiveCategoryIndex(index: Int) {
         val newIndex = mutableState.updateAndGet { state ->
             state.copy(activeCategoryIndex = index)
         }
@@ -785,7 +807,7 @@ class LibraryScreenModel(
         libraryPreferences.lastUsedCategory().set(newIndex)
     }
 
-    fun openChangeCategoryDialog() {
+    private fun openChangeCategoryDialog() {
         screenModelScope.launchIO {
             // Create a copy of selected manga
             val mangaList = state.value.selectedManga
@@ -808,11 +830,11 @@ class LibraryScreenModel(
         }
     }
 
-    fun openDeleteMangaDialog() {
+    private fun openDeleteMangaDialog() {
         mutableState.update { it.copy(dialog = Dialog.DeleteManga(state.value.selectedManga)) }
     }
 
-    fun closeDialog() {
+    private fun closeDialog() {
         mutableState.update { it.copy(dialog = null) }
     }
 

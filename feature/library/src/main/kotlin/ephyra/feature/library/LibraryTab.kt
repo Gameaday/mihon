@@ -54,6 +54,7 @@ import ephyra.presentation.core.ui.AppReadySignal
 import ephyra.presentation.core.ui.BottomNavController
 import ephyra.presentation.core.ui.MigrationConfigScreenFactory
 import ephyra.presentation.core.util.Tab
+import ephyra.presentation.core.util.manga.DownloadAction
 import ephyra.source.local.isLocal
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.channels.Channel
@@ -119,10 +120,10 @@ data object LibraryTab : Tab {
                     hasActiveFilters = state.hasActiveFilters,
                     selectedCount = state.selection.size,
                     title = title,
-                    onClickUnselectAll = screenModel::clearSelection,
-                    onClickSelectAll = screenModel::selectAll,
-                    onClickInvertSelection = screenModel::invertSelection,
-                    onClickFilter = screenModel::showSettingsDialog,
+                    onClickUnselectAll = { screenModel.onEvent(LibraryScreenEvent.ClearSelection) },
+                    onClickSelectAll = { screenModel.onEvent(LibraryScreenEvent.SelectAll) },
+                    onClickInvertSelection = { screenModel.onEvent(LibraryScreenEvent.InvertSelection) },
+                    onClickFilter = { screenModel.onEvent(LibraryScreenEvent.ShowSettingsDialog) },
                     onClickRefresh = { onClickRefresh(state.activeCategory) },
                     onClickGlobalUpdate = { onClickRefresh(null) },
                     onClickOpenRandomManga = {
@@ -138,7 +139,7 @@ data object LibraryTab : Tab {
                         }
                     },
                     searchQuery = state.searchQuery,
-                    onSearchQueryChange = screenModel::search,
+                    onSearchQueryChange = { screenModel.onEvent(LibraryScreenEvent.Search(it)) },
                     // For scroll overlay when no tab
                     scrollBehavior = scrollBehavior.takeIf { !state.showCategoryTabs },
                 )
@@ -146,15 +147,16 @@ data object LibraryTab : Tab {
             bottomBar = {
                 LibraryBottomActionMenu(
                     visible = state.selectionMode,
-                    onChangeCategoryClicked = screenModel::openChangeCategoryDialog,
-                    onMarkAsReadClicked = { screenModel.markReadSelection(true) },
-                    onMarkAsUnreadClicked = { screenModel.markReadSelection(false) },
-                    onDownloadClicked = screenModel::performDownloadAction
-                        .takeIf { state.selectedManga.fastAll { !it.isLocal() } },
-                    onDeleteClicked = screenModel::openDeleteMangaDialog,
+                    onChangeCategoryClicked = { screenModel.onEvent(LibraryScreenEvent.OpenChangeCategoryDialog) },
+                    onMarkAsReadClicked = { screenModel.onEvent(LibraryScreenEvent.MarkReadSelection(true)) },
+                    onMarkAsUnreadClicked = { screenModel.onEvent(LibraryScreenEvent.MarkReadSelection(false)) },
+                    onDownloadClicked = { action: DownloadAction ->
+                        screenModel.onEvent(LibraryScreenEvent.PerformDownloadAction(action))
+                    }.takeIf { state.selectedManga.fastAll { !it.isLocal() } },
+                    onDeleteClicked = { screenModel.onEvent(LibraryScreenEvent.OpenDeleteMangaDialog) },
                     onMigrateClicked = {
                         val selection = state.selection
-                        screenModel.clearSelection()
+                        screenModel.onEvent(LibraryScreenEvent.ClearSelection)
                         navigator.push(migrationConfigScreenFactory.create(selection))
                     },
                 )
@@ -192,7 +194,7 @@ data object LibraryTab : Tab {
                         showPageTabs = state.showCategoryTabs || !state.searchQuery.isNullOrEmpty(),
                         deadSourceCount = state.deadSourceCount,
                         degradedSourceCount = state.degradedSourceCount,
-                        onChangeCurrentPage = screenModel::updateActiveCategoryIndex,
+                        onChangeCurrentPage = { screenModel.onEvent(LibraryScreenEvent.UpdateActiveCategoryIndex(it)) },
                         onClickManga = { navigator.push(MangaScreen(it)) },
                         onContinueReadingClicked = { it: LibraryManga ->
                             scope.launchIO {
@@ -207,16 +209,18 @@ data object LibraryTab : Tab {
                             }
                             Unit
                         }.takeIf { state.showMangaContinueButton },
-                        onToggleSelection = screenModel::toggleSelection,
+                        onToggleSelection = { cat, manga ->
+                            screenModel.onEvent(LibraryScreenEvent.ToggleSelection(cat, manga))
+                        },
                         onToggleRangeSelection = { category, manga ->
-                            screenModel.toggleRangeSelection(category, manga)
+                            screenModel.onEvent(LibraryScreenEvent.ToggleRangeSelection(category, manga))
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         },
                         onRefresh = { onClickRefresh(state.activeCategory) },
                         onGlobalSearchClicked = {
                             navigator.push(GlobalSearchScreen(screenModel.state.value.searchQuery ?: ""))
                         },
-                        onClickHealthFilter = screenModel::enableHealthFilter,
+                        onClickHealthFilter = { screenModel.onEvent(LibraryScreenEvent.EnableHealthFilter) },
                         getItemCountForCategory = { state.getItemCountForCategory(it) },
                         getDisplayMode = { screenModel.getDisplayMode() },
                         getColumnsForOrientation = { screenModel.getColumnsForOrientation(it) },
@@ -226,7 +230,7 @@ data object LibraryTab : Tab {
             }
         }
 
-        val onDismissRequest = screenModel::closeDialog
+        val onDismissRequest = { screenModel.onEvent(LibraryScreenEvent.CloseDialog) }
         when (val dialog = state.dialog) {
             is LibraryScreenModel.Dialog.SettingsSheet -> run {
                 LibrarySettingsDialog(
@@ -241,12 +245,12 @@ data object LibraryTab : Tab {
                     initialSelection = dialog.initialSelection,
                     onDismissRequest = onDismissRequest,
                     onEditCategories = {
-                        screenModel.clearSelection()
+                        screenModel.onEvent(LibraryScreenEvent.ClearSelection)
                         navigator.push(CategoryScreen())
                     },
                     onConfirm = { include, exclude ->
-                        screenModel.clearSelection()
-                        screenModel.setMangaCategories(dialog.manga, include, exclude)
+                        screenModel.onEvent(LibraryScreenEvent.ClearSelection)
+                        screenModel.onEvent(LibraryScreenEvent.SetMangaCategories(dialog.manga, include, exclude))
                     },
                 )
             }
@@ -256,8 +260,8 @@ data object LibraryTab : Tab {
                     containsLocalManga = dialog.manga.any(Manga::isLocal),
                     onDismissRequest = onDismissRequest,
                     onConfirm = { deleteManga, deleteChapter ->
-                        screenModel.removeMangas(dialog.manga, deleteManga, deleteChapter)
-                        screenModel.clearSelection()
+                        screenModel.onEvent(LibraryScreenEvent.RemoveMangas(dialog.manga, deleteManga, deleteChapter))
+                        screenModel.onEvent(LibraryScreenEvent.ClearSelection)
                     },
                 )
             }
@@ -267,8 +271,8 @@ data object LibraryTab : Tab {
 
         BackHandler(enabled = state.selectionMode || state.searchQuery != null) {
             when {
-                state.selectionMode -> screenModel.clearSelection()
-                state.searchQuery != null -> screenModel.search(null)
+                state.selectionMode -> screenModel.onEvent(LibraryScreenEvent.ClearSelection)
+                state.searchQuery != null -> screenModel.onEvent(LibraryScreenEvent.Search(null))
             }
         }
 
@@ -283,8 +287,11 @@ data object LibraryTab : Tab {
         }
 
         LaunchedEffect(Unit) {
-            launch { queryEvent.receiveAsFlow().collect(screenModel::search) }
-            launch { requestSettingsSheetEvent.receiveAsFlow().collectLatest { screenModel.showSettingsDialog() } }
+            launch { queryEvent.receiveAsFlow().collect { screenModel.onEvent(LibraryScreenEvent.Search(it)) } }
+            launch {
+                requestSettingsSheetEvent.receiveAsFlow()
+                    .collectLatest { screenModel.onEvent(LibraryScreenEvent.ShowSettingsDialog) }
+            }
         }
     }
 
