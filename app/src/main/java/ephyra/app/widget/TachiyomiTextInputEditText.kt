@@ -31,8 +31,9 @@ class TachiyomiTextInputEditText @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-        setIncognito(scope!!, GlobalContext.get().get())
+        val newScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        scope = newScope
+        setIncognito(newScope, GlobalContext.get().get())
     }
 
     override fun onDetachedFromWindow() {

@@ -5,6 +5,7 @@ import ephyra.data.room.daos.MangaDao
 import ephyra.data.room.entities.MangaEntity
 import ephyra.domain.library.model.LibraryManga
 import ephyra.domain.manga.model.Manga
+import ephyra.domain.manga.model.MangaNotFoundException
 import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.model.MangaWithChapterCount
 import ephyra.domain.manga.repository.MangaRepository
@@ -19,7 +20,7 @@ class MangaRepositoryImpl(
 ) : MangaRepository {
 
     override suspend fun getMangaById(id: Long): Manga {
-        return mangaDao.getMangaById(id)?.let(MangaMapper::mapManga) ?: throw Exception("Manga not found")
+        return mangaDao.getMangaById(id)?.let(MangaMapper::mapManga) ?: throw MangaNotFoundException(id)
     }
 
     override suspend fun isMangaFavorite(id: Long): Boolean {
@@ -28,7 +29,7 @@ class MangaRepositoryImpl(
 
     override suspend fun getMangaByIdAsFlow(id: Long): Flow<Manga> {
         return mangaDao.getMangaByIdAsFlow(id)
-            .map { it?.let(MangaMapper::mapManga) ?: throw Exception("Manga not found") }
+            .map { it?.let(MangaMapper::mapManga) ?: throw MangaNotFoundException(id) }
     }
 
     override suspend fun getMangaByUrlAndSourceId(url: String, sourceId: Long): Manga? {

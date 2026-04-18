@@ -6,9 +6,12 @@ This document outlines the phased approach to fully modernize the Ephyra codebas
 > Phases 1–3 are **complete**. Phase 4 domain-purity CI gate is in place. Phase 5 (UDF) is
 > **complete** — all 20 ScreenModels and `ReaderViewModel` have a single `onEvent()` entry-point;
 > no Android framework types (`Context`, `Activity`, `View`) appear in any event sealed class;
-> one-shot UI effects flow via `Channel<Effect>` (`WebViewEffect`, `MangaCoverEffect`).
+> one-shot UI effects flow via `Channel<Effect>` (`WebViewEffect`, `MangaCoverEffect`,
+> `TrackInfoDialog.Model.Effect`).
 > Phase 4 repository-to-interactor decomposition and Phase 6 Room migration are the active next
 > steps. Build is green. Koin is at **4.2.1**. Legacy extension API compatibility is preserved.
+> Boot-safety hardening pass completed: `fallbackToDestructiveMigration` added to Room,
+> typed `MangaNotFoundException` replaces generic exceptions, `scope!!` eliminated.
 
 ## Phase 1: Foundation and Discovery ✅
 
@@ -162,12 +165,15 @@ Replace the legacy SQL-first engine with Entity-DAO Room paradigm.
 - [x] Design the Room `Entity` schema mimicking existing SQLDelight tables.
 - [x] Implement Room `DAO`s with `Flow` and `Paging 3` integration.
 - [x] Add `ExcludedScanlatorDao` and wire into `EphyraDatabase`.
-- [ ] Implement `MangaRepositoryImpl` backed by Room DAO (remove SQLDelight path).
-- [ ] Implement `ChapterRepositoryImpl` backed by Room DAO.
-- [ ] Implement `HistoryRepositoryImpl` backed by Room DAO.
+- [x] Implement `MangaRepositoryImpl` backed by Room DAO.
+- [x] Implement `ChapterRepositoryImpl` backed by Room DAO.
+- [x] Implement `HistoryRepositoryImpl` backed by Room DAO.
 - [ ] Implement `TrackRepositoryImpl` backed by Room DAO.
 - [ ] Implement `CategoryRepositoryImpl` backed by Room DAO.
-- [ ] Implement robust migration strategy from existing SQLite schema → Room.
+- [x] Boot-safety: `fallbackToDestructiveMigration(dropAllTables = true)` added while schema
+  is actively evolving — prevents hard crash on Room identity-hash mismatch. This **must** be
+  replaced with proper `addMigrations()` + `Migration` scripts before first production release.
+- [ ] Implement robust versioned migration strategy (SQLite legacy schema → Room v1+).
 - [ ] Add Room migration unit tests.
 - [ ] Retire `AndroidDatabaseHandler` and remove SQLDelight dependency once all paths ported.
 
@@ -181,3 +187,51 @@ Ensure modernizations do not break existing extensions.
   `:app` module boundary and do not affect the public extension API surface.
 - [x] Validate Proguard rules protect `okhttp3`, `jsoup`, and other shared extension APIs from
   stripping or obfuscation.
+
+## Phase 8: Boot-Safety & Runtime Reliability Hardening
+
+Ensure successful builds translate to failure-free runtime behavior.
+
+- [x] **Room schema crash prevention** — `fallbackToDestructiveMigration(dropAllTables = true)` in
+  `AppModule` prevents `IllegalStateException` on Room identity-hash mismatch.  Will be replaced
+  by versioned migrations before production.
+- [x] **Typed `MangaNotFoundException`** — `domain/manga/model/MangaNotFoundException.kt` replaces
+  generic `Exception("Manga not found")` in `MangaRepositoryImpl`; `GetManga.await()` catches it
+  specifically; `GetManga.subscribe(id)` re-logs unexpected errors then re-throws so callers can
+  distinguish "manga deleted" from I/O errors.
+- [x] **`TachiyomiTextInputEditText.scope!!` eliminated** — local val replaces force-unwrap.
+
+### Remaining items before PR merge is safe
+
+These items represent the outstanding risks / violations that should be resolved (or
+formally accepted and documented) before this PR is considered merge-ready:
+
+#### High priority (potential silent failures or unexpected UX)
+- [ ] **`GlobalContext.get()` in `NotificationReceiver`** — four lazy fields use
+  `GlobalContext.get().get()`.  Safe while Koin is always initialized before `onReceive()`,
+  but should be migrated to `KoinComponent` interface (inject via Koin's field injection
+  pattern for BroadcastReceivers) to make the intent explicit.
+- [ ] **`GlobalContext.get()` in `ReaderPageImageView`** — `alwaysDecodeLongStripWithSSIV` lazy
+  property pulls from GlobalContext.  Should be passed as a constructor parameter or via an
+  interface injected into the reader viewer host.
+- [ ] **`GlobalContext.get()` in widget (`BaseUpdatesGridGlanceWidget`)** — Glance widgets cannot
+  receive Koin-injected constructors; use `KoinComponent` inside the widget coroutine scope
+  (already the recommended Koin-Glance pattern) to make the dependency explicit.
+
+#### Medium priority (architecture violations, not immediate crash risks)
+- [ ] **`feature/settings` → `ephyra.data.*` violations (6 imports in 3 files)** — settings
+  screens still import data-layer types directly.  Deferred from Phase 4.
+- [ ] **`feature/manga` + `feature/reader` direct data imports (6 violations)** — same root
+  cause as above; deferred from Phase 4.
+- [ ] **`TrackRepositoryImpl` and `CategoryRepositoryImpl` not yet ported to Room** — still
+  using SQLDelight paths (Phase 6 incomplete).
+- [ ] **Room versioned migrations** — replace `fallbackToDestructiveMigration` with real
+  `Migration` objects before any production data is at risk.
+
+#### Lower priority (code quality / design hygiene)
+- [ ] **`AndroidDatabaseHandler` / SQLDelight removal** — retire once all repos are on Room.
+- [ ] **`withUIContext` in reader viewer classes** (`WebtoonPageHolder`, `PagerPageHolder`) —
+  these are View-layer classes (not ScreenModels) so the violation is less severe, but should
+  be replaced with `Dispatchers.Main` coroutine context dispatch.
+- [ ] **`KoinJavaComponent.get()` in `BaseActivity`** — acceptable interop but should be
+  migrated to `by inject()` delegation for consistency.

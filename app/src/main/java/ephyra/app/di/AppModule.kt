@@ -102,6 +102,11 @@ val koinAppModule = module {
             klass = EphyraDatabase::class.java,
             name = "tachiyomi.db",
         )
+            // Safety net while the schema is still in active development (Phase 6).
+            // Prevents a hard boot crash when the Room identity hash changes between
+            // builds.  This is intentionally destructive — a proper versioned migration
+            // path (with addMigrations()) will replace this once the schema is stable.
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onOpen(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                     super.onOpen(db)
