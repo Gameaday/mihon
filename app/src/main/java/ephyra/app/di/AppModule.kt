@@ -54,6 +54,7 @@ import ephyra.data.track.TrackerManagerImpl
 import ephyra.data.updater.AppUpdateChecker
 import ephyra.app.track.DelayedTrackingStore
 import ephyra.app.track.DelayedTrackingUpdateJob
+import ephyra.app.data.storage.StorageManagerImpl
 import ephyra.app.track.TrackingJobSchedulerImpl
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.storage.service.StorageManager
@@ -250,7 +251,7 @@ val koinAppModule = module {
     single { AndroidStorageFolderProvider(androidApplication()) }
     single { LocalSourceFileSystem(get()) }
     single { LocalCoverManager(androidApplication(), get()) }
-    single { StorageManager(androidApplication(), get()) }
+    single<StorageManager> { StorageManagerImpl(androidApplication(), get()) }
     single { MatchUnlinkedNotifier(get()) }
     worker { AppUpdateDownloadJob(get(), get(), get()) }
     worker { BackupCreateJob(get(), get(), get()) }
