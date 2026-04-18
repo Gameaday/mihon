@@ -1,7 +1,7 @@
 package ephyra.feature.browse.source.browse
 
 import ephyra.domain.manga.model.Manga
-import tachiyomi.source.local.filter.FilterList
+import eu.kanade.tachiyomi.source.model.FilterList
 
 /**
  * All user intents originating from the Browse Source screen.

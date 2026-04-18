@@ -22,6 +22,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.common.Constants
 import ephyra.domain.manga.model.Manga
 import ephyra.feature.browse.presentation.BrowseSourceContent
+import ephyra.feature.browse.source.browse.BrowseSourceScreenEvent
 import ephyra.feature.browse.source.browse.BrowseSourceScreenModel
 import ephyra.feature.browse.source.browse.SourceFilterDialog
 import ephyra.feature.manga.MangaScreen
@@ -68,9 +69,9 @@ data class MigrateSourceSearchScreen(
             topBar = { scrollBehavior ->
                 SearchToolbar(
                     searchQuery = state.toolbarQuery ?: "",
-                    onChangeSearchQuery = screenModel::setToolbarQuery,
+                    onChangeSearchQuery = { screenModel.onEvent(BrowseSourceScreenEvent.SetToolbarQuery(it)) },
                     onClickCloseSearch = navigator::pop,
-                    onSearch = screenModel::search,
+                    onSearch = { screenModel.onEvent(BrowseSourceScreenEvent.Search(it)) },
                     scrollBehavior = scrollBehavior,
                 )
             },
@@ -78,7 +79,7 @@ data class MigrateSourceSearchScreen(
                 ExtendedFloatingActionButton(
                     text = { Text(text = stringResource(MR.strings.action_filter)) },
                     icon = { Icon(Icons.Outlined.FilterList, contentDescription = null) },
-                    onClick = screenModel::openFilterSheet,
+                    onClick = { screenModel.onEvent(BrowseSourceScreenEvent.OpenFilterSheet) },
                     modifier = Modifier.alpha(if (state.filters.isNotEmpty()) 1f else 0f),
                 )
             },
@@ -90,7 +91,9 @@ data class MigrateSourceSearchScreen(
                     .lastOrNull()
 
                 if (migrateListScreen == null) {
-                    screenModel.setDialog(BrowseSourceScreenModel.Dialog.Migrate(target = it, current = currentManga))
+                    screenModel.onEvent(
+                        BrowseSourceScreenEvent.SetDialog(BrowseSourceScreenModel.Dialog.Migrate(target = it, current = currentManga)),
+                    )
                 } else {
                     migrateListScreen.addMatchOverride(current = currentManga.id, target = it.id)
                     navigator.popUntil { screen -> screen is MigrationListPresenter }
@@ -120,15 +123,15 @@ data class MigrateSourceSearchScreen(
             )
         }
 
-        val onDismissRequest = { screenModel.setDialog(null) }
+        val onDismissRequest = { screenModel.onEvent(BrowseSourceScreenEvent.SetDialog(null)) }
         when (val dialog = state.dialog) {
             is BrowseSourceScreenModel.Dialog.Filter -> {
                 SourceFilterDialog(
                     onDismissRequest = onDismissRequest,
                     filters = state.filters,
-                    onReset = screenModel::resetFilters,
-                    onFilter = { screenModel.search(filters = state.filters) },
-                    onUpdate = screenModel::setFilters,
+                    onReset = { screenModel.onEvent(BrowseSourceScreenEvent.ResetFilters) },
+                    onFilter = { screenModel.onEvent(BrowseSourceScreenEvent.Search(filters = state.filters)) },
+                    onUpdate = { screenModel.onEvent(BrowseSourceScreenEvent.SetFilters(it)) },
                 )
             }
 
