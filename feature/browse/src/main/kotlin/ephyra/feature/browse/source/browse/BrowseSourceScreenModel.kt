@@ -16,7 +16,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.core.common.preference.CheckboxState
 import ephyra.core.common.preference.mapAsCheckboxState
 import ephyra.core.common.util.lang.launchIO
-import ephyra.data.cache.CoverCache
+import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.interactor.SetMangaCategories
 import ephyra.domain.category.model.Category

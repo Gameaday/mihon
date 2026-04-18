@@ -5,7 +5,6 @@ import android.net.Uri
 import com.hippo.unifile.UniFile
 import ephyra.core.archive.archiveReader
 import ephyra.core.download.DownloadProvider
-import ephyra.data.database.models.toDomainChapter
 import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.manga.model.Manga
 import ephyra.feature.reader.model.ReaderChapter
@@ -58,9 +57,7 @@ internal class DownloadPageLoader(
         val pages = downloadManager.buildPageList(
             source,
             manga,
-            requireNotNull(chapter.chapter.toDomainChapter()) {
-                "Chapter has no database ID"
-            },
+            chapter.chapter,
         )
         return pages.map { page ->
             ReaderPage(page.index, page.url, page.imageUrl) {

@@ -25,7 +25,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import ephyra.data.cache.CoverCache
+import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga

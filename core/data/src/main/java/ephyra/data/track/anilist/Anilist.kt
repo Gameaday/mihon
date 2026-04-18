@@ -45,6 +45,8 @@ class Anilist(
     private val interceptor by lazy { AnilistInterceptor(this, getUsernameSync()) }
     private val api = AnilistApi(client, interceptor, json)
 
+    override val oauthUrl: String get() = AnilistApi.authUrl().toString()
+
     override val supportsReadingDates: Boolean = true
 
     override fun getLogo() = R.drawable.brand_anilist

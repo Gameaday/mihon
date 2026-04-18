@@ -32,6 +32,8 @@ class Bangumi(
 
     private val api by lazy { BangumiApi(id, client, interceptor, json) }
 
+    override val oauthUrl: String get() = BangumiApi.authUrl().toString()
+
     override val supportsPrivateTracking: Boolean = true
 
     override fun getScoreList(): List<String> = SCORE_LIST

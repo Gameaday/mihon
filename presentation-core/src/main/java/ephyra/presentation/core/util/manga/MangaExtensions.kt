@@ -1,6 +1,6 @@
 package ephyra.presentation.core.util.manga
 
-import ephyra.data.cache.CoverCache
+import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.hasCustomCover

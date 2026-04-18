@@ -79,7 +79,7 @@ class CoverCache(private val context: Context) : ICoverCache {
         }
 
         if (deleteCustomCover) {
-            if (deleteCustomCover(manga.id)) ++deleted
+            if (deleteCustomCoverInternal(manga.id)) ++deleted
         }
 
         return deleted
@@ -96,10 +96,18 @@ class CoverCache(private val context: Context) : ICoverCache {
         customCoverCacheDir.mkdirs()
     }
 
+    override fun deleteCustomCover(mangaId: Long) {
+        deleteCustomCoverInternal(mangaId)
+    }
+
     /**
      * Delete custom cover of the manga from the cache
      */
     fun deleteCustomCover(mangaId: Long?): Boolean {
+        return deleteCustomCoverInternal(mangaId)
+    }
+
+    private fun deleteCustomCoverInternal(mangaId: Long?): Boolean {
         return getCustomCoverFile(mangaId).let {
             it.exists() && it.delete()
         }

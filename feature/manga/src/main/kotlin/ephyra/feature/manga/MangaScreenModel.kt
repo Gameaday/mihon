@@ -81,7 +81,7 @@ class MangaScreenModel(
     private val libraryPreferences: LibraryPreferences,
     private val readerPreferences: ReaderPreferences,
     private val basePreferences: ephyra.domain.base.BasePreferences,
-    private val coverCache: ephyra.data.cache.CoverCache,
+    private val coverCache: ephyra.domain.manga.service.CoverCache,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) : StateScreenModel<MangaScreenModel.State>(State.Loading) {
 

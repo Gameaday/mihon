@@ -15,7 +15,7 @@ import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
-import ephyra.data.cache.CoverCache
+import ephyra.domain.manga.service.CoverCache
 import ephyra.data.saver.Image
 import ephyra.data.saver.ImageSaver
 import ephyra.data.saver.Location

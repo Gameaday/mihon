@@ -11,6 +11,9 @@ interface Tracker {
 
     val name: String
 
+    val oauthUrl: String
+        get() = ""
+
     val supportsReadingDates: Boolean
 
     val supportsPrivateTracking: Boolean

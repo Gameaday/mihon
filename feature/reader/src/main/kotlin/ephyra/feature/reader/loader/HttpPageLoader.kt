@@ -4,8 +4,8 @@ import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.logcat
-import ephyra.data.cache.ChapterCache
-import ephyra.data.database.models.toDomainChapter
+import ephyra.domain.chapter.service.ChapterCache
+import ephyra.domain.chapter.model.toSChapter
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
 import eu.kanade.tachiyomi.network.HttpException
@@ -165,9 +165,7 @@ internal class HttpPageLoader(
      */
     override suspend fun getPages(): List<ReaderPage> {
         check(!isRecycled)
-        val domainChapter = requireNotNull(chapter.chapter.toDomainChapter()) {
-            "Chapter has no database ID"
-        }
+        val domainChapter = chapter.chapter
         val pages = try {
             val cachedPages = chapterCache.getPageListFromCache(domainChapter)
             // All image URLs are already resolved: the recycle() save can be skipped.
@@ -177,7 +175,7 @@ internal class HttpPageLoader(
             if (e is CancellationException) {
                 throw e
             }
-            val networkPages = source.getPageList(chapter.chapter)
+            val networkPages = source.getPageList(chapter.chapter.toSChapter())
             // Persist immediately so a crash before recycle() doesn't lose the page list.
             scope.launchIO {
                 try {
@@ -286,9 +284,7 @@ internal class HttpPageLoader(
                         // Convert to pages without reader information
                         val pagesToSave = pages.map { Page(it.index, it.url, it.imageUrl) }
                         chapterCache.putPageListToCache(
-                            requireNotNull(chapter.chapter.toDomainChapter()) {
-                                "Chapter has no database ID"
-                            },
+                            chapter.chapter,
                             pagesToSave,
                         )
                     } catch (e: Throwable) {

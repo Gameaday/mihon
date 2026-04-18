@@ -13,5 +13,7 @@ interface CoverCache {
 
     fun deleteFromCache(manga: Manga, deleteCustom: Boolean = false): Int
 
+    fun deleteCustomCover(mangaId: Long)
+
     fun deleteAll()
 }

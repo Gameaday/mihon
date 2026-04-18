@@ -47,6 +47,8 @@ class MyAnimeList(
     private val interceptor by lazy { MyAnimeListInterceptor(this, json) }
     private val api by lazy { MyAnimeListApi(id, client, interceptor, json) }
 
+    override val oauthUrl: String get() = MyAnimeListApi.authUrl().toString()
+
     override val supportsReadingDates: Boolean = true
 
     override fun getLogo() = R.drawable.brand_myanimelist

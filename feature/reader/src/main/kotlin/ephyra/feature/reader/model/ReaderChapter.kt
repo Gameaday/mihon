@@ -1,12 +1,11 @@
 package ephyra.feature.reader.model
 
 import ephyra.core.common.util.system.logcat
-import ephyra.data.database.models.Chapter
-import ephyra.domain.chapter.model.toDbChapter
+import ephyra.domain.chapter.model.Chapter
 import ephyra.feature.reader.loader.PageLoader
 import kotlinx.coroutines.flow.MutableStateFlow
 
-data class ReaderChapter(val chapter: Chapter) {
+class ReaderChapter(var chapter: Chapter) {
 
     val stateFlow = MutableStateFlow<State>(State.Wait)
     var state: State
@@ -23,8 +22,6 @@ data class ReaderChapter(val chapter: Chapter) {
     var requestedPage: Int = 0
 
     private var references = 0
-
-    constructor(chapter: ephyra.domain.chapter.model.Chapter) : this(chapter.toDbChapter())
 
     fun ref() {
         references++

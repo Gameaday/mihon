@@ -50,10 +50,6 @@ import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withUIContext
-import ephyra.data.track.anilist.AnilistApi
-import ephyra.data.track.bangumi.BangumiApi
-import ephyra.data.track.myanimelist.MyAnimeListApi
-import ephyra.data.track.shikimori.ShikimoriApi
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.model.AutoTrackState
 import ephyra.domain.track.service.EnhancedTracker
@@ -241,7 +237,7 @@ object SettingsTrackingScreen : SearchableSettings {
                             tracker = trackerManager.get(TrackerManager.MYANIMELIST)!!,
                             login = {
                                 context.openInBrowser(
-                                    MyAnimeListApi.authUrl(),
+                                    trackerManager.get(TrackerManager.MYANIMELIST)!!.oauthUrl,
                                     forceDefaultBrowser = true,
                                 )
                             },
@@ -251,7 +247,7 @@ object SettingsTrackingScreen : SearchableSettings {
                             tracker = trackerManager.get(TrackerManager.ANILIST)!!,
                             login = {
                                 context.openInBrowser(
-                                    AnilistApi.authUrl(),
+                                    trackerManager.get(TrackerManager.ANILIST)!!.oauthUrl,
                                     forceDefaultBrowser = true,
                                 )
                             },
@@ -276,7 +272,7 @@ object SettingsTrackingScreen : SearchableSettings {
                             tracker = trackerManager.get(TrackerManager.SHIKIMORI)!!,
                             login = {
                                 context.openInBrowser(
-                                    ShikimoriApi.authUrl(),
+                                    trackerManager.get(TrackerManager.SHIKIMORI)!!.oauthUrl,
                                     forceDefaultBrowser = true,
                                 )
                             },
@@ -286,7 +282,7 @@ object SettingsTrackingScreen : SearchableSettings {
                             tracker = trackerManager.get(TrackerManager.BANGUMI)!!,
                             login = {
                                 context.openInBrowser(
-                                    BangumiApi.authUrl(),
+                                    trackerManager.get(TrackerManager.BANGUMI)!!.oauthUrl,
                                     forceDefaultBrowser = true,
                                 )
                             },

@@ -15,7 +15,7 @@ import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.utils.mutate
 import ephyra.core.download.DownloadCache
 import ephyra.core.download.util.getNextUnread
-import ephyra.data.cache.CoverCache
+import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.interactor.SetMangaCategories

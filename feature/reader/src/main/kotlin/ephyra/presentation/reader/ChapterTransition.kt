@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ephyra.data.database.models.toDomainChapter
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.service.calculateChapterGap
 import ephyra.feature.reader.model.ChapterTransition
@@ -51,8 +50,8 @@ fun ChapterTransition(
     currChapterDownloaded: Boolean,
     goingToChapterDownloaded: Boolean,
 ) {
-    val currChapter = transition.from.chapter.toDomainChapter()
-    val goingToChapter = transition.to?.chapter?.toDomainChapter()
+    val currChapter = transition.from.chapter
+    val goingToChapter = transition.to?.chapter
 
     ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
         when (transition) {

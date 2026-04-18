@@ -9,7 +9,8 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadProvider
-import ephyra.data.cache.ChapterCache
+import ephyra.domain.chapter.model.toSChapter
+import ephyra.domain.chapter.service.ChapterCache
 import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.manga.model.Manga
@@ -88,7 +89,7 @@ class ChapterLoader(
                 // If the chapter is partially read, set the starting page to the last the user read
                 // otherwise use the requested page.
                 if (!chapter.chapter.read) {
-                    chapter.requestedPage = chapter.chapter.last_page_read
+                    chapter.requestedPage = chapter.chapter.lastPageRead.toInt()
                 }
 
                 chapter.state = ReaderChapter.State.Loaded(pages)
@@ -134,7 +135,7 @@ class ChapterLoader(
                 context,
             )
 
-            source is LocalSource -> source.getFormat(chapter.chapter).let { format ->
+            source is LocalSource -> source.getFormat(chapter.chapter.toSChapter()).let { format ->
                 when (format) {
                     is Format.Directory -> DirectoryPageLoader(format.file)
                     is Format.Archive -> ArchivePageLoader(format.file.archiveReader(context))

@@ -43,6 +43,8 @@ class Shikimori(
 
     private val api by lazy { ShikimoriApi(id, client, interceptor, json) }
 
+    override val oauthUrl: String get() = ShikimoriApi.authUrl().toString()
+
     override fun getScoreList(): List<String> = SCORE_LIST
 
     override fun displayScore(track: Track): String {
