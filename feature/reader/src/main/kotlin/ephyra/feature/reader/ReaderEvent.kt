@@ -24,8 +24,10 @@ sealed interface ReaderEvent {
     data class ViewerLoaded(val viewer: Viewer?) : ReaderEvent
     data class PageSelected(val page: ReaderPage) : ReaderEvent
     data object RestartReadTimer : ReaderEvent
+    data object ToggleChapterBookmark : ReaderEvent
     data class SetMangaReadingMode(val readingMode: ReadingMode) : ReaderEvent
     data class SetMangaOrientationType(val orientation: ReaderOrientation) : ReaderEvent
+    data object ToggleCropBorders : ReaderEvent
     data class ShowMenus(val visible: Boolean) : ReaderEvent
     data object ShowLoadingDialog : ReaderEvent
     data object OpenReadingModeSelectDialog : ReaderEvent

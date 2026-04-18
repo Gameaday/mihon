@@ -308,8 +308,10 @@ class ReaderViewModel @JvmOverloads constructor(
             is ReaderEvent.ViewerLoaded -> onViewerLoaded(event.viewer)
             is ReaderEvent.PageSelected -> onPageSelected(event.page)
             is ReaderEvent.RestartReadTimer -> restartReadTimer()
+            is ReaderEvent.ToggleChapterBookmark -> toggleChapterBookmark()
             is ReaderEvent.SetMangaReadingMode -> setMangaReadingMode(event.readingMode)
             is ReaderEvent.SetMangaOrientationType -> setMangaOrientationType(event.orientation)
+            is ReaderEvent.ToggleCropBorders -> toggleCropBorders()
             is ReaderEvent.ShowMenus -> showMenus(event.visible)
             is ReaderEvent.ShowLoadingDialog -> showLoadingDialog()
             is ReaderEvent.OpenReadingModeSelectDialog -> openReadingModeSelectDialog()
@@ -854,7 +856,7 @@ class ReaderViewModel @JvmOverloads constructor(
     /**
      * Bookmarks the currently active chapter.
      */
-    fun toggleChapterBookmark() {
+    private fun toggleChapterBookmark() {
         val chapter = getCurrentChapter()?.chapter ?: return
         val bookmarked = !chapter.bookmark
 
@@ -962,7 +964,7 @@ class ReaderViewModel @JvmOverloads constructor(
         }
     }
 
-    fun toggleCropBorders(): Boolean {
+    private fun toggleCropBorders(): Boolean {
         val isPagerType = ReadingMode.isPagerType(getMangaReadingMode())
         val pref = if (isPagerType) readerPreferences.cropBorders() else readerPreferences.cropBordersWebtoon()
         val newValue = !pref.getSync()

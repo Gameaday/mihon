@@ -1,7 +1,6 @@
 package ephyra.feature.manga
 
 import android.app.Application
-import android.content.Context
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import cafe.adriel.voyager.core.model.StateScreenModel
@@ -13,7 +12,6 @@ import coil3.size.Size
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.manga.service.CoverCache
 import ephyra.data.saver.Image
@@ -28,11 +26,12 @@ import ephyra.i18n.MR
 import ephyra.presentation.core.util.manga.editCover
 import ephyra.presentation.core.util.system.encoder
 import ephyra.presentation.core.util.system.getBitmapOrNull
-import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.source.local.image.LocalCoverManager
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.network.await
 import eu.kanade.tachiyomi.source.online.HttpSource
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -55,6 +54,11 @@ class MangaCoverScreenModel(
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) : StateScreenModel<Manga?>(null) {
 
+    private val effectChannel = Channel<MangaCoverEffect>(Channel.BUFFERED)
+
+    /** One-shot UI side-effects to be collected by the composable. */
+    val effectFlow = effectChannel.receiveAsFlow()
+
     init {
         screenModelScope.launchIO {
             getManga.subscribe(mangaId)
@@ -64,43 +68,42 @@ class MangaCoverScreenModel(
 
     fun onEvent(event: MangaCoverScreenEvent) {
         when (event) {
-            is MangaCoverScreenEvent.SaveCover -> saveCover(event.context)
-            is MangaCoverScreenEvent.ShareCover -> shareCover(event.context)
-            is MangaCoverScreenEvent.EditCover -> editCover(event.context, event.data)
-            is MangaCoverScreenEvent.DeleteCustomCover -> deleteCustomCover(event.context)
-            is MangaCoverScreenEvent.SetCoverFromUrl -> setCoverFromUrl(event.context, event.coverUrl, event.sourceId)
+            is MangaCoverScreenEvent.SaveCover -> saveCover()
+            is MangaCoverScreenEvent.ShareCover -> shareCover()
+            is MangaCoverScreenEvent.EditCover -> editCover(event.data)
+            is MangaCoverScreenEvent.DeleteCustomCover -> deleteCustomCover()
+            is MangaCoverScreenEvent.SetCoverFromUrl -> setCoverFromUrl(event.coverUrl, event.sourceId)
         }
     }
 
-    private fun saveCover(context: Context) {
+    private fun saveCover() {
         screenModelScope.launch {
             try {
-                saveCoverInternal(context, temp = false)
+                saveCoverInternal(temp = false)
                 snackbarHostState.showSnackbar(
-                    context.stringResource(MR.strings.cover_saved),
+                    application.stringResource(MR.strings.cover_saved),
                     withDismissAction = true,
                 )
             } catch (e: Throwable) {
                 logcat(LogPriority.ERROR, e)
                 snackbarHostState.showSnackbar(
-                    context.stringResource(MR.strings.error_saving_cover),
+                    application.stringResource(MR.strings.error_saving_cover),
                     withDismissAction = true,
                 )
             }
         }
     }
 
-    private fun shareCover(context: Context) {
+    private fun shareCover() {
         screenModelScope.launch {
             try {
-                val uri = saveCoverInternal(context, temp = true) ?: return@launch
-                withUIContext {
-                    context.startActivity(uri.toShareIntent(context))
-                }
+                val uri = saveCoverInternal(temp = true) ?: return@launch
+                // Emit effect — the UI layer handles startActivity with Activity context
+                effectChannel.send(MangaCoverEffect.StartShare(uri))
             } catch (e: Throwable) {
                 logcat(LogPriority.ERROR, e)
                 snackbarHostState.showSnackbar(
-                    context.stringResource(MR.strings.error_sharing_cover),
+                    application.stringResource(MR.strings.error_sharing_cover),
                     withDismissAction = true,
                 )
             }
@@ -114,12 +117,11 @@ class MangaCoverScreenModel(
      * When saving to Pictures, uses the user's preferred [LibraryPreferences.ImageFormat]
      * (WebP lossless by default) for efficient storage.
      *
-     * @param context The context for building and executing the ImageRequest
      * @return the uri to saved file
      */
-    private suspend fun saveCoverInternal(context: Context, temp: Boolean): Uri? {
+    private suspend fun saveCoverInternal(temp: Boolean): Uri? {
         val manga = state.value ?: return null
-        val req = ImageRequest.Builder(context)
+        val req = ImageRequest.Builder(application)
             .data(manga)
             .size(Size.ORIGINAL)
             .build()
@@ -132,7 +134,7 @@ class MangaCoverScreenModel(
         }
 
         return withIOContext {
-            val result = context.imageLoader.execute(req).image?.asDrawable(context.resources)
+            val result = application.imageLoader.execute(req).image?.asDrawable(application.resources)
 
             // TODO: Handle animated cover
             val bitmap = result?.getBitmapOrNull() ?: return@withIOContext null
@@ -150,32 +152,31 @@ class MangaCoverScreenModel(
     /**
      * Update cover with local file.
      *
-     * @param context Context.
      * @param data uri of the cover resource.
      */
-    private fun editCover(context: Context, data: Uri) {
+    private fun editCover(data: Uri) {
         val manga = state.value ?: return
         screenModelScope.launchIO {
-            context.contentResolver.openInputStream(data)?.use {
+            application.contentResolver.openInputStream(data)?.use {
                 try {
                     manga.editCover(localCoverManager, it, updateManga, coverCache)
-                    notifyCoverUpdated(context)
+                    notifyCoverUpdated()
                 } catch (e: Exception) {
-                    notifyFailedCoverUpdate(context, e)
+                    notifyFailedCoverUpdate(e)
                 }
             }
         }
     }
 
-    private fun deleteCustomCover(context: Context) {
-        val mangaId = state.value?.id ?: return
+    private fun deleteCustomCover() {
+        val id = state.value?.id ?: return
         screenModelScope.launchIO {
             try {
-                coverCache.deleteCustomCover(mangaId)
-                updateManga.awaitUpdateCoverLastModified(mangaId)
-                notifyCoverUpdated(context)
+                coverCache.deleteCustomCover(id)
+                updateManga.awaitUpdateCoverLastModified(id)
+                notifyCoverUpdated()
             } catch (e: Exception) {
-                notifyFailedCoverUpdate(context, e)
+                notifyFailedCoverUpdate(e)
             }
         }
     }
@@ -189,11 +190,10 @@ class MangaCoverScreenModel(
      * Uses [sourceId] to look up the [HttpSource] and apply its headers/client so that
      * sources requiring Referer/User-Agent/cookies work correctly.
      *
-     * @param context Context.
      * @param coverUrl URL of the cover image to download.
      * @param sourceId ID of the source that owns this cover URL.
      */
-    private fun setCoverFromUrl(context: Context, coverUrl: String, sourceId: Long) {
+    private fun setCoverFromUrl(coverUrl: String, sourceId: Long) {
         val manga = state.value ?: return
         screenModelScope.launchIO {
             try {
@@ -213,29 +213,30 @@ class MangaCoverScreenModel(
                         manga.editCover(localCoverManager, input, updateManga, coverCache)
                     }
                 }
-                notifyCoverUpdated(context)
+                notifyCoverUpdated()
             } catch (e: Exception) {
-                notifyFailedCoverUpdate(context, e)
+                notifyFailedCoverUpdate(e)
             }
         }
     }
 
-    private fun notifyCoverUpdated(context: Context) {
+    private fun notifyCoverUpdated() {
         screenModelScope.launch {
             snackbarHostState.showSnackbar(
-                context.stringResource(MR.strings.cover_updated),
+                application.stringResource(MR.strings.cover_updated),
                 withDismissAction = true,
             )
         }
     }
 
-    private fun notifyFailedCoverUpdate(context: Context, e: Throwable) {
+    private fun notifyFailedCoverUpdate(e: Throwable) {
         screenModelScope.launch {
             snackbarHostState.showSnackbar(
-                context.stringResource(MR.strings.notification_cover_update_failed),
+                application.stringResource(MR.strings.notification_cover_update_failed),
                 withDismissAction = true,
             )
             logcat(LogPriority.ERROR, e)
         }
     }
 }
+
