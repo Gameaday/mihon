@@ -12,7 +12,6 @@ import ephyra.core.common.util.lang.byteSize
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.storage.DiskUtil
 import ephyra.core.common.util.storage.cacheImageDir
 import ephyra.core.common.util.system.DeviceUtil
@@ -414,18 +413,17 @@ class ReaderViewModel @JvmOverloads constructor(
             chapterList.getOrNull(chapterPos + 1),
         )
 
-        withUIContext {
-            mutableState.update {
-                // Add new references first to avoid unnecessary recycling
-                newChapters.ref()
-                it.viewerChapters?.unref()
+        // MutableStateFlow.update is thread-safe — no UI-thread dispatch needed.
+        mutableState.update {
+            // Add new references first to avoid unnecessary recycling
+            newChapters.ref()
+            it.viewerChapters?.unref()
 
-                chapterToDownload = cancelQueuedDownloads(newChapters.currChapter)
-                it.copy(
-                    viewerChapters = newChapters,
-                    bookmarked = newChapters.currChapter.chapter.bookmark,
-                )
-            }
+            chapterToDownload = cancelQueuedDownloads(newChapters.currChapter)
+            it.copy(
+                viewerChapters = newChapters,
+                bookmarked = newChapters.currChapter.chapter.bookmark,
+            )
         }
         return newChapters
     }
@@ -1064,10 +1062,9 @@ class ReaderViewModel @JvmOverloads constructor(
                         location = Location.Pictures.create(relativePath),
                     ),
                 )
-                withUIContext {
-                    notifier.onComplete(uri)
-                    eventChannel.send(Event.SavedImage(SaveImageResult.Success(uri)))
-                }
+                // Emit the saved URI so the Activity can show the notification and toast
+                // from its own Context — keeping the ViewModel free of UI concerns.
+                eventChannel.send(Event.SavedImage(SaveImageResult.Success(uri)))
             } catch (e: Throwable) {
                 notifier.onError(e.message)
                 eventChannel.send(Event.SavedImage(SaveImageResult.Error(e)))

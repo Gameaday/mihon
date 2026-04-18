@@ -5,6 +5,7 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.domain.manga.interactor.NetworkToLocalManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.toDomainManga
+import ephyra.domain.source.model.NoResultsException
 import ephyra.domain.source.repository.SourcePagingSource
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.model.FilterList
@@ -80,5 +81,3 @@ abstract class BaseSourcePagingSource(
         }
     }
 }
-
-class NoResultsException : Exception()

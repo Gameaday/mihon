@@ -30,7 +30,7 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.forEach
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.data.preference.SharedPreferencesDataStore
+import ephyra.presentation.core.preference.SharedPreferencesDataStore
 import ephyra.domain.source.service.SourceManager
 import ephyra.core.common.util.system.logcat
 import logcat.LogPriority

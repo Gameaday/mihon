@@ -98,11 +98,13 @@ class AuthoritySearchScreenModel(
     }
 
     private fun selectTracker(tracker: Tracker) {
-        mutableState.value = mutableState.value.copy(
-            selectedTracker = tracker,
-            results = persistentListOf(),
-            query = "",
-        )
+        mutableState.update {
+            it.copy(
+                selectedTracker = tracker,
+                results = persistentListOf(),
+                query = "",
+            )
+        }
     }
 
     /**
@@ -125,39 +127,47 @@ class AuthoritySearchScreenModel(
             filteredTrackers.firstOrNull()
         }
 
-        mutableState.value = mutableState.value.copy(
-            contentTypeFilter = contentType,
-            selectedTracker = newTracker,
-            // Clear results when switching type — old results may not be relevant
-            results = persistentListOf(),
-        )
+        mutableState.update {
+            it.copy(
+                contentTypeFilter = contentType,
+                selectedTracker = newTracker,
+                // Clear results when switching type — old results may not be relevant
+                results = persistentListOf(),
+            )
+        }
     }
 
     private fun search(query: String) {
         val tracker = mutableState.value.selectedTracker ?: return
         searchJob?.cancel()
-        mutableState.value = mutableState.value.copy(
-            query = query,
-            isSearching = true,
-            results = persistentListOf(),
-            searchError = null,
-        )
+        mutableState.update {
+            it.copy(
+                query = query,
+                isSearching = true,
+                results = persistentListOf(),
+                searchError = null,
+            )
+        }
         searchJob = screenModelScope.launch {
             try {
                 val results = withIOContext { tracker.search(query) }
-                mutableState.value = mutableState.value.copy(
-                    results = results.toImmutableList(),
-                    isSearching = false,
-                )
+                mutableState.update {
+                    it.copy(
+                        results = results.toImmutableList(),
+                        isSearching = false,
+                    )
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e) { "Authority search failed: query=$query" }
-                mutableState.value = mutableState.value.copy(
-                    isSearching = false,
-                    results = persistentListOf(),
-                    searchError = e.message ?: e.javaClass.simpleName,
-                )
+                mutableState.update {
+                    it.copy(
+                        isSearching = false,
+                        results = persistentListOf(),
+                        searchError = e.message ?: e.javaClass.simpleName,
+                    )
+                }
             }
         }
     }
@@ -174,9 +184,7 @@ class AuthoritySearchScreenModel(
         val canonicalId = "$prefix:${result.remote_id}"
 
         // Track loading state for this specific result
-        mutableState.value = mutableState.value.copy(
-            addingCanonicalIds = mutableState.value.addingCanonicalIds + canonicalId,
-        )
+        mutableState.update { it.copy(addingCanonicalIds = it.addingCanonicalIds + canonicalId) }
 
         screenModelScope.launch {
             try {
@@ -185,10 +193,12 @@ class AuthoritySearchScreenModel(
                     val existingByCanonical = getFavoritesByCanonicalId.await(canonicalId, -1L)
                     if (existingByCanonical.isNotEmpty()) {
                         // Already in library — just mark as added in UI
-                        mutableState.value = mutableState.value.copy(
-                            addedCanonicalIds = mutableState.value.addedCanonicalIds + canonicalId,
-                            addingCanonicalIds = mutableState.value.addingCanonicalIds - canonicalId,
-                        )
+                        mutableState.update { state ->
+                            state.copy(
+                                addedCanonicalIds = state.addedCanonicalIds + canonicalId,
+                                addingCanonicalIds = state.addingCanonicalIds - canonicalId,
+                            )
+                        }
                         return@withIOContext
                     }
 
@@ -197,15 +207,17 @@ class AuthoritySearchScreenModel(
                     val unpairedMatches = getDuplicateLibraryManga.invoke(result.title)
                         .filter { it.manga.canonicalId == null }
                     if (unpairedMatches.isNotEmpty()) {
-                        mutableState.value = mutableState.value.copy(
-                            mergePrompt = MergePromptInfo(
-                                result = result,
-                                canonicalId = canonicalId,
-                                tracker = tracker,
-                                candidates = unpairedMatches.toImmutableList(),
-                            ),
-                            addingCanonicalIds = mutableState.value.addingCanonicalIds - canonicalId,
-                        )
+                        mutableState.update { state ->
+                            state.copy(
+                                mergePrompt = MergePromptInfo(
+                                    result = result,
+                                    canonicalId = canonicalId,
+                                    tracker = tracker,
+                                    candidates = unpairedMatches.toImmutableList(),
+                                ),
+                                addingCanonicalIds = state.addingCanonicalIds - canonicalId,
+                            )
+                        }
                         return@withIOContext
                     }
 
@@ -216,9 +228,7 @@ class AuthoritySearchScreenModel(
                 logcat(LogPriority.ERROR, e) { "Failed to add authority manga: canonical_id=$canonicalId" }
             } finally {
                 // Ensure loading state is cleared even on error
-                mutableState.value = mutableState.value.copy(
-                    addingCanonicalIds = mutableState.value.addingCanonicalIds - canonicalId,
-                )
+                mutableState.update { it.copy(addingCanonicalIds = it.addingCanonicalIds - canonicalId) }
             }
         }
     }
@@ -286,14 +296,16 @@ class AuthoritySearchScreenModel(
                         insertTrack.await(track)
                     }
 
-                    mutableState.value = mutableState.value.copy(
-                        addedCanonicalIds = mutableState.value.addedCanonicalIds + prompt.canonicalId,
-                        mergePrompt = null,
-                    )
+                    mutableState.update { state ->
+                        state.copy(
+                            addedCanonicalIds = state.addedCanonicalIds + prompt.canonicalId,
+                            mergePrompt = null,
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e) { "Failed to merge with existing manga" }
-                mutableState.value = mutableState.value.copy(mergePrompt = null)
+                mutableState.update { it.copy(mergePrompt = null) }
             }
         }
     }
@@ -304,7 +316,7 @@ class AuthoritySearchScreenModel(
      */
     private fun skipMerge() {
         val prompt = mutableState.value.mergePrompt ?: return
-        mutableState.value = mutableState.value.copy(mergePrompt = null)
+        mutableState.update { it.copy(mergePrompt = null) }
         screenModelScope.launch {
             try {
                 withIOContext {
@@ -318,7 +330,7 @@ class AuthoritySearchScreenModel(
 
     /** Dismiss the merge prompt without doing anything. */
     private fun dismissMergePrompt() {
-        mutableState.value = mutableState.value.copy(mergePrompt = null)
+        mutableState.update { it.copy(mergePrompt = null) }
     }
 
     /**
@@ -394,14 +406,16 @@ class AuthoritySearchScreenModel(
             )
         }
 
-        mutableState.value = mutableState.value.copy(
-            addedCanonicalIds = mutableState.value.addedCanonicalIds + canonicalId,
-            sourcePromptManga = SourcePromptInfo(
-                title = result.title,
-                mangaId = manga.id,
-                isSearching = true,
-            ),
-        )
+        mutableState.update { state ->
+            state.copy(
+                addedCanonicalIds = state.addedCanonicalIds + canonicalId,
+                sourcePromptManga = SourcePromptInfo(
+                    title = result.title,
+                    mangaId = manga.id,
+                    isSearching = true,
+                ),
+            )
+        }
 
         // Automatically search for content sources in the background
         autoSearchForSources(manga)
@@ -419,20 +433,22 @@ class AuthoritySearchScreenModel(
                 }
                 val currentPrompt = mutableState.value.sourcePromptManga ?: return@launch
                 if (currentPrompt.mangaId == manga.id) {
-                    mutableState.value = mutableState.value.copy(
-                        sourcePromptManga = currentPrompt.copy(
-                            sourceMatches = matches.toImmutableList(),
-                            isSearching = false,
-                        ),
-                    )
+                    mutableState.update {
+                        it.copy(
+                            sourcePromptManga = currentPrompt.copy(
+                                sourceMatches = matches.toImmutableList(),
+                                isSearching = false,
+                            ),
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 logcat(LogPriority.WARN, e) { "Auto-search for sources failed" }
                 val currentPrompt = mutableState.value.sourcePromptManga ?: return@launch
                 if (currentPrompt.mangaId == manga.id) {
-                    mutableState.value = mutableState.value.copy(
-                        sourcePromptManga = currentPrompt.copy(isSearching = false),
-                    )
+                    mutableState.update {
+                        it.copy(sourcePromptManga = currentPrompt.copy(isSearching = false))
+                    }
                 }
             }
         }
@@ -440,17 +456,17 @@ class AuthoritySearchScreenModel(
 
     /** Dismiss the source prompt dialog. */
     private fun dismissSourcePrompt() {
-        mutableState.value = mutableState.value.copy(sourcePromptManga = null)
+        mutableState.update { it.copy(sourcePromptManga = null) }
     }
 
     /** User tapped a result card to view full details. */
     private fun selectResult(result: TrackSearch) {
-        mutableState.value = mutableState.value.copy(selectedResult = result)
+        mutableState.update { it.copy(selectedResult = result) }
     }
 
     /** Dismiss the detail view. */
     private fun dismissDetail() {
-        mutableState.value = mutableState.value.copy(selectedResult = null)
+        mutableState.update { it.copy(selectedResult = null) }
     }
 
     /** Retry the last failed search. */

@@ -57,6 +57,7 @@ import ephyra.feature.reader.R
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.AddToLibraryFirst
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.Error
 import ephyra.feature.reader.ReaderViewModel.SetAsCoverResult.Success
+import ephyra.feature.reader.SaveImageNotifier
 import ephyra.feature.reader.databinding.ReaderActivityBinding
 import ephyra.feature.reader.model.ReaderChapter
 import ephyra.feature.reader.model.ReaderPage
@@ -542,7 +543,12 @@ class ReaderActivity : BaseActivity() {
 
     fun onSaveImageResult(result: ReaderViewModel.SaveImageResult) {
         when (result) {
-            is ReaderViewModel.SaveImageResult.Success -> toast(MR.strings.picture_saved)
+            is ReaderViewModel.SaveImageResult.Success -> {
+                // Show the BigPicture notification here (Activity Context) — the ViewModel
+                // no longer holds a notifier reference, keeping it UI-framework-agnostic.
+                SaveImageNotifier(this).onComplete(result.uri)
+                toast(MR.strings.picture_saved)
+            }
             is ReaderViewModel.SaveImageResult.Error -> toast(result.error.message)
         }
     }

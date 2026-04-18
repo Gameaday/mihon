@@ -63,7 +63,7 @@ Also enforce the domain purity boundary — `core/domain` must not import `ephyr
 - [ ] Break down remaining `MangaRepository` / `HistoryRepository` direct call-sites into focused
   Interactors.
 - [ ] Port `backup/restore` handlers off `DatabaseHandler` → Interactors backed by Room DAOs.
-- [ ] Lower the `feature → ephyra.data.*` ratchet baseline from 17 → 0.
+- [ ] Lower the `feature → ephyra.data.*` ratchet baseline from 7 → 0.
   See **Known Violations** section below for the full tracked list.
 
 ### Known Violations — feature/presentation → data layer (tracked, not yet fixed)
@@ -72,58 +72,50 @@ These are confirmed architectural violations where feature or presentation-core 
 directly from `ephyra.data.*` instead of going through a domain interface or presentation-core
 re-export. Each item must be addressed before Phase 4 can be considered fully complete.
 
-#### `feature/browse` (1 violation)
-| File | Violation | Fix |
-|------|-----------|-----|
-| `SourcePreferencesScreen.kt` | `import ephyra.data.preference.SharedPreferencesDataStore` | Move `SharedPreferencesDataStore` to `presentation-core`; it is a pure Android UI adapter (`extends PreferenceDataStore`) with no data-layer logic |
+#### `feature/manga` + `feature/reader` (6 violations — same root cause) ⚠️ DEFERRED
+| File | Violation | Fix | Blocker |
+|------|-----------|-----|---------|
+| `MangaCoverScreenModel.kt` | `import ephyra.data.saver.{Image,ImageSaver,Location}` | Extract `ImageSaver` interface + pure `Image`/`Location` to `core/domain`; keep Android impl in `:data` | `Location.directory(Context)` and `Image.Cover(Bitmap)` have Android deps — need careful API split |
+| `ReaderViewModel.kt` | `import ephyra.data.saver.{Image,ImageSaver,Location}` | Same as above | Same |
 
-#### `feature/manga` (3 violations — same root cause)
-| File | Violation | Fix |
-|------|-----------|-----|
-| `MangaCoverScreenModel.kt` | `import ephyra.data.saver.{Image,ImageSaver,Location}` | Extract `ImageSaver` interface + `Image`/`Location` value types to `core/domain`; keep `ImageSaverImpl` in `:data` |
+#### `feature/reader` (1 violation) ⚠️ DEFERRED
+| File | Violation | Fix | Blocker |
+|------|-----------|-----|---------|
+| `SaveImageNotifier.kt` | `import ephyra.data.notification.Notifications` | Move notification channel constants to `core/common` (Android-free constants, not data impl) | `Notifications` uses `NotificationManagerCompat` + `Context` for channel creation — only the `const val` IDs/channel strings should move; the `createChannels()` method must stay in data or app |
 
-#### `feature/reader` (5 violations across 3 files)
-| File | Violation | Fix |
-|------|-----------|-----|
-| `ReaderViewModel.kt` | `import ephyra.data.saver.{Image,ImageSaver,Location}` | Same fix as `MangaCoverScreenModel` above — promote to `core/domain` |
-| `SaveImageNotifier.kt` | `import ephyra.data.notification.Notifications` | Move `Notifications` channel IDs to `core/domain` (they are app-level constants, not data-impl details) |
-| `ReaderPageImageView.kt` | `import ephyra.data.coil.{cropBorders,customDecoder}` | Re-export the `ImageRequest.Builder` extension funs from `presentation-core/coil`; keep `Options.*` accessors in `:data` (used internally by Coil fetchers) |
+#### `feature/settings` (6 violations across 3 files) ⚠️ DEFERRED
+| File | Violation | Fix | Blocker |
+|------|-----------|-----|---------|
+| `SettingsDataScreen.kt` | `import ephyra.data.export.{LibraryExporter,ExportOptions}` | Define `LibraryExporter` interface in `core/domain`; implement in `:data` | Large scope; backup/export system touches many data-layer types |
+| `CreateBackupScreen.kt` | `import ephyra.data.backup.create.{BackupCreator,BackupOptions}` | Define `BackupCreator` interface + `BackupOptions` in `core/domain` | Same |
+| `RestoreBackupScreen.kt` | `import ephyra.data.backup.{BackupFileValidator,restore.RestoreOptions}` | Define `BackupFileValidator` interface + `RestoreOptions` in `core/domain` | Same |
+| `BackupSchemaScreen.kt` | `import ephyra.data.backup.models.Backup` | Move `Backup` model to `core/domain` (it is a pure data model, not an impl detail) | Backup model has many nested types that need moving |
 
-#### `feature/settings` (6 violations across 3 files)
-| File | Violation | Fix |
-|------|-----------|-----|
-| `SettingsDataScreen.kt` | `import ephyra.data.export.{LibraryExporter,ExportOptions}` | Define `LibraryExporter` interface in `core/domain`; implement in `:data` |
-| `CreateBackupScreen.kt` | `import ephyra.data.backup.create.{BackupCreator,BackupOptions}` | Define `BackupCreator` interface + `BackupOptions` in `core/domain` |
-| `RestoreBackupScreen.kt` | `import ephyra.data.backup.{BackupFileValidator,restore.RestoreOptions}` | Define `BackupFileValidator` interface + `RestoreOptions` in `core/domain` |
-| `BackupSchemaScreen.kt` | `import ephyra.data.backup.models.Backup` | Move `Backup` model to `core/domain` (it is a pure data model, not an impl detail) |
+### Known Violations — non-atomic state mutations ✅ FIXED
 
-#### `presentation-core` (1 violation)
-| File | Violation | Fix |
-|------|-----------|-----|
-| `ExceptionFormatter.kt` | `import ephyra.data.source.NoResultsException` | Move `NoResultsException` from `data/source/SourcePagingSource.kt` to `core/domain`; it is a domain-level exception with no data-layer dependency |
+All `mutableState.value = mutableState.value.copy(…)` patterns replaced with
+`mutableState.update { … }` in both affected files:
 
-### Known Violations — non-atomic state mutations (tracked, not yet fixed)
+- ✅ `MatchResultsScreenModel` — 9 mutations fixed
+- ✅ `AuthoritySearchScreenModel` — 21 mutations fixed
 
-Per the [Android UI Layer guidelines](https://developer.android.com/topic/architecture/ui-layer),
-state mutations must be atomic. Using `mutableState.value = mutableState.value.copy(…)` creates
-a read-modify-write race condition; all mutations should use `mutableState.update { … }`.
-
-| File | Violations |
-|------|-----------|
-| `MatchResultsScreenModel.kt` | 9 `mutableState.value =` assignments — replace all with `mutableState.update { … }` |
-| `AuthoritySearchScreenModel.kt` | ~12 `mutableState.value =` assignments — replace all with `mutableState.update { … }` |
-
-### Known Violations — `withUIContext` inside ViewModel (tracked, not yet fixed)
+### Known Violations — `withUIContext` inside ViewModel ✅ FIXED
 
 `withUIContext` (i.e. `withContext(Dispatchers.Main)`) inside a `ViewModel`/`ScreenModel` breaks
 the UI Layer principle that ViewModels should be UI-thread-agnostic. State updates go through
 `MutableStateFlow.update {}` (which is thread-safe); side-effects should be emitted as `Effect`
 channel events and handled by the UI layer.
 
-| File | Line | Context | Fix |
-|------|------|---------|-----|
-| `ReaderViewModel.kt` | ~417 | `withUIContext { mutableState.update { … } }` around viewer chapter swap | Remove `withUIContext` wrapper — `MutableStateFlow.update` is already thread-safe |
-| `ReaderViewModel.kt` | ~1067 | `withUIContext { notifier.onComplete(uri); eventChannel.send(…) }` | `eventChannel.send` is suspend-safe from any dispatcher; `SaveImageNotifier.onComplete` needs UI thread — emit an `Effect.ShowSaveImageNotification(uri)` and handle in `ReaderActivity` |
+| File | Line | Fix applied |
+|------|------|-------------|
+| `ReaderViewModel.kt` | ~417 | ✅ `withUIContext` wrapper removed — `MutableStateFlow.update` is thread-safe on any dispatcher |
+| `ReaderViewModel.kt` | ~1067 | ✅ `notifier.onComplete(uri)` moved to `ReaderActivity.onSaveImageResult(Success)`; ViewModel emits `Event.SavedImage(Success(uri))` only |
+
+**Remaining note:** `SaveImageNotifier` is still constructed inside `ReaderViewModel.saveImage()`
+using `app` (Application context) for the `onClear()` and `onError()` notification paths. Using
+`Application` context for notification operations is acceptable (no Activity leak), but the
+long-term clean fix is to emit `ReaderEffect.ClearSaveNotification` / `ReaderEffect.SaveError`
+and move the `SaveImageNotifier` entirely to `ReaderActivity`.
 
 ## Phase 5: UI Architecture Stabilization (UDF) ✅
 

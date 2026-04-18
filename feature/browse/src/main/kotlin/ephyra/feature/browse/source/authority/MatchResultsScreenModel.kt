@@ -12,6 +12,7 @@ import ephyra.domain.track.interactor.MatchUnlinkedManga
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority
 import org.koin.core.annotation.Factory
@@ -33,7 +34,7 @@ class MatchResultsScreenModel(
 
     private fun loadManga() {
         screenModelScope.launch {
-            mutableState.value = mutableState.value.copy(isLoading = true)
+            mutableState.update { it.copy(isLoading = true) }
             try {
                 val favorites = withIOContext { getFavorites.await() }
                 val unlinked = favorites
@@ -48,17 +49,19 @@ class MatchResultsScreenModel(
                 // Compute content type counts for the summary
                 val mangaCount = favorites.count { it.contentType == ContentType.MANGA }
                 val novelCount = favorites.count { it.contentType == ContentType.NOVEL }
-                mutableState.value = mutableState.value.copy(
-                    isLoading = false,
-                    unlinkedManga = unlinked,
-                    recentlyLinked = linked,
-                    totalFavorites = favorites.size,
-                    mangaCount = mangaCount,
-                    novelCount = novelCount,
-                )
+                mutableState.update {
+                    it.copy(
+                        isLoading = false,
+                        unlinkedManga = unlinked,
+                        recentlyLinked = linked,
+                        totalFavorites = favorites.size,
+                        mangaCount = mangaCount,
+                        novelCount = novelCount,
+                    )
+                }
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e) { "Failed to load manga for match results" }
-                mutableState.value = mutableState.value.copy(isLoading = false)
+                mutableState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -71,27 +74,33 @@ class MatchResultsScreenModel(
         if (manga.id in mutableState.value.matchingIds) return
         if (mutableState.value.isRetryingAll) return
         screenModelScope.launch {
-            mutableState.value = mutableState.value.copy(
-                matchingIds = mutableState.value.matchingIds + manga.id,
-                failedIds = mutableState.value.failedIds - manga.id,
-            )
+            mutableState.update { state ->
+                state.copy(
+                    matchingIds = state.matchingIds + manga.id,
+                    failedIds = state.failedIds - manga.id,
+                )
+            }
             try {
                 val canonicalId = withIOContext { matchUnlinkedManga.awaitSingle(manga) }
                 if (canonicalId != null) {
                     // Reload to move from unlinked to linked
                     loadManga()
                 } else {
-                    mutableState.value = mutableState.value.copy(
-                        matchingIds = mutableState.value.matchingIds - manga.id,
-                        failedIds = mutableState.value.failedIds + manga.id,
-                    )
+                    mutableState.update { state ->
+                        state.copy(
+                            matchingIds = state.matchingIds - manga.id,
+                            failedIds = state.failedIds + manga.id,
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 logcat(LogPriority.WARN, e) { "Failed to match '${manga.title}'" }
-                mutableState.value = mutableState.value.copy(
-                    matchingIds = mutableState.value.matchingIds - manga.id,
-                    failedIds = mutableState.value.failedIds + manga.id,
-                )
+                mutableState.update { state ->
+                    state.copy(
+                        matchingIds = state.matchingIds - manga.id,
+                        failedIds = state.failedIds + manga.id,
+                    )
+                }
             }
         }
     }
@@ -102,25 +111,25 @@ class MatchResultsScreenModel(
     fun retryAll() {
         if (mutableState.value.isRetryingAll) return
         screenModelScope.launch {
-            mutableState.value = mutableState.value.copy(isRetryingAll = true)
+            mutableState.update { it.copy(isRetryingAll = true) }
             try {
                 withIOContext {
                     matchUnlinkedManga.await { current, total ->
-                        mutableState.value = mutableState.value.copy(
-                            retryAllProgress = current to total,
-                        )
+                        mutableState.update { it.copy(retryAllProgress = current to total) }
                     }
                 }
                 loadManga()
             } catch (e: Exception) {
                 logcat(LogPriority.WARN, e) { "Retry all failed" }
             } finally {
-                mutableState.value = mutableState.value.copy(
-                    isRetryingAll = false,
-                    retryAllProgress = null,
-                    matchingIds = emptySet(),
-                    failedIds = emptySet(),
-                )
+                mutableState.update {
+                    it.copy(
+                        isRetryingAll = false,
+                        retryAllProgress = null,
+                        matchingIds = emptySet(),
+                        failedIds = emptySet(),
+                    )
+                }
             }
         }
     }
