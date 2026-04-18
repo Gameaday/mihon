@@ -18,17 +18,21 @@ object StartupTracker {
      * Each phase must be completed exactly once via [complete].  Any phase that is still
      * absent from [completedPhases] after the diagnostic timeout is highlighted as pending
      * (or blocked) in the overlay.
+     *
+     * [timeoutMs] is the maximum time (measured from process start) within which this phase
+     * should complete.  Phases still pending past their budget are shown as OVERDUE in
+     * [StartupDiagnosticOverlay] with an amber warning icon.
      */
-    enum class Phase(val displayName: String) {
-        APP_CREATED("Application created"),
-        KOIN_INITIALIZED("Koin DI ready"),
-        MIGRATOR_STARTED("Migrator launched"),
-        WORKMANAGER_CONFIGURED("WorkManager configured"),
-        ACTIVITY_CREATED("Main activity created"),
-        COMPOSE_STARTED("Compose content initialized"),
-        MIGRATOR_COMPLETE("Migrations complete"),
-        NAVIGATOR_CREATED("Navigator ready"),
-        HOME_SCREEN_LOADED("App ready"),
+    enum class Phase(val displayName: String, val timeoutMs: Long) {
+        APP_CREATED("Application created",          2_000L),
+        KOIN_INITIALIZED("Koin DI ready",           8_000L),
+        MIGRATOR_STARTED("Migrator launched",      10_000L),
+        WORKMANAGER_CONFIGURED("WorkManager configured", 12_000L),
+        ACTIVITY_CREATED("Main activity created",  15_000L),
+        COMPOSE_STARTED("Compose content initialized", 20_000L),
+        MIGRATOR_COMPLETE("Migrations complete",   40_000L),
+        NAVIGATOR_CREATED("Navigator ready",       45_000L),
+        HOME_SCREEN_LOADED("App ready",            60_000L),
     }
 
     data class PhaseEntry(val phase: Phase, val timestampMs: Long)

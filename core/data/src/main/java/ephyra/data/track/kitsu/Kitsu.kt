@@ -3,6 +3,7 @@ package ephyra.data.track.kitsu
 import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
+import ephyra.core.common.util.system.logcat
 import ephyra.data.track.BaseTracker
 import ephyra.data.track.DeletableTracker
 import ephyra.data.track.kitsu.dto.KitsuOAuth
@@ -15,6 +16,7 @@ import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper
 import kotlinx.serialization.json.Json
+import logcat.LogPriority
 import java.text.DecimalFormat
 import ephyra.data.database.models.Track as DbTrack
 
@@ -159,7 +161,8 @@ class Kitsu(
     fun restoreToken(): KitsuOAuth? {
         return try {
             json.decodeFromString<KitsuOAuth>(trackPreferences.trackToken(this@Kitsu).getSync())
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) { "Failed to restore Kitsu OAuth token from preferences; user may need to log in again" }
             null
         }
     }

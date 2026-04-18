@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.HourglassEmpty
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -111,11 +112,19 @@ private fun DiagnosticContent(modifier: Modifier = Modifier) {
                     value = StartupTracker.completedPhases
                 }
             }
+            // Track elapsed time for the overdue indicator (polls every 500ms alongside phase state).
+            val nowElapsedMs by produceState(initialValue = StartupTracker.elapsedMs()) {
+                while (true) {
+                    delay(500)
+                    value = StartupTracker.elapsedMs()
+                }
+            }
             StartupTracker.Phase.entries.forEach { phase ->
                 val entry = completed.firstOrNull { it.phase == phase }
                 PhaseRow(
                     phase = phase,
                     elapsedMs = entry?.let { it.timestampMs - StartupTracker.processStartMs },
+                    nowElapsedMs = nowElapsedMs,
                 )
             }
 
@@ -148,8 +157,9 @@ private fun DiagnosticContent(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PhaseRow(phase: StartupTracker.Phase, elapsedMs: Long?) {
+private fun PhaseRow(phase: StartupTracker.Phase, elapsedMs: Long?, nowElapsedMs: Long) {
     val isComplete = elapsedMs != null
+    val isOverdue = !isComplete && nowElapsedMs > phase.timeoutMs && StartupTracker.lastError == null
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth(),
@@ -158,12 +168,14 @@ private fun PhaseRow(phase: StartupTracker.Phase, elapsedMs: Long?) {
             imageVector = when {
                 isComplete -> Icons.Filled.CheckCircle
                 StartupTracker.lastError != null -> Icons.Outlined.Error
+                isOverdue -> Icons.Outlined.Warning
                 else -> Icons.Outlined.HourglassEmpty
             },
             contentDescription = null,
             tint = when {
                 isComplete -> Color(0xFF66BB6A)
                 StartupTracker.lastError != null -> Color(0xFFFF6B6B)
+                isOverdue -> Color(0xFFFF9800) // amber — overdue but no error yet
                 else -> Color(0xFFFFB74D)
             },
             modifier = Modifier.size(16.dp),
@@ -171,14 +183,23 @@ private fun PhaseRow(phase: StartupTracker.Phase, elapsedMs: Long?) {
         Spacer(Modifier.width(8.dp))
         Text(
             text = phase.displayName,
-            color = if (isComplete) Color.White else Color(0xFF888888),
+            color = when {
+                isComplete -> Color.White
+                isOverdue -> Color(0xFFFFCC80) // amber text for overdue
+                else -> Color(0xFF888888)
+            },
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.weight(1f),
         )
-        if (isComplete && elapsedMs != null) {
-            Text(
+        when {
+            isComplete -> Text(
                 text = "+${elapsedMs}ms",
                 color = Color(0xFF666666),
+                style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
+            )
+            isOverdue -> Text(
+                text = "OVERDUE (>${phase.timeoutMs / 1_000}s)",
+                color = Color(0xFFFF9800),
                 style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
             )
         }

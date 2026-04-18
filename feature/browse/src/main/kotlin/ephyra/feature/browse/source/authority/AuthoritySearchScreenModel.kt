@@ -6,12 +6,16 @@ import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.chapter.interactor.GenerateAuthorityChapters
 import ephyra.domain.manga.interactor.FindContentSource
+import ephyra.domain.manga.interactor.GetDuplicateLibraryManga
+import ephyra.domain.manga.interactor.GetFavoritesByCanonicalId
+import ephyra.domain.manga.interactor.GetMangaByUrlAndSourceId
+import ephyra.domain.manga.interactor.NetworkToLocalManga
+import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.model.MangaWithChapterCount
 import ephyra.domain.manga.model.mergedAlternativeTitles
-import ephyra.domain.manga.repository.MangaRepository
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.interactor.TrackerListImporter
@@ -32,7 +36,11 @@ import org.koin.core.annotation.Factory
 @Factory
 class AuthoritySearchScreenModel(
     private val trackerManager: TrackerManager,
-    private val mangaRepository: MangaRepository,
+    private val getFavoritesByCanonicalId: GetFavoritesByCanonicalId,
+    private val getDuplicateLibraryManga: GetDuplicateLibraryManga,
+    private val getMangaByUrlAndSourceId: GetMangaByUrlAndSourceId,
+    private val networkToLocalManga: NetworkToLocalManga,
+    private val updateManga: UpdateManga,
     private val insertTrack: InsertTrack,
     private val generateAuthorityChapters: GenerateAuthorityChapters,
     private val findContentSource: FindContentSource,
@@ -157,7 +165,7 @@ class AuthoritySearchScreenModel(
             try {
                 withIOContext {
                     // Reuse the same dedup logic as TrackerListImporter
-                    val existingByCanonical = mangaRepository.getFavoritesByCanonicalId(canonicalId, -1L)
+                    val existingByCanonical = getFavoritesByCanonicalId.await(canonicalId, -1L)
                     if (existingByCanonical.isNotEmpty()) {
                         // Already in library — just mark as added in UI
                         mutableState.value = mutableState.value.copy(
@@ -169,7 +177,7 @@ class AuthoritySearchScreenModel(
 
                     // Check for unpaired library manga (no canonical ID) that match by title.
                     // If found, prompt the user to merge with existing content first.
-                    val unpairedMatches = mangaRepository.getDuplicateLibraryManga(-1L, result.title.lowercase())
+                    val unpairedMatches = getDuplicateLibraryManga.invoke(result.title)
                         .filter { it.manga.canonicalId == null }
                     if (unpairedMatches.isNotEmpty()) {
                         mutableState.value = mutableState.value.copy(
@@ -212,7 +220,7 @@ class AuthoritySearchScreenModel(
                     // Assign canonical ID and enrich missing metadata from the authoritative result
                     val result = prompt.result
                     val manga = candidate.manga
-                    mangaRepository.update(
+                    updateManga.await(
                         MangaUpdate(
                             id = manga.id,
                             canonicalId = prompt.canonicalId,
@@ -305,7 +313,7 @@ class AuthoritySearchScreenModel(
         tracker: Tracker,
         canonicalId: String,
     ) {
-        val existingByUrl = mangaRepository.getMangaByUrlAndSourceId(
+        val existingByUrl = getMangaByUrlAndSourceId.await(
             canonicalId,
             TrackerListImporter.AUTHORITY_SOURCE_ID,
         )
@@ -323,13 +331,13 @@ class AuthoritySearchScreenModel(
                 description = result.summary.ifBlank { null },
                 initialized = true,
             )
-            val inserted = mangaRepository.insertNetworkManga(listOf(newManga))
+            val inserted = networkToLocalManga(listOf(newManga))
             inserted.firstOrNull() ?: return
         }
 
         // Mark as favourite and set content type from publishing_type
         val inferredType = ContentType.fromPublishingType(result.publishing_type)
-        mangaRepository.update(
+        updateManga.await(
             MangaUpdate(
                 id = manga.id,
                 favorite = true,
@@ -444,7 +452,7 @@ class AuthoritySearchScreenModel(
             addAll(result.alternative_titles)
         }
         val merged = manga.mergedAlternativeTitles(newTitles) ?: return
-        mangaRepository.update(
+        updateManga.await(
             MangaUpdate(id = manga.id, alternativeTitles = merged),
         )
     }

@@ -86,7 +86,7 @@ or preference stores directly.
 | Status | File | Violation | Fix Applied / Required |
 |--------|------|-----------|------------------------|
 | ✅ | `feature/browse/.../authority/MatchResultsScreenModel.kt` | Constructor injects `MangaRepository` directly | Replaced with `GetFavorites` interactor |
-| ⏳ | `feature/browse/.../authority/AuthoritySearchScreenModel.kt` | Constructor injects `MangaRepository` for 4 distinct operations | Create `GetFavoritesByCanonicalId` (exists ✅), `GetDuplicateLibraryMangaByTitle`, `NetworkMangaInserter`, `UpdateMangaMetadata` interactors; inject all instead of repository |
+| ✅ | `feature/browse/.../authority/AuthoritySearchScreenModel.kt` | Constructor injects `MangaRepository` for 4 distinct operations | Replaced with `GetFavoritesByCanonicalId`, `GetDuplicateLibraryManga` (new `invoke(title)` overload added), `GetMangaByUrlAndSourceId`, `UpdateManga`, `NetworkToLocalManga` |
 
 ---
 
@@ -123,6 +123,9 @@ or preference stores directly.
 | ✅ | `core/data/.../ChapterCache.kt:191` | `catch (_: Exception) {}` on `editor.abort()` — no log | `logcat(DEBUG)` added |
 | ✅ | `core/data/.../ChapterCache.kt:229` | `catch (_: Exception) {}` on `editor.abort()` — no log | `logcat(DEBUG)` added |
 | ✅ | `core/data/.../ChapterCache.kt:145` | `catch (_: IOException) {}` in `isImageInCache()` — no log | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../track/jellyfin/JellyfinApi.kt:505` | `catch (_: Exception)` in `checkServerReachable()` — returns false silently | `logcat(DEBUG)` added |
+| ✅ | `core/data/.../track/kitsu/Kitsu.kt:162` | `catch (_: Exception)` in `restoreToken()` — returns null silently | `logcat(DEBUG)` added |
+| ✅ | `data/.../manga/MangaMapper.kt:337` | `catch (_: Exception)` on JSON parse fall-through in `parseAlternativeTitles()` — no log | `logcat(DEBUG)` added |
 | ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:79` | `catch (_: Exception) { /* skip */ }` on dimension read — no log | `logcat(DEBUG)` added |
 | ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:149` | `catch (_: Exception)` in `resolveBlockedDHashes()` — no log | `logcat(DEBUG)` added |
 | ✅ | `feature/reader/.../ReaderPagePreProcessor.kt:176` | `catch (_: Exception)` in `checkAndFilter()` — no log | `logcat(DEBUG)` added |
@@ -181,7 +184,7 @@ Dependencies that must become interfaces before unit-testing is possible:
 | ✅ | `initializeMigrator()` crash-safe | Migrator throw left splash on forever | try/catch records error + completes phase + fallback init |
 | ✅ | Theme/log-level `.getSync()` guarded | DataStore race on first launch | try/catch with safe defaults |
 | ✅ | `WORKMANAGER_CONFIGURED` phase added | No startup visibility for WorkManager init | Phase added to enum; `complete()` called inside `workManagerConfiguration` getter — fires the first time WorkManager requests its `Configuration` |
-| ⏳ | Time-bound all phases | Only `MIGRATOR_COMPLETE` (30 s) and overlay (10 s) have timeouts | Add explicit per-phase timeout thresholds to `StartupDiagnosticOverlay` |
+| ✅ | Time-bound all phases | Only `MIGRATOR_COMPLETE` (30 s) and overlay (10 s) had timeouts | `timeoutMs: Long` added to each `Phase` enum entry; `StartupDiagnosticOverlay` now shows `Warning` icon + "OVERDUE (>Ns)" label in amber for any pending phase that has exceeded its individual budget |
 
 ---
 

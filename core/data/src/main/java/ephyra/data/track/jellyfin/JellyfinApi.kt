@@ -1,11 +1,13 @@
 package ephyra.data.track.jellyfin
 
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.system.logcat
 import ephyra.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.parseAs
 import kotlinx.serialization.json.Json
+import logcat.LogPriority
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -502,7 +504,8 @@ class JellyfinApi(
                 .awaitSuccess()
                 .close()
             true
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logcat(LogPriority.DEBUG, e) { "Jellyfin server not reachable at '$serverUrl'" }
             false
         }
     }

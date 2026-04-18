@@ -1,5 +1,6 @@
 package ephyra.data.manga
 
+import ephyra.core.common.util.system.logcat
 import ephyra.data.room.entities.MangaEntity
 import ephyra.data.room.views.LibraryView
 import ephyra.data.room.views.UpdatesView
@@ -11,6 +12,7 @@ import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import logcat.LogPriority
 
 object MangaMapper {
     fun mapManga(
@@ -334,8 +336,9 @@ object MangaMapper {
         if (trimmed.startsWith("[")) {
             try {
                 return Json.decodeFromString<List<String>>(trimmed).filter { it.isNotBlank() }
-            } catch (_: Exception) {
-                // Fall through to pipe-separated parsing
+            } catch (e: Exception) {
+                // JSON parse failed — fall through to legacy pipe-separated parsing
+                logcat(LogPriority.DEBUG, e) { "Failed to parse alternativeTitles as JSON array; falling back to pipe-separated: '$trimmed'" }
             }
         }
         // Legacy pipe-separated format
