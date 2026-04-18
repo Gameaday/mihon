@@ -121,6 +121,7 @@ val koinAppModule = module {
     single { get<EphyraDatabase>().updateDao() }
     single { get<EphyraDatabase>().extensionRepoDao() }
     single { get<EphyraDatabase>().sourceDao() }
+    single { get<EphyraDatabase>().excludedScanlatorDao() }
 
     single {
         Json {

@@ -10,8 +10,6 @@ import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.model.TrackSearch
-import ephyra.domain.track.model.toDbTrack
-import ephyra.domain.track.model.toDomainTrack
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.domain.track.service.Tracker
 import eu.kanade.tachiyomi.network.HttpException

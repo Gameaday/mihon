@@ -1,24 +1,17 @@
 package ephyra.domain.manga.interactor
 
-import ephyra.data.DatabaseHandler
+import ephyra.domain.manga.repository.ExcludedScanlatorRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class GetExcludedScanlators(
-    private val handler: DatabaseHandler,
+    private val repository: ExcludedScanlatorRepository,
 ) {
 
     suspend fun await(mangaId: Long): Set<String> {
-        return handler.awaitList {
-            excluded_scanlatorsQueries.getExcludedScanlatorsByMangaId(mangaId)
-        }
-            .toSet()
+        return repository.getExcludedScanlators(mangaId)
     }
 
     fun subscribe(mangaId: Long): Flow<Set<String>> {
-        return handler.subscribeToList {
-            excluded_scanlatorsQueries.getExcludedScanlatorsByMangaId(mangaId)
-        }
-            .map { it.toSet() }
+        return repository.subscribeExcludedScanlators(mangaId)
     }
 }

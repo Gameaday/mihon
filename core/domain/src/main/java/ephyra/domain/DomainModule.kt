@@ -3,6 +3,7 @@ package ephyra.domain
 import ephyra.data.category.CategoryRepositoryImpl
 import ephyra.data.chapter.ChapterRepositoryImpl
 import ephyra.data.history.HistoryRepositoryImpl
+import ephyra.data.manga.ExcludedScanlatorRepositoryImpl
 import ephyra.data.manga.MangaRepositoryImpl
 import ephyra.data.release.ReleaseServiceImpl
 import ephyra.data.repository.ExtensionRepoRepositoryImpl
@@ -73,6 +74,7 @@ import ephyra.domain.manga.interactor.SetMangaChapterFlags
 import ephyra.domain.manga.interactor.SetMangaViewerFlags
 import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.interactor.UpdateMangaNotes
+import ephyra.domain.manga.repository.ExcludedScanlatorRepository
 import ephyra.domain.manga.repository.MangaRepository
 import ephyra.domain.migration.usecases.MigrateMangaUseCase
 import ephyra.domain.release.interactor.GetApplicationRelease
@@ -122,6 +124,7 @@ val koinDomainModule = module {
     factory { DeleteCategory(get(), get(), get()) }
 
     single<MangaRepository> { MangaRepositoryImpl(get()) }
+    single<ExcludedScanlatorRepository> { ExcludedScanlatorRepositoryImpl(get()) }
     factory { GetDuplicateLibraryManga(get()) }
     factory { GetFavorites(get()) }
     factory { GetFavoritesByCanonicalId(get()) }

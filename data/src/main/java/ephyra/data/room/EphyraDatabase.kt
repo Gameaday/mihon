@@ -3,6 +3,15 @@ package ephyra.data.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import ephyra.data.room.daos.CategoryDao
+import ephyra.data.room.daos.ChapterDao
+import ephyra.data.room.daos.ExcludedScanlatorDao
+import ephyra.data.room.daos.ExtensionRepoDao
+import ephyra.data.room.daos.HistoryDao
+import ephyra.data.room.daos.MangaDao
+import ephyra.data.room.daos.SourceDao
+import ephyra.data.room.daos.TrackDao
+import ephyra.data.room.daos.UpdateDao
 import ephyra.data.room.entities.*
 import ephyra.data.room.views.*
 
@@ -28,12 +37,13 @@ import ephyra.data.room.views.*
 )
 @TypeConverters(RoomTypeConverters::class)
 abstract class EphyraDatabase : RoomDatabase() {
-    abstract fun mangaDao(): ephyra.data.room.daos.MangaDao
-    abstract fun chapterDao(): ephyra.data.room.daos.ChapterDao
-    abstract fun categoryDao(): ephyra.data.room.daos.CategoryDao
-    abstract fun historyDao(): ephyra.data.room.daos.HistoryDao
-    abstract fun trackDao(): ephyra.data.room.daos.TrackDao
-    abstract fun updateDao(): ephyra.data.room.daos.UpdateDao
-    abstract fun extensionRepoDao(): ephyra.data.room.daos.ExtensionRepoDao
-    abstract fun sourceDao(): ephyra.data.room.daos.SourceDao
+    abstract fun mangaDao(): MangaDao
+    abstract fun chapterDao(): ChapterDao
+    abstract fun categoryDao(): CategoryDao
+    abstract fun historyDao(): HistoryDao
+    abstract fun trackDao(): TrackDao
+    abstract fun updateDao(): UpdateDao
+    abstract fun extensionRepoDao(): ExtensionRepoDao
+    abstract fun sourceDao(): SourceDao
+    abstract fun excludedScanlatorDao(): ExcludedScanlatorDao
 }

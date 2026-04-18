@@ -1,6 +1,6 @@
 package ephyra.domain.chapter.interactor
 
-import ephyra.data.chapter.ChapterSanitizer
+import ephyra.domain.chapter.service.ChapterSanitizer
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.model.NoChaptersException
 import ephyra.domain.chapter.model.copyFromSChapter

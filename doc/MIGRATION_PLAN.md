@@ -79,5 +79,5 @@ Ensure modernizations do not break existing extensions.
   module.
 - [x] Verify network interceptors compatibility — `internal` visibility changes are scoped to the
   `:app` module boundary and do not affect the public extension API surface.
-- [ ] Validate Proguard rules protect `okhttp3`, `jsoup`, and other shared extension APIs from
+- [x] Validate Proguard rules protect `okhttp3`, `jsoup`, and other shared extension APIs from
   stripping or obfuscation.

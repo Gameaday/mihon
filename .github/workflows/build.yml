@@ -81,6 +81,24 @@ jobs:
             exit 1
           fi
 
+      - name: Architecture fitness – no ephyra.data.* imports in core domain module
+        run: |
+          # The :core:domain module contains domain interactors and must not import
+          # concrete :data implementations.  Interactors must depend only on repository
+          # interfaces defined in :domain.  Any ephyra.data.* import in core/domain/src
+          # is a Dependency Rule violation (domain must not know about the data layer).
+          #
+          # DomainModule.kt (the Koin wiring file) is explicitly excluded because it is
+          # the single authorised place where interfaces are bound to implementations.
+          VIOLATIONS=$(grep -rn --include="*.kt" "^\s*import ephyra\.data\." \
+            core/domain/src 2>/dev/null \
+            | grep -v "core/domain/src/main/java/ephyra/domain/DomainModule.kt:" || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "::error::ephyra.data.* imports found in core/domain (architectural violation):"
+            echo "$VIOLATIONS"
+            exit 1
+          fi
+
       - name: Architecture fitness – data-boundary ratchet (feature modules must not import ephyra.data.*)
         run: |
           # Feature modules must not import concrete :data implementations directly.
