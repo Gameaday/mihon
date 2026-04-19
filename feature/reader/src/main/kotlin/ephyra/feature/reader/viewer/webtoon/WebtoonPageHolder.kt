@@ -14,10 +14,11 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.withIOContext
-import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.core.common.util.system.dpToPx
 import ephyra.core.common.util.system.logcat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ephyra.feature.reader.databinding.ReaderErrorBinding
 import ephyra.feature.reader.model.ReaderPage
 import ephyra.feature.reader.viewer.ReaderPageImageView
@@ -209,7 +210,7 @@ class WebtoonPageHolder(
                 val isAnimated = bitmap == null && ImageUtil.isAnimatedAndSupported(source)
                 Triple(source, bitmap, isAnimated)
             }
-            withUIContext {
+            withContext(Dispatchers.Main) {
                 val config = ReaderPageImageView.Config(
                     zoomDuration = viewer.config.doubleTapAnimDuration,
                     minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
@@ -228,7 +229,7 @@ class WebtoonPageHolder(
             // Don't show an error — the loader will re-download the page automatically.
             if (page?.status == Page.State.Queue) return
             logcat(LogPriority.ERROR, e)
-            withUIContext {
+            withContext(Dispatchers.Main) {
                 setError(e)
             }
         }

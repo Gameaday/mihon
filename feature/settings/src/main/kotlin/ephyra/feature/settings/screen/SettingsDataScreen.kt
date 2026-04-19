@@ -46,7 +46,6 @@ import com.hippo.unifile.UniFile
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.storage.displayablePath
 import ephyra.core.common.util.lang.launchNonCancellable
-import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.logcat
 import ephyra.domain.chapter.service.ChapterCache
@@ -74,6 +73,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import org.koin.compose.koinInject
 
@@ -316,13 +316,13 @@ object SettingsDataScreen : SearchableSettings {
                         scope.launchNonCancellable {
                             try {
                                 val deletedFiles = chapterCache.clear()
-                                withUIContext {
+                                withContext(Dispatchers.Main) {
                                     context.toast(context.stringResource(MR.strings.cache_deleted, deletedFiles))
                                     cacheReadableSizeSema++
                                 }
                             } catch (e: Throwable) {
                                 logcat(LogPriority.ERROR, e)
-                                withUIContext { context.toast(MR.strings.cache_delete_error) }
+                                withContext(Dispatchers.Main) { context.toast(MR.strings.cache_delete_error) }
                             }
                         }
                     },

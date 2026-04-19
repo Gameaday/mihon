@@ -49,7 +49,6 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
-import ephyra.core.common.util.lang.withUIContext
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.model.AutoTrackState
 import ephyra.domain.track.service.EnhancedTracker
@@ -65,6 +64,8 @@ import ephyra.presentation.core.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ephyra.core.common.util.system.logcat
 import logcat.LogPriority
 
@@ -135,7 +136,7 @@ object SettingsTrackingScreen : SearchableSettings {
                             importingFromMal = true
                             scope.launchIO {
                                 val result = trackerListImporter.importFromMal()
-                                withUIContext {
+                                withContext(Dispatchers.Main) {
                                     importingFromMal = false
                                     if (result.isSuccess) {
                                         val msg = context.stringResource(
@@ -658,7 +659,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                                 libraryPreferences.jellyfinLibraryId().set(
                                                     nextLib?.id ?: "",
                                                 )
-                                                withUIContext {
+                                                withContext(Dispatchers.Main) {
                                                     context.toast(
                                                         if (nextLib != null) {
                                                             context.stringResource(
@@ -674,7 +675,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                                 }
                                             }
                                         } catch (e: Exception) {
-                                            withUIContext {
+                                            withContext(Dispatchers.Main) {
                                                 context.toast(MR.strings.jellyfin_test_failed)
                                             }
                                         }
@@ -702,7 +703,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                             )
                                             // Refresh stored server name on successful test
                                             trackPreferences.jellyfinServerName().set(info.serverName)
-                                            withUIContext {
+                                            withContext(Dispatchers.Main) {
                                                 context.toast(
                                                     context.stringResource(
                                                         MR.strings.jellyfin_test_success,
@@ -712,7 +713,7 @@ object SettingsTrackingScreen : SearchableSettings {
                                                 )
                                             }
                                         } catch (e: Exception) {
-                                            withUIContext {
+                                            withContext(Dispatchers.Main) {
                                                 context.toast(MR.strings.jellyfin_test_failed)
                                             }
                                         }
@@ -892,7 +893,7 @@ object SettingsTrackingScreen : SearchableSettings {
                     onClick = {
                         scope.launchIO {
                             tracker.logout()
-                            withUIContext { onDismissRequest() }
+                            withContext(Dispatchers.Main) { onDismissRequest() }
                         }
                     },
                 ) {
@@ -1025,10 +1026,10 @@ object SettingsTrackingScreen : SearchableSettings {
                                     username.text,
                                     password.text,
                                 )
-                                withUIContext { onDismissRequest() }
+                                withContext(Dispatchers.Main) { onDismissRequest() }
                             } catch (e: Exception) {
                                 inputError = true
-                                withUIContext { context.toast(e.message ?: "") }
+                                withContext(Dispatchers.Main) { context.toast(e.message ?: "") }
                             }
                             processing = false
                         }
@@ -1072,12 +1073,12 @@ object SettingsTrackingScreen : SearchableSettings {
                             processing = true
                             try {
                                 jellyfin.updateServerUrl(newUrl.text)
-                                withUIContext {
+                                withContext(Dispatchers.Main) {
                                     context.toast(MR.strings.jellyfin_server_updated)
                                     onDismissRequest()
                                 }
                             } catch (e: Exception) {
-                                withUIContext { context.toast(e.message ?: "") }
+                                withContext(Dispatchers.Main) { context.toast(e.message ?: "") }
                             }
                             processing = false
                         }
@@ -1104,7 +1105,7 @@ object SettingsTrackingScreen : SearchableSettings {
             tracker.login(username, password)
             true
         } catch (e: Exception) {
-            withUIContext { context.toast(e.message ?: "") }
+            withContext(Dispatchers.Main) { context.toast(e.message ?: "") }
             false
         }
     }

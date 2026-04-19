@@ -216,22 +216,30 @@ formally accepted and documented) before this PR is considered merge-ready:
 - [x] **`GlobalContext.get()` in widget (`BaseUpdatesGridGlanceWidget`)** — migrated to
   `KoinComponent` + `by inject()` fields; class now implements `KoinComponent`.
 
-#### Medium priority (architecture violations, not immediate crash risks)
-- [ ] **`feature/settings` → `ephyra.data.*` violations (6 imports in 3 files)** — settings
-  screens still import data-layer types directly.  Deferred from Phase 4.
-- [ ] **`feature/manga` + `feature/reader` direct data imports (6 violations)** — same root
-  cause as above; deferred from Phase 4.
-- [ ] **`TrackRepositoryImpl` and `CategoryRepositoryImpl` not yet ported to Room** — still
-  using SQLDelight paths (Phase 6 incomplete).
+#### Medium priority (architecture violations, not immediate crash risks) — ✅ ALL COMPLETE
+- [x] **`feature/settings` → `ephyra.data.*` violations** — **already fixed** before this
+  session; `grep` finds no `ephyra.data.*` imports in `feature/settings`.
+- [x] **`feature/manga` + `feature/reader` direct data imports** — **already fixed** before
+  this session; `grep` finds no violations.
+- [x] **`TrackRepositoryImpl` and `CategoryRepositoryImpl` not yet ported to Room** —
+  **already complete**: both impls depend only on `TrackDao` / `CategoryDao` (Room).
 - [ ] **Room versioned migrations** — replace `fallbackToDestructiveMigration` with real
-  `Migration` objects before any production data is at risk.
+  `Migration` objects before any production data is at risk.  Low urgency during active
+  schema development; must be addressed before v1 release.
 
 #### Lower priority (code quality / design hygiene)
-- [ ] **`AndroidDatabaseHandler` / SQLDelight removal** — retire once all repos are on Room.
-- [ ] **`withUIContext` in reader viewer classes** (`WebtoonPageHolder`, `PagerPageHolder`) —
-  these are View-layer classes (not ScreenModels) so the violation is less severe, but should
-  be replaced with `Dispatchers.Main` coroutine context dispatch.
-- [x] **`KoinJavaComponent.get()` in `BaseActivity`** — **accepted pattern**: Kotlin class
-  delegation (`by`) requires a concrete instance at the declaration site; `inject()` returns
-  `Lazy<T>` and cannot be used there. `KoinJavaComponent.get()` is the correct Koin idiom for
-  this case and is executed only after `startKoin()`.  Comment added to `BaseActivity.kt`.
+- [x] **`withUIContext` in reader viewer classes** (`WebtoonPageHolder`, `PagerPageHolder`) —
+  replaced with `withContext(Dispatchers.Main)`.  Both files now import
+  `kotlinx.coroutines.Dispatchers` directly and no longer depend on the `withUIContext` util.
+- [x] **`withUIContext` in settings composables** (`SettingsAdvancedScreen`,
+  `SettingsDataScreen`, `SettingsTrackingScreen`) — all 13 call sites replaced with
+  `withContext(Dispatchers.Main)`.  `withUIContext` imports removed; `Dispatchers` /
+  `withContext` imports added where missing.
+- [x] **`KoinJavaComponent.get()` in `BaseActivity`** — accepted pattern, documented.
+- [ ] **`AndroidDatabaseHandler` / SQLDelight retirement** — four backup
+  restorer/creator classes (`MangaBackupCreator`, `MangaRestorer`, `CategoriesRestorer`,
+  `ExtensionRepoRestorer`) still call `handler.awaitList { categoriesQueries.* }`,
+  `chaptersQueries.*`, etc. directly via the SQLDelight handler.  These need Room-based
+  domain interactors for the missing query paths (e.g. `GetChaptersByMangaId` with
+  `applyScanlatorFilter`, excluded-scanlators, `GetMangaSourceAndUrl`, backup track mapper)
+  before the handler can be removed.  Blocking dependency for full SQLDelight retirement.

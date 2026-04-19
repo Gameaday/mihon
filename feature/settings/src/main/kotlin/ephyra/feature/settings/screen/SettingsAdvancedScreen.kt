@@ -26,7 +26,6 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.common.util.lang.launchNonCancellable
-import ephyra.core.common.util.lang.withUIContext
 import ephyra.core.common.util.system.GLUtil
 import ephyra.core.common.util.system.logcat
 import ephyra.core.common.util.system.setDefaultSettings
@@ -66,7 +65,9 @@ import eu.kanade.tachiyomi.network.PREF_DOH_SHECAN
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import okhttp3.Headers
 import org.koin.compose.koinInject
@@ -326,7 +327,7 @@ object SettingsAdvancedScreen : SearchableSettings {
                     onClick = {
                         scope.launchNonCancellable {
                             val success = resetViewerFlags.await()
-                            withUIContext {
+                            withContext(Dispatchers.Main) {
                                 val message = if (success) {
                                     MR.strings.pref_reset_viewer_flags_success
                                 } else {
