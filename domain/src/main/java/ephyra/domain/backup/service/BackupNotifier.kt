@@ -2,6 +2,7 @@ package ephyra.domain.backup.service
 
 interface BackupNotifier {
     fun showBackupProgress()
+
     /**
      * Called when a backup has been created successfully.
      *

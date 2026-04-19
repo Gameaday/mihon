@@ -33,7 +33,12 @@ class ExtensionInstallerPreference(
     private fun check(value: ExtensionInstaller): ExtensionInstaller {
         when (value) {
             ExtensionInstaller.PACKAGEINSTALLER -> {
-                if (!capabilityProvider.isAvailable(ExtensionInstaller.PACKAGEINSTALLER)) return ExtensionInstaller.LEGACY
+                if (!capabilityProvider.isAvailable(
+                        ExtensionInstaller.PACKAGEINSTALLER,
+                    )
+                ) {
+                    return ExtensionInstaller.LEGACY
+                }
             }
 
             ExtensionInstaller.SHIZUKU -> {

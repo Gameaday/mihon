@@ -48,11 +48,11 @@ import ephyra.core.common.storage.displayablePath
 import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.util.system.DeviceUtil
 import ephyra.core.common.util.system.logcat
-import ephyra.domain.chapter.service.ChapterCache
-import ephyra.domain.export.LibraryExporter
 import ephyra.domain.backup.service.BackupPreferences
 import ephyra.domain.backup.service.BackupScheduler
 import ephyra.domain.backup.service.RestoreScheduler
+import ephyra.domain.chapter.service.ChapterCache
+import ephyra.domain.export.LibraryExporter
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.manga.interactor.GetFavorites
 import ephyra.domain.manga.model.Manga
@@ -336,7 +336,10 @@ object SettingsDataScreen : SearchableSettings {
     }
 
     @Composable
-    private fun getExportGroup(getFavorites: GetFavorites, libraryExporter: LibraryExporter): Preference.PreferenceGroup {
+    private fun getExportGroup(
+        getFavorites: GetFavorites,
+        libraryExporter: LibraryExporter,
+    ): Preference.PreferenceGroup {
         var showDialog by remember { mutableStateOf(false) }
         var exportOptions by remember {
             mutableStateOf(

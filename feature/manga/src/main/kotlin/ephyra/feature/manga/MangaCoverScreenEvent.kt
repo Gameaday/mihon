@@ -32,4 +32,3 @@ sealed interface MangaCoverEffect {
     /** Launch the system share chooser with the cached cover at [uri]. */
     data class StartShare(val uri: Uri) : MangaCoverEffect
 }
-

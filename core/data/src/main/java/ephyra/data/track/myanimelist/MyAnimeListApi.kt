@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import ephyra.core.common.util.PkceUtil
 import ephyra.core.common.util.lang.withIOContext
+import ephyra.core.common.util.system.logcat
 import ephyra.data.database.models.Track
 import ephyra.data.track.model.TrackSearch
 import ephyra.data.track.myanimelist.dto.MALListItem
@@ -18,7 +19,6 @@ import eu.kanade.tachiyomi.network.POST
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.interceptor.rateLimit
 import eu.kanade.tachiyomi.network.parseAs
-import ephyra.core.common.util.system.logcat
 import kotlinx.serialization.json.Json
 import logcat.LogPriority
 import okhttp3.FormBody

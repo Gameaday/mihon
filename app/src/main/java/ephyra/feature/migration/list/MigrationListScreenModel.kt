@@ -161,7 +161,9 @@ class MigrationListScreenModel(
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    logcat(LogPriority.WARN, e) { "Failed to fetch thumbnail details for '${result.manga.title}' during migration search" }
+                    logcat(LogPriority.WARN, e) {
+                        "Failed to fetch thumbnail details for '${result.manga.title}' during migration search"
+                    }
                 }
             }
 
@@ -295,7 +297,9 @@ class MigrationListScreenModel(
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    logcat(LogPriority.WARN, e) { "Chapter sync failed for '${manga.title}' during migration; target will be missing chapters" }
+                    logcat(LogPriority.WARN, e) {
+                        "Chapter sync failed for '${manga.title}' during migration; target will be missing chapters"
+                    }
                     return@async null
                 }
                 manga

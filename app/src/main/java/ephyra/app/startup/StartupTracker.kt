@@ -24,15 +24,15 @@ object StartupTracker {
      * [StartupDiagnosticOverlay] with an amber warning icon.
      */
     enum class Phase(val displayName: String, val timeoutMs: Long) {
-        APP_CREATED("Application created",          2_000L),
-        KOIN_INITIALIZED("Koin DI ready",           8_000L),
-        MIGRATOR_STARTED("Migrator launched",      10_000L),
+        APP_CREATED("Application created", 2_000L),
+        KOIN_INITIALIZED("Koin DI ready", 8_000L),
+        MIGRATOR_STARTED("Migrator launched", 10_000L),
         WORKMANAGER_CONFIGURED("WorkManager configured", 12_000L),
-        ACTIVITY_CREATED("Main activity created",  15_000L),
+        ACTIVITY_CREATED("Main activity created", 15_000L),
         COMPOSE_STARTED("Compose content initialized", 20_000L),
-        MIGRATOR_COMPLETE("Migrations complete",   40_000L),
-        NAVIGATOR_CREATED("Navigator ready",       45_000L),
-        HOME_SCREEN_LOADED("App ready",            60_000L),
+        MIGRATOR_COMPLETE("Migrations complete", 40_000L),
+        NAVIGATOR_CREATED("Navigator ready", 45_000L),
+        HOME_SCREEN_LOADED("App ready", 60_000L),
     }
 
     data class PhaseEntry(val phase: Phase, val timestampMs: Long)
@@ -40,11 +40,11 @@ object StartupTracker {
     // ConcurrentHashMap makes complete() truly idempotent under concurrency:
     // putIfAbsent is atomic, eliminating the check-then-act race that a
     // CopyOnWriteArrayList had.
-    private val _phases = ConcurrentHashMap<Phase, PhaseEntry>()
+    private val _completedPhases = ConcurrentHashMap<Phase, PhaseEntry>()
 
     /** Immutable snapshot of all completed phases sorted by completion time. */
     val completedPhases: List<PhaseEntry>
-        get() = _phases.values.sortedBy { it.timestampMs }
+        get() = _completedPhases.values.sortedBy { it.timestampMs }
 
     /** Wall-clock time at which the tracker was first loaded (proxy for process start). */
     val processStartMs: Long = System.currentTimeMillis()
@@ -65,7 +65,7 @@ object StartupTracker {
      */
     fun complete(phase: Phase) {
         val entry = PhaseEntry(phase, System.currentTimeMillis())
-        if (_phases.putIfAbsent(phase, entry) != null) return // already completed
+        if (_completedPhases.putIfAbsent(phase, entry) != null) return // already completed
         val elapsed = entry.timestampMs - processStartMs
         logcat(LogPriority.INFO) { "[Startup] ✓ ${phase.displayName} (+${elapsed}ms)" }
     }
@@ -81,7 +81,7 @@ object StartupTracker {
         logcat(LogPriority.ERROR, error) { "[Startup] ✗ ${phase.displayName}" }
     }
 
-    fun isComplete(phase: Phase): Boolean = _phases.containsKey(phase)
+    fun isComplete(phase: Phase): Boolean = _completedPhases.containsKey(phase)
 
     /** Returns elapsed milliseconds since the tracker was first loaded (proxy for process start). */
     fun elapsedMs(): Long = System.currentTimeMillis() - processStartMs

@@ -338,7 +338,9 @@ object MangaMapper {
                 return Json.decodeFromString<List<String>>(trimmed).filter { it.isNotBlank() }
             } catch (e: Exception) {
                 // JSON parse failed — fall through to legacy pipe-separated parsing
-                logcat(LogPriority.DEBUG, e) { "Failed to parse alternativeTitles as JSON array; falling back to pipe-separated: '$trimmed'" }
+                logcat(LogPriority.DEBUG, e) {
+                    "Failed to parse alternativeTitles as JSON array; falling back to pipe-separated: '$trimmed'"
+                }
             }
         }
         // Legacy pipe-separated format

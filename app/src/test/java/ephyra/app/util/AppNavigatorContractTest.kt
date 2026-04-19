@@ -111,7 +111,13 @@ class AppNavigatorContractTest {
         assertNotNull(openWebView) { "NavigatorImpl must override openWebView" }
 
         // Neither method should be abstract
-        assertFalse(java.lang.reflect.Modifier.isAbstract(openManga!!.modifiers), "openMangaScreen in NavigatorImpl must not be abstract")
-        assertFalse(java.lang.reflect.Modifier.isAbstract(openWebView!!.modifiers), "openWebView in NavigatorImpl must not be abstract")
+        assertFalse(
+            java.lang.reflect.Modifier.isAbstract(openManga!!.modifiers),
+            "openMangaScreen in NavigatorImpl must not be abstract",
+        )
+        assertFalse(
+            java.lang.reflect.Modifier.isAbstract(openWebView!!.modifiers),
+            "openWebView in NavigatorImpl must not be abstract",
+        )
     }
 }

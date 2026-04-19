@@ -28,4 +28,3 @@ sealed interface WebViewEffect {
     /** Open [url] in the default browser. */
     data class OpenInBrowser(val url: String) : WebViewEffect
 }
-

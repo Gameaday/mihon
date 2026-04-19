@@ -45,7 +45,6 @@ import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.util.lang.toLocalDate
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import ephyra.domain.track.service.DeletableTracker
 import ephyra.domain.manga.interactor.GetManga
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.interactor.DeleteTrack
@@ -53,6 +52,7 @@ import ephyra.domain.track.interactor.GetTracks
 import ephyra.domain.track.interactor.RefreshTracks
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.model.TrackSearch
+import ephyra.domain.track.service.DeletableTracker
 import ephyra.domain.track.service.EnhancedTracker
 import ephyra.domain.track.service.Tracker
 import ephyra.domain.track.service.TrackerManager
@@ -281,7 +281,9 @@ data class TrackInfoDialogHomeScreen(
                     )
                     item.tracker.register(track, mangaId)
                 } catch (e: Exception) {
-                    logcat(LogPriority.ERROR, e) { "Failed to register track for tracker '${item.tracker.name}'; manga id=$mangaId" }
+                    logcat(LogPriority.ERROR, e) {
+                        "Failed to register track for tracker '${item.tracker.name}'; manga id=$mangaId"
+                    }
                     effectChannel.send(Effect.ShowToast(application.stringResource(MR.strings.error_no_match)))
                 }
             }

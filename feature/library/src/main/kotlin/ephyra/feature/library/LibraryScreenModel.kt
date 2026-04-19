@@ -15,7 +15,6 @@ import ephyra.core.common.util.lang.launchNonCancellable
 import ephyra.core.common.utils.mutate
 import ephyra.core.download.DownloadCache
 import ephyra.core.download.util.getNextUnread
-import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.interactor.SetMangaCategories
@@ -38,6 +37,7 @@ import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaUpdate
 import ephyra.domain.manga.model.SourceStatus
 import ephyra.domain.manga.model.applyFilter
+import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.track.interactor.GetTracksPerManga
 import ephyra.domain.track.model.Track
@@ -553,8 +553,16 @@ class LibraryScreenModel(
             is LibraryScreenEvent.ClearSelection -> clearSelection()
             is LibraryScreenEvent.PerformDownloadAction -> performDownloadAction(event.action)
             is LibraryScreenEvent.MarkReadSelection -> markReadSelection(event.read)
-            is LibraryScreenEvent.RemoveMangas -> removeMangas(event.mangas, event.deleteFromLibrary, event.deleteChapters)
-            is LibraryScreenEvent.SetMangaCategories -> setMangaCategories(event.mangaList, event.addCategories, event.removeCategories)
+            is LibraryScreenEvent.RemoveMangas -> removeMangas(
+                event.mangas,
+                event.deleteFromLibrary,
+                event.deleteChapters,
+            )
+            is LibraryScreenEvent.SetMangaCategories -> setMangaCategories(
+                event.mangaList,
+                event.addCategories,
+                event.removeCategories,
+            )
             is LibraryScreenEvent.ShowSettingsDialog -> showSettingsDialog()
             is LibraryScreenEvent.EnableHealthFilter -> enableHealthFilter()
             is LibraryScreenEvent.OpenChangeCategoryDialog -> openChangeCategoryDialog()

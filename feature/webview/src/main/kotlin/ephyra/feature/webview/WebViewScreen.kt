@@ -7,6 +7,7 @@ import androidx.core.net.toUri
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ephyra.core.common.util.system.logcat
 import ephyra.presentation.core.util.AssistContentScreen
 import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.system.openInBrowser
@@ -14,7 +15,6 @@ import ephyra.presentation.core.util.system.toShareIntent
 import ephyra.presentation.core.util.system.toast
 import logcat.LogPriority
 import org.koin.core.parameter.parametersOf
-import ephyra.core.common.util.system.logcat
 
 class WebViewScreen(
     private val url: String,
@@ -65,4 +65,3 @@ class WebViewScreen(
         )
     }
 }
-

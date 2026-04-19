@@ -22,8 +22,10 @@ import org.koin.android.ext.android.inject
  * `Lazy<T>` — not a `T` — and therefore cannot be used directly in a `by` delegation clause.
  * `KoinJavaComponent.get()` is the idiomatic Koin solution for this specific pattern: it is
  * resolved eagerly at the time the class is instantiated, which always occurs after
- * `App.onCreate()` / `startKoin()`, so Koin is guaranteed to be ready.  This usage is
- * intentional and does not require further refactoring.
+ * `App.onCreate()` / `startKoin()`, so Koin is guaranteed to be ready for any activity that
+ * is started normally.  [GlobalExceptionHandler] guards against the pre-Koin window by
+ * checking `GlobalContext.getOrNull()` before launching [ephyra.app.crash.CrashActivity].
+ * This usage is intentional and does not require further refactoring.
  */
 open class BaseActivity :
     AppCompatActivity(),

@@ -12,9 +12,9 @@ import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.source.local.isLocal
 import eu.kanade.tachiyomi.source.model.SManga
+import logcat.LogPriority
 import java.time.Instant
 import java.time.ZonedDateTime
-import logcat.LogPriority
 
 class UpdateManga(
     private val mangaRepository: MangaRepository,

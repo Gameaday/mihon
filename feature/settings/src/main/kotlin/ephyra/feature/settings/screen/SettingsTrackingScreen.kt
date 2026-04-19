@@ -49,6 +49,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import dev.icerock.moko.resources.StringResource
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.util.lang.launchIO
+import ephyra.core.common.util.system.logcat
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.model.AutoTrackState
 import ephyra.domain.track.service.EnhancedTracker
@@ -66,7 +67,6 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ephyra.core.common.util.system.logcat
 import logcat.LogPriority
 
 object SettingsTrackingScreen : SearchableSettings {
@@ -616,7 +616,9 @@ object SettingsTrackingScreen : SearchableSettings {
                                         }?.name
                                     }
                                 } catch (e: Exception) {
-                                    logcat(LogPriority.WARN, e) { "Failed to load Jellyfin library name for id=$currentLibraryId" }
+                                    logcat(LogPriority.WARN, e) {
+                                        "Failed to load Jellyfin library name for id=$currentLibraryId"
+                                    }
                                 }
                             }
                         }

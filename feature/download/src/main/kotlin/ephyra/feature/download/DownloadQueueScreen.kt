@@ -325,10 +325,21 @@ object DownloadQueueScreen : Screen() {
                                         val (series, others) = downloadList.partition { it.manga.id == mangaId }
                                         screenModel.onEvent(DownloadQueueScreenEvent.Reorder(others + series))
                                     },
-                                    onCancel = { screenModel.onEvent(DownloadQueueScreenEvent.Cancel(listOf(displayItem.download))) },
+                                    onCancel = {
+                                        screenModel.onEvent(
+                                            DownloadQueueScreenEvent.Cancel(listOf(displayItem.download)),
+                                        )
+                                    },
                                     onCancelSeries = {
                                         val mangaId = displayItem.download.manga.id
-                                        screenModel.onEvent(DownloadQueueScreenEvent.Cancel(downloadList.filter { it.manga.id == mangaId }))
+                                        screenModel.onEvent(
+                                            DownloadQueueScreenEvent.Cancel(
+                                                downloadList.filter {
+                                                    it.manga.id ==
+                                                        mangaId
+                                                },
+                                            ),
+                                        )
                                     },
                                     dragHandle = {
                                         IconButton(

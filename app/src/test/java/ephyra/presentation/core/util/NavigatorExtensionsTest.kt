@@ -212,6 +212,9 @@ class NavigatorExtensionsTest {
         // In Kotlin, an interface method with a default body is compiled as a default
         // JVM interface method (JVM 8+). Checking it is NOT abstract confirms the default body.
         val javaMethod = method!!
-        assertFalse(java.lang.reflect.Modifier.isAbstract(javaMethod.modifiers), "Tab.onReselect should have a default (non-abstract) implementation")
+        assertFalse(
+            java.lang.reflect.Modifier.isAbstract(javaMethod.modifiers),
+            "Tab.onReselect should have a default (non-abstract) implementation",
+        )
     }
 }

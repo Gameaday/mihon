@@ -7,6 +7,7 @@ import ephyra.domain.manga.model.Manga
 interface LibraryUpdateNotifier {
     suspend fun showProgressNotification(manga: List<Manga>, current: Int, total: Int)
     fun showQueueSizeWarningNotificationIfNeeded(mangaToUpdate: List<LibraryManga>)
+
     /**
      * Shows a notification listing titles that failed to update, with an action to open
      * the full error log.

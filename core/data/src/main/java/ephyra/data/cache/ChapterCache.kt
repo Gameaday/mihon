@@ -10,7 +10,6 @@ import ephyra.data.cache.ChapterCache.Companion.CACHE_SIZE_HIGH
 import ephyra.data.cache.ChapterCache.Companion.CACHE_SIZE_LOW
 import ephyra.data.cache.ChapterCache.Companion.CACHE_SIZE_MEDIUM
 import ephyra.domain.chapter.model.Chapter
-import ephyra.domain.chapter.service.ChapterCache as IChapterCache
 import eu.kanade.tachiyomi.source.model.Page
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,6 +20,7 @@ import okio.Path.Companion.toOkioPath
 import okio.buffer
 import java.io.File
 import java.io.IOException
+import ephyra.domain.chapter.service.ChapterCache as IChapterCache
 
 /**
  * Class used to create chapter cache
@@ -124,7 +124,9 @@ class ChapterCache(
                 try {
                     editor.abort()
                 } catch (abortEx: Exception) {
-                    logcat(LogPriority.DEBUG, abortEx) { "Failed to abort disk-cache editor after page-list write failure" }
+                    logcat(LogPriority.DEBUG, abortEx) {
+                        "Failed to abort disk-cache editor after page-list write failure"
+                    }
                 }
                 throw e
             }

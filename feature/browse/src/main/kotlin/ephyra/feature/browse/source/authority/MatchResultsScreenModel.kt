@@ -4,10 +4,10 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
+import ephyra.domain.manga.interactor.GetFavorites
 import ephyra.domain.manga.model.CanonicalId
 import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
-import ephyra.domain.manga.interactor.GetFavorites
 import ephyra.domain.track.interactor.MatchUnlinkedManga
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

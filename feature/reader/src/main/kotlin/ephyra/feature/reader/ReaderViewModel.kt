@@ -8,6 +8,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ephyra.core.common.preference.toggle
+import ephyra.core.common.saver.Image
+import ephyra.core.common.saver.ImageSaver
+import ephyra.core.common.saver.Location
 import ephyra.core.common.util.lang.byteSize
 import ephyra.core.common.util.lang.launchIO
 import ephyra.core.common.util.lang.launchNonCancellable
@@ -20,16 +23,12 @@ import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadProvider
 import ephyra.core.download.util.filterDownloaded
 import ephyra.core.download.util.removeDuplicates
-import ephyra.domain.chapter.service.ChapterCache
-import ephyra.domain.manga.service.CoverCache
-import ephyra.core.common.saver.Image
-import ephyra.core.common.saver.ImageSaver
-import ephyra.core.common.saver.Location
 import ephyra.domain.chapter.interactor.GetChaptersByMangaId
 import ephyra.domain.chapter.interactor.UpdateChapter
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.model.ChapterUpdate
 import ephyra.domain.chapter.model.toSChapter
+import ephyra.domain.chapter.service.ChapterCache
 import ephyra.domain.chapter.service.getChapterSort
 import ephyra.domain.download.model.Download
 import ephyra.domain.download.service.DownloadManager
@@ -45,6 +44,7 @@ import ephyra.domain.manga.model.ContentType
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.readerOrientation
 import ephyra.domain.manga.model.readingMode
+import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.reader.model.ReaderOrientation
 import ephyra.domain.reader.model.ReadingMode
 import ephyra.domain.reader.service.ReaderPreferences
@@ -1205,7 +1205,9 @@ class ReaderViewModel @JvmOverloads constructor(
                     val blocked = ImageUtil.hexToDHash(hexStr)
                     ImageUtil.dHashDistance(hash, blocked) <= threshold
                 } catch (e: Exception) {
-                    logcat(LogPriority.DEBUG, e) { "Skipping malformed blocked-page hash entry during check: '$hexStr'" }
+                    logcat(LogPriority.DEBUG, e) {
+                        "Skipping malformed blocked-page hash entry during check: '$hexStr'"
+                    }
                     false
                 }
             }

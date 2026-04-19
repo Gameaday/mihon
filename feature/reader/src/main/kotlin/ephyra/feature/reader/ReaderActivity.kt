@@ -681,7 +681,9 @@ class ReaderActivity : BaseActivity() {
                 try {
                     contentResolver.openInputStream(data.toUri())?.readBytes()
                 } catch (e: Exception) {
-                    logcat(LogPriority.WARN, e) { "Failed to read display ICC profile from URI; disabling colour management" }
+                    logcat(LogPriority.WARN, e) {
+                        "Failed to read display ICC profile from URI; disabling colour management"
+                    }
                     null
                 }
             } else {

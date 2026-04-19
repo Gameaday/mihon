@@ -16,7 +16,6 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import ephyra.core.common.preference.CheckboxState
 import ephyra.core.common.preference.mapAsCheckboxState
 import ephyra.core.common.util.lang.launchIO
-import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.category.interactor.SetMangaCategories
 import ephyra.domain.category.model.Category
@@ -28,6 +27,7 @@ import ephyra.domain.manga.interactor.UpdateManga
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.MangaWithChapterCount
 import ephyra.domain.manga.model.toMangaUpdate
+import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.source.interactor.GetIncognitoState
 import ephyra.domain.source.interactor.GetRemoteManga
 import ephyra.domain.source.service.SourceManager

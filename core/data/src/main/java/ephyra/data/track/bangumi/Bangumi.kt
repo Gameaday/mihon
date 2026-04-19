@@ -137,7 +137,9 @@ class Bangumi(
         return try {
             json.decodeFromString<BGMOAuth>(trackPreferences.trackToken(this@Bangumi).getSync())
         } catch (e: Exception) {
-            logcat(LogPriority.DEBUG, e) { "Failed to restore Bangumi OAuth token from preferences; user may need to log in again" }
+            logcat(LogPriority.DEBUG, e) {
+                "Failed to restore Bangumi OAuth token from preferences; user may need to log in again"
+            }
             null
         }
     }

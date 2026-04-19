@@ -57,7 +57,9 @@ private fun ColumnScope.FilterSheet(
     TriStateItem(
         label = stringResource(MR.strings.label_downloaded),
         state = filterDownloaded,
-        onClick = { screenModel.onEvent(UpdatesSettingsScreenEvent.ToggleFilter(UpdatesPreferences::filterDownloaded)) },
+        onClick = {
+            screenModel.onEvent(UpdatesSettingsScreenEvent.ToggleFilter(UpdatesPreferences::filterDownloaded))
+        },
     )
 
     val filterUnread by screenModel.updatesPreferences.filterUnread().collectAsState()
@@ -78,7 +80,9 @@ private fun ColumnScope.FilterSheet(
     TriStateItem(
         label = stringResource(MR.strings.action_filter_bookmarked),
         state = filterBookmarked,
-        onClick = { screenModel.onEvent(UpdatesSettingsScreenEvent.ToggleFilter(UpdatesPreferences::filterBookmarked)) },
+        onClick = {
+            screenModel.onEvent(UpdatesSettingsScreenEvent.ToggleFilter(UpdatesPreferences::filterBookmarked))
+        },
     )
 
     HorizontalDivider(modifier = Modifier.padding(MaterialTheme.padding.small))

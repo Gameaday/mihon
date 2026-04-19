@@ -7,6 +7,7 @@ interface AppUpdateNotifier {
     fun promptUpdate(release: Release)
     fun onDownloadStarted(title: String? = null)
     fun onProgressChange(progress: Int)
+
     /**
      * Called when an APK download has finished and is ready to install.
      *

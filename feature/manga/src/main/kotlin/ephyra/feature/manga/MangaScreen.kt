@@ -25,12 +25,12 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ephyra.core.common.util.lang.withIOContext
 import ephyra.core.common.util.system.logcat
-import ephyra.domain.manga.service.CoverCache
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.manga.model.hasCustomCover
 import ephyra.domain.manga.model.toSManga
+import ephyra.domain.manga.service.CoverCache
 import ephyra.feature.category.CategoryScreen
 import ephyra.feature.category.components.ChangeCategoryDialog
 import ephyra.feature.manga.notes.MangaNotesScreen
@@ -333,7 +333,7 @@ class MangaScreen(
                         CoverSearchDialog(
                             state = coverSearchState,
                             onCoverSelected = { cover ->
-                            sm.onEvent(MangaCoverScreenEvent.SetCoverFromUrl(cover.thumbnailUrl, cover.sourceId))
+                                sm.onEvent(MangaCoverScreenEvent.SetCoverFromUrl(cover.thumbnailUrl, cover.sourceId))
                                 showCoverSearch = false
                             },
                             onSetAsMetadataSource = { cover ->

@@ -30,19 +30,19 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.forEach
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ephyra.presentation.core.preference.SharedPreferencesDataStore
+import ephyra.core.common.util.system.logcat
 import ephyra.domain.base.BasePreferences
 import ephyra.domain.source.service.SourceManager
-import ephyra.core.common.util.system.logcat
-import logcat.LogPriority
 import ephyra.presentation.core.components.AppBar
 import ephyra.presentation.core.components.material.Scaffold
+import ephyra.presentation.core.preference.SharedPreferencesDataStore
 import ephyra.presentation.core.screens.LoadingScreen
 import ephyra.presentation.core.util.Screen
 import ephyra.presentation.core.util.ifSourcesLoaded
 import ephyra.presentation.core.widget.TachiyomiTextInputEditText.Companion.setIncognito
 import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.sourcePreferences
+import logcat.LogPriority
 import org.koin.android.ext.android.inject
 import org.koin.compose.getKoin
 
@@ -160,7 +160,9 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
                         @Suppress("UNCHECKED_CAST")
                         method.invoke(pref) as? EditTextPreference.OnBindEditTextListener
                     } catch (e: Exception) {
-                        logcat(LogPriority.DEBUG, e) { "Reflection access to OnBindEditTextListener unavailable; IME incognito applied without chaining" }
+                        logcat(LogPriority.DEBUG, e) {
+                            "Reflection access to OnBindEditTextListener unavailable; IME incognito applied without chaining"
+                        }
                         null
                     }
                     pref.setOnBindEditTextListener {

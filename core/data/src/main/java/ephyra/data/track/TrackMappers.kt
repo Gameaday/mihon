@@ -1,7 +1,7 @@
 package ephyra.data.track
 
-import ephyra.data.database.models.Track as DbTrack
 import ephyra.domain.track.model.Track
+import ephyra.data.database.models.Track as DbTrack
 
 /**
  * Mapper functions between the domain [Track] model and the legacy SQLDelight [DbTrack] model.

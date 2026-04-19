@@ -4,14 +4,14 @@ import android.app.Application
 import dev.icerock.moko.resources.StringResource
 import ephyra.app.core.common.R
 import ephyra.data.track.BaseTracker
-import ephyra.domain.track.service.DeletableTracker
 import ephyra.data.track.myanimelist.dto.MALOAuth
+import ephyra.data.track.toDbTrack
+import ephyra.data.track.toDomainTrack
 import ephyra.domain.track.interactor.AddTracks
 import ephyra.domain.track.interactor.InsertTrack
 import ephyra.domain.track.model.Track
 import ephyra.domain.track.model.TrackSearch
-import ephyra.data.track.toDbTrack
-import ephyra.data.track.toDomainTrack
+import ephyra.domain.track.service.DeletableTracker
 import ephyra.domain.track.service.TrackPreferences
 import ephyra.i18n.MR
 import eu.kanade.tachiyomi.network.NetworkHelper

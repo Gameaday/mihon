@@ -6,9 +6,9 @@ import android.content.pm.Signature
 import java.security.MessageDigest
 
 internal fun PackageInfo.getCertificateFingerprints(): List<String> {
-    // signingInfo is null on API < 28 or when GET_SIGNING_CERTIFICATES was not requested.
-    // Return an empty list in that case so the production-app check conservatively returns
-    // false rather than crashing before GlobalExceptionHandler is installed.
+    // signingInfo may be null on API < 28 or when signing certificates were not requested
+    // or are otherwise unavailable.  Return an empty list in that case so the
+    // production-app check conservatively returns false.
     val signingInfo = signingInfo ?: return emptyList()
     return if (signingInfo.hasMultipleSigners()) {
         signingInfo.apkContentsSigners

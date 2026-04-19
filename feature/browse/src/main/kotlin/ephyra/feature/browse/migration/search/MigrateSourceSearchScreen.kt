@@ -92,7 +92,9 @@ data class MigrateSourceSearchScreen(
 
                 if (migrateListScreen == null) {
                     screenModel.onEvent(
-                        BrowseSourceScreenEvent.SetDialog(BrowseSourceScreenModel.Dialog.Migrate(target = it, current = currentManga)),
+                        BrowseSourceScreenEvent.SetDialog(
+                            BrowseSourceScreenModel.Dialog.Migrate(target = it, current = currentManga),
+                        ),
                     )
                 } else {
                     migrateListScreen.addMatchOverride(current = currentManga.id, target = it.id)

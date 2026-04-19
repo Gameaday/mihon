@@ -116,7 +116,12 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
                     .get<BasePreferences>()
                     .alwaysDecodeLongStripWithSSIV()
                     .getSync()
-                val view = ReaderPageImageView(readerThemedContext, isWebtoon = true, alwaysDecodeLongStripWithSSIV = alwaysDecode)
+                val view =
+                    ReaderPageImageView(
+                        readerThemedContext,
+                        isWebtoon = true,
+                        alwaysDecodeLongStripWithSSIV = alwaysDecode,
+                    )
                 WebtoonPageHolder(view, viewer)
             }
 

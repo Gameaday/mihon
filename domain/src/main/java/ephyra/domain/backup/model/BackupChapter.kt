@@ -41,7 +41,8 @@ data class BackupChapter(
     }
 }
 
-val backupChapterMapper = {        _: Long,
+val backupChapterMapper = {
+        _: Long,
         _: Long,
         url: String,
         name: String,

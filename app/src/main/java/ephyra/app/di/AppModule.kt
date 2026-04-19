@@ -11,6 +11,7 @@ import ephyra.app.data.library.LibraryUpdateJob
 import ephyra.app.data.library.LibraryUpdateNotifier
 import ephyra.app.data.library.MetadataUpdateJob
 import ephyra.app.data.scheduler.WorkSchedulerImpl
+import ephyra.app.data.storage.StorageManagerImpl
 import ephyra.app.data.updater.AppUpdateDownloadJob
 import ephyra.app.data.updater.AppUpdateDownloaderImpl
 import ephyra.app.data.updater.AppUpdateNotifier
@@ -18,10 +19,14 @@ import ephyra.app.extension.ExtensionManager
 import ephyra.app.extension.api.ExtensionApi
 import ephyra.app.extension.util.ExtensionInstaller
 import ephyra.app.extension.util.ExtensionLoader
+import ephyra.app.track.DelayedTrackingStore
+import ephyra.app.track.DelayedTrackingUpdateJob
 import ephyra.app.track.MatchUnlinkedJob
 import ephyra.app.track.MatchUnlinkedNotifier
+import ephyra.app.track.TrackingJobSchedulerImpl
 import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
 import ephyra.app.ui.base.delegate.ThemingDelegateImpl
+import ephyra.core.common.saver.ImageSaver
 import ephyra.core.common.storage.AndroidStorageFolderProvider
 import ephyra.core.common.util.system.logcat
 import ephyra.core.download.DownloadCache
@@ -32,7 +37,6 @@ import ephyra.core.download.DownloadStore
 import ephyra.core.download.Downloader
 import ephyra.data.backup.BackupDecoder
 import ephyra.data.backup.BackupFileValidatorImpl
-import ephyra.domain.backup.service.BackupFileValidator
 import ephyra.data.backup.create.BackupCreator
 import ephyra.data.backup.create.creators.CategoriesBackupCreator
 import ephyra.data.backup.create.creators.ExtensionRepoBackupCreator
@@ -46,22 +50,16 @@ import ephyra.data.backup.restore.restorers.MangaRestorer
 import ephyra.data.backup.restore.restorers.PreferenceRestorer
 import ephyra.data.cache.ChapterCache
 import ephyra.data.cache.CoverCache
-import ephyra.domain.chapter.service.ChapterCache as IChapterCache
-import ephyra.domain.manga.service.CoverCache as ICoverCache
 import ephyra.data.coil.MangaCoverFetcher
 import ephyra.data.coil.MangaCoverKeyer
 import ephyra.data.coil.MangaKeyer
 import ephyra.data.export.LibraryExporterImpl
 import ephyra.data.room.EphyraDatabase
-import ephyra.core.common.saver.ImageSaver
 import ephyra.data.saver.ImageSaverImpl
-import ephyra.domain.export.LibraryExporter
 import ephyra.data.track.TrackerManagerImpl
 import ephyra.data.updater.AppUpdateChecker
-import ephyra.app.track.DelayedTrackingStore
-import ephyra.app.track.DelayedTrackingUpdateJob
-import ephyra.app.data.storage.StorageManagerImpl
-import ephyra.app.track.TrackingJobSchedulerImpl
+import ephyra.domain.backup.service.BackupFileValidator
+import ephyra.domain.export.LibraryExporter
 import ephyra.domain.source.service.SourceManager
 import ephyra.domain.storage.service.StorageManager
 import ephyra.domain.track.service.TrackerManager
@@ -95,6 +93,8 @@ import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ephyra.app.BuildConfig as AppBuildConfig
+import ephyra.domain.chapter.service.ChapterCache as IChapterCache
+import ephyra.domain.manga.service.CoverCache as ICoverCache
 import ephyra.presentation.core.ui.delegate.SecureActivityDelegate as CoreSecureActivityDelegate
 import ephyra.presentation.core.ui.delegate.ThemingDelegate as CoreThemingDelegate
 
@@ -234,7 +234,9 @@ val koinAppModule = module {
     single<ephyra.domain.library.service.MetadataUpdateScheduler> { get<WorkSchedulerImpl>() }
 
     single { PreferenceRestorer(androidApplication(), get(), get(), get(), get(), get(), get()) }
-    single { MangaRestorer(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single {
+        MangaRestorer(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+    }
 
     single { LibraryUpdateNotifier(androidApplication(), get(), get()) }
     single<ephyra.domain.library.service.LibraryUpdateNotifier> { get<LibraryUpdateNotifier>() }

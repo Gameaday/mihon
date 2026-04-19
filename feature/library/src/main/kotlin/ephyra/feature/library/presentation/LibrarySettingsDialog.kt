@@ -96,7 +96,9 @@ private fun ColumnScope.FilterPage(
             filterDownloaded
         },
         enabled = !downloadedOnly,
-        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterDownloaded)) },
+        onClick = {
+            screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterDownloaded))
+        },
     )
     val filterUnread by screenModel.libraryPreferences.filterUnread().collectAsState()
     TriStateItem(
@@ -114,7 +116,9 @@ private fun ColumnScope.FilterPage(
     TriStateItem(
         label = stringResource(MR.strings.action_filter_bookmarked),
         state = filterBookmarked,
-        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterBookmarked)) },
+        onClick = {
+            screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterBookmarked))
+        },
     )
     val filterCompleted by screenModel.libraryPreferences.filterCompleted().collectAsState()
     TriStateItem(
@@ -126,13 +130,17 @@ private fun ColumnScope.FilterPage(
     TriStateItem(
         label = stringResource(MR.strings.action_filter_source_health_dead),
         state = filterSourceHealthDead,
-        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterSourceHealthDead)) },
+        onClick = {
+            screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterSourceHealthDead))
+        },
     )
     val filterContentTypeManga by screenModel.libraryPreferences.filterContentTypeManga().collectAsState()
     TriStateItem(
         label = stringResource(MR.strings.action_filter_content_type_manga),
         state = filterContentTypeManga,
-        onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterContentTypeManga)) },
+        onClick = {
+            screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterContentTypeManga))
+        },
     )
     // TODO: re-enable when custom intervals are ready for stable
     if ((!appInfo.isRelease) && LibraryPreferences.MANGA_OUTSIDE_RELEASE_PERIOD in autoUpdateMangaRestrictions) {
@@ -140,7 +148,9 @@ private fun ColumnScope.FilterPage(
         TriStateItem(
             label = stringResource(MR.strings.action_filter_interval_custom),
             state = filterIntervalCustom,
-            onClick = { screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterIntervalCustom)) },
+            onClick = {
+                screenModel.onEvent(LibrarySettingsScreenEvent.ToggleFilter(LibraryPreferences::filterIntervalCustom))
+            },
         )
     }
 
@@ -212,7 +222,9 @@ private fun ColumnScope.SortPage(
                 icon = Icons.Default.Refresh
                     .takeIf { sortingMode == LibrarySort.Type.Random },
                 onClick = {
-                    screenModel.onEvent(LibrarySettingsScreenEvent.SetSort(category, mode, LibrarySort.Direction.Ascending))
+                    screenModel.onEvent(
+                        LibrarySettingsScreenEvent.SetSort(category, mode, LibrarySort.Direction.Ascending),
+                    )
                 },
             )
             return@map

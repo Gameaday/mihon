@@ -96,7 +96,8 @@ private fun DiagnosticContent(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             )
             Text(
-                text = "App has not fully started after ${TIMEOUT_MS / 1_000}s (${StartupTracker.elapsedMs()}ms elapsed)",
+                text = "App not ready after ${TIMEOUT_MS / 1_000}s " +
+                    "(${StartupTracker.elapsedMs()}ms elapsed)",
                 color = Color(0xFFAAAAAA),
                 style = MaterialTheme.typography.bodySmall,
             )

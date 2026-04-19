@@ -7,6 +7,7 @@ interface DownloadNotifier {
     suspend fun onProgressChange(download: Download)
     fun onPaused()
     fun onComplete()
+
     /**
      * Shows a warning notification.
      *

@@ -29,9 +29,9 @@ import ephyra.app.R
 import ephyra.app.crash.CrashActivity
 import ephyra.app.crash.GlobalExceptionHandler
 import ephyra.app.di.koinAppModule
-import ephyra.app.startup.StartupTracker
 import ephyra.app.di.koinAppModule_UI
 import ephyra.app.di.koinPreferenceModule
+import ephyra.app.startup.StartupTracker
 import ephyra.core.common.core.security.PrivacyPreferences
 import ephyra.core.common.i18n.stringResource
 import ephyra.core.common.preference.Preference
@@ -186,14 +186,18 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
 
         // Compute the device's maximum GPU texture size on an IO thread rather than the main
         // thread.  GLUtil.DEVICE_TEXTURE_LIMIT performs EGL driver queries that can take
-        // hundreds of milliseconds on some devices, and preference.isSet() reads from the
-        // DataStore snapshot which starts empty on every cold start (the background collection
-        // coroutine may not have emitted yet), causing the EGL work to run unconditionally on
-        // the main thread on every launch.  Running this on IO eliminates the main-thread
-        // blockage while still persisting the computed value for the image pipeline.
+        // hundreds of milliseconds on some devices.
+        //
+        // We use preference.get() (a suspend function that awaits the first DataStore emission)
+        // instead of preference.isSet() (which reads from the in-memory snapshot).  The snapshot
+        // starts as emptyPreferences() on every cold start and is populated asynchronously, so
+        // isSet() always returns false before the first emission — meaning the EGL query and a
+        // spurious write would occur on every launch, overwriting any value the user previously
+        // configured.  Comparing the awaited value against the compiled-in default
+        // (GLUtil.SAFE_TEXTURE_LIMIT) is the correct way to detect "never been set".
         scope.launch(Dispatchers.IO) {
             val preference = get<BasePreferences>().hardwareBitmapThreshold()
-            if (!preference.isSet()) {
+            if (preference.get() == preference.defaultValue()) {
                 preference.set(GLUtil.DEVICE_TEXTURE_LIMIT)
             }
         }

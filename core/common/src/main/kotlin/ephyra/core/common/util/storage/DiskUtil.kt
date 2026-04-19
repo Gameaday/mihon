@@ -58,7 +58,9 @@ object DiskUtil {
             val stat = StatFs(file.absolutePath)
             stat.blockCountLong * stat.blockSizeLong
         } catch (e: Exception) {
-            logcat(LogPriority.WARN, e) { "Failed to read total storage space for '${file.absolutePath}'; returning -1" }
+            logcat(LogPriority.WARN, e) {
+                "Failed to read total storage space for '${file.absolutePath}'; returning -1"
+            }
             -1L
         }
     }

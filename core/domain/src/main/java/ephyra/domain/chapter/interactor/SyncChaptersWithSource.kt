@@ -1,6 +1,5 @@
 package ephyra.domain.chapter.interactor
 
-import ephyra.domain.chapter.service.ChapterSanitizer
 import ephyra.domain.chapter.model.Chapter
 import ephyra.domain.chapter.model.NoChaptersException
 import ephyra.domain.chapter.model.copyFromSChapter
@@ -8,6 +7,7 @@ import ephyra.domain.chapter.model.toChapterUpdate
 import ephyra.domain.chapter.model.toSChapter
 import ephyra.domain.chapter.repository.ChapterRepository
 import ephyra.domain.chapter.service.ChapterRecognition
+import ephyra.domain.chapter.service.ChapterSanitizer
 import ephyra.domain.download.service.DownloadManager
 import ephyra.domain.download.service.DownloadProvider
 import ephyra.domain.library.service.LibraryPreferences

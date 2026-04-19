@@ -8,20 +8,20 @@ import ephyra.app.data.updater.AppUpdateNotifier
 import ephyra.app.ui.base.delegate.SecureActivityDelegateImpl
 import ephyra.app.ui.base.delegate.ThemingDelegateImpl
 import ephyra.core.common.notification.NotificationManager
-import ephyra.core.download.DownloadManager as CoreDownloadManager
 import ephyra.data.track.TrackerManagerImpl
-import ephyra.domain.backup.service.BackupNotifier as DomainBackupNotifier
-import ephyra.domain.download.service.DownloadManager as DomainDownloadManager
-import ephyra.domain.library.service.LibraryUpdateNotifier as DomainLibraryUpdateNotifier
 import ephyra.domain.release.service.AppUpdateDownloader
-import ephyra.domain.release.service.AppUpdateNotifier as DomainAppUpdateNotifier
 import ephyra.domain.track.service.TrackerManager
-import ephyra.presentation.core.ui.delegate.SecureActivityDelegate as CoreSecureActivityDelegate
-import ephyra.presentation.core.ui.delegate.ThemingDelegate as CoreThemingDelegate
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
+import ephyra.core.download.DownloadManager as CoreDownloadManager
+import ephyra.domain.backup.service.BackupNotifier as DomainBackupNotifier
+import ephyra.domain.download.service.DownloadManager as DomainDownloadManager
+import ephyra.domain.library.service.LibraryUpdateNotifier as DomainLibraryUpdateNotifier
+import ephyra.domain.release.service.AppUpdateNotifier as DomainAppUpdateNotifier
+import ephyra.presentation.core.ui.delegate.SecureActivityDelegate as CoreSecureActivityDelegate
+import ephyra.presentation.core.ui.delegate.ThemingDelegate as CoreThemingDelegate
 
 /**
  * Structural contract tests for every remaining interface→implementation binding declared in

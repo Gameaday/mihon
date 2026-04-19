@@ -41,7 +41,9 @@ class CategoryScreen : Screen() {
             onClickCreate = { screenModel.onEvent(CategoryScreenEvent.ShowDialog(CategoryDialog.Create)) },
             onClickRename = { screenModel.onEvent(CategoryScreenEvent.ShowDialog(CategoryDialog.Rename(it))) },
             onClickDelete = { screenModel.onEvent(CategoryScreenEvent.ShowDialog(CategoryDialog.Delete(it))) },
-            onChangeOrder = { category, newIndex -> screenModel.onEvent(CategoryScreenEvent.ChangeOrder(category, newIndex)) },
+            onChangeOrder = { category, newIndex ->
+                screenModel.onEvent(CategoryScreenEvent.ChangeOrder(category, newIndex))
+            },
             navigateUp = navigator::pop,
         )
 
