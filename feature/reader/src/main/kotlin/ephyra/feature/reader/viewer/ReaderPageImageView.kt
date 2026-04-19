@@ -34,12 +34,10 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_
 import ephyra.core.common.util.system.ImageUtil
 import ephyra.presentation.core.data.coil.cropBorders
 import ephyra.presentation.core.data.coil.customDecoder
-import ephyra.domain.base.BasePreferences
 import ephyra.feature.reader.viewer.webtoon.WebtoonSubsamplingImageView
 import ephyra.presentation.core.util.system.animatorDurationScale
 import ephyra.presentation.core.util.view.isVisibleOnScreen
 import okio.BufferedSource
-import org.koin.core.context.GlobalContext
 
 /**
  * A wrapper view for showing page image.
@@ -54,11 +52,13 @@ open class ReaderPageImageView @JvmOverloads constructor(
     @AttrRes defStyleAttrs: Int = 0,
     @StyleRes defStyleRes: Int = 0,
     private val isWebtoon: Boolean = false,
+    /**
+     * Whether long-strip images in webtoon mode should always be decoded with SSIV.
+     * Callers should read this preference and pass it in at construction time, keeping
+     * this View free of any Koin / GlobalContext dependency.
+     */
+    private val alwaysDecodeLongStripWithSSIV: Boolean = false,
 ) : FrameLayout(context, attrs, defStyleAttrs, defStyleRes) {
-
-    private val alwaysDecodeLongStripWithSSIV by lazy {
-        GlobalContext.get().get<BasePreferences>().alwaysDecodeLongStripWithSSIV().getSync()
-    }
 
     private var pageView: View? = null
 

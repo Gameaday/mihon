@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import ephyra.domain.base.BasePreferences
 import ephyra.domain.reader.service.ReaderPreferences
 import ephyra.domain.ui.UiPreferences
 import ephyra.feature.reader.model.ChapterTransition
@@ -111,7 +112,11 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             PAGE_VIEW -> {
-                val view = ReaderPageImageView(readerThemedContext, isWebtoon = true)
+                val alwaysDecode = viewer.activity.getKoin()
+                    .get<BasePreferences>()
+                    .alwaysDecodeLongStripWithSSIV()
+                    .getSync()
+                val view = ReaderPageImageView(readerThemedContext, isWebtoon = true, alwaysDecodeLongStripWithSSIV = alwaysDecode)
                 WebtoonPageHolder(view, viewer)
             }
 

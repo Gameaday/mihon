@@ -43,15 +43,16 @@ import ephyra.presentation.widget.util.calculateRowAndColumnCount
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.map
-import org.koin.core.context.GlobalContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.time.Instant
 import java.time.ZonedDateTime
 
-abstract class BaseUpdatesGridGlanceWidget : GlanceAppWidget() {
+abstract class BaseUpdatesGridGlanceWidget : GlanceAppWidget(), KoinComponent {
 
-    private val context: Context by lazy { GlobalContext.get().get<Application>() }
-    private val getUpdates: GetUpdates by lazy { GlobalContext.get().get() }
-    private val preferences: SecurityPreferences by lazy { GlobalContext.get().get() }
+    private val widgetContext: Application by inject()
+    private val getUpdates: GetUpdates by inject()
+    private val preferences: SecurityPreferences by inject()
 
     override val sizeMode = SizeMode.Exact
 
@@ -117,7 +118,7 @@ abstract class BaseUpdatesGridGlanceWidget : GlanceAppWidget() {
                 .distinctBy { it.mangaId }
                 .take(rowCount * columnCount)
                 .map { updatesView ->
-                    val request = ImageRequest.Builder(context)
+                    val request = ImageRequest.Builder(widgetContext)
                         .data(
                             MangaCover(
                                 mangaId = updatesView.mangaId,
@@ -132,9 +133,9 @@ abstract class BaseUpdatesGridGlanceWidget : GlanceAppWidget() {
                         .size(widthPx, heightPx)
                         .scale(Scale.FILL)
                         .build()
-                    val bitmap = context.imageLoader.executeBlocking(request)
+                    val bitmap = widgetContext.imageLoader.executeBlocking(request)
                         .image
-                        ?.asDrawable(context.resources)
+                        ?.asDrawable(widgetContext.resources)
                         ?.toBitmap()
                     Pair(updatesView.mangaId, bitmap)
                 }

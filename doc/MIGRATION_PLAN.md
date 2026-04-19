@@ -206,17 +206,15 @@ Ensure successful builds translate to failure-free runtime behavior.
 These items represent the outstanding risks / violations that should be resolved (or
 formally accepted and documented) before this PR is considered merge-ready:
 
-#### High priority (potential silent failures or unexpected UX)
-- [ ] **`GlobalContext.get()` in `NotificationReceiver`** — four lazy fields use
-  `GlobalContext.get().get()`.  Safe while Koin is always initialized before `onReceive()`,
-  but should be migrated to `KoinComponent` interface (inject via Koin's field injection
-  pattern for BroadcastReceivers) to make the intent explicit.
-- [ ] **`GlobalContext.get()` in `ReaderPageImageView`** — `alwaysDecodeLongStripWithSSIV` lazy
-  property pulls from GlobalContext.  Should be passed as a constructor parameter or via an
-  interface injected into the reader viewer host.
-- [ ] **`GlobalContext.get()` in widget (`BaseUpdatesGridGlanceWidget`)** — Glance widgets cannot
-  receive Koin-injected constructors; use `KoinComponent` inside the widget coroutine scope
-  (already the recommended Koin-Glance pattern) to make the dependency explicit.
+#### High priority (potential silent failures or unexpected UX) — ✅ ALL COMPLETE
+- [x] **`GlobalContext.get()` in `NotificationReceiver`** — migrated to `KoinComponent` +
+  `by inject()` fields; two local lazy vars in `markAsRead` promoted to class-level injected
+  fields.
+- [x] **`GlobalContext.get()` in `ReaderPageImageView`** — removed; `alwaysDecodeLongStripWithSSIV`
+  is now a constructor parameter (default `false`).  `WebtoonAdapter` reads the preference from
+  `viewer.activity.getKoin()` and passes it at view construction time.
+- [x] **`GlobalContext.get()` in widget (`BaseUpdatesGridGlanceWidget`)** — migrated to
+  `KoinComponent` + `by inject()` fields; class now implements `KoinComponent`.
 
 #### Medium priority (architecture violations, not immediate crash risks)
 - [ ] **`feature/settings` → `ephyra.data.*` violations (6 imports in 3 files)** — settings
@@ -233,5 +231,7 @@ formally accepted and documented) before this PR is considered merge-ready:
 - [ ] **`withUIContext` in reader viewer classes** (`WebtoonPageHolder`, `PagerPageHolder`) —
   these are View-layer classes (not ScreenModels) so the violation is less severe, but should
   be replaced with `Dispatchers.Main` coroutine context dispatch.
-- [ ] **`KoinJavaComponent.get()` in `BaseActivity`** — acceptable interop but should be
-  migrated to `by inject()` delegation for consistency.
+- [x] **`KoinJavaComponent.get()` in `BaseActivity`** — **accepted pattern**: Kotlin class
+  delegation (`by`) requires a concrete instance at the declaration site; `inject()` returns
+  `Lazy<T>` and cannot be used there. `KoinJavaComponent.get()` is the correct Koin idiom for
+  this case and is executed only after `startKoin()`.  Comment added to `BaseActivity.kt`.
