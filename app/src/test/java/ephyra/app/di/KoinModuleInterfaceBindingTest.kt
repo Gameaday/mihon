@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -142,6 +144,59 @@ class KoinModuleInterfaceBindingTest {
         }
         assertSame(libraryScheduler, metadataScheduler) {
             "LibraryUpdateScheduler and MetadataUpdateScheduler should be the same singleton"
+        }
+    }
+}
+
+/**
+ * Structural guard tests for [ephyra.feature.more.MoreTab].
+ *
+ * MoreTab.Content() uses the `rememberScreenModel { }` pattern for its private
+ * [MoreScreenModel] (no Koin lookup for the ScreenModel class itself) and obtains
+ * the two runtime dependencies via `koinInject<>()`.  The two @Test methods below
+ * verify those injection types are — and must remain — resolvable from the Koin graph.
+ *
+ * No Koin context is started; both checks are pure JVM reflection invariants.
+ */
+@Execution(ExecutionMode.CONCURRENT)
+class MoreTabDependencyContractTest {
+
+    /**
+     * [koinAppModule] registers [ephyra.core.download.DownloadManager] under the
+     * [ephyra.domain.download.service.DownloadManager] domain interface.
+     * MoreTab.Content() calls `koinInject<DownloadManager>()` (domain interface) so this
+     * binding must remain valid; otherwise the More tab crashes immediately on open.
+     */
+    @Test
+    fun `MoreTab — core DownloadManager still implements domain DownloadManager`() {
+        assertTrue(
+            ephyra.domain.download.service.DownloadManager::class.java.isAssignableFrom(
+                ephyra.core.download.DownloadManager::class.java,
+            ),
+        ) {
+            "ephyra.core.download.DownloadManager must implement " +
+                "ephyra.domain.download.service.DownloadManager so MoreTab's " +
+                "koinInject<DownloadManager>() resolves at runtime."
+        }
+    }
+
+    /**
+     * [koinPreferenceModule] registers [ephyra.domain.base.BasePreferences] as a concrete
+     * `single { BasePreferences(get(), get()) }`.  MoreTab.Content() calls
+     * `koinInject<BasePreferences>()` directly.  If BasePreferences is ever changed to an
+     * interface or abstract class the Koin definition would fail at startKoin time —
+     * crashing the app before the user sees anything.
+     */
+    @Test
+    fun `MoreTab — BasePreferences is a concrete instantiable class`() {
+        val cls = ephyra.domain.base.BasePreferences::class.java
+        assertFalse(cls.isInterface) {
+            "BasePreferences must remain a concrete class so the koinPreferenceModule " +
+                "single{} registration keeps working for MoreTab's koinInject<BasePreferences>()."
+        }
+        assertFalse(java.lang.reflect.Modifier.isAbstract(cls.modifiers)) {
+            "BasePreferences must not be abstract — koinPreferenceModule registers it as a " +
+                "concrete single{} and MoreTab.Content() injects it directly."
         }
     }
 }

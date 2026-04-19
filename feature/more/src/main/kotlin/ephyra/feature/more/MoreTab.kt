@@ -10,8 +10,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import org.koin.core.annotation.Factory
+import org.koin.compose.koinInject
 
 data object MoreTab : Tab {
 
@@ -59,7 +59,9 @@ data object MoreTab : Tab {
     override fun Content() {
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = koinScreenModel<MoreScreenModel>()
+        val downloadManager = koinInject<DownloadManager>()
+        val preferences = koinInject<BasePreferences>()
+        val screenModel = rememberScreenModel { MoreScreenModel(downloadManager, preferences) }
         val downloadQueueState by screenModel.downloadQueueState.collectAsStateWithLifecycle()
         MoreScreen(
             downloadQueueStateProvider = { downloadQueueState },
@@ -81,7 +83,7 @@ data object MoreTab : Tab {
     }
 }
 
-@Factory
+@Suppress("UNUSED") // instantiated by rememberScreenModel in MoreTab.Content()
 private class MoreScreenModel(
     private val downloadManager: DownloadManager,
     preferences: BasePreferences,
