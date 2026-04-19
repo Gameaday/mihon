@@ -1,11 +1,11 @@
 package ephyra.data.backup.restore.restorers
 
-import ephyra.data.DatabaseHandler
 import ephyra.data.backup.models.BackupExtensionRepos
 import ephyra.domain.extensionrepo.interactor.GetExtensionRepo
+import ephyra.domain.extensionrepo.repository.ExtensionRepoRepository
 
 class ExtensionRepoRestorer(
-    private val handler: DatabaseHandler,
+    private val extensionRepoRepository: ExtensionRepoRepository,
     private val getExtensionRepos: GetExtensionRepo,
 ) {
 
@@ -24,15 +24,13 @@ class ExtensionRepoRestorer(
         } else if (shaExists != null) {
             error("${shaExists.name} has the same signing key fingerprint")
         } else {
-            handler.await {
-                extension_reposQueries.insert(
-                    backupRepo.baseUrl,
-                    backupRepo.name,
-                    backupRepo.shortName,
-                    backupRepo.website,
-                    backupRepo.signingKeyFingerprint,
-                )
-            }
+            extensionRepoRepository.insertRepo(
+                backupRepo.baseUrl,
+                backupRepo.name,
+                backupRepo.shortName,
+                backupRepo.website,
+                backupRepo.signingKeyFingerprint,
+            )
         }
     }
 }

@@ -23,5 +23,7 @@ interface HistoryRepository {
 
     suspend fun upsertHistory(historyUpdate: HistoryUpdate)
 
+    suspend fun getHistoryByChapterId(chapterId: Long): History?
+
     suspend fun removeResettedHistory()
 }

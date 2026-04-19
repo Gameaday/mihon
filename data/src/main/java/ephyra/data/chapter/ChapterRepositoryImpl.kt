@@ -113,4 +113,8 @@ class ChapterRepositoryImpl(
     override suspend fun getChapterByUrlAndMangaId(url: String, mangaId: Long): Chapter? {
         return chapterDao.getChapterByUrlAndMangaId(url, mangaId)?.let(ChapterMapper::mapChapter)
     }
+
+    override suspend fun getChapterByUrl(url: String): Chapter? {
+        return chapterDao.getChapterByUrl(url)?.let(ChapterMapper::mapChapter)
+    }
 }

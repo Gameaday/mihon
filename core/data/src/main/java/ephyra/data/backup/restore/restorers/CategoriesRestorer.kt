@@ -1,12 +1,13 @@
 package ephyra.data.backup.restore.restorers
 
-import ephyra.data.DatabaseHandler
 import ephyra.data.backup.models.BackupCategory
 import ephyra.domain.category.interactor.GetCategories
+import ephyra.domain.category.model.Category
+import ephyra.domain.category.repository.CategoryRepository
 import ephyra.domain.library.service.LibraryPreferences
 
 class CategoriesRestorer(
-    private val handler: DatabaseHandler,
+    private val categoryRepository: CategoryRepository,
     private val getCategories: GetCategories,
     private val libraryPreferences: LibraryPreferences,
 ) {
@@ -23,11 +24,14 @@ class CategoriesRestorer(
                     val dbCategory = dbCategoriesByName[it.name]
                     if (dbCategory != null) return@map dbCategory
                     val order = nextOrder++
-                    handler.awaitOneExecutable {
-                        categoriesQueries.insert(it.name, order, it.flags)
-                        categoriesQueries.selectLastInsertedRowId()
-                    }
-                        .let { id -> it.toCategory(id).copy(order = order) }
+                    val newCategory = Category(
+                        id = 0,
+                        name = it.name,
+                        order = order,
+                        flags = it.flags,
+                    )
+                    val id = categoryRepository.insert(newCategory)
+                    it.toCategory(id).copy(order = order)
                 }
 
             libraryPreferences.categorizedDisplaySettings().set(

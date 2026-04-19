@@ -51,4 +51,11 @@ interface MangaRepository {
     suspend fun insertNetworkManga(manga: List<Manga>): List<Manga>
 
     suspend fun deleteNonLibraryManga(sourceIds: List<Long>, keepReadManga: Long)
+
+    /**
+     * Returns a lightweight list of (source, url) pairs for all known manga.
+     * Used by the backup restorer to sort incoming mangas by whether they are new
+     * to this device without loading full [Manga] objects.
+     */
+    suspend fun getAllMangaSourceAndUrl(): List<Pair<Long, String>>
 }

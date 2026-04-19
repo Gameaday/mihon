@@ -41,8 +41,7 @@ data class BackupChapter(
     }
 }
 
-val backupChapterMapper = {
-        _: Long,
+val backupChapterMapper = {        _: Long,
         _: Long,
         url: String,
         name: String,
@@ -73,3 +72,23 @@ val backupChapterMapper = {
         version = version,
     )
 }
+
+/**
+ * Converts a [Chapter] domain model to its [BackupChapter] protobuf representation.
+ * Used by [ephyra.data.backup.create.creators.MangaBackupCreator] to avoid a direct SQLDelight
+ * dependency on the chapter query mapper.
+ */
+fun Chapter.toBackupChapter(): BackupChapter = BackupChapter(
+    url = url,
+    name = name,
+    chapterNumber = chapterNumber.toFloat(),
+    scanlator = scanlator,
+    read = read,
+    bookmark = bookmark,
+    lastPageRead = lastPageRead,
+    dateFetch = dateFetch,
+    dateUpload = dateUpload,
+    sourceOrder = sourceOrder,
+    lastModifiedAt = lastModifiedAt,
+    version = version,
+)

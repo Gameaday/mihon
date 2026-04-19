@@ -1,21 +1,25 @@
 package ephyra.data.backup.create.creators
 
-import ephyra.data.DatabaseHandler
 import ephyra.data.backup.create.BackupOptions
 import ephyra.data.backup.models.BackupChapter
 import ephyra.data.backup.models.BackupHistory
 import ephyra.data.backup.models.BackupManga
-import ephyra.data.backup.models.backupChapterMapper
-import ephyra.data.backup.models.backupTrackMapper
+import ephyra.domain.backup.model.toBackupChapter
+import ephyra.domain.backup.model.toBackupTracking
 import ephyra.domain.category.interactor.GetCategories
+import ephyra.domain.chapter.interactor.GetChaptersByMangaId
 import ephyra.domain.history.interactor.GetHistory
+import ephyra.domain.manga.interactor.GetExcludedScanlators
 import ephyra.domain.manga.model.Manga
 import ephyra.domain.reader.model.ReadingMode
+import ephyra.domain.track.interactor.GetTracks
 
 class MangaBackupCreator(
-    private val handler: DatabaseHandler,
     private val getCategories: GetCategories,
     private val getHistory: GetHistory,
+    private val getChaptersByMangaId: GetChaptersByMangaId,
+    private val getTracks: GetTracks,
+    private val getExcludedScanlators: GetExcludedScanlators,
 ) {
 
     suspend operator fun invoke(mangas: List<Manga>, options: BackupOptions): List<BackupManga> {
@@ -25,28 +29,18 @@ class MangaBackupCreator(
     }
 
     private suspend fun backupManga(manga: Manga, options: BackupOptions): BackupManga {
-        // Entry for this manga
         val mangaObject = manga.toBackupManga()
 
-        mangaObject.excludedScanlators = handler.awaitList {
-            excluded_scanlatorsQueries.getExcludedScanlatorsByMangaId(manga.id)
-        }
+        mangaObject.excludedScanlators = getExcludedScanlators.await(manga.id).toList()
 
         if (options.chapters) {
-            // Backup all the chapters
-            handler.awaitList {
-                chaptersQueries.getChaptersByMangaId(
-                    mangaId = manga.id,
-                    applyScanlatorFilter = 0, // false
-                    mapper = backupChapterMapper,
-                )
-            }
+            getChaptersByMangaId.await(manga.id, applyScanlatorFilter = false)
+                .map { it.toBackupChapter() }
                 .takeUnless(List<BackupChapter>::isEmpty)
                 ?.let { mangaObject.chapters = it }
         }
 
         if (options.categories) {
-            // Backup categories for this manga
             val categoriesForManga = getCategories.await(manga.id)
             if (categoriesForManga.isNotEmpty()) {
                 mangaObject.categories = categoriesForManga.map { it.order }
@@ -54,7 +48,7 @@ class MangaBackupCreator(
         }
 
         if (options.tracking) {
-            val tracks = handler.awaitList { manga_syncQueries.getTracksByMangaId(manga.id, backupTrackMapper) }
+            val tracks = getTracks.await(manga.id).map { it.toBackupTracking() }
             if (tracks.isNotEmpty()) {
                 mangaObject.tracking = tracks
             }
@@ -63,9 +57,8 @@ class MangaBackupCreator(
         if (options.history) {
             val historyByMangaId = getHistory.await(manga.id)
             if (historyByMangaId.isNotEmpty()) {
-                val chaptersById = handler.awaitList {
-                    chaptersQueries.getChaptersByMangaId(manga.id, applyScanlatorFilter = 0)
-                }.associateBy { it._id }
+                val chaptersById = getChaptersByMangaId.await(manga.id, applyScanlatorFilter = false)
+                    .associateBy { it.id }
                 val history = historyByMangaId.mapNotNull { history ->
                     chaptersById[history.chapterId]?.let { chapter ->
                         BackupHistory(chapter.url, history.readAt?.time ?: 0L, history.readDuration)

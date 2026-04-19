@@ -13,6 +13,11 @@ data class SourceWithCountRecord(
     val count: Long,
 )
 
+data class MangaSourceUrlRecord(
+    val source: Long,
+    val url: String,
+)
+
 @Dao
 interface MangaDao {
 
@@ -33,6 +38,9 @@ interface MangaDao {
 
     @Query("SELECT * FROM mangas WHERE favorite = 1")
     suspend fun getFavorites(): List<MangaEntity>
+
+    @Query("SELECT source, url FROM mangas")
+    suspend fun getAllMangaSourceAndUrl(): List<MangaSourceUrlRecord>
 
     @Query("SELECT * FROM libraryView")
     fun getLibraryMangaAsFlow(): Flow<List<LibraryView>>

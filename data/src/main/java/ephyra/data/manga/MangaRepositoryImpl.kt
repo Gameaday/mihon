@@ -219,4 +219,8 @@ class MangaRepositoryImpl(
         // Room DAO handles this. keepReadManga logic needs to be verified in SQL.
         mangaDao.deleteNonLibraryManga(sourceIds)
     }
+
+    override suspend fun getAllMangaSourceAndUrl(): List<Pair<Long, String>> {
+        return mangaDao.getAllMangaSourceAndUrl().map { Pair(it.source, it.url) }
+    }
 }

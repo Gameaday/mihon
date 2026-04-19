@@ -86,3 +86,23 @@ val backupTrackMapper = {
         isPrivate = isPrivate,
     )
 }
+
+/**
+ * Converts a [Track] domain model to its [BackupTracking] protobuf representation.
+ * Used by [ephyra.data.backup.create.creators.MangaBackupCreator] to avoid a direct
+ * SQLDelight dependency on the track query mapper.
+ */
+fun Track.toBackupTracking(): BackupTracking = BackupTracking(
+    syncId = trackerId.toInt(),
+    mediaId = remoteId,
+    libraryId = libraryId,
+    title = title,
+    lastChapterRead = lastChapterRead.toFloat(),
+    totalChapters = totalChapters.toInt(),
+    score = score.toFloat(),
+    status = status.toInt(),
+    startedReadingDate = startDate,
+    finishedReadingDate = finishDate,
+    trackingUrl = remoteUrl,
+    isPrivate = isPrivate,
+)

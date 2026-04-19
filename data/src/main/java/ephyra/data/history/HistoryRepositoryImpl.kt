@@ -56,6 +56,10 @@ class HistoryRepositoryImpl(
         historyDao.upsert(entity)
     }
 
+    override suspend fun getHistoryByChapterId(chapterId: Long): History? {
+        return historyDao.getHistoryByChapterId(chapterId)?.let(HistoryMapper::mapHistory)
+    }
+
     override suspend fun removeResettedHistory() {
         historyDao.removeResettedHistory()
     }

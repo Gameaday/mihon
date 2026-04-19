@@ -213,7 +213,7 @@ val koinAppModule = module {
     single<BackupFileValidator> { BackupFileValidatorImpl(androidApplication(), get(), get()) }
 
     single { CategoriesBackupCreator(get()) }
-    single { MangaBackupCreator(get(), get(), get()) }
+    single { MangaBackupCreator(get(), get(), get(), get(), get()) }
     single { PreferenceBackupCreator(get(), get()) }
     single { ExtensionRepoBackupCreator(get()) }
     single { SourcesBackupCreator(get()) }
@@ -231,7 +231,7 @@ val koinAppModule = module {
     single<ephyra.domain.library.service.MetadataUpdateScheduler> { get<WorkSchedulerImpl>() }
 
     single { PreferenceRestorer(androidApplication(), get(), get(), get(), get(), get(), get()) }
-    single { MangaRestorer(get(), get(), get(), get(), get(), get(), get(), get()) }
+    single { MangaRestorer(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 
     single { LibraryUpdateNotifier(androidApplication(), get(), get()) }
     single<ephyra.domain.library.service.LibraryUpdateNotifier> { get<LibraryUpdateNotifier>() }

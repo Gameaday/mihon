@@ -32,14 +32,14 @@ class CategoryRepositoryImpl(
         return categoryDao.getCategoriesByMangaIdAsFlow(mangaId).map { list -> list.map(CategoryMapper::mapCategory) }
     }
 
-    override suspend fun insert(category: Category) {
+    override suspend fun insert(category: Category): Long {
         val entity = CategoryEntity(
             id = 0,
             name = category.name,
             sort = category.order.toInt(),
             flags = category.flags,
         )
-        categoryDao.insert(entity)
+        return categoryDao.insert(entity)
     }
 
     override suspend fun updatePartial(update: CategoryUpdate) {

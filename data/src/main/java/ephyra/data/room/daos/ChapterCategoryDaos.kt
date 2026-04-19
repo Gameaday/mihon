@@ -45,6 +45,9 @@ interface ChapterDao {
     @Query("SELECT * FROM chapters WHERE manga_id = :mangaId AND url = :url LIMIT 1")
     suspend fun getChapterByUrlAndMangaId(url: String, mangaId: Long): ChapterEntity?
 
+    @Query("SELECT * FROM chapters WHERE url = :url LIMIT 1")
+    suspend fun getChapterByUrl(url: String): ChapterEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(chapter: ChapterEntity): Long
 
