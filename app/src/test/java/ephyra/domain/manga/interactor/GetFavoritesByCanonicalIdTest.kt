@@ -50,6 +50,7 @@ class GetFavoritesByCanonicalIdTest {
         override suspend fun clearCanonicalId(mangaId: Long) = throw NotImplementedError()
         override suspend fun insertNetworkManga(manga: List<Manga>) = throw NotImplementedError()
         override suspend fun deleteNonLibraryManga(sourceIds: List<Long>, keepReadManga: Long) {}
+        override suspend fun getAllMangaSourceAndUrl(): List<Pair<Long, String>> = emptyList()
     }
 
     private fun testManga(
