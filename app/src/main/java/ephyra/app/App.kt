@@ -107,9 +107,12 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
     override fun onCreate() {
         super<Application>.onCreate()
         StartupTracker.complete(StartupTracker.Phase.APP_CREATED)
-        TelemetryConfig.init(applicationContext)
 
+        // Install the crash handler first so any subsequent failure in onCreate is
+        // captured and surfaced via CrashActivity instead of dying silently.
         GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
+
+        TelemetryConfig.init(applicationContext)
 
         // Avoid potential crashes from multiple WebView processes
         val process = getProcessName()
@@ -177,13 +180,23 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
             .onEach(TelemetryConfig::setCrashlyticsEnabled)
             .launchIn(scope)
 
-        basePreferences.hardwareBitmapThreshold().let { preference ->
-            if (!preference.isSet()) preference.set(GLUtil.DEVICE_TEXTURE_LIMIT)
-        }
-
         basePreferences.hardwareBitmapThreshold().changes()
             .onEach { ImageUtil.hardwareBitmapThreshold = it }
             .launchIn(scope)
+
+        // Compute the device's maximum GPU texture size on an IO thread rather than the main
+        // thread.  GLUtil.DEVICE_TEXTURE_LIMIT performs EGL driver queries that can take
+        // hundreds of milliseconds on some devices, and preference.isSet() reads from the
+        // DataStore snapshot which starts empty on every cold start (the background collection
+        // coroutine may not have emitted yet), causing the EGL work to run unconditionally on
+        // the main thread on every launch.  Running this on IO eliminates the main-thread
+        // blockage while still persisting the computed value for the image pipeline.
+        scope.launch(Dispatchers.IO) {
+            val preference = get<BasePreferences>().hardwareBitmapThreshold()
+            if (!preference.isSet()) {
+                preference.set(GLUtil.DEVICE_TEXTURE_LIMIT)
+            }
+        }
 
         setAppCompatDelegateThemeMode(
             try {
