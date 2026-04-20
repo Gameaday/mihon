@@ -116,9 +116,20 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
         // Initialise telemetry off the main thread: Firebase's initializeApp performs
         // file I/O and service lookups that can block the main thread for hundreds of
         // milliseconds on cold starts, contributing to ANR on slow devices.
+        // The try-catch is required: an unhandled exception from a child coroutine of
+        // lifecycleScope (backed by SupervisorJob) propagates to the thread's uncaught-
+        // exception handler (GlobalExceptionHandler).  After startKoin() succeeds, Koin
+        // is available, so GlobalExceptionHandler would launch CrashActivity — crashing
+        // the app because of a non-critical telemetry failure (e.g. missing
+        // google-services.json in a fork/test build).  Swallowing the error here keeps
+        // the app alive; telemetry will simply be inactive for that session.
         val scope = ProcessLifecycleOwner.get().lifecycleScope
         scope.launch(Dispatchers.IO) {
-            TelemetryConfig.init(applicationContext)
+            try {
+                TelemetryConfig.init(applicationContext)
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Telemetry initialisation failed; telemetry will be inactive" }
+            }
         }
 
         // Avoid potential crashes from multiple WebView processes
