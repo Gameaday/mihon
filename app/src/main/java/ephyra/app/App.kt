@@ -28,6 +28,7 @@ import coil3.util.DebugLogger
 import ephyra.app.R
 import ephyra.app.crash.CrashActivity
 import ephyra.app.crash.GlobalExceptionHandler
+import ephyra.app.crash.StartupFailureActivity
 import ephyra.app.di.koinAppModule
 import ephyra.app.di.koinAppModule_UI
 import ephyra.app.di.koinPreferenceModule
@@ -112,7 +113,13 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
         // captured and surfaced via CrashActivity instead of dying silently.
         GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
 
-        TelemetryConfig.init(applicationContext)
+        // Initialise telemetry off the main thread: Firebase's initializeApp performs
+        // file I/O and service lookups that can block the main thread for hundreds of
+        // milliseconds on cold starts, contributing to ANR on slow devices.
+        val scope = ProcessLifecycleOwner.get().lifecycleScope
+        scope.launch(Dispatchers.IO) {
+            TelemetryConfig.init(applicationContext)
+        }
 
         // Avoid potential crashes from multiple WebView processes
         val process = getProcessName()
@@ -128,18 +135,29 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
                 modules(koinAppModule, koinPreferenceModule, koinDomainModule, koinAppModule_UI)
             }
         } catch (e: Exception) {
-            // Record the failure so the StartupDiagnosticOverlay can surface it,
-            // then re-throw so the GlobalExceptionHandler opens CrashActivity.
+            // startKoin() threw before Koin was fully initialised.  GlobalExceptionHandler
+            // cannot open CrashActivity here because that activity's BaseActivity superclass
+            // calls KoinJavaComponent.get() eagerly — doing so before startKoin() completes
+            // would cause a second crash that swallows the original error and shows no UI.
+            //
+            // Instead we launch StartupFailureActivity directly (zero Koin dependencies,
+            // plain Android Views) and then terminate the process.  This guarantees the
+            // user always sees a readable error screen instead of a blank ANR dialog.
             StartupTracker.recordError(StartupTracker.Phase.KOIN_INITIALIZED, e)
-            throw e
+            val intent = Intent(applicationContext, StartupFailureActivity::class.java).apply {
+                putExtra(StartupFailureActivity.EXTRA_STACK_TRACE, e.stackTraceToString())
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
+            applicationContext.startActivity(intent)
+            // Give the activity intent time to be delivered before the process exits.
+            android.os.Process.killProcess(android.os.Process.myPid())
+            return
         }
         StartupTracker.complete(StartupTracker.Phase.KOIN_INITIALIZED)
 
         setupNotificationChannels()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-
-        val scope = ProcessLifecycleOwner.get().lifecycleScope
 
         // Show notification to disable Incognito Mode when it's enabled
         basePreferences.incognitoMode().changes()
