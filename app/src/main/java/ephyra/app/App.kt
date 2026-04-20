@@ -28,6 +28,7 @@ import coil3.util.DebugLogger
 import ephyra.app.R
 import ephyra.app.crash.CrashActivity
 import ephyra.app.crash.GlobalExceptionHandler
+import ephyra.app.crash.StartupFailureActivity
 import ephyra.app.di.koinAppModule
 import ephyra.app.di.koinAppModule_UI
 import ephyra.app.di.koinPreferenceModule
@@ -112,7 +113,24 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
         // captured and surfaced via CrashActivity instead of dying silently.
         GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
 
-        TelemetryConfig.init(applicationContext)
+        // Initialise telemetry off the main thread: Firebase's initializeApp performs
+        // file I/O and service lookups that can block the main thread for hundreds of
+        // milliseconds on cold starts, contributing to ANR on slow devices.
+        // The try-catch is required: an unhandled exception from a child coroutine of
+        // lifecycleScope (backed by SupervisorJob) propagates to the thread's uncaught-
+        // exception handler (GlobalExceptionHandler).  After startKoin() succeeds, Koin
+        // is available, so GlobalExceptionHandler would launch CrashActivity — crashing
+        // the app because of a non-critical telemetry failure (e.g. missing
+        // google-services.json in a fork/test build).  Swallowing the error here keeps
+        // the app alive; telemetry will simply be inactive for that session.
+        val scope = ProcessLifecycleOwner.get().lifecycleScope
+        scope.launch(Dispatchers.IO) {
+            try {
+                TelemetryConfig.init(applicationContext)
+            } catch (e: Exception) {
+                logcat(LogPriority.WARN, e) { "Telemetry initialization failed; telemetry will be inactive" }
+            }
+        }
 
         // Avoid potential crashes from multiple WebView processes
         val process = getProcessName()
@@ -128,18 +146,32 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
                 modules(koinAppModule, koinPreferenceModule, koinDomainModule, koinAppModule_UI)
             }
         } catch (e: Exception) {
-            // Record the failure so the StartupDiagnosticOverlay can surface it,
-            // then re-throw so the GlobalExceptionHandler opens CrashActivity.
+            // startKoin() threw before Koin was fully initialised.  GlobalExceptionHandler
+            // cannot open CrashActivity here because that activity's BaseActivity superclass
+            // calls KoinJavaComponent.get() eagerly — doing so before startKoin() completes
+            // would cause a second crash that swallows the original error and shows no UI.
+            //
+            // Instead we launch StartupFailureActivity directly (zero Koin dependencies,
+            // plain Android Views) and then terminate the process.  This guarantees the
+            // user always sees a readable error screen instead of a blank ANR dialog.
             StartupTracker.recordError(StartupTracker.Phase.KOIN_INITIALIZED, e)
-            throw e
+            val intent = Intent(applicationContext, StartupFailureActivity::class.java).apply {
+                putExtra(StartupFailureActivity.EXTRA_STACK_TRACE, e.stackTraceToString())
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
+            applicationContext.startActivity(intent)
+            // exitProcess() triggers JVM shutdown hooks before terminating, giving
+            // the runtime more opportunity to flush the pending Binder IPC that carries
+            // the StartupFailureActivity intent to the system server.  This is safer
+            // than the direct killProcess() + sleep pattern which relies on a fixed
+            // timing guess.
+            kotlin.system.exitProcess(1)
         }
         StartupTracker.complete(StartupTracker.Phase.KOIN_INITIALIZED)
 
         setupNotificationChannels()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-
-        val scope = ProcessLifecycleOwner.get().lifecycleScope
 
         // Show notification to disable Incognito Mode when it's enabled
         basePreferences.incognitoMode().changes()

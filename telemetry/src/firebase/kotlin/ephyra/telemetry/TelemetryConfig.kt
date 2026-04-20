@@ -6,8 +6,10 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object TelemetryConfig {
-    private var analytics: FirebaseAnalytics? = null
-    private var crashlytics: FirebaseCrashlytics? = null
+    // @Volatile ensures writes from the background init() coroutine are immediately
+    // visible to the main-thread setAnalyticsEnabled / setCrashlyticsEnabled calls.
+    @Volatile private var analytics: FirebaseAnalytics? = null
+    @Volatile private var crashlytics: FirebaseCrashlytics? = null
 
     fun init(context: Context) {
         // To stop forks/test builds from polluting our data

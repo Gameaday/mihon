@@ -109,6 +109,18 @@
             android:exported="false"
             android:process=":error_handler" />
 
+        <!--
+            Koin-free fallback shown when App.onCreate() fails before startKoin()
+            completes (e.g. a module binding throws).  CrashActivity extends BaseActivity
+            which calls KoinJavaComponent.get() eagerly; launching it before Koin is ready
+            would trigger a second crash that silently swallows the original error.
+            StartupFailureActivity has zero Koin dependencies and uses only plain Android
+            Views, so it works regardless of DI state.
+        -->
+        <activity
+            android:name=".crash.StartupFailureActivity"
+            android:exported="false" />
+
         <activity
             android:name=".ui.deeplink.DeepLinkActivity"
             android:exported="true"
