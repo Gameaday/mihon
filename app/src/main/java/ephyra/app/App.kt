@@ -263,14 +263,13 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
 
         // LogcatLogger was installed at the top of onCreate() with a base priority.
         // Upgrade to VERBOSE now if the user has enabled verbose logging — Koin is ready
-        // so networkPreferences is available.  We add alongside the existing logger rather
-        // than replacing it: replacing requires clear()+add() which creates a brief empty-
-        // list window where concurrent log calls could be dropped.  In verbose mode the
-        // DEBUG/INFO/WARN/ERROR messages will appear via both loggers, which is acceptable
-        // for this developer-only setting.
+        // so networkPreferences is available.  We replace element [0] in a single list
+        // operation (which is atomic for a single element set) rather than clear()+add(),
+        // which would create a brief empty-list window where concurrent log calls could
+        // be dropped, or add()-alongside, which would cause duplicate messages.
         try {
             if (networkPreferences.verboseLogging().getSync()) {
-                LogcatLogger.loggers += AndroidLogcatLogger(LogPriority.VERBOSE)
+                LogcatLogger.loggers[0] = AndroidLogcatLogger(LogPriority.VERBOSE)
             }
         } catch (e: Exception) {
             logcat(LogPriority.WARN, e) { "Failed to read verboseLogging; keeping default log priority" }

@@ -36,7 +36,7 @@ import logcat.LogPriority
  *   migrate to [Preference.changes] or collect the [StateFlow] from [Preference.stateIn].
  *
  * No SharedPreferences migration is performed: Ephyra uses a distinct application ID
- * (`app.Ephyra`) that no prior app version shared, so there is never a legacy
+ * (`app.ephyra`) that no prior app version shared, so there is never a legacy
  * SharedPreferences file to migrate from.  Users who want to carry forward data from
  * another app must use the backup-import flow.
  *
