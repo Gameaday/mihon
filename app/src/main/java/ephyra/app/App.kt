@@ -149,7 +149,10 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             }
             applicationContext.startActivity(intent)
-            // Give the activity intent time to be delivered before the process exits.
+            // Sleep briefly so the OS has time to deliver the activity intent before
+            // this process exits.  Without a delay, killProcess() can race the Binder
+            // IPC that carries the Intent to the system server.
+            Thread.sleep(200)
             android.os.Process.killProcess(android.os.Process.myPid())
             return
         }
