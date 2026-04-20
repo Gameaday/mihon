@@ -69,6 +69,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
@@ -276,7 +277,21 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
         // fresh install and run only isAlways migrations instead of the versioned ones.
         ProcessLifecycleOwner.get().lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val old = preference.get()
+                // Apply a bounded timeout so that a stuck or slow DataStore (e.g. locked
+                // storage, first-launch SharedPreferences migration) cannot keep initGate
+                // pending forever.  Without this, Migrator.awaitAndRelease() in MainActivity
+                // would wait for the full MIGRATION_TIMEOUT_MS (30 s) before the UI renders,
+                // leaving users on a blank screen.  If the read times out we default to 0
+                // (fresh-install path) which runs only Migration.ALWAYS migrations — the
+                // safest conservative fallback.
+                val old = withTimeoutOrNull(PREFERENCE_READ_TIMEOUT_MS) { preference.get() }
+                    ?: run {
+                        logcat(LogPriority.WARN) {
+                            "DataStore read timed out after ${PREFERENCE_READ_TIMEOUT_MS}ms; " +
+                                "treating as fresh install (old=0)"
+                        }
+                        0
+                    }
                 logcat { "Migration from $old to ${BuildConfig.VERSION_CODE}" }
                 StartupTracker.complete(StartupTracker.Phase.MIGRATOR_STARTED)
                 Migrator.initialize(
@@ -424,5 +439,13 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
 
     companion object {
         private const val ACTION_DISABLE_INCOGNITO_MODE = "tachi.action.DISABLE_INCOGNITO_MODE"
+
+        /**
+         * Maximum time to wait for the DataStore preference read in [initializeMigrator].
+         * A healthy device typically completes in < 500 ms; 5 s is generous while still
+         * preventing an indefinite hang that would leave the user on a blank screen for the
+         * full MIGRATION_TIMEOUT_MS (30 s) in MainActivity.
+         */
+        private const val PREFERENCE_READ_TIMEOUT_MS = 5_000L
     }
 }

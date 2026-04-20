@@ -85,4 +85,13 @@ object StartupTracker {
 
     /** Returns elapsed milliseconds since the tracker was first loaded (proxy for process start). */
     fun elapsedMs(): Long = System.currentTimeMillis() - processStartMs
+
+    /**
+     * Resets all phase state so the singleton can be exercised multiple times in a
+     * single test run.  Must only be called from test code.
+     */
+    internal fun resetForTest() {
+        _completedPhases.clear()
+        lastError = null
+    }
 }

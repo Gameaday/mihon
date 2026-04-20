@@ -306,7 +306,14 @@ class MainActivity : BaseActivity(), AppReadySignal {
                     ShowOnboarding()
                 }
 
-                var showChangelog by remember { mutableStateOf(didMigration == true && !BuildConfig.DEBUG) }
+                var showChangelog by remember { mutableStateOf(false) }
+                // `remember { mutableStateOf(didMigration == true …) }` would always
+                // initialise to false because the lambda only runs on first composition
+                // when didMigration is still null.  LaunchedEffect re-evaluates whenever
+                // didMigration changes, so the dialog correctly appears after an upgrade.
+                LaunchedEffect(didMigration) {
+                    if (didMigration == true && !BuildConfig.DEBUG) showChangelog = true
+                }
                 if (showChangelog) {
                     AlertDialog(
                         onDismissRequest = { showChangelog = false },
