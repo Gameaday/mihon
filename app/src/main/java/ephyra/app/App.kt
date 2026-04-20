@@ -128,7 +128,7 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
             try {
                 TelemetryConfig.init(applicationContext)
             } catch (e: Exception) {
-                logcat(LogPriority.WARN, e) { "Telemetry initialisation failed; telemetry will be inactive" }
+                logcat(LogPriority.WARN, e) { "Telemetry initialization failed; telemetry will be inactive" }
             }
         }
 
@@ -160,12 +160,12 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             }
             applicationContext.startActivity(intent)
-            // Sleep briefly so the OS has time to deliver the activity intent before
-            // this process exits.  Without a delay, killProcess() can race the Binder
-            // IPC that carries the Intent to the system server.
-            Thread.sleep(200)
-            android.os.Process.killProcess(android.os.Process.myPid())
-            return
+            // exitProcess() triggers JVM shutdown hooks before terminating, giving
+            // the runtime more opportunity to flush the pending Binder IPC that carries
+            // the StartupFailureActivity intent to the system server.  This is safer
+            // than the direct killProcess() + sleep pattern which relies on a fixed
+            // timing guess.
+            kotlin.system.exitProcess(1)
         }
         StartupTracker.complete(StartupTracker.Phase.KOIN_INITIALIZED)
 
