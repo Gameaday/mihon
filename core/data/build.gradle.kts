@@ -14,7 +14,7 @@ android {
         buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")
         buildConfigField("String", "BUILD_TIME", "\"${getBuildTime(useLastCommitTime = false)}\"")
-        buildConfigField("String", "APPLICATION_ID", "\"app.Ephyra\"")
+        buildConfigField("String", "APPLICATION_ID", "\"app.ephyra\"")
         buildConfigField("String", "VERSION_NAME", "\"0.20.0\"")
     }
 

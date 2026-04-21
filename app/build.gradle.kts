@@ -27,7 +27,7 @@ android {
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
-        applicationId = "app.Ephyra"
+        applicationId = "app.ephyra"
 
         versionCode = 20
         versionName = "0.20.0"

@@ -2,7 +2,6 @@ package ephyra.core.common.preference
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -35,26 +34,23 @@ import logcat.LogPriority
  * - Synchronous [Preference.get] reads from an eagerly-loaded snapshot that is
  *   kept permanently in sync. This is a **transitional bridge** — callers should
  *   migrate to [Preference.changes] or collect the [StateFlow] from [Preference.stateIn].
- * - Automatic one-time migration from SharedPreferences via [SharedPreferencesMigration].
+ *
+ * No SharedPreferences migration is performed: Ephyra uses a distinct application ID
+ * (`app.ephyra`) that no prior app version shared, so there is never a legacy
+ * SharedPreferences file to migrate from.  Users who want to carry forward data from
+ * another app must use the backup-import flow.
  *
  * @param context Application context.
  * @param name DataStore file name (without path/extension).
- * @param sharedPreferencesName Legacy SharedPreferences file to migrate from.
  */
 class DataStorePreferenceStore(
     private val context: Context,
     name: String = "ephyra_preferences",
-    sharedPreferencesName: String = "${context.packageName}_preferences",
 ) : PreferenceStore {
 
     private val storeScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-        name = name,
-        produceMigrations = { ctx ->
-            listOf(SharedPreferencesMigration(ctx, sharedPreferencesName))
-        },
-    )
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = name)
 
     private val dataStore: DataStore<Preferences> get() = context.dataStore
 

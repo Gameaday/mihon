@@ -69,6 +69,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
@@ -108,6 +109,17 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
     override fun onCreate() {
         super<Application>.onCreate()
         StartupTracker.complete(StartupTracker.Phase.APP_CREATED)
+
+        // Install the logger as early as possible so every subsequent logcat() call —
+        // including those inside startKoin(), StartupTracker, and any catch blocks — is
+        // captured rather than silently dropped.  Without this, the entire window from
+        // APP_CREATED through KOIN_INITIALIZED is a "log blackout", making cold-start and
+        // boot-failure diagnosis blind.  We pick the right minimum priority immediately
+        // (no Koin needed) and upgrade to VERBOSE after Koin if the user opted in.
+        if (!LogcatLogger.isInstalled) {
+            LogcatLogger.install()
+            LogcatLogger.loggers += AndroidLogcatLogger(if (BuildConfig.DEBUG) LogPriority.DEBUG else LogPriority.INFO)
+        }
 
         // Install the crash handler first so any subsequent failure in onCreate is
         // captured and surfaced via CrashActivity instead of dying silently.
@@ -249,20 +261,18 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
         // Updates widget update
         WidgetManager(get(), get()).apply { init(scope) }
 
-        if (!LogcatLogger.isInstalled) {
-            val minLogPriority = try {
-                when {
-                    networkPreferences.verboseLogging().getSync() -> LogPriority.VERBOSE
-                    BuildConfig.DEBUG -> LogPriority.DEBUG
-                    else -> LogPriority.INFO
-                }
-            } catch (e: Exception) {
-                // Preference snapshot unavailable; choose a safe default.
-                logcat(LogPriority.WARN, e) { "Failed to read verboseLogging; defaulting log priority" }
-                if (BuildConfig.DEBUG) LogPriority.DEBUG else LogPriority.INFO
+        // LogcatLogger was installed at the top of onCreate() with a base priority.
+        // Upgrade to VERBOSE now if the user has enabled verbose logging — Koin is ready
+        // so networkPreferences is available.  We replace element [0] in a single list
+        // operation (which is atomic for a single element set) rather than clear()+add(),
+        // which would create a brief empty-list window where concurrent log calls could
+        // be dropped, or add()-alongside, which would cause duplicate messages.
+        try {
+            if (networkPreferences.verboseLogging().getSync()) {
+                LogcatLogger.loggers[0] = AndroidLogcatLogger(LogPriority.VERBOSE)
             }
-            LogcatLogger.install()
-            LogcatLogger.loggers += AndroidLogcatLogger(minLogPriority)
+        } catch (e: Exception) {
+            logcat(LogPriority.WARN, e) { "Failed to read verboseLogging; keeping default log priority" }
         }
 
         initializeMigrator()
@@ -276,7 +286,21 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
         // fresh install and run only isAlways migrations instead of the versioned ones.
         ProcessLifecycleOwner.get().lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val old = preference.get()
+                // Apply a bounded timeout so that a stuck or slow DataStore (e.g. locked
+                // storage) cannot keep initGate pending forever.  Without this,
+                // Migrator.awaitAndRelease() in MainActivity would wait for the full
+                // MIGRATION_TIMEOUT_MS (30 s) before the UI renders, leaving users on a
+                // blank screen.  If the read times out we default to 0 (fresh-install path)
+                // which runs only Migration.ALWAYS migrations — the safest conservative
+                // fallback.
+                val old = withTimeoutOrNull(PREFERENCE_READ_TIMEOUT_MS) { preference.get() }
+                    ?: run {
+                        logcat(LogPriority.WARN) {
+                            "DataStore read timed out after ${PREFERENCE_READ_TIMEOUT_MS}ms; " +
+                                "treating as fresh install (old=0)"
+                        }
+                        0
+                    }
                 logcat { "Migration from $old to ${BuildConfig.VERSION_CODE}" }
                 StartupTracker.complete(StartupTracker.Phase.MIGRATOR_STARTED)
                 Migrator.initialize(
@@ -423,6 +447,14 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
     }
 
     companion object {
-        private const val ACTION_DISABLE_INCOGNITO_MODE = "tachi.action.DISABLE_INCOGNITO_MODE"
+        private val ACTION_DISABLE_INCOGNITO_MODE = "${BuildConfig.APPLICATION_ID}.DISABLE_INCOGNITO_MODE"
+
+        /**
+         * Maximum time to wait for the DataStore preference read in [initializeMigrator].
+         * A healthy device typically completes in < 500 ms; 5 s is generous while still
+         * preventing an indefinite hang that would leave the user on a blank screen for the
+         * full MIGRATION_TIMEOUT_MS (30 s) in MainActivity.
+         */
+        private const val PREFERENCE_READ_TIMEOUT_MS = 5_000L
     }
 }

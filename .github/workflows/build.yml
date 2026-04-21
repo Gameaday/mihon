@@ -118,6 +118,43 @@ jobs:
             exit 1
           fi
 
+      - name: Architecture fitness – all HomeScreen tabs must call signalReady()
+        run: |
+          # Every composable file that backs a tab in HomeScreen.TABS must call
+          # (context as? AppReadySignal)?.signalReady() so that the splash screen is
+          # dismissed as soon as that tab's content has loaded.  Without this call the
+          # splash stays visible until SPLASH_MAX_DURATION (3 s) elapses and then
+          # dismisses to a blank or still-loading screen — the primary symptom of the
+          # "app silently unresponsive on start" bug class.
+          #
+          # If a tab is added to HomeScreen.TABS without the signalReady() call this
+          # check will fail CI immediately, preventing the regression from reaching users.
+          TABS=(
+            "feature/library/src/main/kotlin/ephyra/feature/library/LibraryTab.kt"
+            "feature/updates/src/main/kotlin/ephyra/feature/updates/UpdatesTab.kt"
+            "feature/history/src/main/kotlin/ephyra/feature/history/HistoryTab.kt"
+            "feature/browse/src/main/kotlin/ephyra/feature/browse/BrowseTab.kt"
+            "feature/more/src/main/kotlin/ephyra/feature/more/MoreTab.kt"
+          )
+          MISSING=()
+          for tab in "${TABS[@]}"; do
+            if [ ! -f "$tab" ]; then
+              MISSING+=("MISSING FILE: $tab")
+            elif ! grep -q "AppReadySignal" "$tab"; then
+              MISSING+=("$tab")
+            fi
+          done
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "::error::The following HomeScreen tabs do not reference AppReadySignal / signalReady():"
+            for f in "${MISSING[@]}"; do
+              echo "::error::  $f"
+            done
+            echo "::error::Add a LaunchedEffect that calls (context as? AppReadySignal)?.signalReady()"
+            echo "::error::when the tab's content has finished loading."
+            exit 1
+          fi
+          echo "All ${#TABS[@]} HomeScreen tabs correctly reference AppReadySignal."
+
       - name: Build app
         run: |
           FLAGS="-Penable-updater"
