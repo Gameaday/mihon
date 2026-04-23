@@ -19,7 +19,7 @@ materialKolor = "5.0.0-alpha07"
 # Koin 4.2.0 Ecosystem (Native Plugin path)
 koin = "4.2.1"
 koin_annotations = "4.2.1"
-koin_compiler_plugin = "0.6.2"
+koin_compiler_plugin = "1.0.0-RC1"
 
 # Compiler Tools
 ksp = "2.3.6"

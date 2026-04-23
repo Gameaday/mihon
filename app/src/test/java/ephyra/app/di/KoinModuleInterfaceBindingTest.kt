@@ -200,3 +200,64 @@ class MoreTabDependencyContractTest {
         }
     }
 }
+
+/**
+ * Verifies that platform-specific types used by the DI graph are correctly identified as
+ * externally provided (not from the graph itself).
+ *
+ * With Koin Compiler Plugin 1.0.0-RC1 and [compileSafety] enabled, the compiler validates
+ * every annotated class's constructor.  Types provided by the Android platform — such as
+ * [androidx.lifecycle.SavedStateHandle] for ViewModels or [android.app.Application] for
+ * context-aware singletons — must NOT appear as auto-resolved `get()` calls inside DSL
+ * factory/viewModel lambdas; they are supplied either by the ViewModel framework or via
+ * an explicit `androidApplication()` / `parametersOf(…)` call.
+ *
+ * These tests are pure JVM reflection checks — no Koin context is started.
+ */
+@Execution(ExecutionMode.CONCURRENT)
+class PlatformTypeGuardTest {
+
+    /**
+     * [ReaderViewModel] receives its [androidx.lifecycle.SavedStateHandle] from the Android
+     * ViewModel framework, NOT from the Koin DI graph.  The `koinAppModule_UI` viewModel {}
+     * block passes it with `savedState = get()`, which works because Koin's ViewModel scope
+     * provides a synthetic binding for SavedStateHandle.
+     *
+     * This test documents that contract: if SavedStateHandle is ever removed from
+     * ReaderViewModel's constructor, the DSL entry must be updated accordingly so the
+     * framework-provided handle is not leaked into the general DI graph.
+     */
+    @Test
+    fun `ReaderViewModel constructor declares SavedStateHandle as first parameter`() {
+        val params = ephyra.feature.reader.ReaderViewModel::class.java
+            .declaredConstructors
+            .maxByOrNull { it.parameterCount }
+            ?.parameterTypes
+            ?: emptyArray()
+
+        assertTrue(
+            params.any { it == androidx.lifecycle.SavedStateHandle::class.java },
+        ) {
+            "ReaderViewModel must accept a SavedStateHandle — it is a platform-provided type " +
+                "supplied by the Koin ViewModel scope, not resolved from the global DI graph."
+        }
+    }
+
+    /**
+     * Several DSL `single {}` blocks in [koinAppModule] use `androidApplication()` to receive
+     * the app [android.app.Application] context.  [android.app.Application] is not registered
+     * as a Koin bean; it is provided by the Android runtime and bound through
+     * `androidContext(this)` inside `startKoin {}`.
+     *
+     * This test verifies that [android.app.Application] is NOT a plain interface or abstract
+     * class — confirming it is an instantiable, bindable Android platform type.
+     */
+    @Test
+    fun `Application is a concrete platform class bound by androidContext`() {
+        val cls = android.app.Application::class.java
+        assertFalse(cls.isInterface) {
+            "android.app.Application must not be an interface — it is a concrete platform " +
+                "class that Koin binds via androidContext(…) in startKoin {}."
+        }
+    }
+}

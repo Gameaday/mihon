@@ -48,3 +48,8 @@ dependencies {
 
     testImplementation(libs.bundles.test)
 }
+
+koinCompiler {
+    compileSafety.set(true)
+    unsafeDslChecks.set(true)
+}
