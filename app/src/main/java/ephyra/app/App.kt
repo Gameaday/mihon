@@ -29,7 +29,6 @@ import ephyra.app.R
 import ephyra.app.crash.CrashActivity
 import ephyra.app.crash.GlobalExceptionHandler
 import ephyra.app.crash.StartupFailureActivity
-import ephyra.app.di.AppAnnotatedModule
 import ephyra.app.di.koinAppModule
 import ephyra.app.di.koinAppModule_UI
 import ephyra.app.di.koinPreferenceModule
@@ -156,7 +155,7 @@ class App : Application(), Configuration.Provider, DefaultLifecycleObserver, Sin
                 // koinPreferenceModule is placed before koinDomainModule so that all
                 // preference bindings are registered before any domain single{} block
                 // could (in future) reference them during construction.
-                modules(koinAppModule, koinPreferenceModule, koinDomainModule, koinAppModule_UI, AppAnnotatedModule().module)
+                modules(koinAppModule, koinPreferenceModule, koinDomainModule, koinAppModule_UI)
             }
         } catch (e: Exception) {
             // startKoin() threw before Koin was fully initialised.  GlobalExceptionHandler
