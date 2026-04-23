@@ -132,8 +132,6 @@ val koinAppModule = module {
     }
 
     single<ProtoBuf> { ProtoBuf }
-    single { ExtensionLoader(get(), get()) }
-    single { ExtensionInstaller(androidContext(), get(), get(), get()) }
 
     single { CrashLogUtil(androidContext(), get()) }
     single { ChapterCache(androidApplication(), get()) } bind IChapterCache::class
@@ -149,7 +147,6 @@ val koinAppModule = module {
     single { MangaCoverFetcher.MangaFactory(lazy { get<NetworkHelper>().client }, get(), get()) }
 
     single { JavaScriptEngine(androidApplication()) }
-    single { ExtensionApi(get(), get(), get(), get(), get(), get(), get()) }
 
     single { DownloadStore(androidApplication(), get(), get(), get(), get()) }
     single { DownloadProvider(androidApplication(), get(), get()) }

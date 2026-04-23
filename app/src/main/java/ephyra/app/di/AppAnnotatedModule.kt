@@ -1,6 +1,7 @@
 package ephyra.app.di
 
 import android.app.Application
+import android.content.Context
 import ephyra.app.data.scheduler.WorkSchedulerImpl
 import ephyra.app.data.updater.AppUpdateDownloaderImpl
 import ephyra.app.extension.ExtensionManager
@@ -24,6 +25,8 @@ import ephyra.domain.category.interactor.GetCategories
 import ephyra.domain.chapter.interactor.GetChapter
 import ephyra.domain.download.service.DownloadPreferences
 import ephyra.domain.extension.interactor.TrustExtension
+import ephyra.domain.extensionrepo.interactor.GetExtensionRepo
+import ephyra.domain.extensionrepo.interactor.UpdateExtensionRepo
 import ephyra.domain.library.service.LibraryPreferences
 import ephyra.domain.library.service.LibraryUpdateScheduler
 import ephyra.domain.library.service.MetadataUpdateScheduler
@@ -173,10 +176,40 @@ class AppAnnotatedModule {
         sourceManager, downloadPreferences, libraryPreferences, downloader, pendingDeleter,
     )
 
+    // ── Extension infrastructure (internal types — not consumed cross-module) ──
+
+    @Single
+    internal fun extensionLoader(
+        preferences: SourcePreferences,
+        trustExtension: TrustExtension,
+    ): ExtensionLoader = ExtensionLoader(preferences, trustExtension)
+
+    @Single
+    internal fun extensionInstaller(
+        context: Context,
+        basePreferences: BasePreferences,
+        networkHelper: NetworkHelper,
+        extensionLoader: ExtensionLoader,
+    ): ExtensionInstaller = ExtensionInstaller(context, basePreferences, networkHelper, extensionLoader)
+
+    @Single
+    internal fun extensionApi(
+        networkHelper: NetworkHelper,
+        preferenceStore: PreferenceStore,
+        getExtensionRepo: GetExtensionRepo,
+        updateExtensionRepo: UpdateExtensionRepo,
+        securityPreferences: SecurityPreferences,
+        extensionLoader: ExtensionLoader,
+        json: Json,
+    ): ExtensionApi = ExtensionApi(
+        networkHelper, preferenceStore, getExtensionRepo, updateExtensionRepo,
+        securityPreferences, extensionLoader, json,
+    )
+
     // ── Extension manager ─────────────────────────────────────────────────────
 
     @Single
-    fun extensionManagerImpl(
+    internal fun extensionManagerImpl(
         app: Application,
         preferences: SourcePreferences,
         trustExtension: TrustExtension,
@@ -189,12 +222,12 @@ class AppAnnotatedModule {
     )
 
     @Single
-    fun extensionManagerInterface(impl: ExtensionManager): IExtensionManager = impl
+    internal fun extensionManagerInterface(impl: ExtensionManager): IExtensionManager = impl
 
     // ── Source manager ────────────────────────────────────────────────────────
 
     @Single
-    fun sourceManager(
+    internal fun sourceManager(
         app: Application,
         extensionManager: ExtensionManager,
         sourceRepository: StubSourceRepository,
