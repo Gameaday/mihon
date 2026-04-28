@@ -127,7 +127,7 @@ agp = { id = "com.android.application", version.ref = "agp" }
 agp-library = { id = "com.android.library", version.ref = "agp" }
 agp-multiplatform = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 agp-test = { id = "com.android.test", version.ref = "agp" }
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version = "2.3.20" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version = "2.3.21" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.4" }
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlib_version" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
