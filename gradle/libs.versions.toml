@@ -22,7 +22,7 @@ koin_annotations = "4.2.1"
 koin_compiler_plugin = "0.6.2"
 
 # Compiler Tools
-ksp = "2.3.6"
+ksp = "2.3.7"
 room = "2.8.4"
 paging = "3.4.2"
 
