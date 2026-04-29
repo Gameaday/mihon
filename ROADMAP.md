@@ -57,12 +57,15 @@ The following foundational work has been completed and merged:
    that every developer must read before contributing. This document supersedes any informal
    conventions previously used in the codebase.
 2. **[Architecture Principles](doc/ARCHITECTURE.md)**: Technical details of the design patterns
-   and architectural rules governing the modernized state of Ephyra (Koin, Room, UDF, Domain
+   and architectural rules governing the modernized state of Ephyra (Hilt, Room, UDF, Domain
    Interactors).
 3. **[Migration Plan](doc/MIGRATION_PLAN.md)**: A structured roadmap outlining the phased
    transition. Use this document to track progress and identify the current active phase of
    modernization.
-4. **[Validation Criteria (Definition of Done)](doc/VALIDATION_CRITERIA.md)**: Establishing the
+4. **[Compile-Time Safety Plan](doc/COMPILE_SAFETY_PLAN.md)**: Detailed plan for migrating
+   from Koin (runtime DI) to Hilt (compile-time DI) and completing the Room/SQLDelight
+   consolidation.  This is the **active priority for Phase 10**.
+5. **[Validation Criteria (Definition of Done)](doc/VALIDATION_CRITERIA.md)**: Establishing the
    testable metrics for when a modernization phase or architectural pattern is considered completely
    migrated.
 
@@ -70,14 +73,13 @@ The following foundational work has been completed and merged:
 
 The following phases are the active next priorities. See `doc/MIGRATION_PLAN.md` for details.
 
+- **Phase 10 (ACTIVE)** — Compile-Time Safety: Replace Koin with Hilt (compile-time DI
+  graph validation), retire SQLDelight, and add CI enforcement gates.  A green build must
+  equal a running app — no more runtime `NoBeanDefFoundException` crashes.
+  See [`doc/COMPILE_SAFETY_PLAN.md`](doc/COMPILE_SAFETY_PLAN.md) for the full phased plan.
 - **Phase 4** — Business Logic Isolation: Break down "God Object" repositories into single-purpose
   Domain Interactors.
-- **Phase 5** — UI Architecture Stabilization: Enforce strict Unidirectional Data Flow in all
-  `ScreenModel`s.
-- **Phase 6** — Database Engine: Migrate from SQLDelight to Room.
-- **Koin Graph Safety**: Once a future Koin Annotations release includes `@ExternalDefinitions`,
-  replace the current `compileSafety.set(false)` approach with explicit external definition
-  annotations per feature module.
+- **Phase 6** — Database Engine: Complete SQLDelight retirement (tracked in Phase 10-G).
 
 ---
 

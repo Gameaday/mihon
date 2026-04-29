@@ -287,3 +287,25 @@ The following `GlobalContext` usages remain and are intentionally out of scope f
    `Migration` objects before any production schema change.
 2. **SQLDelight backup retirement** — backup restorer/creator classes still depend on
    `DatabaseHandler`.  Requires domain interactor coverage first.
+
+---
+
+## Phase 10: Compile-Time Safety (Koin → Hilt + Room/SQLDelight consolidation)
+
+Replace all runtime-validated dependency injection and database infrastructure with
+compile-time verified equivalents.  The root cause of post-build runtime crashes is that
+Koin 4.2.1 is configured with `compileSafety.set(false)` — missing or misconfigured
+bindings only surface as `NoBeanDefFoundException` crashes at runtime.
+
+**Full details, task checklist, and session tracking are in
+[`doc/COMPILE_SAFETY_PLAN.md`](COMPILE_SAFETY_PLAN.md).**
+
+Summary of sub-phases:
+- [ ] **Phase A** — Hilt bootstrap (`@HiltAndroidApp`, dual-boot period)
+- [ ] **Phase B** — Core / data / domain Hilt modules
+- [ ] **Phase C** — Network, preferences, app services Hilt modules
+- [ ] **Phase D** — Workers (`@HiltWorker` / `HiltWorkerFactory`)
+- [ ] **Phase E** — Feature module ScreenModels + Voyager-Hilt
+- [ ] **Phase F** — Koin removal, `Injekt` shim re-backed to static registry
+- [ ] **Phase G** — Room schema export, SQLDelight retirement, versioned migrations
+- [ ] **Phase H** — CI enforcement gates (no-Koin, schema-export, no-fallback checks)
